@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第0讲：2026赛季抢跑计划 - 安徽三联学院专属版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Oswald:wght@500&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            font-size: 18px;
+        }
+        .title-font {
+            font-family: 'Oswald', sans-serif;
+        }
+        /* 2026 抢跑主题色：极光绿搭配深蓝 */
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .score-badge {
+            background-color: #ecfccb;
+            color: #3f6212;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+        .highlight-box {
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Hero Section -->
+    <header class="gradient-bg text-white py-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 opacity-5 text-[20rem] font-bold pointer-events-none select-none text-white leading-none">
+            2026
+        </div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl">
+                <div class="flex items-center gap-3 mb-6 flex-wrap">
+                    <span class="bg-green-500 text-gray-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">2026赛季早鸟集训</span>
+                    <span class="bg-white text-blue-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">三联院能字〔2025〕2号</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                    别人还在等明年通知，<br>
+                    <span class="text-green-400">我们现在开始“抢跑”</span>
+                </h1>
+                <p class="text-xl text-blue-200 font-light mb-8 max-w-2xl">
+                    深度复盘 <strong>2025年赛项规程</strong>，精准锁定 2026 拿分点。<br>
+                    提前半年备战，预定下学期期末免考资格。
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#exam-analysis" class="bg-green-500 text-blue-900 font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-green-400 transition-colors">
+                        <i class="fas fa-microscope mr-2"></i> 2025真题拆解
+                    </a>
+                    <a href="#rewards" class="bg-white bg-opacity-10 text-white font-bold py-3 px-8 rounded-lg border border-blue-400 hover:bg-white hover:bg-opacity-20 transition-colors">
+                        <i class="fas fa-gift mr-2"></i> 学校奖励政策
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12 space-y-20">
+
+        <!-- Section 1: Exam Analysis (Updated based on 2025 PDF) -->
+        <section id="exam-analysis">
+            <div class="flex items-center mb-10">
+                <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center text-white mr-4 shadow-lg">
+                    <i class="fas fa-tasks text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900">1. 考什么？(依据2025规程深度拆解)</h2>
+                    <p class="text-sm text-gray-500 mt-1">技能赛道：<strong>龙架构容器云技术与应用</strong> | 满分 100 分</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+                <div class="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                    
+                    <!-- Module 1 -->
+                    <div class="p-6 hover:bg-purple-50 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-purple-600 font-bold text-lg">模块一</div>
+                            <span class="score-badge">20 分</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">应用场景设计</h3>
+                        <p class="text-xs text-gray-500 mb-3"><i class="fas fa-pen-fancy mr-1"></i> 文档题</p>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                            <li><strong>集群设计方案：</strong> 10分。画拓扑图，写设计思路。</li>
+                            <li><strong>测试方案与结果：</strong> 10分。截图证明你的集群能跑。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Module 2 -->
+                    <div class="p-6 hover:bg-purple-50 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-purple-600 font-bold text-lg">模块二</div>
+                            <span class="score-badge">20 分</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">K8s 集群搭建</h3>
+                        <p class="text-xs text-gray-500 mb-3"><i class="fas fa-server mr-1"></i> 基础环境题</p>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                            <li><strong>Master 初始化：</strong> 5分。使用 <code>kubeadm</code> 命令。</li>
+                            <li><strong>配置私有仓库：</strong> 5分。</li>
+                            <li><strong>Node 节点加入：</strong> 10分。至少添加2个Node节点。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Module 3 -->
+                    <div class="p-6 hover:bg-purple-50 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-purple-600 font-bold text-lg">模块三</div>
+                            <span class="score-badge">30 分</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">应用部署</h3>
+                        <p class="text-xs text-gray-500 mb-3"><i class="fas fa-cubes mr-1"></i> 核心操作题</p>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                            <li><strong>Namespace：</strong> 为应用创建独立命名空间。</li>
+                            <li><strong>Pod 运行：</strong> 15分。确保应用（如Web服务）跑起来。</li>
+                            <li><strong>NodePort 映射：</strong> 15分。让集群外能访问网页。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Module 4 -->
+                    <div class="p-6 hover:bg-purple-50 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-purple-600 font-bold text-lg">模块四</div>
+                            <span class="score-badge">30 分</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">弹性伸缩</h3>
+                        <p class="text-xs text-gray-500 mb-3"><i class="fas fa-expand-arrows-alt mr-1"></i> 进阶题</p>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                            <li><strong>动态扩容：</strong> 15分。将副本数扩容到 3 个。</li>
+                            <li><strong>动态缩容：</strong> 15分。将副本数缩容到 2 个。</li>
+                            <li><strong>负载均衡：</strong> 验证流量分发。</li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="bg-purple-100 p-4 text-center text-purple-800 text-sm font-medium">
+                    <i class="fas fa-lightbulb mr-1"></i> 结论：只要熟练掌握 <code>kubeadm</code>, <code>kubectl apply</code>, <code>kubectl scale</code> 三大命令，80分就到手了！
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Why This Track? (Strategic Analysis) -->
+        <section id="strategy">
+            <div class="flex items-center mb-10">
+                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white mr-4 shadow-lg">
+                    <i class="fas fa-chess-queen text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900">2. 2025赛道横向对比：为什么选它？</h2>
+                    <p class="text-sm text-gray-500 mt-1">避开红海，选择“性价比”之王</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Track 1 -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 opacity-60 hover:opacity-100 transition-opacity">
+                    <div class="text-xs font-bold text-gray-400 uppercase mb-2">技能赛主题一</div>
+                    <h4 class="font-bold text-gray-800 mb-2">大数据应用</h4>
+                    <p class="text-xs text-gray-500">清洗、分析、可视化、建模。</p>
+                    <div class="mt-4 text-red-500 text-xs font-bold">🚫 劝退理由：数学建模大神扎堆，竞争极度激烈。</div>
+                </div>
+
+                <!-- Track 2 -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 opacity-60 hover:opacity-100 transition-opacity">
+                    <div class="text-xs font-bold text-gray-400 uppercase mb-2">技能赛主题二</div>
+                    <h4 class="font-bold text-gray-800 mb-2">区块链技术应用</h4>
+                    <p class="text-xs text-gray-500">智能合约、共识算法、密码学。</p>
+                    <div class="mt-4 text-red-500 text-xs font-bold">🚫 劝退理由：概念晦涩难懂，对编程功底要求极高。</div>
+                </div>
+
+                <!-- Track 3 (Target) -->
+                <div class="bg-white p-6 rounded-2xl border-2 border-green-500 shadow-lg transform md:-translate-y-2">
+                    <div class="text-xs font-bold text-green-600 uppercase mb-2">技能赛主题三 (目标)</div>
+                    <h4 class="font-bold text-gray-800 mb-2">龙架构容器云</h4>
+                    <p class="text-xs text-gray-500">Docker, K8s, 集群运维。</p>
+                    <div class="mt-4 text-green-600 text-xs font-bold">✅ 推荐理由：操作有固定套路，不需要高深算法，也是就业刚需技能。</div>
+                </div>
+
+                <!-- Track 4 -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 opacity-60 hover:opacity-100 transition-opacity">
+                    <div class="text-xs font-bold text-gray-400 uppercase mb-2">技能赛主题四</div>
+                    <h4 class="font-bold text-gray-800 mb-2">网络漏洞挖掘</h4>
+                    <p class="text-xs text-gray-500">CTF模式，Web安全，逆向。</p>
+                    <div class="mt-4 text-red-500 text-xs font-bold">🚫 劝退理由：需要常年CTF实战积累，小白很难速成。</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 3: School Policy & Timeline -->
+        <section id="rewards">
+            <div class="grid md:grid-cols-2 gap-10">
+                
+                <!-- Left: Timeline -->
+                <div>
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white mr-3">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900">2026 预测时间轴</h3>
+                    </div>
+                    <div class="relative border-l-4 border-blue-200 ml-5 space-y-8">
+                        <div class="relative pl-8">
+                            <span class="absolute -left-2.5 top-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+                            <h4 class="font-bold text-gray-800">现在 - 1月</h4>
+                            <p class="text-sm text-green-600 font-bold">早鸟集训期</p>
+                            <p class="text-xs text-gray-500 mt-1">完成 Docker/K8s 基础环境搭建。对手还在玩游戏，你已经配好了集群。</p>
+                        </div>
+                        <div class="relative pl-8">
+                            <span class="absolute -left-2.5 top-1 w-4 h-4 bg-gray-300 rounded-full border-2 border-white"></span>
+                            <h4 class="font-bold text-gray-800">3月下旬 - 4月初</h4>
+                            <p class="text-sm text-gray-600">报名 & 校赛</p>
+                            <p class="text-xs text-gray-500 mt-1">参考2025年是3月21日开始报名。组队（3人/队），提交报名表。</p>
+                        </div>
+                        <div class="relative pl-8">
+                            <span class="absolute -left-2.5 top-1 w-4 h-4 bg-gray-300 rounded-full border-2 border-white"></span>
+                            <h4 class="font-bold text-gray-800">4月20日左右</h4>
+                            <p class="text-sm text-gray-600">初赛选拔</p>
+                            <p class="text-xs text-gray-500 mt-1">线上答题或操作，筛选出省赛名额。</p>
+                        </div>
+                        <div class="relative pl-8">
+                            <span class="absolute -left-2.5 top-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                            <h4 class="font-bold text-gray-800">5月中旬 (16-17日)</h4>
+                            <p class="text-sm text-red-600 font-bold">省级决赛</p>
+                            <p class="text-xs text-gray-500 mt-1">现场实操。地点待定（2025在黄山，2026大概率仍是省内风景优美的高校）。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Rewards -->
+                <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white mr-3">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900">三联专属红利</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-6">依据《三联院能字〔2025〕2号》文件，本赛事为 <strong>省级B类</strong>。</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center">
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-gray-800">期末成绩“复活甲”</div>
+                                <div class="text-xs text-gray-500 mt-1">获奖 = 相关课程免考 (认定为优秀/良好) 或平时分+20分。</div>
+                            </div>
+                            <div class="text-2xl text-yellow-500"><i class="fas fa-graduation-cap"></i></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center">
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-gray-800">团队现金奖励</div>
+                                <div class="text-xs text-gray-500 mt-1">一等奖1000元，二等奖800元，三等奖500元。</div>
+                            </div>
+                            <div class="text-2xl text-red-500"><i class="fas fa-yen-sign"></i></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center">
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-gray-800">公费外出比赛</div>
+                                <div class="text-xs text-gray-500 mt-1">学校提供差旅支持 + 每天50元生活补助。</div>
+                            </div>
+                            <div class="text-2xl text-blue-500"><i class="fas fa-bus-alt"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="text-center py-12">
+            <p class="text-gray-600 mb-6 text-lg font-medium">不要等到2026年文件下发再后悔没准备</p>
+            <button class="bg-gradient-to-r from-green-600 to-green-800 text-white font-bold py-4 px-12 rounded-full shadow-xl hover:scale-105 transition-transform duration-200 text-lg">
+                <i class="fas fa-rocket mr-2"></i> 立即开始第一讲：环境配置
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-8 mt-auto border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center text-sm">
+            <p>2026 赛季 安徽省大学生网络与分布式系统创新设计大赛 - 三联学院赛前集训营</p>
+            <p class="mt-2 text-xs opacity-50">政策依据：三联院能字〔2025〕2号 | 赛题依据：2025年赛项规程</p>
+        </div>
+    </footer>
+
+</body>
+</html>
