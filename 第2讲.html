@@ -1,0 +1,1514 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 竞赛培训 - 第二讲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+        }
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            border-right: 3px solid #2563eb;
+        }
+        .terminal-window {
+            background-color: #1e1e1e;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .terminal-header {
+            background-color: #2d2d2d;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .terminal-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white shadow-lg shrink-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-xl font-bold">2</div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Docker 零基础特训营</h1>
+                    <p class="text-xs text-slate-400">第二讲：玩转容器网络与修改网页</p>
+                </div>
+            </div>
+            <div class="hidden md:block text-sm opacity-80">
+                <span class="bg-green-600 text-white px-2 py-1 rounded text-xs mr-2">实战篇</span>
+                目标：修改并发布一个网页
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
+            <div class="p-6">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">本节挑战</h3>
+                <nav class="space-y-1">
+                    <a href="#docker-commands" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group active">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-book"></i></span> 1. 命令速查手册
+                    </a>
+                    <a href="#warmup" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-coffee"></i></span> 2. 课前热身
+                    </a>
+                    <a href="#concept-web" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-network-wired"></i></span> 3. 什么是 Web 服务？
+                    </a>
+                    <a href="#nginx-run" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-play"></i></span> 4. 启动 Nginx
+                    </a>
+                    <a href="#port-mapping" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-exchange-alt"></i></span> 5. 核心：端口映射
+                    </a>
+                    <a href="#hack-container" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-user-secret"></i></span> 6. 潜入容器改网页
+                    </a>
+                    <a href="#lifecycle" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-trash-alt"></i></span> 7. 打扫战场
+                    </a>
+                    <a href="#final-challenge" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-rocket"></i></span> 8. 完整实战
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth" id="main-content">
+            <div class="max-w-4xl mx-auto space-y-12 pb-20">
+
+                <!-- Section 1: Docker Commands Reference -->
+                <section id="docker-commands" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">1. Docker 常用命令速查手册</h2>
+                        <p class="mt-2 text-gray-600">这是专门为练习准备的命令参考手册。掌握这些核心命令，你就能在竞赛中游刃有余。每个命令都附带预期输出，方便对照练习。</p>
+                    </div>
+
+                    <!-- 基础信息命令 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-100 bg-blue-50">
+                            <h3 class="text-lg font-semibold text-blue-900 mb-2"><i class="fas fa-info-circle mr-2"></i> 基础信息命令</h3>
+                            <p class="text-sm text-blue-800">查看 Docker 版本和系统信息</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- docker version -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker version</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">查看 Docker 客户端和服务端的版本信息</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="text-gray-500"># 命令</div>
+                                        $ docker version<br><br>
+                                        <div class="text-gray-500"># 预期输出</div>
+                                        <span class="text-white">Client: Docker Engine - Community<br>
+                                        &nbsp;&nbsp;Version: 24.0.6<br>
+                                        &nbsp;&nbsp;API version: 1.43<br>
+                                        &nbsp;&nbsp;Go version: go1.20.7<br>
+                                        &nbsp;&nbsp;OS/Arch: linux/amd64<br><br>
+                                        Server: Docker Engine - Community<br>
+                                        &nbsp;&nbsp;Version: 24.0.6<br>
+                                        &nbsp;&nbsp;API version: 1.43</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker info -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker info</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">查看 Docker 系统详细信息，包括容器、镜像、网络等统计</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="text-gray-500"># 命令</div>
+                                        $ docker info<br><br>
+                                        <div class="text-gray-500"># 预期输出（部分）</div>
+                                        <span class="text-white">Containers: 2<br>
+                                        &nbsp;&nbsp;Running: 1<br>
+                                        &nbsp;&nbsp;Paused: 0<br>
+                                        &nbsp;&nbsp;Stopped: 1<br>
+                                        Images: 15<br>
+                                        Server Version: 24.0.6</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 镜像管理命令 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-100 bg-green-50">
+                            <h3 class="text-lg font-semibold text-green-900 mb-2"><i class="fas fa-compact-disc mr-2"></i> 镜像管理命令</h3>
+                            <p class="text-sm text-green-800">下载、查看、删除镜像</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- docker pull -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker pull [镜像名:标签]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">从 Docker Hub 下载镜像</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker pull ubuntu:20.04</span>
+                                            <button onclick="copyCode('docker pull ubuntu:20.04')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-gray-500 mt-2">20.04: Pulling from library/ubuntu</p>
+                                        <p class="text-white opacity-50">Status: Downloaded newer image for ubuntu:20.04</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker images -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker images</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">列出本地所有镜像</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker images</span>
+                                            <button onclick="copyCode('docker images')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">REPOSITORY    TAG       IMAGE ID       CREATED        SIZE<br>
+                                        ubuntu        20.04     1234567890ab   2 weeks ago    72.8MB<br>
+                                        nginx         latest    fedcba654321   1 week ago     133MB</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker rmi -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker rmi [镜像ID或名称]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">删除本地镜像</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker rmi hello-world</span>
+                                            <button onclick="copyCode('docker rmi hello-world')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">Untagged: hello-world:latest<br>Deleted: sha256:abcdef1234567890...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 容器管理命令 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-100 bg-purple-50">
+                            <h3 class="text-lg font-semibold text-purple-900 mb-2"><i class="fas fa-box-open mr-2"></i> 容器管理命令</h3>
+                            <p class="text-sm text-purple-800">创建、运行、停止容器</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- docker run -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker run [选项] 镜像名 [命令]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">创建并运行容器（最核心的命令）</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="text-gray-500"># 后台运行 Nginx</div>
+                                        <div class="flex justify-between group">
+                                            <span>$ docker run -d -p 8080:80 --name my-nginx nginx</span>
+                                            <button onclick="copyCode('docker run -d -p 8080:80 --name my-nginx nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">abcdef1234567890... (容器ID)</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker ps -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker ps</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">查看运行中的容器（加 -a 查看所有容器）</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker ps -a</span>
+                                            <button onclick="copyCode('docker ps -a')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">CONTAINER ID   IMAGE     COMMAND     CREATED         STATUS          PORTS                  NAMES<br>
+                                        abc123def456   nginx     "nginx"     2 minutes ago   Up 2 minutes    0.0.0.0:8080->80/tcp   my-nginx</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker stop/start/restart -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker stop/start/restart [容器名/ID]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">停止、启动、重启容器</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker stop my-nginx</span>
+                                            <button onclick="copyCode('docker stop my-nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">my-nginx</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker rm -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker rm [容器名/ID]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">删除已停止的容器</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker rm my-nginx</span>
+                                            <button onclick="copyCode('docker rm my-nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">my-nginx</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 容器操作命令 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-100 bg-orange-50">
+                            <h3 class="text-lg font-semibold text-orange-900 mb-2"><i class="fas fa-terminal mr-2"></i> 容器操作命令</h3>
+                            <p class="text-sm text-orange-800">进入容器、查看日志</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- docker exec -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker exec -it [容器名] [命令]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">在运行中的容器内执行命令</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker exec -it my-nginx bash</span>
+                                            <button onclick="copyCode('docker exec -it my-nginx bash')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white mt-2">root@abcdef123456:/# <span class="text-yellow-400 animate-pulse">_</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker logs -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker logs [容器名/ID]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">查看容器的日志输出</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker logs my-nginx</span>
+                                            <button onclick="copyCode('docker logs my-nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">/docker-entrypoint.sh: Configuration complete<br>
+                                        2023/10/10 10:00:01 [notice] 1#1: nginx/1.25.2<br>
+                                        2023/10/10 10:00:01 [notice] 1#1: start worker processes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 镜像构建命令 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-100 bg-red-50">
+                            <h3 class="text-lg font-semibold text-red-900 mb-2"><i class="fas fa-hammer mr-2"></i> 镜像构建命令</h3>
+                            <p class="text-sm text-red-800">构建自定义镜像（进阶内容）</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- docker build -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker build -t [镜像名:标签] [构建上下文路径]</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">根据 Dockerfile 构建镜像</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker build -t my-app:1.0 .</span>
+                                            <button onclick="copyCode('docker build -t my-app:1.0 .')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">Step 1/3 : FROM ubuntu:20.04<br>
+                                        Step 2/3 : RUN apt-get update<br>
+                                        Successfully built abc123def456</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统清理命令 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-100 bg-indigo-50">
+                            <h3 class="text-lg font-semibold text-indigo-900 mb-2"><i class="fas fa-broom mr-2"></i> 系统清理命令</h3>
+                            <p class="text-sm text-indigo-800">清理 Docker 资源</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- docker system prune -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker system prune</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">清理未使用的容器、镜像、网络等资源</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker system prune</span>
+                                            <button onclick="copyCode('docker system prune')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">WARNING! This will remove all stopped containers...<br>
+                                        Are you sure? [y/N] y<br>
+                                        Total reclaimed space: 1.234GB</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- docker system df -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2"><code class="bg-white px-2 py-1 rounded text-sm">docker system df</code></h4>
+                                <p class="text-sm text-gray-600 mb-3">查看 Docker 磁盘使用情况</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-4 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker system df</span>
+                                            <button onclick="copyCode('docker system df')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2">TYPE            TOTAL     ACTIVE    SIZE<br>
+                                        Images          15        5         2.345GB<br>
+                                        Containers      2         1         0B</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 练习任务 -->
+                    <div class="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border-2 border-green-300 p-6 shadow-md">
+                        <h3 class="text-lg font-bold text-green-900 mb-4"><i class="fas fa-tasks mr-2"></i> 🎯 Docker 命令练习任务</h3>
+                        <p class="text-sm text-green-800 mb-4">按照以下步骤练习，巩固所学命令：</p>
+
+                        <div class="space-y-4">
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
+                                <h4 class="font-bold text-gray-800 mb-2">任务 1：基础环境检查</h4>
+                                <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+                                    <li>运行 <code>docker version</code> 检查安装</li>
+                                    <li>运行 <code>docker info</code> 查看系统信息</li>
+                                    <li>运行 <code>docker system df</code> 查看磁盘使用</li>
+                                </ol>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                                <h4 class="font-bold text-gray-800 mb-2">任务 2：镜像操作练习</h4>
+                                <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+                                    <li>运行 <code>docker pull nginx</code> 下载 Nginx 镜像</li>
+                                    <li>运行 <code>docker images</code> 查看下载的镜像</li>
+                                    <li>运行 <code>docker pull ubuntu:20.04</code> 下载 Ubuntu 镜像</li>
+                                    <li>再次运行 <code>docker images</code> 确认有两个镜像</li>
+                                </ol>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500">
+                                <h4 class="font-bold text-gray-800 mb-2">任务 3：容器操作练习</h4>
+                                <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+                                    <li>运行 <code>docker run -d --name test-web -p 8888:80 nginx</code></li>
+                                    <li>运行 <code>docker ps</code> 查看运行中的容器</li>
+                                    <li>在浏览器访问 <code>http://localhost:8888</code> 确认 Nginx 工作</li>
+                                    <li>运行 <code>docker logs test-web</code> 查看容器日志</li>
+                                    <li>运行 <code>docker exec -it test-web bash</code> 进入容器</li>
+                                    <li>在容器内运行 <code>ls /usr/share/nginx/html</code> 查看网页文件</li>
+                                    <li>输入 <code>exit</code> 退出容器</li>
+                                    <li>运行 <code>docker stop test-web</code> 停止容器</li>
+                                    <li>运行 <code>docker ps -a</code> 查看所有容器（包括停止的）</li>
+                                    <li>运行 <code>docker start test-web</code> 重新启动容器</li>
+                                    <li>运行 <code>docker stop test-web</code> 再次停止容器</li>
+                                    <li>运行 <code>docker rm test-web</code> 删除容器</li>
+                                </ol>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-red-500">
+                                <h4 class="font-bold text-gray-800 mb-2">任务 4：清理练习</h4>
+                                <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+                                    <li>运行 <code>docker ps -a</code> 确认没有运行中的容器</li>
+                                    <li>运行 <code>docker images</code> 查看所有镜像</li>
+                                    <li>运行 <code>docker system prune</code> 清理未使用的资源</li>
+                                    <li>再次运行 <code>docker system df</code> 查看清理后的磁盘使用</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
+                            <p class="text-xs font-bold text-green-900 mb-2"><i class="fas fa-lightbulb mr-1"></i> 练习提示：</p>
+                            <ul class="text-xs text-green-800 space-y-1">
+                                <li>每个命令执行后，观察输出是否符合预期</li>
+                                <li>练习过程中，可以随时使用 <code>docker ps</code> 和 <code>docker images</code> 检查状态</li>
+                                <li>如果遇到问题，可以使用 <code>docker --help</code> 查看帮助</li>
+                                <li>建议多练习几遍，直到熟练掌握这些命令</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Warmup -->
+                <section id="warmup" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">2. 课前热身：找回手感</h2>
+                        <p class="mt-2 text-gray-600">打开你的 Ubuntu (WSL) 终端，确认一切正常。</p>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                        <p class="text-sm text-yellow-700">
+                            <strong>新手提示：</strong> 如果遇到 <code>permission denied</code> (权限拒绝)，请在命令前加上 <code>sudo</code>。
+                        </p>
+                    </div>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="terminal-dot bg-red-500"></div>
+                            <div class="terminal-dot bg-yellow-500"></div>
+                            <div class="terminal-dot bg-green-500"></div>
+                            <span class="text-gray-400 text-xs ml-2">Terminal</span>
+                        </div>
+                        <div class="p-4 text-green-400 font-mono text-sm space-y-4">
+                            <div>
+                                <p class="text-gray-500 mb-1"># 1. 检查 Docker 是否启动</p>
+                                <div class="flex justify-between group">
+                                    <span>$ docker version</span>
+                                    <button onclick="copyCode('docker version')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 mb-1"># 2. 看看有没有正在运行的容器 (应该是空的)</p>
+                                <div class="flex justify-between group">
+                                    <span>$ docker ps</span>
+                                    <button onclick="copyCode('docker ps')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                </div>
+                                <p class="text-white opacity-50 mt-2">CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Concept Web -->
+                <section id="concept-web" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">3. 基础知识铺垫：什么是 Web 服务？</h2>
+                        <p class="mt-2 text-gray-600">在开始动手之前，我们需要理解一些基本概念。别担心，我会用最简单的比喻来解释！</p>
+                    </div>
+
+                    <!-- 什么是网站 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-blue-900 mb-4"><i class="fas fa-globe mr-2"></i> 首先：什么是网站？</h3>
+                        
+                        <div class="bg-white p-5 rounded-lg mb-4">
+                            <p class="text-gray-700 mb-3">简单来说，<strong>网站 = 一堆文件</strong>（主要是 HTML、CSS、图片等）</p>
+                            <p class="text-gray-600 text-sm">就像你们做土木设计时的图纸、说明书、照片等文件一样，网站也是由一堆文件组成的。</p>
+                        </div>
+
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <p class="text-sm text-yellow-800"><strong>🤔 但是问题来了：</strong></p>
+                            <p class="text-sm text-yellow-700 mt-2">你电脑里有这些文件，别人怎么看到呢？就像你的设计图纸在你电脑里，工地上的工人怎么看到？</p>
+                            <p class="text-sm text-yellow-700 mt-2"><strong>答案：你需要把文件"分享"出去！</strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Web 服务器的作用 -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4"><i class="fas fa-server mr-2"></i> Web 服务器是干什么的？</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-4">
+                            <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-lg border border-purple-200">
+                                <h4 class="font-bold text-purple-900 mb-3 flex items-center">
+                                    <span class="text-2xl mr-2">🏢</span> 建筑工地的例子
+                                </h4>
+                                <div class="space-y-2 text-sm text-gray-700">
+                                    <p><strong>工地办公室：</strong></p>
+                                    <ul class="list-disc list-inside ml-4 space-y-1 text-xs">
+                                        <li>储存图纸、文件</li>
+                                        <li>工人来了就发放图纸</li>
+                                        <li>24小时有人值班</li>
+                                        <li>谁来要资料都能拿到</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-green-50 to-blue-50 p-5 rounded-lg border border-green-200">
+                                <h4 class="font-bold text-green-900 mb-3 flex items-center">
+                                    <span class="text-2xl mr-2">💻</span> Web 服务器
+                                </h4>
+                                <div class="space-y-2 text-sm text-gray-700">
+                                    <p><strong>网站的办公室：</strong></p>
+                                    <ul class="list-disc list-inside ml-4 space-y-1 text-xs">
+                                        <li>储存网页文件</li>
+                                        <li>浏览器来了就发网页</li>
+                                        <li>24小时运行</li>
+                                        <li>谁访问都能看到</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                            <p class="text-sm text-blue-900 font-bold mb-2">💡 关键理解：</p>
+                            <p class="text-sm text-blue-800">Web 服务器就是一个<strong>永不停歇的文件管理员</strong>，专门负责把网页文件发送给来访问的浏览器。没有它，网站就是一堆"锁在抽屉里"的文件，别人根本看不到。</p>
+                        </div>
+                    </div>
+
+                    <!-- Nginx 介绍 -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4"><i class="fas fa-rocket mr-2"></i> 认识 Nginx：最流行的 Web 服务器</h3>
+                        
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="bg-green-100 p-4 rounded-full shrink-0">
+                                <i class="fas fa-server text-green-600 text-3xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Nginx 是什么？</h4>
+                                <p class="text-sm text-gray-700 mb-2">
+                                    <strong>Nginx</strong>（读音：Engine-X）是一个非常强大的 Web 服务器软件，全世界超过 30% 的网站都在使用它。
+                                </p>
+                                <p class="text-sm text-gray-600">包括淘宝、京东、B站等大型网站都用 Nginx！</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-lg p-5 mb-4">
+                            <h4 class="font-bold text-orange-900 mb-3">🎯 Nginx 的核心工作流程：</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">1</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">监听端口（等待客人）</p>
+                                        <p class="text-xs text-gray-600">Nginx 会默认监听 80 端口，等待浏览器来访问</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">2</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">接收请求（客人来了）</p>
+                                        <p class="text-xs text-gray-600">浏览器访问网站时，Nginx 接收到请求</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">3</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">找到文件（找图纸）</p>
+                                        <p class="text-xs text-gray-600">Nginx 去文件夹找对应的 HTML 文件</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">4</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">返回网页（发出去）</p>
+                                        <p class="text-xs text-gray-600">把网页内容发送给浏览器，你就看到网页了</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                            <p class="text-sm text-green-900 font-bold mb-2">✨ 为什么我们用 Nginx？</p>
+                            <ul class="text-sm text-green-800 space-y-1">
+                                <li>• <strong>简单：</strong>安装即用，不需要复杂配置</li>
+                                <li>• <strong>稳定：</strong>可以连续运行几个月不出问题</li>
+                                <li>• <strong>快速：</strong>处理请求的速度非常快</li>
+                                <li>• <strong>流行：</strong>大量教程和文档，遇到问题容易解决</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 网络基础：IP 和端口 -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border-2 border-indigo-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-indigo-900 mb-4"><i class="fas fa-network-wired mr-2"></i> 网络基础知识：地址和门牌号</h3>
+                        
+                        <div class="bg-white p-5 rounded-lg border border-indigo-200 mb-4">
+                            <h4 class="font-bold text-gray-800 mb-3">🏘️ 用小区来理解网络</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-blue-500 text-white rounded px-3 py-1 text-sm font-bold shrink-0">IP地址</div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-bold text-gray-800 mb-1">= 楼号（哪栋楼）</p>
+                                        <p class="text-xs text-gray-600">比如：192.168.1.100 就像"5号楼"</p>
+                                        <p class="text-xs text-gray-600 mt-1">用来标识网络上的一台电脑</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-green-500 text-white rounded px-3 py-1 text-sm font-bold shrink-0">端口号</div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-bold text-gray-800 mb-1">= 门牌号（哪个房间）</p>
+                                        <p class="text-xs text-gray-600">比如：80 端口就像"5号楼 101室"</p>
+                                        <p class="text-xs text-gray-600 mt-1">一台电脑可以同时运行多个服务，端口号用来区分它们</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-3 mb-4">
+                            <div class="bg-white p-4 rounded-lg border border-purple-200 text-center">
+                                <div class="text-2xl font-bold text-purple-600 mb-1">80</div>
+                                <p class="text-xs text-gray-600">HTTP 网站的标准端口</p>
+                                <p class="text-xs text-gray-500 mt-1">Nginx 默认使用</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-purple-200 text-center">
+                                <div class="text-2xl font-bold text-purple-600 mb-1">443</div>
+                                <p class="text-xs text-gray-600">HTTPS 加密网站端口</p>
+                                <p class="text-xs text-gray-500 mt-1">带锁的安全网站</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-purple-200 text-center">
+                                <div class="text-2xl font-bold text-purple-600 mb-1">8080</div>
+                                <p class="text-xs text-gray-600">常用的备用端口</p>
+                                <p class="text-xs text-gray-500 mt-1">我们今天会用到</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-100 border-2 border-indigo-300 rounded-lg p-4">
+                            <p class="text-sm text-indigo-900 font-bold mb-2">📌 记住这个公式：</p>
+                            <div class="bg-white p-3 rounded font-mono text-center">
+                                <span class="text-blue-600 font-bold">IP地址</span>
+                                <span class="text-gray-400">:</span>
+                                <span class="text-green-600 font-bold">端口号</span>
+                                <span class="text-gray-400 mx-2">=</span>
+                                <span class="text-orange-600 font-bold">完整地址</span>
+                            </div>
+                            <p class="text-xs text-gray-600 text-center mt-2">例如：192.168.1.100:80 = "访问 192.168.1.100 这台电脑的 80 端口"</p>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Section 4: Run Nginx -->
+                <section id="nginx-run" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">4. 启动 Nginx (失败的尝试)</h2>
+                        <p class="mt-2 text-gray-600">我们先试着直接启动它，看看会发生什么。</p>
+                    </div>
+
+                    <div class="terminal-window mb-4">
+                        <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                        <div class="p-4 text-green-400 font-mono text-sm">
+                            <div class="flex justify-between group">
+                                <span>$ docker run -d nginx</span>
+                                <button onclick="copyCode('docker run -d nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                            </div>
+                            <p class="text-gray-500 mt-2">Unable to find image 'nginx:latest' locally...</p>
+                            <p class="text-gray-500">Downloaded newer image for nginx:latest</p>
+                            <p class="text-white mt-2">a1b2c3d4e5f6... (容器ID)</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                        <h4 class="text-red-800 font-bold text-sm mb-2">❌ 问题来了：</h4>
+                        <p class="text-sm text-red-700">
+                            容器虽然启动了（你可以用 <code>docker ps</code> 看到它），但是你在浏览器里输入 <code>localhost</code>，发现<strong>什么都打不开</strong>。
+                        </p>
+                        <p class="text-sm text-red-700 mt-2">
+                            <strong>原因：</strong> 容器是一个封闭的盒子。Nginx 在盒子里吆喝，你在盒子外面根本听不见。我们需要“开个窗户”。
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4 text-sm text-gray-500">
+                        先把它删了，我们重来：<br>
+                        <code class="bg-gray-200 px-2 py-1 rounded">docker rm -f $(docker ps -q)</code> <span class="text-xs">(这是一个暴力清空命令，仅限练习时使用)</span>
+                    </div>
+                </section>
+
+                <!-- Section 5: Port Mapping -->
+                <section id="port-mapping" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">5. 核心概念：端口映射 (Port Mapping)</h2>
+                        <p class="mt-2 text-gray-600">这是竞赛中最重要的考点之一。一定要理解透彻！</p>
+                    </div>
+
+                    <!-- 为什么需要端口映射 -->
+                    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border-2 border-red-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-red-900 mb-4"><i class="fas fa-question-circle mr-2"></i> 为什么需要端口映射？</h3>
+                        
+                        <div class="bg-white p-5 rounded-lg mb-4">
+                            <h4 class="font-bold text-gray-800 mb-3">🔒 Docker 容器的隔离机制</h4>
+                            <p class="text-sm text-gray-700 mb-3">
+                                还记得我们说过，<strong>Docker 容器就像一个密封的盒子</strong>吗？这个盒子有一个很重要的特性：<strong>完全隔离</strong>。
+                            </p>
+                            <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                                <p class="text-sm text-gray-700 mb-2"><strong>隔离意味着：</strong></p>
+                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1 ml-4">
+                                    <li>容器里的文件，外面看不到</li>
+                                    <li>容器里的端口，外面访问不了</li>
+                                    <li>容器里跑的 Nginx，外面的浏览器根本连不上</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-lg p-5 mb-4">
+                            <h4 class="font-bold text-orange-900 mb-3">🏗️ 建筑工地的比喻</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <p class="text-sm font-bold text-gray-800 mb-2">没有端口映射：</p>
+                                    <div class="space-y-2 text-xs text-gray-600">
+                                        <p>🚧 工地围起来了（容器隔离）</p>
+                                        <p>📋 里面有图纸（网页文件）</p>
+                                        <p>🚪 但是大门锁着（没有对外开放）</p>
+                                        <p>❌ 外面的人进不去拿图纸</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg">
+                                    <p class="text-sm font-bold text-gray-800 mb-2">有端口映射：</p>
+                                    <div class="space-y-2 text-xs text-gray-600">
+                                        <p>🚧 工地还是围起来的（还是隔离）</p>
+                                        <p>📋 图纸还在里面（文件还在容器里）</p>
+                                        <p>🚪 但开了一扇小窗口（端口映射）</p>
+                                        <p>✅ 外面的人可以通过窗口拿图纸！</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
+                            <p class="text-sm text-red-900 font-bold mb-2">🎯 核心理解：</p>
+                            <p class="text-sm text-red-800">
+                                <strong>端口映射 = 在容器的墙上开个洞</strong>，让外面的人可以通过这个洞访问容器里的服务。
+                                没有这个洞，容器里的 Nginx 跑得再好，外面也访问不到！
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 什么是端口映射 -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4"><i class="fas fa-exchange-alt mr-2"></i> 什么是端口映射？</h3>
+                        
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-5 rounded-lg border border-blue-200 mb-4">
+                            <h4 class="font-bold text-blue-900 mb-3">🔌 端口映射的本质：建立连接通道</h4>
+                            <p class="text-sm text-gray-700 mb-3">
+                                端口映射就是在你的电脑和容器之间<strong>建立一条专用通道</strong>，让数据可以在两者之间流通。
+                            </p>
+                            
+                            <div class="bg-white p-4 rounded-lg">
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">1</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-bold text-gray-800">浏览器访问电脑的 8080 端口</p>
+                                            <p class="text-xs text-gray-600">用户在浏览器输入 localhost:8080</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-center">
+                                        <i class="fas fa-arrow-down text-2xl text-blue-500"></i>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">2</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-bold text-gray-800">Docker 自动转发到容器的 80 端口</p>
+                                            <p class="text-xs text-gray-600">这是端口映射的魔法时刻</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-center">
+                                        <i class="fas fa-arrow-down text-2xl text-green-500"></i>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">3</div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-bold text-gray-800">容器里的 Nginx 接收请求并返回网页</p>
+                                            <p class="text-xs text-gray-600">用户看到了网页内容</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 border border-purple-200 p-4 rounded-lg">
+                            <p class="text-sm text-purple-900 font-bold mb-2">💡 记住这个比喻：</p>
+                            <p class="text-sm text-purple-800">
+                                端口映射就像<strong>给密封箱子装了一根管道</strong>。外面的水（请求）可以通过管道流进去，里面的水（响应）也可以流出来。
+                                没有这根管道，箱子就是完全封闭的！
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Visual Concept -->
+                    <div class="bg-white p-6 rounded-xl border-2 border-gray-300 shadow-lg mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4 text-lg">📊 端口映射可视化图解</h3>
+                        <div class="flex flex-col md:flex-row items-center justify-center gap-8 text-sm">
+                            <div class="text-center">
+                                <div class="bg-blue-100 p-4 rounded-lg mb-2 border-2 border-blue-300">
+                                    <i class="fab fa-windows text-4xl text-blue-600"></i>
+                                    <div class="mt-2 font-bold">你的电脑 (宿主机)</div>
+                                    <div class="text-xs text-gray-500">公网IP / localhost</div>
+                                </div>
+                                <div class="font-mono text-blue-600 font-bold">端口: 8080</div>
+                                <div class="text-xs text-gray-500 mt-1">(外面的人访问这里)</div>
+                            </div>
+                            
+                            <div class="flex flex-col items-center text-gray-400">
+                                <i class="fas fa-long-arrow-alt-right text-3xl"></i>
+                                <span class="text-xs bg-yellow-200 px-3 py-1 rounded font-mono font-bold text-gray-800 my-2">-p 8080:80</span>
+                                <span class="text-xs text-red-600 font-bold">← 这就是端口映射！</span>
+                                <span class="text-xs text-gray-600 mt-1">（建立通道）</span>
+                            </div>
+
+                            <div class="text-center">
+                                <div class="bg-green-100 p-4 rounded-lg mb-2 border-2 border-green-300">
+                                    <i class="fab fa-docker text-4xl text-green-600"></i>
+                                    <div class="mt-2 font-bold">Docker 容器</div>
+                                    <div class="text-xs text-gray-500">Nginx 默认监听</div>
+                                </div>
+                                <div class="font-mono text-green-600 font-bold">端口: 80</div>
+                                <div class="text-xs text-gray-500 mt-1">(Nginx 在这里工作)</div>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-gray-600 text-sm bg-gray-50 p-3 rounded border border-gray-200">
+                            <strong>🔍 详细解释：</strong> <code class="bg-white px-2 py-1 rounded">-p 8080:80</code> 的意思是：
+                            "把我电脑的 <strong class="text-blue-600">8080 端口</strong>（左边）连接到容器的 <strong class="text-green-600">80 端口</strong>（右边）。
+                            当有人访问我电脑的 8080 端口时，Docker 会自动把请求转发给容器的 80 端口，Nginx 就能收到请求并返回网页了。"
+                        </p>
+                    </div>
+
+                    <!-- 常见问题 -->
+                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-300 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-yellow-900 mb-4"><i class="fas fa-lightbulb mr-2"></i> 常见疑问解答</h3>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                                <h4 class="text-sm font-bold text-gray-800 mb-2">❓ 为什么左边是 8080，右边是 80？</h4>
+                                <p class="text-xs text-gray-700">
+                                    <strong>左边（8080）</strong>是你电脑的端口，可以随便改（8888、9000都行）。<br>
+                                    <strong>右边（80）</strong>是容器里 Nginx 的端口，这个不能随便改，因为 Nginx 默认就监听 80 端口。
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                                <h4 class="text-sm font-bold text-gray-800 mb-2">❓ 可以用其他端口吗？</h4>
+                                <p class="text-xs text-gray-700 mb-2">
+                                    可以！比如：<br>
+                                    <code class="bg-gray-100 px-2 py-1 rounded">-p 9000:80</code> 浏览器访问 localhost:9000<br>
+                                    <code class="bg-gray-100 px-2 py-1 rounded">-p 3000:80</code> 浏览器访问 localhost:3000<br>
+                                    左边的端口号随你喜欢，右边的 80 一般不变。
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                                <h4 class="text-sm font-bold text-gray-800 mb-2">❓ 不写 -p 参数会怎样？</h4>
+                                <p class="text-xs text-gray-700">
+                                    容器能启动，但你访问不了！就像工地围起来了，但没开门窗，外面的人进不去。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The Real Command -->
+                    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border-2 border-green-300 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-green-900 mb-4"><i class="fas fa-terminal mr-2"></i> 现在开始实际操作</h3>
+                        <p class="text-sm text-green-800 mb-4">有了前面的理解，现在来执行带端口映射的命令：</p>
+                        
+                        <div class="terminal-window">
+                            <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                            <div class="p-4 text-green-400 font-mono text-sm">
+                                <p class="text-gray-500 mb-2"># 这次我们加上 -p 参数 (-d 表示后台运行)</p>
+                                <div class="flex justify-between group mb-4">
+                                    <span>$ docker run -d -p 8080:80 --name my-web nginx</span>
+                                    <button onclick="copyCode('docker run -d -p 8080:80 --name my-web nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                </div>
+                                <p class="text-white text-xs">f7a8b9c0d1e2... (出现长串ID说明成功)</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-white p-4 rounded-lg border border-green-200">
+                            <p class="text-sm font-bold text-green-900 mb-2">📝 命令详解：</p>
+                            <ul class="text-xs text-gray-700 space-y-1">
+                                <li>• <code>docker run</code> - 创建并启动容器</li>
+                                <li>• <code>-d</code> - 后台运行</li>
+                                <li>• <code>-p 8080:80</code> - <strong>端口映射！电脑的8080 → 容器的80</strong></li>
+                                <li>• <code>--name my-web</code> - 给容器起名叫 my-web</li>
+                                <li>• <code>nginx</code> - 使用 nginx 镜像</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Verification -->
+                    <div class="mt-6 flex items-center justify-between bg-green-50 border border-green-200 p-4 rounded-lg">
+                        <div>
+                            <h4 class="font-bold text-green-800">🎉 见证奇迹的时刻</h4>
+                            <p class="text-sm text-green-700">打开浏览器，访问：<code>http://localhost:8080</code></p>
+                        </div>
+                        <a href="http://localhost:8080" target="_blank" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded shadow">
+                            立即点击访问 <i class="fas fa-external-link-alt ml-1"></i>
+                        </a>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 text-center">如果你看到 "Welcome to nginx!" 的页面，恭喜你，你搭建了第一个服务器！</p>
+                </section>
+
+                <!-- Section 6: Hack Container -->
+                <section id="hack-container" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">6. 进阶操作：潜入容器改网页</h2>
+                        <p class="mt-2 text-gray-600">默认的欢迎页面太丑了。我们进去把它改掉。</p>
+                    </div>
+
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6">
+                        <h4 class="text-indigo-900 font-bold text-sm mb-1">🗝️ 关键命令：docker exec</h4>
+                        <p class="text-sm text-indigo-800">
+                            <code>docker exec -it [容器名] bash</code><br>
+                            这行命令相当于给你开了一个“传送门”，让你穿越到容器内部的 Linux 系统里去。
+                        </p>
+                    </div>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal (Interactive)</span></div>
+                        <div class="p-4 text-green-400 font-mono text-sm space-y-4">
+                            
+                            <div>
+                                <p class="text-gray-500"># 1. 进入容器内部 (注意提示符会变)</p>
+                                <div class="flex justify-between group">
+                                    <span>$ docker exec -it my-web bash</span>
+                                    <button onclick="copyCode('docker exec -it my-web bash')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                </div>
+                                <p class="text-white">root@f7a8b9c0d1e2:/# <span class="text-yellow-400 animate-pulse">_</span></p>
+                            </div>
+
+                            <div>
+                                <p class="text-gray-500"># 2. 找到网页文件在哪里 (Nginx 默认在这里)</p>
+                                <span>root@...:/# cd /usr/share/nginx/html</span>
+                            </div>
+
+                            <div>
+                                <p class="text-gray-500"># 3. 此时没有 nano 编辑器，我们用简单粗暴的方法覆盖它</p>
+                                <p class="text-gray-500 text-xs mb-1">// echo "内容" > 文件名：意思是把双引号里的内容写入文件</p>
+                                <div class="flex justify-between group">
+                                    <span>root@...:/# echo "&lt;h1&gt;Hello [你的名字]!&lt;/h1&gt;" > index.html</span>
+                                    <button onclick="copyCode('echo \'<h1>Hello Hacker!</h1>\' > index.html')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-gray-500"># 4. 退出容器，回到地球</p>
+                                <span>root@...:/# exit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-600 mb-2">现在，回到浏览器，<strong>刷新</strong> 刚才的 <code>localhost:8080</code> 页面。</p>
+                        <p class="text-xl font-bold text-blue-600">看到了吗？页面变成了你写的内容！</p>
+                    </div>
+                </section>
+
+                <!-- Section 7: Lifecycle -->
+                <section id="lifecycle" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">7. 打扫战场：生命周期管理</h2>
+                        <p class="mt-2 text-gray-600">不仅要会创建，还要会删除。保持环境整洁是专业选手的素养。</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded border border-gray-200 text-center">
+                            <code class="text-orange-500 font-bold block mb-1">docker stop</code>
+                            <span class="text-xs text-gray-500">关机 (数据还在)</span>
+                        </div>
+                        <div class="bg-white p-4 rounded border border-gray-200 text-center">
+                            <code class="text-red-500 font-bold block mb-1">docker rm</code>
+                            <span class="text-xs text-gray-500">删除 (扔进垃圾桶)</span>
+                        </div>
+                        <div class="bg-white p-4 rounded border border-gray-200 text-center">
+                            <code class="text-blue-500 font-bold block mb-1">docker ps -a</code>
+                            <span class="text-xs text-gray-500">查看所有 (包括关机的)</span>
+                        </div>
+                    </div>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                        <div class="p-4 text-green-400 font-mono text-sm space-y-3">
+                            <div>
+                                <p class="text-gray-500"># 1. 停止容器</p>
+                                <span>$ docker stop my-web</span>
+                                <p class="text-xs text-gray-500 mt-1">// 此时再去刷新网页，应该打不开了</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500"># 2. 删除容器</p>
+                                <span>$ docker rm my-web</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-500"># 3. 确认删除干净</p>
+                                <span>$ docker ps -a</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 8: Final Challenge -->
+                <section id="final-challenge" class="scroll-mt-8">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">8. 完整实战：从零到发布你的第一个网页</h2>
+                        <p class="mt-2 text-gray-600">现在我们把前面学到的所有知识串起来，一步步完成一个完整的网页发布。跟着做，一定能成功！</p>
+                    </div>
+
+                    <!-- 目标说明 -->
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-xl p-6 mb-6">
+                        <h3 class="text-xl font-bold text-purple-900 mb-3"><i class="fas fa-bullseye mr-2"></i> 我们的目标</h3>
+                        <p class="text-purple-800 mb-4">创建一个属于你自己的网页，任何人在浏览器输入 <code class="bg-white px-2 py-1 rounded">http://localhost:8080</code> 就能看到你的网页！</p>
+                        <div class="bg-white p-4 rounded-lg">
+                            <p class="text-sm text-gray-700 mb-2"><strong>最终效果：</strong></p>
+                            <div class="bg-gray-100 p-3 rounded text-center">
+                                <h1 class="text-2xl font-bold text-blue-600">欢迎来到 [你的名字] 的网站！</h1>
+                                <p class="text-gray-600 mt-2">这是我用 Docker 做的第一个网页 🎉</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-blue-200 overflow-hidden mb-6">
+                        <div class="bg-blue-50 p-4 border-b border-blue-200">
+                            <h3 class="text-lg font-bold text-blue-900"><i class="fas fa-step-forward mr-2"></i> 步骤 1：启动 Nginx 容器（带端口映射）</h3>
+                            <p class="text-sm text-blue-700 mt-1">这一步我们要让 Nginx 在后台运行，并且打开 8080 端口</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                                <p class="text-sm text-yellow-800"><strong>💡 提示：</strong> 这条命令有点长，但不用担心！我们一部分一部分来理解。</p>
+                            </div>
+                            
+                            <div class="terminal-window mb-4">
+                                <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                <div class="p-4 text-green-400 font-mono text-sm">
+                                    <div class="flex justify-between group">
+                                        <span>$ docker run -d -p 8080:80 --name my-website nginx</span>
+                                        <button onclick="copyCode('docker run -d -p 8080:80 --name my-website nginx')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                    </div>
+                                    <p class="text-white opacity-50 mt-3">a1b2c3d4e5f6789... (一长串ID)</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                <h4 class="font-bold text-gray-800 mb-2">命令详解（每个部分的作用）：</h4>
+                                <ul class="space-y-2 text-sm text-gray-700">
+                                    <li><code class="bg-white px-2 py-1 rounded">docker run</code> - 创建并启动一个容器</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">-d</code> - 在后台运行（daemon 模式），不占用终端</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">-p 8080:80</code> - 端口映射：把电脑的 8080 端口连接到容器的 80 端口</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">--name my-website</code> - 给容器起个名字叫 "my-website"，方便后面操作</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">nginx</code> - 使用 nginx 镜像</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                <h4 class="font-bold text-green-800 mb-2"><i class="fas fa-check-circle mr-1"></i> 如何确认成功？</h4>
+                                <p class="text-sm text-green-700 mb-2">运行下面这个命令查看容器状态：</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-3 text-green-400 font-mono text-sm">
+                                        <div class="flex justify-between group">
+                                            <span>$ docker ps</span>
+                                            <button onclick="copyCode('docker ps')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white opacity-50 mt-2 text-xs">CONTAINER ID   IMAGE   COMMAND   CREATED   STATUS   PORTS                  NAMES<br>
+                                        a1b2c3d4e5f6   nginx   ...       5 sec ago   Up 5 sec   0.0.0.0:8080->80/tcp   my-website</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-green-700 mt-2">✅ 看到 <code>my-website</code> 出现在列表里，STATUS 显示 "Up"，就说明成功了！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-green-200 overflow-hidden mb-6">
+                        <div class="bg-green-50 p-4 border-b border-green-200">
+                            <h3 class="text-lg font-bold text-green-900"><i class="fas fa-step-forward mr-2"></i> 步骤 2：在浏览器里查看默认网页</h3>
+                            <p class="text-sm text-green-700 mt-1">现在 Nginx 已经在运行了，我们来看看它长什么样</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">🖱️ 操作步骤：</h4>
+                                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 ml-4">
+                                        <li>打开你的浏览器（Chrome、Edge、Firefox 都可以）</li>
+                                        <li>在地址栏输入：<code class="bg-gray-200 px-2 py-1 rounded">localhost:8080</code></li>
+                                        <li>按回车键</li>
+                                    </ol>
+                                </div>
+
+                                <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                    <p class="text-sm text-blue-800 mb-2"><strong>👀 你应该看到：</strong></p>
+                                    <div class="bg-white p-4 rounded border">
+                                        <h1 class="text-2xl font-bold">Welcome to nginx!</h1>
+                                        <p class="text-gray-600 text-sm mt-2">If you see this page, the nginx web server is successfully installed and working...</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                                    <p class="text-sm text-yellow-800"><strong>🤔 为什么是 localhost:8080？</strong></p>
+                                    <ul class="text-xs text-yellow-700 mt-2 space-y-1">
+                                        <li><code>localhost</code> = 你自己的电脑（本地）</li>
+                                        <li><code>8080</code> = 我们刚才用 <code>-p 8080:80</code> 打开的端口号</li>
+                                        <li>合起来就是："访问我电脑的 8080 端口"</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-purple-200 overflow-hidden mb-6">
+                        <div class="bg-purple-50 p-4 border-b border-purple-200">
+                            <h3 class="text-lg font-bold text-purple-900"><i class="fas fa-step-forward mr-2"></i> 步骤 3：进入容器内部</h3>
+                            <p class="text-sm text-purple-700 mt-1">现在我们要"穿越"进容器里面，去修改网页文件</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-4">
+                                <p class="text-sm text-indigo-800"><strong>🔑  关键理解：</strong></p>
+                                <p class="text-sm text-indigo-700 mt-2">Docker 容器就像一个虚拟的小电脑。<code>docker exec</code> 命令就像一扇传送门，让我们进去操作这个"小电脑"。</p>
+                            </div>
+
+                            <div class="terminal-window mb-4">
+                                <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                <div class="p-4 text-green-400 font-mono text-sm">
+                                    <p class="text-gray-500 mb-2"># 执行这条命令进入容器</p>
+                                    <div class="flex justify-between group mb-3">
+                                        <span>$ docker exec -it my-website bash</span>
+                                        <button onclick="copyCode('docker exec -it my-website bash')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                    </div>
+                                    <p class="text-white">root@a1b2c3d4e5f6:/# <span class="text-yellow-400 animate-pulse">_</span></p>
+                                    <p class="text-gray-500 text-xs mt-2"># 👆 看到提示符变成 root@... 就说明成功进入容器了！</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                <h4 class="font-bold text-gray-800 mb-2">命令详解：</h4>
+                                <ul class="space-y-2 text-sm text-gray-700">
+                                    <li><code class="bg-white px-2 py-1 rounded">docker exec</code> - 在运行中的容器里执行命令</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">-it</code> - 进入交互模式（可以像正常使用终端一样操作）</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">my-website</code> - 容器的名字（刚才我们起的）</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">bash</code> - 启动一个命令行终端</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                <h4 class="font-bold text-green-800 mb-2"><i class="fas fa-info-circle mr-1"></i> 重要提示</h4>
+                                <p class="text-sm text-green-700">进入容器后，你的终端提示符会变化。这是正常的！说明你现在在容器"里面"了。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-orange-200 overflow-hidden mb-6">
+                        <div class="bg-orange-50 p-4 border-b border-orange-200">
+                            <h3 class="text-lg font-bold text-orange-900"><i class="fas fa-step-forward mr-2"></i> 步骤 4：找到网页文件的位置</h3>
+                            <p class="text-sm text-orange-700 mt-1">Nginx 把网页文件放在一个固定的文件夹里，我们需要先进入这个文件夹</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="bg-orange-50 border-l-4 border-orange-400 p-4 mb-4">
+                                <p class="text-sm text-orange-800"><strong>📁 小知识：</strong></p>
+                                <p class="text-sm text-orange-700 mt-2">Nginx 的网页文件默认放在 <code>/usr/share/nginx/html</code> 这个文件夹里。记住这个路径很重要！</p>
+                            </div>
+
+                            <div class="terminal-window mb-4">
+                                <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal (在容器内)</span></div>
+                                <div class="p-4 text-green-400 font-mono text-sm">
+                                    <p class="text-gray-500 mb-2"># 进入网页文件夹</p>
+                                    <div class="flex justify-between group mb-3">
+                                        <span>root@...:/# cd /usr/share/nginx/html</span>
+                                        <button onclick="copyCode('cd /usr/share/nginx/html')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                    </div>
+                                    <p class="text-gray-500 mb-2"># 看看文件夹里有什么文件</p>
+                                    <div class="flex justify-between group mb-3">
+                                        <span>root@...:/usr/share/nginx/html# ls</span>
+                                        <button onclick="copyCode('ls')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                    </div>
+                                    <p class="text-white">50x.html  index.html</p>
+                                    <p class="text-gray-500 text-xs mt-2"># 👆 看到了！index.html 就是我们要修改的文件</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-gray-800 mb-2">命令说明：</h4>
+                                <ul class="space-y-2 text-sm text-gray-700">
+                                    <li><code class="bg-white px-2 py-1 rounded">cd</code> - change directory（改变目录），就是"进入某个文件夹"</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">ls</code> - list（列出），就是"看看这里有什么文件"</li>
+                                    <li><code class="bg-white px-2 py-1 rounded">index.html</code> - 网站的首页文件（浏览器访问网站时第一个加载的文件）</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-red-200 overflow-hidden mb-6">
+                        <div class="bg-red-50 p-4 border-b border-red-200">
+                            <h3 class="text-lg font-bold text-red-900"><i class="fas fa-step-forward mr-2"></i> 步骤 5：修改网页内容</h3>
+                            <p class="text-sm text-red-700 mt-1">现在是最关键的一步：把默认网页改成你自己的内容！</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                                <p class="text-sm text-yellow-800"><strong>⚠️ 注意：</strong></p>
+                                <p class="text-sm text-yellow-700 mt-2">容器里没有安装文本编辑器（nano、vim 都没有），所以我们用 <code>echo</code> 命令直接写入内容。</p>
+                            </div>
+
+                            <div class="terminal-window mb-4">
+                                <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal (在容器内)</span></div>
+                                <div class="p-4 text-green-400 font-mono text-sm">
+                                    <p class="text-gray-500 mb-2"># 方法1: 简单版（一行代码）</p>
+                                    <div class="flex justify-between group mb-4">
+                                        <span>root@...:/usr/share/nginx/html# echo "&lt;h1&gt;欢迎来到我的网站！&lt;/h1&gt;" > index.html</span>
+                                        <button onclick="copyCode('echo &quot;&lt;h1&gt;欢迎来到我的网站！&lt;/h1&gt;&quot; > index.html')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                    </div>
+
+                                    <p class="text-gray-500 mb-2"># 方法2: 完整版（多行代码，更漂亮）</p>
+                                    <div class="mb-2">
+                                        <span>root@...:/usr/share/nginx/html# cat > index.html << 'EOF'</span>
+                                    </div>
+                                    <div class="text-white ml-4 space-y-0.5">
+                                        <div>&lt;!DOCTYPE html&gt;</div>
+                                        <div>&lt;html lang="zh-CN"&gt;</div>
+                                        <div>&lt;head&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;meta charset="UTF-8"&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;title&gt;我的第一个网页&lt;/title&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;style&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;body { font-family: Arial; text-align: center; padding: 50px; }</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h1 { color: #2563eb; }</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/style&gt;</div>
+                                        <div>&lt;/head&gt;</div>
+                                        <div>&lt;body&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;h1&gt;🎉 欢迎来到 [你的名字] 的网站！&lt;/h1&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;p&gt;这是我用 Docker 创建的第一个网页&lt;/p&gt;</div>
+                                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;p&gt;日期：2025-01-20&lt;/p&gt;</div>
+                                        <div>&lt;/body&gt;</div>
+                                        <div>&lt;/html&gt;</div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span>EOF</span>
+                                    </div>
+                                    <p class="text-gray-500 text-xs mt-3"># 👆 记得修改 [你的名字] 为你自己的名字！</p>
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                    <h4 class="font-bold text-blue-900 mb-2">方法1 说明（简单）</h4>
+                                    <p class="text-sm text-blue-800"><code>echo "内容" > 文件</code> 的意思是：把引号里的内容写入文件。</p>
+                                    <p class="text-xs text-blue-700 mt-2">优点：简单快速<br>缺点：只有一行</p>
+                                </div>
+                                <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                    <h4 class="font-bold text-green-900 mb-2">方法2 说明（完整）</h4>
+                                    <p class="text-sm text-green-800"><code>cat > 文件 << 'EOF'</code> 可以输入多行内容，直到遇到 <code>EOF</code> 为止。</p>
+                                    <p class="text-xs text-green-700 mt-2">优点：可以写完整的 HTML<br>缺点：稍微复杂一点</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                <h4 class="font-bold text-green-800 mb-2"><i class="fas fa-check-circle mr-1"></i> 确认修改成功</h4>
+                                <p class="text-sm text-green-700 mb-2">运行这个命令查看文件内容：</p>
+                                <div class="terminal-window">
+                                    <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal</span></div>
+                                    <div class="p-3 text-green-400 font-mono text-xs">
+                                        <div class="flex justify-between group">
+                                            <span>root@...:/usr/share/nginx/html# cat index.html</span>
+                                            <button onclick="copyCode('cat index.html')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                        </div>
+                                        <p class="text-white mt-2">&lt;h1&gt;欢迎来到我的网站！&lt;/h1&gt;</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-green-700 mt-2">✅ 看到你刚才写的内容，就说明修改成功了！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-indigo-200 overflow-hidden mb-6">
+                        <div class="bg-indigo-50 p-4 border-b border-indigo-200">
+                            <h3 class="text-lg font-bold text-indigo-900"><i class="fas fa-step-forward mr-2"></i> 步骤 6：退出容器</h3>
+                            <p class="text-sm text-indigo-700 mt-1">修改完成后，我们需要退出容器，回到正常的终端</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="terminal-window mb-4">
+                                <div class="terminal-header"><span class="text-gray-400 text-xs">Terminal (在容器内)</span></div>
+                                <div class="p-4 text-green-400 font-mono text-sm">
+                                    <p class="text-gray-500 mb-2"># 输入 exit 退出容器</p>
+                                    <div class="flex justify-between group mb-3">
+                                        <span>root@...:/usr/share/nginx/html# exit</span>
+                                        <button onclick="copyCode('exit')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100"><i class="far fa-copy"></i></button>
+                                    </div>
+                                    <p class="text-white">$</p>
+                                    <p class="text-gray-500 text-xs mt-2"># 👆 提示符变回 $ 说明成功退出，回到你的电脑了</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                                <p class="text-sm text-blue-800"><strong>💡 重要：</strong></p>
+                                <p class="text-sm text-blue-700 mt-2">退出容器不会停止容器运行！Nginx 还在后台工作，网页还能继续访问。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-pink-200 overflow-hidden mb-6">
+                        <div class="bg-pink-50 p-4 border-b border-pink-200">
+                            <h3 class="text-lg font-bold text-pink-900"><i class="fas fa-rocket mr-2"></i> 步骤 7：见证奇迹的时刻！</h3>
+                            <p class="text-sm text-pink-700 mt-1">回到浏览器刷新页面，看看你的作品吧！</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border-2 border-yellow-300">
+                                    <h4 class="text-xl font-bold text-orange-900 mb-3">🎯 操作步骤：</h4>
+                                    <ol class="list-decimal list-inside space-y-3 text-gray-800">
+                                        <li class="ml-4">回到浏览器（不要关闭刚才打开的页面）</li>
+                                        <li class="ml-4">确保地址栏还是 <code class="bg-white px-2 py-1 rounded">localhost:8080</code></li>
+                                        <li class="ml-4">按 <kbd class="bg-gray-700 text-white px-2 py-1 rounded">F5</kbd> 键 或 点击刷新按钮 🔄</li>
+                                    </ol>
+                                </div>
+
+                                <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border-2 border-green-300">
+                                    <h4 class="text-xl font-bold text-green-900 mb-3">🎉 成功！你应该看到：</h4>
+                                    <div class="bg-white p-6 rounded-lg border-2 border-blue-200 text-center">
+                                        <h1 class="text-3xl font-bold text-blue-600 mb-3">欢迎来到 [你的名字] 的网站！</h1>
+                                        <p class="text-gray-600">这是我用 Docker 创建的第一个网页</p>
+                                        <p class="text-gray-500 text-sm mt-2">日期：2025-01-20</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-center gap-4 mt-6">
+                                    <a href="http://localhost:8080" target="_blank" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:scale-105">
+                                        <i class="fas fa-external-link-alt mr-2"></i> 立即访问你的网站
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting -->
+                    <div class="bg-red-50 rounded-xl border-2 border-red-200 p-6 mb-6">
+                        <h3 class="text-xl font-bold text-red-900 mb-4"><i class="fas fa-question-circle mr-2"></i> 遇到问题？看这里！</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-white p-4 rounded-lg border border-red-200">
+                                <h4 class="font-bold text-red-800 mb-2">❌ 问题1：浏览器打不开 localhost:8080</h4>
+                                <p class="text-sm text-red-700 mb-2"><strong>可能原因：</strong></p>
+                                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside ml-4">
+                                    <li>容器没有运行。运行 <code class="bg-gray-200 px-2 py-1 rounded">docker ps</code> 检查</li>
+                                    <li>端口被占用。尝试换一个端口，比如 <code class="bg-gray-200 px-2 py-1 rounded">-p 9090:80</code></li>
+                                    <li>Docker Desktop 没有启动。打开 Docker Desktop 程序</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-red-200">
+                                <h4 class="font-bold text-red-800 mb-2">❌ 问题2：刷新后还是显示 "Welcome to nginx!"</h4>
+                                <p class="text-sm text-red-700 mb-2"><strong>解决方法：</strong></p>
+                                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside ml-4">
+                                    <li>按 <kbd class="bg-gray-700 text-white px-2 py-1 rounded">Ctrl + Shift + R</kbd> 强制刷新（清除缓存）</li>
+                                    <li>确认你修改的是 <code class="bg-gray-200 px-2 py-1 rounded">index.html</code> 文件</li>
+                                    <li>检查文件内容：在容器内运行 <code class="bg-gray-200 px-2 py-1 rounded">cat index.html</code></li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-red-200">
+                                <h4 class="font-bold text-red-800 mb-2">❌ 问题3：进不去容器（docker exec 报错）</h4>
+                                <p class="text-sm text-red-700 mb-2"><strong>解决方法：</strong></p>
+                                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside ml-4">
+                                    <li>检查容器名字是否正确：<code class="bg-gray-200 px-2 py-1 rounded">docker ps</code> 查看</li>
+                                    <li>确保容器正在运行（STATUS 显示 "Up"）</li>
+                                    <li>如果容器停止了，运行 <code class="bg-gray-200 px-2 py-1 rounded">docker start my-website</code> 启动</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl border-2 border-purple-300 p-6">
+                        <h3 class="text-2xl font-bold text-purple-900 mb-4"><i class="fas fa-trophy mr-2"></i> 恭喜你！你已经掌握了：</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg">
+                                <h4 class="font-bold text-purple-800 mb-2">✅ Docker 核心技能</h4>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li>• 启动容器并映射端口</li>
+                                    <li>• 进入容器内部操作</li>
+                                    <li>• 修改容器里的文件</li>
+                                    <li>• 理解容器与宿主机的关系</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg">
+                                <h4 class="font-bold text-purple-800 mb-2">✅ Web 开发基础</h4>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li>• 理解什么是 Web 服务器</li>
+                                    <li>• 知道如何部署网页</li>
+                                    <li>• 了解端口映射的原理</li>
+                                    <li>• 创建了你的第一个网站</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4">
+                            <p class="text-center text-yellow-900 font-bold">📸 别忘了截图保存你的成果，证明你完成了这个挑战！</p>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function copyCode(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("命令已复制: " + text + "\n请在终端中点击鼠标右键粘贴。");
+            });
+        }
+
+        // Scroll spy logic
+        const mainContent = document.getElementById('main-content');
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        mainContent.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (mainContent.scrollTop >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').includes(current)) {
+                    a.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
