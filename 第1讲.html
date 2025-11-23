@@ -6,83 +6,8 @@
     <title>Docker 竞赛培训 - 第一讲</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/common.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Noto Sans SC', sans-serif;
-            scroll-behavior: smooth;
-            font-size: 24px;
-            line-height: 1.8;
-            color: #0f172a;
-        }
-        @media (min-width:1920px){body{font-size:26px;line-height:1.9}}
-        @media (min-width:2560px){body{font-size:28px;line-height:2}}
-        code, pre {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            line-height: 1.8;
-            padding: 2rem;
-        }
-        pre{margin:2rem 0;display:block;clear:both}
-        code{padding:.4rem .8rem;display:inline-block;margin:0.2rem 0.1rem;vertical-align:baseline}
-        @media (min-width:1920px){code,pre{font-size:1rem}}
-        @media (min-width:2560px){code,pre{font-size:1rem}}
-        .section-card {
-            border-radius: 2rem;
-            background: rgba(255, 255, 255, 0.96);
-            padding: 3.5rem 4rem;
-            box-shadow: 0 30px 50px -35px rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.25);
-            margin-bottom: 2.5rem;
-        }
-        @media (min-width:2560px){.section-card{padding:4rem 4.5rem;margin-bottom:3rem}}
-        h1{font-size:2rem!important}h2{font-size:1.8rem!important}h3{font-size:1.5rem!important}h4{font-size:1.3rem!important}
-        .section-card h2 {
-            font-size: 1.8rem!important;
-            letter-spacing: -0.02em;
-            position: relative;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-        @media (min-width:1920px){h1{font-size:2.2rem!important}h2,.section-card h2{font-size:2rem!important}h3{font-size:1.6rem!important}h4{font-size:1.4rem!important}}
-        @media (min-width:2560px){h1{font-size:2.4rem!important}h2,.section-card h2{font-size:2.2rem!important}h3{font-size:1.7rem!important}h4{font-size:1.5rem!important}}
-        @media (min-width:3440px){h1{font-size:2.6rem!important}h2,.section-card h2{font-size:2.4rem!important}h3{font-size:1.8rem!important}h4{font-size:1.6rem!important}}
-        .section-card h2::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 90px;
-            height: 5px;
-            background: linear-gradient(to right, #2563eb, #f97316);
-            border-radius: 3px;
-        }
-        .section-card h3 {
-            font-size: 1.5rem!important;
-            letter-spacing: -0.01em;
-            margin-top: 2rem;
-            margin-bottom: 1.5rem;
-        }
-        .section-card h4 {
-            font-size: 1.3rem!important;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-        p,li,td,span:not(h1 span):not(h2 span):not(h3 span):not(h4 span),label,strong,em,b{font-size:1rem!important;letter-spacing:.02em}
-        .text-xs,.text-sm,.text-base,.text-lg,.text-xl{font-size:1rem!important}
-        .terminal-window{max-height:none!important;overflow-y:visible!important}
-        p,
-        li,
-        span,
-        small,
-        .text-sm {
-            line-height: 2;
-            letter-spacing: 0.02em;
-            margin-bottom: 0.75rem;
-        }
-        p{margin-bottom:1rem}
-        ul,ol{margin-top:1rem;margin-bottom:1rem;padding-left:2rem}
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -96,37 +21,6 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; 
-        }
-        .nav-item.active {
-            background-color: #eff6ff;
-            color: #2563eb;
-            border-right: 3px solid #2563eb;
-        }
-        .cmd-card:hover {
-            transform: translateY(-2px);
-        }
-        .concept-card {
-            transition: all 0.3s ease;
-        }
-        .concept-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        /* 高分辨率屏幕容器优化 */
-        @media (min-width: 1920px) {
-            .container {
-                max-width: 1500px;
-            }
-        }
-        @media (min-width: 2560px) {
-            .container {
-                max-width: 1800px;
-            }
-        }
-        @media (min-width: 3440px) {
-            .container {
-                max-width: 2200px;
-            }
         }
     </style>
 </head>
@@ -1500,63 +1394,7 @@ exit                 # 退出容器</pre>
     </div>
 
     <!-- Scripts -->
-    <script>
-        // Copy functionality
-        function copyToClipboard(btn) {
-            const pre = btn.parentElement.nextElementSibling;
-            const text = pre.innerText;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check mr-1"></i> 已复制';
-                btn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-                btn.classList.add('bg-green-600', 'hover:bg-green-700');
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalHtml;
-                    btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
-                    btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                }, 2000);
-            });
-        }
-
-        function copyCodeText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Optional: show a toast notification
-                alert("命令已复制: " + text);
-            });
-        }
-
-        // Active Navigation Highlighting
-        const mainContent = document.getElementById('main-content');
-        const sections = document.querySelectorAll('section');
-        const navItems = document.querySelectorAll('.nav-item');
-
-        // 导航栏点击切换高亮
-        navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        mainContent.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (mainContent.scrollTop >= (sectionTop - 150)) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navItems.forEach(a => {
-                a.classList.remove('active');
-                if (a.getAttribute('href').includes(current)) {
-                    a.classList.add('active');
-                }
-            });
-        });
-    </script>
+    <script src="scripts/main.js" defer></script>
 </body>
 </html>
 
