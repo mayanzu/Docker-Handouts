@@ -12,41 +12,77 @@
         body {
             font-family: 'Noto Sans SC', sans-serif;
             scroll-behavior: smooth;
-            font-size: 18px;
-            line-height: 1.75;
+            font-size: 24px;
+            line-height: 1.8;
             color: #0f172a;
         }
+        @media (min-width:1920px){body{font-size:26px;line-height:1.9}}
+        @media (min-width:2560px){body{font-size:28px;line-height:2}}
         code, pre {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            line-height: 1.7;
+            font-size: 1rem;
+            line-height: 1.8;
+            padding: 2rem;
         }
+        pre{margin:2rem 0;display:block;clear:both}
+        code{padding:.4rem .8rem;display:inline-block;margin:0.2rem 0.1rem;vertical-align:baseline}
+        @media (min-width:1920px){code,pre{font-size:1rem}}
+        @media (min-width:2560px){code,pre{font-size:1rem}}
         .section-card {
-            border-radius: 1.75rem;
+            border-radius: 2rem;
             background: rgba(255, 255, 255, 0.96);
-            padding: 2.5rem 2.5rem 3rem;
+            padding: 3.5rem 4rem;
             box-shadow: 0 30px 50px -35px rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(148, 163, 184, 0.25);
+            margin-bottom: 2.5rem;
         }
+        @media (min-width:2560px){.section-card{padding:4rem 4.5rem;margin-bottom:3rem}}
+        h1{font-size:2rem!important}h2{font-size:1.8rem!important}h3{font-size:1.5rem!important}h4{font-size:1.3rem!important}
         .section-card h2 {
-            font-size: 2.6rem;
+            font-size: 1.8rem!important;
             letter-spacing: -0.02em;
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        @media (min-width:1920px){h1{font-size:2.2rem!important}h2,.section-card h2{font-size:2rem!important}h3{font-size:1.6rem!important}h4{font-size:1.4rem!important}}
+        @media (min-width:2560px){h1{font-size:2.4rem!important}h2,.section-card h2{font-size:2.2rem!important}h3{font-size:1.7rem!important}h4{font-size:1.5rem!important}}
+        @media (min-width:3440px){h1{font-size:2.6rem!important}h2,.section-card h2{font-size:2.4rem!important}h3{font-size:1.8rem!important}h4{font-size:1.6rem!important}}
+        .section-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 90px;
+            height: 5px;
+            background: linear-gradient(to right, #2563eb, #f97316);
+            border-radius: 3px;
         }
         .section-card h3 {
-            font-size: 1.6rem;
+            font-size: 1.5rem!important;
             letter-spacing: -0.01em;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
         }
         .section-card h4 {
-            font-size: 1.15rem;
+            font-size: 1.3rem!important;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
         }
+        p,li,td,span:not(h1 span):not(h2 span):not(h3 span):not(h4 span),label,strong,em,b{font-size:1rem!important;letter-spacing:.02em}
+        .text-xs,.text-sm,.text-base,.text-lg,.text-xl{font-size:1rem!important}
+        .terminal-window{max-height:none!important;overflow-y:visible!important}
         p,
         li,
         span,
         small,
         .text-sm {
-            line-height: 1.72;
-            letter-spacing: 0.01em;
+            line-height: 2;
+            letter-spacing: 0.02em;
+            margin-bottom: 0.75rem;
         }
+        p{margin-bottom:1rem}
+        ul,ol{margin-top:1rem;margin-bottom:1rem;padding-left:2rem}
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -76,6 +112,22 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
+        /* 高分辨率屏幕容器优化 */
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1500px;
+            }
+        }
+        @media (min-width: 2560px) {
+            .container {
+                max-width: 1800px;
+            }
+        }
+        @media (min-width: 3440px) {
+            .container {
+                max-width: 2200px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
@@ -100,43 +152,43 @@
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
+        <aside class="w-80 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
             <div class="p-6">
-                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">课程目录</h3>
-                <nav class="space-y-1">
-                    <a href="#foundations" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-graduation-cap"></i></span> 基础知识预热
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲目录</h3>
+                <nav class="space-y-2 text-base">
+                    <a href="#foundations" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-graduation-cap"></i></span> 0. 基础知识预热
                     </a>
-                    <a href="#intro" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group active">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-lightbulb"></i></span> 为什么用 Docker
+                    <a href="#intro" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group active">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-lightbulb"></i></span> 1. 为什么用 Docker
                     </a>
-                    <a href="#wsl" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fab fa-windows"></i></span> WSL 2 安装
+                    <a href="#wsl" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fab fa-windows"></i></span> 2. WSL 2 安装
                     </a>
-                    <a href="#docker-desktop-guide" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-window-maximize"></i></span> Desktop 使用指南
+                    <a href="#docker-desktop-guide" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-window-maximize"></i></span> 3. Desktop 使用指南
                     </a>
-                    <a href="#vmware-ubuntu" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-box-open"></i></span> VMware + Ubuntu
+                    <a href="#vmware-ubuntu" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-box-open"></i></span> 4. VMware + Ubuntu
                     </a>
-                    <a href="#linux-basics" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-terminal"></i></span> Linux 生存指南
+                    <a href="#linux-basics" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-terminal"></i></span> 5. Linux 生存指南
                     </a>
-                    <a href="#docker-install" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-download"></i></span> Docker 安装
+                    <a href="#docker-install" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-download"></i></span> 6. Docker 安装
                     </a>
-                    <a href="#docker-concepts" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-brain"></i></span> 核心概念通俗解
+                    <a href="#docker-concepts" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-brain"></i></span> 7. 核心概念通俗解
                     </a>
-                    <a href="#docker-first-run" class="nav-item flex items-center px-3 py-2 text-sm font-medium rounded-l-md text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-play-circle"></i></span> 初体验与命令
+                    <a href="#docker-first-run" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-play-circle"></i></span> 8. 初体验与命令
                     </a>
                 </nav>
             </div>
             <div class="mt-auto p-6 border-t border-gray-100">
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <h4 class="text-sm font-bold text-blue-800 mb-2"><i class="fas fa-exclamation-triangle mr-1"></i> 课前检查</h4>
-                    <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <h4 class="text-base font-bold text-blue-800 mb-3"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲核心</h4>
+                    <ul class="text-sm text-blue-700 space-y-2 list-disc list-inside">
                         <li>BIOS 开启虚拟化</li>
                         <li>Win10 2004+ / Win11</li>
                         <li>能够连接互联网</li>
@@ -146,8 +198,8 @@
         </aside>
 
         <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth" id="main-content">
-            <div class="max-w-4xl mx-auto space-y-12 pb-20">
+        <main class="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 scroll-smooth" id="main-content">
+            <div class="max-w-5xl mx-auto space-y-16 pb-32 lg:max-w-6xl xl:max-w-7xl">
 
                 <!-- Section 0: 基础知识预热 -->
                 <section id="foundations" class="scroll-mt-8 mb-12 section-card">
@@ -802,7 +854,7 @@ $ docker run -it ubuntu bash</pre>
                     </div>
 
                     <!-- Docker Desktop 实操练习 -->
-                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border-2 border-indigo-300 p-6 shadow-md mb-6">
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-6 mb-6">
                         <h3 class="text-lg font-bold text-indigo-900 mb-4"><i class="fas fa-mouse mr-2"></i> 🎮 Docker Desktop GUI 实操指南</h3>
                         <p class="text-sm text-indigo-800 mb-4">如果你更喜欢点点点而不是敲命令，Docker Desktop 的 GUI 可以帮你。这些操作会帮你更深刻理解容器的概念。</p>
 
@@ -1072,7 +1124,7 @@ $ docker run -it ubuntu bash</pre>
                     </div>
 
                     <!-- 练习区间 -->
-                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-300 p-6 shadow-md mb-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200 p-6 mb-6">
                         <h3 class="text-lg font-bold text-blue-900 mb-4"><i class="fas fa-dumbbell mr-2"></i> 🎯 现在就来练习吧！</h3>
                         <p class="text-sm text-blue-800 mb-4">打开你的 WSL Ubuntu 终端，一个命令一个命令地输入。不要复制粘贴！手工打一遍，才能真正记住。</p>
 
@@ -1349,7 +1401,7 @@ ls my_first_project/          # 不进入文件夹，直接查看其内容</pre>
                     </div>
 
                     <!-- 实操练习：Docker 基础命令 -->
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-300 p-6 shadow-md mb-6">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-6 mb-6">
                         <h3 class="text-lg font-bold text-green-900 mb-4"><i class="fas fa-flask mr-2"></i> 🚀 Docker 初体验：跟着做</h3>
                         <p class="text-sm text-green-800 mb-4">确保 Docker Desktop 已启动（任务栏看得到 Docker 图标）。然后在 WSL 终端中执行这些命令：</p>
 
@@ -1479,6 +1531,14 @@ exit                 # 退出容器</pre>
         const mainContent = document.getElementById('main-content');
         const sections = document.querySelectorAll('section');
         const navItems = document.querySelectorAll('.nav-item');
+
+        // 导航栏点击切换高亮
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
 
         mainContent.addEventListener('scroll', () => {
             let current = '';

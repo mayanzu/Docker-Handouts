@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docker 竞赛培训 - 第四讲：全栈编排 Docker Compose 实战</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 20% 50%, rgba(59,130,246,0.08) 0px, transparent 60%),
+                radial-gradient(at 80% 80%, rgba(251,146,60,0.08) 0px, transparent 60%);
+            font-size: 24px;
+            line-height: 1.8;
+            color: #0f172a;
+        }
+        @media (min-width:1920px){body{font-size:26px;line-height:1.9}}@media (min-width:2560px){body{font-size:28px;line-height:2}}@media (min-width:3440px){body{font-size:30px;line-height:2.1}}
+        code, pre {font-family:'JetBrains Mono',monospace;font-size:1rem;line-height:1.8}
+        @media (min-width:1920px){code,pre{font-size:1rem;line-height:1.9}}@media (min-width:2560px){code,pre{font-size:1rem;line-height:2}}@media (min-width:3440px){code,pre{font-size:1rem;line-height:2.1}}
+        .section-card {border-radius:2rem;background:rgba(255,255,255,0.96);padding:3.5rem 4rem;box-shadow:0 30px 50px -35px rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.25);transition:.3s;margin-bottom:2.5rem}
+        @media (min-width:2560px){.section-card{padding:4rem 4.5rem;margin-bottom:3rem}}@media (min-width:3440px){.section-card{padding:4.5rem 5rem;margin-bottom:3.5rem}}
+        .section-card:hover{box-shadow:0 40px 60px -30px rgba(15,23,42,.9);border-color:rgba(37,99,235,.15)}
+        h1{font-size:2rem!important}h2{font-size:1.8rem!important}h3{font-size:1.5rem!important}h4{font-size:1.3rem!important}
+        .section-card h2{font-size:1.8rem!important;letter-spacing:-.02em;position:relative;padding-bottom:1rem;margin-bottom:2rem}
+        @media (min-width:1920px){h1{font-size:2.2rem!important}h2,.section-card h2{font-size:2rem!important}h3{font-size:1.6rem!important}h4{font-size:1.4rem!important}}
+        @media (min-width:2560px){h1{font-size:2.4rem!important}h2,.section-card h2{font-size:2.2rem!important}h3{font-size:1.7rem!important}h4{font-size:1.5rem!important}}
+        @media (min-width:3440px){h1{font-size:2.6rem!important}h2,.section-card h2{font-size:2.4rem!important}h3{font-size:1.8rem!important}h4{font-size:1.6rem!important}}
+        .section-card h2::after{content:'';position:absolute;bottom:0;left:0;width:90px;height:5px;background:linear-gradient(to right,#2563eb,#f97316);border-radius:3px}
+        .section-card h3{font-size:1.5rem!important;letter-spacing:-.01em;margin-top:2rem;margin-bottom:1rem}
+        .section-card h4{font-size:1.3rem!important;margin-top:1.5rem;margin-bottom:0.75rem}
+        p,li,td,span:not(h1 span):not(h2 span):not(h3 span):not(h4 span),div:not(h1):not(h2):not(h3):not(h4),a:not(.nav-item),label,strong,em,b{font-size:1rem!important;letter-spacing:.02em}
+        p,li,td{margin-bottom:0.75rem}
+        p{margin-bottom:1rem}
+        ul,ol{margin-top:1rem;margin-bottom:1rem}
+        .text-xs,.text-sm,.text-base,.text-lg,.text-xl{font-size:1rem!important}
+        .nav-item{transition:.2s;border-left:3px solid transparent}
+        .nav-item:hover{background-color:rgba(59,130,246,.05);border-left-color:#3b82f6}
+        .nav-item.active{background-color:rgba(59,130,246,.1);border-left-color:#2563eb;color:#1e40af}
+        .tip-box,.warning-box,.success-box,.info-box{padding:2.5rem 3rem;border-radius:1rem;border-left:6px solid;box-shadow:0 4px 6px -1px rgba(0,0,0,.08);margin:2rem 0;clear:both}
+        .tip-box{background:linear-gradient(135deg,#fef9c3,#fde68a);border-left-color:#eab308}
+        .warning-box{background:linear-gradient(135deg,#fee2e2,#fecaca);border-left-color:#ef4444}
+        .success-box{background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-left-color:#10b981}
+        .info-box{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:#3b82f6}
+        @media (min-width:1920px){.tip-box,.warning-box,.success-box,.info-box{padding:2.25rem 2.75rem}}@media (min-width:2560px){.tip-box,.warning-box,.success-box,.info-box{padding:2.5rem 3rem;border-radius:1.2rem}}@media (min-width:3440px){.tip-box,.warning-box,.success-box,.info-box{padding:2.75rem 3.25rem}}
+        .code-inline{background:linear-gradient(135deg,#f1f5f9,#e2e8f0);color:#e11d48;padding:.4rem .8rem;border-radius:.4rem;font-family:'JetBrains Mono',monospace;font-size:1em;font-weight:600;border:1px solid rgba(226,29,72,.15);display:inline-block;margin:0.2rem 0.1rem;vertical-align:baseline}
+        @media (min-width:1920px){.code-inline{padding:.45rem .85rem}}@media (min-width:2560px){.code-inline{padding:.5rem .9rem}}@media (min-width:3440px){.code-inline{padding:.55rem .95rem}}
+        pre{position:relative;margin-top:2rem;margin-bottom:2rem;padding:2rem!important;display:block;clear:both}
+        .copy-button{position:absolute;top:1rem;right:1rem;padding:.5rem 1rem;border-radius:.5rem;border:1px solid rgba(107,114,128,.35);background:rgba(31,41,55,.6);color:#cbd5e1;font-size:1rem;cursor:pointer;transition:.2s}
+        .copy-button:hover{background:rgba(31,41,55,.85);color:#fff}
+        @media (min-width:1920px){.container{max-width:1500px}}@media (min-width:2560px){.container{max-width:1800px}}@media (min-width:3440px){.container{max-width:2200px}}
+        .terminal-window{background:linear-gradient(to bottom,#1e293b,#0f172a);border-radius:1rem;overflow:hidden;border:1px solid rgba(148,163,184,.15);box-shadow:0 20px 40px -20px rgba(15,23,42,.6);margin-top:1.5rem;margin-bottom:1.5rem}
+        .terminal-header{background:#334155;padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid rgba(148,163,184,.2)}
+        .terminal-dot{width:16px;height:16px;border-radius:50%}
+        @media (min-width:1920px){.terminal-dot{width:18px;height:18px}}@media (min-width:2560px){.terminal-dot{width:20px;height:20px}}
+        .terminal-window{max-height:none!important;overflow-y:visible!important}
+        .terminal-window .p-3{padding:1.5rem!important}
+        table{border-collapse:collapse;width:100%;font-size:1rem;margin-top:1.5rem;margin-bottom:1.5rem}
+        table th,table td{border:1px solid #e2e8f0;padding:1.2rem 1.5rem;text-align:left;line-height:1.8}
+        table th{background:#f1f5f9;font-weight:600}
+        @media (min-width:1920px){table{font-size:1rem}table th,table td{padding:1.4rem 1.7rem}}@media (min-width:2560px){table{font-size:1rem}table th,table td{padding:1.6rem 1.9rem}}@media (min-width:3440px){table{font-size:1rem}table th,table td{padding:1.8rem 2.1rem}}
+        .badge{display:inline-block;background:#2563eb;color:#fff;font-size:1rem;padding:.4rem .8rem;border-radius:.5rem;letter-spacing:.05em}
+        .step{display:inline-flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border-radius:50%;font-size:1.2rem;font-weight:600;color:#fff;background:#2563eb;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+        .grid-auto{display:grid;gap:2rem}
+        @media (min-width:900px){.grid-auto{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}}
+        .accent-box{background:linear-gradient(135deg,#eef2ff,#e0f2fe);border:1px solid rgba(59,130,246,.25);padding:2rem 2.5rem;border-radius:1.2rem;margin-bottom:1.5rem}
+        .accent-box h4{font-weight:700;color:#1e3a8a;margin-bottom:1rem;font-size:1.4rem}
+        @media (min-width:1920px){.accent-box{padding:2.25rem 2.75rem}.accent-box h4{font-size:1.5rem}}
+        @media (min-width:2560px){.accent-box{padding:2.5rem 3rem}.accent-box h4{font-size:1.6rem}}
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+    <header class="bg-blue-900 text-white shadow-lg shrink-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fab fa-docker text-3xl text-blue-300"></i>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Docker 容器技术竞赛培训</h1>
+                    <p class="text-xs text-blue-200">第四讲：全栈编排——Docker Compose 实战</p>
+                </div>
+            </div>
+            <div class="hidden md:block text-sm opacity-80"><i class="fas fa-clock mr-1"></i> 预计时长：3小时（30 + 90 + 60）</div>
+        </div>
+    </header>
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="w-80 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
+            <div class="p-6">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲目录</h3>
+                <nav class="space-y-2 text-base">
+                    <a href="#theory" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 active"><span class="w-6 text-center mr-2"><i class="fas fa-gears"></i></span>1. 理论：自动挡</a>
+                    <a href="#wordpress" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50"><span class="w-6 text-center mr-2"><i class="fas fa-wordpress"></i></span>2. WordPress+MySQL</a>
+                    <a href="#compose-file" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50"><span class="w-6 text-center mr-2"><i class="fas fa-file-code"></i></span>3. docker-compose.yml 详解</a>
+                    <a href="#commands" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50"><span class="w-6 text-center mr-2"><i class="fas fa-terminal"></i></span>4. 常用命令</a>
+                    <a href="#troubleshoot" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50"><span class="w-6 text-center mr-2"><i class="fas fa-bug"></i></span>5. 常见问题排查</a>
+                    <a href="#challenge" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50"><span class="w-6 text-center mr-2"><i class="fas fa-rocket"></i></span>6. 竞赛模拟题</a>
+                    <a href="#extras" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50"><span class="w-6 text-center mr-2"><i class="fas fa-layer-group"></i></span>7. 进阶与优化</a>
+                </nav>
+            </div>
+            <div class="mt-auto p-6 border-t border-gray-100">
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <h4 class="text-base font-bold text-blue-800 mb-3"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲核心</h4>
+                    <ul class="text-sm text-blue-700 space-y-2 list-disc list-inside">
+                        <li>YAML 描述应用栈</li>
+                        <li>服务之间 DNS 互联</li>
+                        <li>卷与数据持久化</li>
+                        <li>一键启停 + 排错</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+        <main class="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 scroll-smooth" id="main-content">
+            <div class="max-w-5xl mx-auto space-y-16 pb-32 lg:max-w-6xl xl:max-w-7xl">
+                <!-- 理论部分 -->
+                <section id="theory" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fas fa-gears text-blue-600 mr-3"></i> 1. 从"手动挡"到"自动挡"：为什么用 Docker Compose？</h2>
+                    <div class="space-y-6 mt-6">
+                        <div class="info-box text-sm">
+                            <strong><i class="fas fa-book-open mr-2"></i>前置知识回顾（第1-3讲）</strong>
+                            <ul class="list-disc list-inside mt-3 space-y-2">
+                                <li><strong>容器基础：</strong>我们已经学会用 <span class="code-inline">docker run</span> 启动单个容器（如 Nginx、MySQL）</li>
+                                <li><strong>网络通信：</strong>容器间需要 <span class="code-inline">--network</span> 连到同一网络才能互访，用 IP 或容器名通信</li>
+                                <li><strong>数据持久化：</strong>用 <span class="code-inline">-v</span> 挂载卷（Volume）保证数据不随容器删除而丢失</li>
+                                <li><strong>端口映射：</strong>用 <span class="code-inline">-p</span> 把容器端口暴露到主机，外部才能访问服务</li>
+                                <li><strong>环境变量：</strong>用 <span class="code-inline">-e</span> 向容器注入配置（如数据库密码）</li>
+                            </ul>
+                        </div>
+                        <div class="warning-box text-sm">
+                            <strong><i class="fas fa-question-circle mr-2"></i>现在的问题是什么？</strong>
+                            <p class="mt-2">当我们要部署一个<strong>多容器应用</strong>（比如 WordPress = 前端容器 + MySQL容器），前面学的知识都要用上，但要敲很多条命令，顺序不能错，参数容易漏，团队协作时更难同步……</p>
+                            <p class="mt-2 font-semibold text-orange-700">👉 这就好比每次开车都要手动打火、挂挡、调后视镜——能开，但太累了！</p>
+                        </div>
+                        <div class="grid-auto">
+                            <div class="accent-box">
+                                <h4><i class="fas fa-hand-point-right mr-1"></i> 手动方式痛点</h4>
+                                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                                    <li>多个 docker run 命令顺序复杂</li>
+                                    <li>端口 / 网络 / 环境变量容易写错</li>
+                                    <li>无法一眼看出整体结构</li>
+                                    <li>团队成员难以复现</li>
+                                </ul>
+                            </div>
+                            <div class="accent-box">
+                                <h4><i class="fas fa-bolt mr-1"></i> Compose 优势</h4>
+                                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                                    <li>单一 YAML 描述全部服务</li>
+                                    <li>内建网络，服务名即域名</li>
+                                    <li>统一管理卷与环境变量</li>
+                                    <li>一键启动 / 停止 / 日志聚合</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="info-box text-sm leading-relaxed">
+                            <strong><i class="fas fa-lightbulb mr-1"></i> 核心理念：</strong> docker-compose.yml = 应用“结构清单”。它描述 <span class="code-inline">服务 (services)</span>、<span class="code-inline">网络 (networks)</span>、<span class="code-inline">卷 (volumes)</span>，让复杂应用栈可复制、可版本化。
+                        </div>
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <span class="terminal-dot bg-red-400"></span>
+                                <span class="terminal-dot bg-yellow-400"></span>
+                                <span class="terminal-dot bg-green-400"></span>
+                                <span class="text-white text-xs tracking-wider">手动 VS Compose</span>
+                            </div>
+                            <div class="p-4 text-xs text-green-200 space-y-3">
+<pre class="text-xs text-green-100 overflow-x-auto"><code># 手动方式：每条命令都要敲且顺序不能错
+$ docker network create wp-net
+$ docker run --name wp-db --network wp-net -e MYSQL_ROOT_PASSWORD=rootpass123 \
+    -e MYSQL_DATABASE=wordpress -v wp-mysql:/var/lib/mysql -d mysql:8.0
+$ docker run --name wp-app -p 8080:80 --network wp-net \
+    -e WORDPRESS_DB_HOST=wp-db:3306 wordpress:latest
+</code></pre>
+<pre class="text-xs text-green-100 overflow-x-auto"><code># Compose：把参数写进 YAML 后只需一句
+$ docker compose up -d
+[+] Running 2/2
+ ✔ Container wp-db     Started
+ ✔ Container wp-app    Started
+</code></pre>
+                                <p class="text-[0.7rem] text-gray-300">💡 YAML 可以提交到 Git，所有同学拉到本地直接 <span class="code-inline">docker compose up</span>。</p>
+                            </div>
+                        </div>
+                        <div class="accent-box text-sm">
+                            <h4 class="font-bold text-blue-900 mb-3"><i class="fas fa-lightbulb mr-2"></i>深入理解：Compose 帮我们做了什么？</h4>
+                            <div class="space-y-3">
+                                <div class="bg-white p-3 rounded-lg border border-blue-100">
+                                    <p class="font-semibold text-gray-800">1️⃣ 自动创建网络</p>
+                                    <p class="text-xs text-gray-600 mt-1">手动方式需要 <span class="code-inline">docker network create</span>，Compose 自动创建 <span class="code-inline">项目名_default</span> 网络，所有服务自动加入。</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-blue-100">
+                                    <p class="font-semibold text-gray-800">2️⃣ 服务名即域名</p>
+                                    <p class="text-xs text-gray-600 mt-1">Compose 内置 DNS：服务名 <span class="code-inline">db</span> 直接当主机名用，不需要查 IP。就像打电话存了联系人，不用记号码。</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-blue-100">
+                                    <p class="font-semibold text-gray-800">3️⃣ 统一管理生命周期</p>
+                                    <p class="text-xs text-gray-600 mt-1"><span class="code-inline">docker compose up/down/restart</span> 一次操作所有容器，不用一个个手动启停。</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-blue-100">
+                                    <p class="font-semibold text-gray-800">4️⃣ 声明式配置</p>
+                                    <p class="text-xs text-gray-600 mt-1">YAML 是"说明书"而非"操作步骤"：只描述<strong>最终状态</strong>，Compose 自动按依赖顺序启动。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tip-box text-sm">
+                            <strong>思考题：</strong>
+                            <ol class="list-decimal list-inside mt-2 space-y-1">
+                                <li>为什么在后端代码里访问数据库不再写 127.0.0.1？</li>
+                                <li>如何让数据库数据在容器删除后仍保留？</li>
+                                <li>如果需要添加一个缓存服务，只要改哪一个文件？</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+                <!-- WordPress + MySQL 实战 -->
+                <section id="wordpress" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fab fa-wordpress text-sky-600 mr-3"></i> 2. 实战：用 Compose 快速部署 WordPress + MySQL</h2>
+                    <div class="space-y-8 mt-6">
+                        <div class="warning-box text-sm">
+                            <strong><i class="fas fa-triangle-exclamation mr-1"></i> 目标：</strong> 一条指令启动一个包含数据库 + CMS 的栈，并保证数据库有持久化。
+                        </div>
+                        <div class="accent-box text-sm">
+                            <h4 class="font-bold text-indigo-900 mb-3"><i class="fas fa-graduation-cap mr-2"></i>实战前必备：YAML 基础语法 5 分钟速成</h4>
+                            <p class="text-xs text-gray-700 mb-3">YAML 是一种<strong>缩进敏感</strong>的配置语言（类似 Python），比 JSON 更易读。Compose 配置文件就是 YAML 格式。</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="bg-white p-3 rounded border border-indigo-100">
+                                    <p class="font-semibold text-xs text-indigo-800 mb-2">✅ 正确写法</p>
+                                    <pre class="bg-gray-900 text-green-300 rounded p-2 text-[0.65rem]"><code>services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"</code></pre>
+                                    <p class="text-[0.65rem] text-gray-600 mt-2">• 用<strong>空格</strong>缩进（通常2空格）<br>• 冒号后必须有空格<br>• 列表用 <span class="code-inline">-</span> 开头</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-red-100">
+                                    <p class="font-semibold text-xs text-red-800 mb-2">❌ 常见错误</p>
+                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem]"><code>services:
+    web:           # Tab缩进（错！）
+    image:nginx    # 冒号后无空格（错！）
+    ports:
+    - 80:80        # 引号缺失（错！）</code></pre>
+                                    <p class="text-[0.65rem] text-gray-600 mt-2">• <strong>禁用 Tab</strong>，只用空格<br>• 端口映射要加引号<br>• 冒号后必须空格</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-box text-sm">
+                            <strong><i class="fas fa-sitemap mr-2"></i>应用架构分析：WordPress 需要哪些组件？</strong>
+                            <div class="mt-3 space-y-2">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">🗄️</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">MySQL 数据库容器</p>
+                                        <p class="text-xs text-gray-600">存储文章、用户、评论等数据。需要环境变量配置密码，需要卷持久化数据。</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">🌐</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">WordPress 应用容器</p>
+                                        <p class="text-xs text-gray-600">PHP 应用，对外提供网页。需要知道数据库地址（用服务名），需要卷持久化上传的文件/主题。</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">🔗</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">依赖关系</p>
+                                        <p class="text-xs text-gray-600">WordPress <strong>依赖</strong> MySQL：必须等数据库完全启动（健康检查通过）后，WordPress 才能连接成功。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="success-box text-sm">
+                            <strong><i class="fas fa-lightbulb mr-2"></i>关键知识点回顾</strong>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+                                <li><strong>环境变量传递：</strong>第2讲学的 <span class="code-inline">-e</span> 在 Compose 中变成 <span class="code-inline">environment:</span> 字段</li>
+                                <li><strong>卷挂载：</strong>第3讲学的 <span class="code-inline">-v</span> 在 Compose 中变成 <span class="code-inline">volumes:</span> 字段</li>
+                                <li><strong>端口映射：</strong>第1讲学的 <span class="code-inline">-p</span> 在 Compose 中变成 <span class="code-inline">ports:</span> 字段</li>
+                                <li><strong>服务名解析：</strong>WordPress 配置 <span class="code-inline">WORDPRESS_DB_HOST: db</span>，<span class="code-inline">db</span> 就是 MySQL 服务名，Compose 自动 DNS 解析</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 space-y-4">
+                            <h3 class="font-bold text-blue-900 flex items-center"><span class="step mr-2">1</span> 创建工作目录</h3>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="mkdir compose-wp&#10;cd compose-wp">复制</button><code>mkdir compose-wp
+cd compose-wp</code></pre>
+                            <p class="text-xs text-gray-600">（保持目录整洁，后续只需一个 YAML 文件即可描述整个应用栈。）</p>
+                            <div class="info-box text-xs">
+                                <strong>预期输出：</strong> 终端不会返回额外内容；使用 <span class="code-inline">pwd</span> / <span class="code-inline">cd</span> 验证当前目录已切换到 <span class="code-inline">compose-wp</span>。
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 space-y-4">
+                            <h3 class="font-bold text-green-900 flex items-center"><span class="step mr-2">2</span> 编写 docker-compose.yml</h3>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 overflow-x-auto text-sm"><button class="copy-button">复制</button><code># 可选：指定版本（新版本可省略）
+services:
+  db:
+    image: mysql:8.0
+    container_name: wp-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass456
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      timeout: 3s
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wp-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass456
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_data:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  wp_data:
+</code></pre>
+                            <div class="info-box text-xs leading-relaxed">
+                                <p><strong>关键解释：</strong></p>
+                                <ul class="list-disc list-inside mt-2 space-y-1">
+                                    <li><span class="code-inline">depends_on + healthcheck</span>：确保 WordPress 等数据库健康后再启动。</li>
+                                    <li><span class="code-inline">volumes</span>：<span class="code-inline">db_data</span> 持久化 MySQL、<span class="code-inline">wp_data</span> 持久化站点文件。</li>
+                                    <li><span class="code-inline">WORDPRESS_DB_HOST: db:3306</span>：服务名 db 直接作为主机名（Compose 自带 DNS）。</li>
+                                </ul>
+                            </div>
+                            <div class="accent-box text-xs">
+                                <h4 class="text-blue-900 text-sm font-semibold mb-1">文件检查</h4>
+                                <p>运行 <span class="code-inline">ls</span> 或 <span class="code-inline">dir</span> 应只看到 <span class="code-inline">docker-compose.yml</span>。</p>
+                                <pre class="bg-gray-900 text-green-200 rounded p-3 mt-2"><code>$ ls
+ docker-compose.yml</code></pre>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 space-y-4">
+                            <h3 class="font-bold text-orange-900 flex items-center"><span class="step mr-2">3</span> 一键启动与验证</h3>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="docker compose up -d&#10;docker compose ps">复制</button><code>docker compose up -d
+# 或旧版：docker-compose up -d
+
+docker compose ps</code></pre>
+                            <div class="terminal-window">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs tracking-wider">预期输出</span>
+                                </div>
+                                <div class="p-4 text-xs text-green-100 space-y-4">
+<pre class="text-[0.7rem]"><code>$ docker compose up -d
+[+] Running 2/2
+ ✔ Container wp-db     Started
+ ✔ Container wp-app    Started</code></pre>
+<pre class="text-[0.7rem]"><code>$ docker compose ps
+NAME      IMAGE             COMMAND               STATE           PORTS
+wp-db     mysql:8.0         "docker-entrypoint…"  Up 15s          3306/tcp
+wp-app    wordpress:latest  "docker-entrypoint…"  Up 10s          0.0.0.0:8080->80/tcp</code></pre>
+                                </div>
+                            </div>
+                            <div class="success-box text-xs">
+                                <strong>浏览器访问：</strong> <span class="code-inline">http://localhost:8080</span> → 看到 WordPress 安装页面即成功。
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 space-y-4">
+                            <h3 class="font-bold text-purple-900 flex items-center"><span class="step mr-2">4</span> 常用后续命令</h3>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="docker compose logs -f&#10;docker compose exec db mysql -u root -p&#10;docker compose down&#10;docker compose down -v">复制</button><code># 实时所有服务日志
+                                    docker compose logs -f
+                                    # 进入数据库交互
+                                    docker compose exec db mysql -u root -p
+                                    # 停止并移除（保留卷）
+                                    docker compose down
+                                    # 停止并删除卷（慎用！）
+                                    docker compose down -v</code></pre>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span class="terminal-dot bg-red-400"></span>
+                                        <span class="terminal-dot bg-yellow-400"></span>
+                                        <span class="terminal-dot bg-green-400"></span>
+                                        <span class="text-white text-xs tracking-wider">日志 & 交互示例</span>
+                                    </div>
+                                    <div class="p-4 text-xs text-green-100 space-y-4">
+    <pre class="text-[0.7rem]"><code>$ docker compose logs -f db
+    wp-db  | 2025-05-01T12:00:02.123Z  Ready for connections</code></pre>
+    <pre class="text-[0.7rem]"><code>$ docker compose exec db mysql -u root -p
+    Enter password: ********
+    mysql> SHOW DATABASES;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    | wordpress          |
+    +--------------------+</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="bg-gradient-to-br from-rose-50 to-rose-100 border border-rose-200 rounded-xl p-6 space-y-4">
+                            <h3 class="font-bold text-rose-900 flex items-center"><span class="step mr-2">5</span> 验证卷持久化</h3>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="docker compose down&#10;docker compose up -d&#10;docker compose exec db mysql -u root -p -e &quot;SHOW DATABASES;&quot;">复制</button><code># 停止容器（卷仍保留）
+docker compose down
+
+# 再次启动
+docker compose up -d
+
+# 检查数据库是否仍在
+docker compose exec db mysql -u root -p -e "SHOW DATABASES;"</code></pre>
+                            <div class="terminal-window">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs tracking-wider">预期输出</span>
+                                </div>
+                                <div class="p-4 text-xs text-green-100 space-y-4">
+<pre class="text-[0.7rem]"><code>$ docker compose down
+[+] Running 2/2
+ ✔ Container wp-app   Removed
+ ✔ Container wp-db    Removed
+Network compose-wp_default     Removed
+Volume compose-wp_db_data      Skipped
+Volume compose-wp_wp_data      Skipped</code></pre>
+<pre class="text-[0.7rem]"><code>$ docker compose exec db mysql -u root -p -e "SHOW DATABASES;"
+Enter password: ********
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| wordpress          |
++--------------------+</code></pre>
+                                </div>
+                            </div>
+                            <div class="info-box text-xs">
+                                <strong>预期：</strong> 输出仍包含 <span class="code-inline">wordpress</span> 数据库；浏览器刷新后网站数据不丢失。若执行 <span class="code-inline">docker compose down -v</span> 再启动，则需要重新安装，说明卷被删除。
+                            </div>
+                        </div>
+                        <div class="tip-box text-sm">
+                            <strong>小练习：</strong> 请修改端口映射为 <span class="code-inline">8888:80</span> 并再次启动，确认可通过 <span class="code-inline">http://localhost:8888</span> 访问。
+                        </div>
+                    </div>
+                </section>
+                <!-- Compose File 结构详解 -->
+                <section id="compose-file" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fas fa-file-code text-indigo-600 mr-3"></i> 3. docker-compose.yml 结构与关键字段</h2>
+                    <div class="space-y-6 mt-6">
+                        <div class="info-box text-sm">
+                            <strong><i class="fas fa-link mr-2"></i>与前几讲知识的对应关系</strong>
+                            <p class="mt-2 text-xs">Compose 配置文件本质上是把<strong>命令行参数</strong>转换成 YAML 格式。下表帮你建立对照：</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="text-xs">
+                                <thead>
+                                    <tr class="bg-blue-50">
+                                        <th class="w-1/4">docker run 参数</th>
+                                        <th class="w-1/4">Compose 字段</th>
+                                        <th class="w-1/2">作用说明</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-mono">--name myapp</td>
+                                        <td class="font-mono">container_name: myapp</td>
+                                        <td>指定容器名（可选，默认用"项目名_服务名_序号"）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">-p 8080:80</td>
+                                        <td class="font-mono">ports:<br>&nbsp;&nbsp;- "8080:80"</td>
+                                        <td>端口映射（注意加引号）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">-e KEY=value</td>
+                                        <td class="font-mono">environment:<br>&nbsp;&nbsp;KEY: value</td>
+                                        <td>环境变量注入（也可用列表格式 <span class="code-inline">- KEY=value</span>）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">-v vol:/path</td>
+                                        <td class="font-mono">volumes:<br>&nbsp;&nbsp;- vol:/path</td>
+                                        <td>卷挂载（顶层需声明 <span class="code-inline">volumes:</span>）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">--network mynet</td>
+                                        <td class="font-mono">networks:<br>&nbsp;&nbsp;- mynet</td>
+                                        <td>加入指定网络（默认自动创建）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">--restart unless-stopped</td>
+                                        <td class="font-mono">restart: unless-stopped</td>
+                                        <td>重启策略（no / always / on-failure / unless-stopped）</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mt-8 mb-4">关键字段详解（附完整示例）</h3>
+                        <div class="space-y-6">
+                            <!-- services -->
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
+                                <h4 class="font-bold text-blue-900 mb-2"><span class="code-inline">services</span> - 定义所有容器服务</h4>
+                                <p class="text-sm text-gray-700 mb-3">这是 Compose 文件的核心，每个服务就是一个容器。服务名可以作为主机名在容器间通信。</p>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+  web:        # 服务名，其他容器可用 "web" 访问
+    image: nginx:alpine
+  db:         # 另一个服务
+    image: mysql:8.0</code></pre>
+                                <p class="text-xs text-gray-600 mt-2">💡 <strong>理解要点：</strong>web 容器里可以 <span class="code-inline">ping db</span> 或访问 <span class="code-inline">http://db:3306</span></p>
+                            </div>
+                            
+                            <!-- image -->
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
+                                <h4 class="font-bold text-green-900 mb-2"><span class="code-inline">image</span> - 指定使用的镜像</h4>
+                                <p class="text-sm text-gray-700 mb-3">等同于 <span class="code-inline">docker run</span> 后面跟的镜像名。可以是 Docker Hub 或私有仓库的镜像。</p>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+  web:
+    image: nginx:1.25-alpine    # 推荐指定版本号
+  # 或使用私有仓库
+  app:
+    image: registry.example.com/myapp:v1.0</code></pre>
+                                <p class="text-xs text-gray-600 mt-2">💡 <strong>最佳实践：</strong>生产环境必须指定版本号（如 <span class="code-inline">:1.25</span>），别用 <span class="code-inline">:latest</span></p>
+                            </div>
+                            
+                            <!-- ports -->
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
+                                <h4 class="font-bold text-purple-900 mb-2"><span class="code-inline">ports</span> - 端口映射</h4>
+                                <p class="text-sm text-gray-700 mb-3">将容器端口暴露到主机。格式：<span class="code-inline">"主机端口:容器端口"</span>（必须加引号！）</p>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"      # 主机8080 → 容器80
+      - "8443:443"     # 可以映射多个端口
+      - "127.0.0.1:9000:9000"  # 只绑定本地回环</code></pre>
+                                <p class="text-xs text-gray-600 mt-2">⚠️ <strong>注意：</strong>不加引号会被 YAML 解析为时间！写成 <span class="code-inline">8080:80</span> 会报错</p>
+                            </div>
+                            
+                            <!-- environment -->
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-yellow-500 shadow-sm">
+                                <h4 class="font-bold text-yellow-900 mb-2"><span class="code-inline">environment</span> - 环境变量</h4>
+                                <p class="text-sm text-gray-700 mb-3">向容器注入配置，等同于 <span class="code-inline">docker run -e</span>。支持两种写法。</p>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+  db:
+    image: mysql:8.0
+    environment:
+      # 写法1：键值对格式（推荐）
+      MYSQL_ROOT_PASSWORD: secret123
+      MYSQL_DATABASE: myapp
+      # 写法2：列表格式
+      # - MYSQL_ROOT_PASSWORD=secret123
+      # - MYSQL_DATABASE=myapp</code></pre>
+                                <p class="text-xs text-gray-600 mt-2">💡 <strong>敏感信息：</strong>密码应该放 <span class="code-inline">.env</span> 文件，不要直接写在 YAML 里</p>
+                            </div>
+                            
+                            <!-- volumes -->
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-red-500 shadow-sm">
+                                <h4 class="font-bold text-red-900 mb-2"><span class="code-inline">volumes</span> - 数据持久化</h4>
+                                <p class="text-sm text-gray-700 mb-3">挂载卷或目录，等同于 <span class="code-inline">docker run -v</span>。容器删除后数据仍保留。</p>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql        # 命名卷（推荐）
+      - ./config:/etc/mysql/conf.d    # 挂载本地目录
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro  # 只读
+
+# ⚠️ 命名卷必须在文件末尾声明！
+volumes:
+  db_data:    # 这样才能使用 db_data</code></pre>
+                                <p class="text-xs text-gray-600 mt-2">💡 <strong>区别：</strong>命名卷由 Docker 管理，本地目录挂载用 <span class="code-inline">./</span> 开头</p>
+                            </div>
+                            
+                            <!-- depends_on -->
+                            <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-500 shadow-sm">
+                                <h4 class="font-bold text-indigo-900 mb-2"><span class="code-inline">depends_on</span> - 启动顺序</h4>
+                                <p class="text-sm text-gray-700 mb-3">控制启动顺序。⚠️ 只保证容器启动，不保证服务就绪！</p>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+  web:
+    image: wordpress
+    depends_on:
+      db:
+        condition: service_healthy  # ✅ 推荐：等健康检查通过
+  db:
+    image: mysql:8.0
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10</code></pre>
+                                <p class="text-xs text-gray-600 mt-2">💡 <strong>原理：</strong>没有 healthcheck 时，depends_on 只等容器启动，MySQL 可能还未初始化完成</p>
+                            </div>
+                        </div>
+                        <div class="info-box text-xs">
+                            <strong>提示：</strong> 默认所有 services 在同一网络下，可直接用 <span class="code-inline">服务名:端口</span> 互相访问，无需手写 <span class="code-inline">--network</span>。
+                        </div>
+                        <div class="warning-box text-sm">
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i>新手常见错误与解决</strong>
+                            <div class="mt-3 space-y-3">
+                                <div class="bg-white p-3 rounded border border-orange-100">
+                                    <p class="font-semibold text-xs text-red-700">❌ 错误 1：端口不加引号</p>
+                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem] mt-1"><code>ports:
+  - 8080:80   # YAML 会误解为时间格式！</code></pre>
+                                    <p class="text-[0.65rem] text-green-700 mt-2">✅ 正确：<span class="code-inline">- "8080:80"</span> 或 <span class="code-inline">- '8080:80'</span></p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-orange-100">
+                                    <p class="font-semibold text-xs text-red-700">❌ 错误 2：depends_on 不等于"等数据库启动完成"</p>
+                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem] mt-1"><code>depends_on:
+  - db   # 只保证 db 容器启动，不保证 MySQL 服务就绪！</code></pre>
+                                    <p class="text-[0.65rem] text-green-700 mt-2">✅ 正确：加 <span class="code-inline">condition: service_healthy</span> + healthcheck</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-orange-100">
+                                    <p class="font-semibold text-xs text-red-700">❌ 错误 3：忘记在顶层声明 volumes</p>
+                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem] mt-1"><code>services:
+  db:
+    volumes:
+      - db_data:/var/lib/mysql
+# 忘了在文件末尾加：
+# volumes:
+#   db_data:</code></pre>
+                                    <p class="text-[0.65rem] text-green-700 mt-2">✅ 正确：文件末尾必须声明 <span class="code-inline">volumes: { db_data: }</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- 常用命令速查 -->
+                <section id="commands" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fas fa-terminal text-gray-700 mr-3"></i> 4. Docker Compose 常用命令速查</h2>
+                    <div class="space-y-6 mt-6">
+                        <div class="info-box text-sm">
+                            <strong><i class="fas fa-exchange-alt mr-2"></i>Compose 命令 vs Docker 命令对照</strong>
+                            <p class="text-xs mt-2">每条 <span class="code-inline">docker compose</span> 命令背后都是在帮你批量执行对应的 <span class="code-inline">docker</span> 命令。理解这层对应关系，遇到问题就能更快定位。</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="text-xs">
+                                <thead>
+                                    <tr class="bg-gray-50">
+                                        <th>Compose 命令</th>
+                                        <th>等价的 docker 操作</th>
+                                        <th>说明</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-mono">docker compose up -d</td>
+                                        <td class="font-mono text-[0.65rem]">docker network create ...<br>docker run -d --name db ...<br>docker run -d --name web ...</td>
+                                        <td>创建网络 + 按依赖顺序启动所有服务</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">docker compose ps</td>
+                                        <td class="font-mono">docker ps --filter ...</td>
+                                        <td>只显示当前项目的容器状态</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">docker compose logs -f</td>
+                                        <td class="font-mono">docker logs -f db & docker logs -f web</td>
+                                        <td>聚合所有服务的日志输出</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">docker compose exec web sh</td>
+                                        <td class="font-mono">docker exec -it web sh</td>
+                                        <td>进入指定服务的容器（自动找容器名）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">docker compose down</td>
+                                        <td class="font-mono text-[0.65rem]">docker stop db web<br>docker rm db web<br>docker network rm ...</td>
+                                        <td>停止并删除容器 + 网络（保留卷）</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-mono">docker compose down -v</td>
+                                        <td class="font-mono">... + docker volume rm ...</td>
+                                        <td>连同卷一起删除（<strong>慎用！</strong>）</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="space-y-6 mt-6">
+                        <!-- up -d -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
+                            <h4 class="font-bold text-green-900 mb-2">🚀 启动所有服务（后台运行）</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose up -d</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong><span class="code-inline">-d</span> = detached 模式（后台）。会自动创建网络、卷，按依赖顺序启动容器。</p>
+                            <div class="terminal-window mt-3">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs">预期输出</span>
+                                </div>
+                                <div class="p-3 text-xs text-green-200">
+<pre><code>[+] Running 3/3
+ ✔ Network myproject_default    Created    0.1s
+ ✔ Container myproject-db-1     Started    0.5s
+ ✔ Container myproject-web-1    Started    0.8s</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ps -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
+                            <h4 class="font-bold text-blue-900 mb-2">👀 查看容器状态</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose ps</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>只显示当前项目的容器（不像 <span class="code-inline">docker ps</span> 显示所有容器）。</p>
+                            <div class="terminal-window mt-3">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs">预期输出</span>
+                                </div>
+                                <div class="p-3 text-xs text-green-200">
+<pre><code>NAME                  IMAGE         STATUS         PORTS
+myproject-db-1        mysql:8.0     Up 2 minutes   3306/tcp
+myproject-web-1       nginx:alpine  Up 2 minutes   0.0.0.0:8080->80/tcp</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- logs -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-yellow-500 shadow-sm">
+                            <h4 class="font-bold text-yellow-900 mb-2">📋 查看日志（实时滚动）</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose logs -f          # 查看所有服务日志
+docker compose logs -f web      # 只看 web 服务日志
+docker compose logs --tail 50   # 只看最后50行</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong><span class="code-inline">-f</span> = follow（跟随），类似 <span class="code-inline">tail -f</span>。按 <kbd>Ctrl+C</kbd> 退出。</p>
+                            <div class="terminal-window mt-3">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs">预期输出示例</span>
+                                </div>
+                                <div class="p-3 text-xs text-green-200">
+<pre><code>myproject-db-1   | 2025-11-23 10:30:15 Ready for connections
+myproject-web-1  | 192.168.1.10 - - [23/Nov/2025] "GET / HTTP/1.1" 200</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- exec -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
+                            <h4 class="font-bold text-purple-900 mb-2">🔧 进入容器执行命令</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose exec web sh              # 进入 web 容器的 shell
+docker compose exec db mysql -u root -p  # 进入 MySQL 交互式客户端
+docker compose exec web cat /etc/hosts   # 执行单条命令</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>不用记容器名，直接用服务名。相当于 <span class="code-inline">docker exec -it 容器名 命令</span>。</p>
+                        </div>
+
+                        <!-- down -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-red-500 shadow-sm">
+                            <h4 class="font-bold text-red-900 mb-2">🛑 停止并删除容器</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose down       # 删除容器 + 网络，保留卷
+docker compose down -v    # 连卷一起删（⚠️ 数据会丢失！）</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>默认保留卷（数据持久化）。加 <span class="code-inline">-v</span> 会删除所有数据，慎用！</p>
+                            <div class="terminal-window mt-3">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs">预期输出</span>
+                                </div>
+                                <div class="p-3 text-xs text-green-200">
+<pre><code>[+] Running 3/3
+ ✔ Container myproject-web-1    Removed    1.2s
+ ✔ Container myproject-db-1     Removed    2.3s
+ ✔ Network myproject_default    Removed    0.1s</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- restart -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-500 shadow-sm">
+                            <h4 class="font-bold text-indigo-900 mb-2">🔄 重启服务</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose restart          # 重启所有服务
+docker compose restart web      # 只重启 web 服务</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>修改配置文件后需要重启。不会重新创建容器，只是 stop + start。</p>
+                        </div>
+
+                        <!-- config -->
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-teal-500 shadow-sm">
+                            <h4 class="font-bold text-teal-900 mb-2">✅ 验证配置文件</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose config   # 检查 YAML 语法是否正确</code></pre>
+                            <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>启动前先运行这个，可以提前发现缩进、引号等语法错误。</p>
+                        </div>
+                    </div>
+                </section>
+                <!-- 排错 -->
+                <section id="troubleshoot" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fas fa-bug text-red-600 mr-3"></i> 5. 常见问题与排查技巧</h2>
+                    <div class="space-y-6 mt-6 text-sm">
+                        <div class="warning-box">
+                            <strong>问题 1：WordPress 提示无法连接数据库</strong>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+                                <li>检查 <span class="code-inline">WORDPRESS_DB_HOST</span> 是否为 <span class="code-inline">db:3306</span></li>
+                                <li>确认 <span class="code-inline">MYSQL_DATABASE</span> / 用户 / 密码一致</li>
+                                <li>使用 <span class="code-inline">docker compose logs db</span> 查看 MySQL 是否初始化完成</li>
+                            </ul>
+                        </div>
+                        <div class="warning-box">
+                            <strong>问题 2：MySQL 启动后立即退出</strong>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+                                <li>密码太简单或为空 → 使用复杂密码</li>
+                                <li>旧数据卷与镜像版本冲突 → 尝试 <span class="code-inline">docker compose down -v</span> 后重新启动（慎重，数据将清空）</li>
+                            </ul>
+                        </div>
+                        <div class="warning-box">
+                            <strong>问题 3：端口冲突</strong>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+                                <li>修改 <span class="code-inline">ports: - "8888:80"</span></li>
+                                <li>查看占用：<span class="code-inline">netstat -ano | findstr 8080</span>（Windows）</li>
+                            </ul>
+                        </div>
+                        <div class="info-box text-xs">
+                            <strong>调试技巧：</strong> 使用 <span class="code-inline">docker compose exec</span> 进入容器后可直接 <span class="code-inline">ping db</span> 验证 DNS、生效网络。
+                        </div>
+                    </div>
+                </section>
+                <!-- 竞赛模拟题 -->
+                <section id="challenge" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fas fa-rocket text-pink-600 mr-3"></i> 6. 实战练习：Nginx + MySQL 双服务部署</h2>
+                    <div class="space-y-6 mt-6">
+                        <div class="success-box">
+                            <strong>🎯 练习目标：</strong> 部署一个 Nginx 网站 + MySQL 数据库的双容器应用，掌握服务间 DNS 通信和数据持久化。
+                        </div>
+                        <div class="info-box">
+                            <strong><i class="fas fa-lightbulb mr-2"></i>场景说明</strong>
+                            <p class="mt-2">你正在为学校官网搭建测试环境：</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>前端是一个静态 HTML 页面（用 Nginx 提供）</li>
+                                <li>后端有一个 MySQL 数据库（存储用户信息、文章等）</li>
+                                <li>前端页面需要通过 PHP 脚本连接数据库（本练习简化为直接测试连通性）</li>
+                            </ul>
+                        </div>
+                        <div class="warning-box">
+                            <strong><i class="fas fa-clipboard-list mr-2"></i>你需要完成的任务</strong>
+                            <ol class="list-decimal list-inside mt-3 space-y-2">
+                                <li>创建一个 <span class="code-inline">docker-compose.yml</span> 文件</li>
+                                <li>定义两个服务：<span class="code-inline">web</span>（Nginx）和 <span class="code-inline">db</span>（MySQL）</li>
+                                <li>Nginx 映射到主机的 <span class="code-inline">8090</span> 端口</li>
+                                <li>MySQL 数据持久化到名为 <span class="code-inline">mysql_data</span> 的卷</li>
+                                <li>在 <span class="code-inline">web</span> 容器中验证能够 <span class="code-inline">ping db</span>（测试 DNS 解析）</li>
+                            </ol>
+                        </div>
+                        
+                        <h3 class="font-bold text-gray-800 text-xl mb-4">📝 分步实现指南</h3>
+                        
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 p-5 rounded-lg">
+                            <h4 class="font-bold text-blue-900 mb-3 flex items-center"><span class="step mr-2">1</span> 创建工作目录</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>mkdir nginx-mysql-demo
+cd nginx-mysql-demo</code></pre>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 p-5 rounded-lg">
+                            <h4 class="font-bold text-green-900 mb-3 flex items-center"><span class="step mr-2">2</span> 编写 docker-compose.yml</h4>
+                            <p class="text-sm text-gray-700 mb-3">按照以下提示填空完成配置文件：</p>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm overflow-x-auto"><button class="copy-button">复制</button><code>services:
+  web:
+    image: nginx:alpine
+    container_name: my-nginx
+    ports:
+      - "__________"    # 填空1：映射到主机8090端口
+    depends_on:
+      - db              # Nginx 依赖 MySQL（虽然不直接通信，但演示依赖关系）
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:8.0
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ________    # 填空2：设置root密码（如 mypass123）
+      MYSQL_DATABASE: ________         # 填空3：创建一个数据库（如 testdb）
+    volumes:
+      - mysql_data:________            # 填空4：MySQL数据目录 /var/lib/mysql
+    networks:
+      - mynetwork
+
+# 填空5：声明命名卷
+volumes:
+  ________:
+
+# 填空6：声明网络（可选，Compose 会自动创建，这里是为了演示）
+networks:
+  ________:</code></pre>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 p-5 rounded-lg">
+                            <h4 class="font-bold text-yellow-900 mb-3 flex items-center"><span class="step mr-2">3</span> 参考答案</h4>
+                            <details class="bg-white p-4 rounded">
+                                <summary class="cursor-pointer font-semibold text-gray-800 mb-2">点击查看完整答案</summary>
+                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm overflow-x-auto mt-3"><button class="copy-button">复制</button><code>services:
+  web:
+    image: nginx:alpine
+    container_name: my-nginx
+    ports:
+      - "8090:80"      # 主机8090 → 容器80
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:8.0
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mypass123
+      MYSQL_DATABASE: testdb
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
+volumes:
+  mysql_data:
+
+networks:
+  mynetwork:</code></pre>
+                            </details>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500 p-5 rounded-lg">
+                            <h4 class="font-bold text-purple-900 mb-3 flex items-center"><span class="step mr-2">4</span> 启动并验证</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code># 1. 检查配置文件语法
+docker compose config
+
+# 2. 启动服务
+docker compose up -d
+
+# 3. 查看运行状态
+docker compose ps</code></pre>
+                            <div class="terminal-window mt-3">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs">预期输出</span>
+                                </div>
+                                <div class="p-3 text-xs text-green-200">
+<pre><code>NAME        IMAGE          STATUS         PORTS
+my-nginx    nginx:alpine   Up 10 seconds  0.0.0.0:8090->80/tcp
+my-mysql    mysql:8.0      Up 12 seconds  3306/tcp</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500 p-5 rounded-lg">
+                            <h4 class="font-bold text-pink-900 mb-3 flex items-center"><span class="step mr-2">5</span> 验证服务间通信（重点！）</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code># 进入 web 容器
+docker compose exec web sh
+
+# 在容器内测试 DNS 解析
+ping -c 3 db
+
+# 尝试连接 MySQL（需要安装客户端，这里演示原理）
+# apk add mysql-client
+# mysql -h db -u root -p</code></pre>
+                            <div class="terminal-window mt-3">
+                                <div class="terminal-header">
+                                    <span class="terminal-dot bg-red-400"></span>
+                                    <span class="terminal-dot bg-yellow-400"></span>
+                                    <span class="terminal-dot bg-green-400"></span>
+                                    <span class="text-white text-xs">预期输出</span>
+                                </div>
+                                <div class="p-3 text-xs text-green-200">
+<pre><code>/ # ping -c 3 db
+PING db (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.123 ms
+64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.098 ms
+64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.101 ms
+
+--- db ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss</code></pre>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-3">💡 <strong>说明：</strong>看到 ping 成功，证明 Compose 的 DNS 生效了！<span class="code-inline">db</span> 这个服务名被自动解析成了容器的 IP 地址。</p>
+                        </div>
+                        
+                        <div class="tip-box">
+                            <strong><i class="fas fa-graduation-cap mr-2"></i>知识点总结</strong>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>服务名即主机名：</strong><span class="code-inline">db</span> 可以直接 ping 通，不需要知道 IP</li>
+                                <li><strong>端口映射：</strong>只有 <span class="code-inline">web</span> 暴露了主机端口，<span class="code-inline">db</span> 只在内部网络可访问（更安全）</li>
+                                <li><strong>数据持久化：</strong><span class="code-inline">mysql_data</span> 卷保证删除容器后数据库数据不丢失</li>
+                                <li><strong>depends_on：</strong>保证 MySQL 先启动，Nginx 后启动（虽然本例中不直接依赖）</li>
+                            </ul>
+                        </div>
+                        <div class="success-box">
+                            <strong><i class="fas fa-trophy mr-2"></i>挑战任务（可选）</strong>
+                            <p class="mt-2">完成基础练习后，尝试以下扩展：</p>
+                            <ol class="list-decimal list-inside mt-2 space-y-1">
+                                <li>给 MySQL 添加 healthcheck，让 web 等数据库健康后再启动</li>
+                                <li>在 Nginx 中挂载一个自定义 HTML 文件（<span class="code-inline">./index.html:/usr/share/nginx/html/index.html</span>）</li>
+                                <li>运行 <span class="code-inline">docker compose down</span>，再 <span class="code-inline">docker compose up -d</span>，验证 MySQL 数据是否仍在</li>
+                                <li>修改 MySQL 密码，重新启动，进入 MySQL 容器验证新密码生效</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+                <!-- 进阶优化 -->
+                <section id="extras" class="section-card">
+                    <h2 class="font-bold text-gray-900 flex items-center"><i class="fas fa-layer-group text-teal-600 mr-3"></i> 7. 进阶与优化策略</h2>
+                    <div class="space-y-6 mt-6 text-sm">
+                        <div class="accent-box text-xs">
+                            <h4><i class="fas fa-shield-alt mr-1"></i> 使用 .env 管理敏感变量</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-3 text-[0.7rem]"><code># .env 示例
+MYSQL_ROOT_PASSWORD=rootpass123
+MYSQL_DATABASE=wordpress
+MYSQL_USER=wpuser
+MYSQL_PASSWORD=wppass456</code></pre>
+                            <p class="mt-2">在 compose 中用 <span class="code-inline">environment:</span> 引用或使用 <span class="code-inline">env_file: .env</span>。</p>
+                        </div>
+                        <div class="accent-box text-xs">
+                            <h4><i class="fas fa-network-wired mr-1"></i> 自定义网络隔离</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-3 text-[0.7rem]"><code>networks:
+  internal:
+    driver: bridge
+services:
+  db:
+    networks: [internal]
+  wordpress:
+    networks: [internal]</code></pre>
+                            <p class="mt-2">防止与其他栈端口和网络相互干扰。</p>
+                        </div>
+                        <div class="accent-box text-xs">
+                            <h4><i class="fas fa-check-circle mr-1"></i> Healthcheck 提升可靠性</h4>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-3 text-[0.7rem]"><code>healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:5000/api/counter"]
+  interval: 15s
+  retries: 4
+  timeout: 3s</code></pre>
+                        </div>
+                        <div class="accent-box text-xs">
+                            <h4><i class="fas fa-compress-arrows-alt mr-1"></i> 减少镜像体积</h4>
+                            <ul class="list-disc list-inside space-y-1 mt-1">
+                                <li>使用 <span class="code-inline">alpine</span> 基础镜像</li>
+                                <li>多阶段构建：编译阶段 + 运行阶段</li>
+                                <li>清理缓存：如 <span class="code-inline">pip install --no-cache-dir</span></li>
+                            </ul>
+                        </div>
+                        <div class="success-box text-xs">
+                            <strong>总结：</strong> Compose = 描述、协作、复现、扩展的利器。掌握：服务名互联、卷持久化、健康依赖、分层优化，即具备竞赛中快速搭建“应用栈”能力。
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+        // 可选：平滑滚动激活导航
+        const navLinks = document.querySelectorAll('aside nav a');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                const id = e.target.getAttribute('id');
+                const link = Array.from(navLinks).find(a => a.getAttribute('href') === '#' + id);
+                if (link) {
+                    if (e.isIntersecting) {
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                }
+            });
+        }, { root: document.querySelector('#main-content'), threshold: 0.25 });
+        document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+
+        // 统一的复制按钮逻辑
+        document.querySelectorAll('.copy-button').forEach(btn => {
+            const originalLabel = btn.textContent;
+            btn.addEventListener('click', async () => {
+                const codeBlock = btn.parentElement?.querySelector('code');
+                const text = btn.dataset.copy || codeBlock?.innerText || '';
+                if (!text.trim()) {
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(text);
+                    btn.textContent = '已复制';
+                    setTimeout(() => btn.textContent = originalLabel, 1500);
+                } catch (err) {
+                    console.error('复制失败', err);
+                    btn.textContent = '失败';
+                    setTimeout(() => btn.textContent = originalLabel, 1500);
+                }
+            });
+        });
+
+        // 导航栏高亮切换
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 根据滚动位置自动高亮
+        const sections = document.querySelectorAll('section[id]');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

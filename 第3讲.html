@@ -16,162 +16,164 @@
             background-image: 
                 radial-gradient(at 20% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
                 radial-gradient(at 80% 80%, rgba(251, 146, 60, 0.08) 0px, transparent 50%);
-            font-size: 17px;
-            line-height: 1.7;
+            font-size: 24px;
+            line-height: 1.8;
             color: #0f172a;
         }
         @media (min-width: 1920px) {
             body {
-                font-size: 18px;
-                line-height: 1.75;
+                font-size: 26px;
+                line-height: 1.9;
             }
         }
         @media (min-width: 2560px) {
             body {
-                font-size: 20px;
-                line-height: 1.8;
+                font-size: 28px;
+                line-height: 2;
             }
         }
         @media (min-width: 3440px) {
             body {
-                font-size: 22px;
-                line-height: 1.85;
+                font-size: 30px;
+                line-height: 2.1;
             }
         }
         code, pre {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            line-height: 1.7;
+            font-size: 1rem;
+            line-height: 1.8;
+            padding: 2rem;
         }
+        pre{margin:2rem 0;display:block;clear:both}
+        code{padding:.4rem .8rem;display:inline-block;margin:0.2rem 0.1rem;vertical-align:baseline}
         @media (min-width: 1920px) {
             code, pre {
                 font-size: 1rem;
-                line-height: 1.75;
+                line-height: 1.9;
             }
         }
         @media (min-width: 2560px) {
             code, pre {
-                font-size: 1.1rem;
-                line-height: 1.8;
+                font-size: 1rem;
+                line-height: 2;
             }
         }
         @media (min-width: 3440px) {
             code, pre {
-                font-size: 1.15rem;
-                line-height: 1.85;
+                font-size: 1rem;
+                line-height: 2.1;
             }
         }
         .section-card {
             border-radius: 1.75rem;
             background: rgba(255, 255, 255, 0.96);
-            padding: 2rem 2.5rem;
+            padding: 3.5rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 30px 50px -35px rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(148, 163, 184, 0.25);
             transition: all 0.3s ease;
         }
+        @media (min-width: 1920px) {
+            .section-card {
+                padding: 4rem;
+            }
+        }
         @media (min-width: 2560px) {
             .section-card {
-                padding: 2.5rem 3rem;
+                padding: 4.5rem;
             }
         }
         @media (min-width: 3440px) {
             .section-card {
-                padding: 3rem 3.5rem;
+                padding: 5rem;
             }
         }
         .section-card:hover {
             box-shadow: 0 40px 60px -30px rgba(15, 23, 42, 0.9);
             border-color: rgba(37, 99, 235, 0.15);
         }
+        h1{font-size:2rem!important}h2{font-size:1.8rem!important}h3{font-size:1.5rem!important}h4{font-size:1.3rem!important}
         .section-card h2 {
-            font-size: 2.2rem;
+            font-size: 1.8rem!important;
             letter-spacing: -0.02em;
             position: relative;
-            padding-bottom: 0.5rem;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
         }
         @media (min-width: 1920px) {
-            .section-card h2 {
-                font-size: 2.8rem;
-            }
+            h1{font-size:2.2rem!important}h2,.section-card h2{font-size:2rem!important}h3{font-size:1.6rem!important}h4{font-size:1.4rem!important}
         }
         @media (min-width: 2560px) {
-            .section-card h2 {
-                font-size: 3.4rem;
-            }
+            h1{font-size:2.4rem!important}h2,.section-card h2{font-size:2.2rem!important}h3{font-size:1.7rem!important}h4{font-size:1.5rem!important}
         }
         @media (min-width: 3440px) {
-            .section-card h2 {
-                font-size: 3.8rem;
-            }
+            h1{font-size:2.6rem!important}h2,.section-card h2{font-size:2.4rem!important}h3{font-size:1.8rem!important}h4{font-size:1.6rem!important}
         }
         .section-card h2::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 60px;
-            height: 4px;
+            width: 90px;
+            height: 5px;
             background: linear-gradient(to right, #2563eb, #f97316);
-            border-radius: 2px;
+            border-radius: 3px;
         }
         .section-card h3 {
-            font-size: 1.35rem;
+            font-size: 1.5rem!important;
             letter-spacing: -0.01em;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
         }
+        .section-card h4 {
+            font-size: 1.3rem!important;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        p,li,td,span:not(h1 span):not(h2 span):not(h3 span):not(h4 span),label,strong,em,b{font-size:1rem!important;letter-spacing:.02em}
+        .text-xs,.text-sm,.text-base,.text-lg,.text-xl{font-size:1rem!important}
+        .terminal-window{max-height:none!important;overflow-y:visible!important}
         @media (min-width: 1920px) {
-            .section-card h3 {
-                font-size: 1.75rem;
+            .section-card h4 {
+                font-size: 1.8rem;
             }
         }
         @media (min-width: 2560px) {
-            .section-card h3 {
+            .section-card h4 {
                 font-size: 2.1rem;
             }
         }
         @media (min-width: 3440px) {
-            .section-card h3 {
+            .section-card h4 {
                 font-size: 2.4rem;
-            }
-        }
-        .section-card h4 {
-            font-size: 1.15rem;
-        }
-        @media (min-width: 1920px) {
-            .section-card h4 {
-                font-size: 1.35rem;
-            }
-        }
-        @media (min-width: 2560px) {
-            .section-card h4 {
-                font-size: 1.6rem;
-            }
-        }
-        @media (min-width: 3440px) {
-            .section-card h4 {
-                font-size: 1.8rem;
             }
         }
         p,
         li,
         td {
             letter-spacing: 0.02em;
+            line-height: 2;
+            margin-bottom: 1rem;
+        }
+        li {
+            padding-left: 2rem;
         }
         .cmd-card {
             background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
             border: 1.5px solid rgba(37, 99, 235, 0.2);
             border-radius: 0.75rem;
-            padding: 1rem 1.25rem;
-            margin-bottom: 0.75rem;
+            padding: 2rem 2.5rem;
+            margin-bottom: 1.5rem;
             transition: all 0.2s ease;
         }
         @media (min-width: 1920px) {
             .cmd-card {
-                padding: 1.5rem 1.75rem;
+                padding: 2.5rem 3rem;
             }
         }
         @media (min-width: 2560px) {
             .cmd-card {
-                padding: 2rem 2.25rem;
+                padding: 3rem 3.5rem;
             }
         }
         .cmd-card:hover {
@@ -195,30 +197,31 @@
             overflow: hidden;
             box-shadow: 0 20px 40px -20px rgba(15, 23, 42, 0.5);
             border: 1px solid rgba(148, 163, 184, 0.1);
+            margin: 1.5rem 0;
         }
         .terminal-header {
             background: #334155;
-            padding: 0.5rem 1rem;
+            padding: 1rem 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
         .terminal-dot {
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
         }
         @media (min-width: 1920px) {
             .terminal-dot {
-                width: 14px;
-                height: 14px;
+                width: 18px;
+                height: 18px;
             }
         }
         @media (min-width: 2560px) {
             .terminal-dot {
-                width: 16px;
-                height: 16px;
+                width: 20px;
+                height: 20px;
             }
         }
         .terminal-output {
@@ -247,90 +250,94 @@
         }
         .tip-box {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
-            padding: 1rem 1.25rem;
+            border-left: 5px solid #f59e0b;
+            padding: 2rem;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
+            margin-bottom: 1.5rem;
         }
         .warning-box {
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border-left: 4px solid #ef4444;
-            padding: 1rem 1.25rem;
+            border-left: 5px solid #ef4444;
+            padding: 2rem;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+            margin-bottom: 1.5rem;
         }
         .success-box {
             background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border-left: 4px solid #10b981;
-            padding: 1rem 1.25rem;
+            border-left: 5px solid #10b981;
+            padding: 2rem;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1);
+            margin-bottom: 1.5rem;
         }
         .info-box {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-left: 4px solid #3b82f6;
-            padding: 1rem 1.25rem;
+            border-left: 5px solid #3b82f6;
+            padding: 2rem;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+            margin-bottom: 1.5rem;
         }
         @media (min-width: 1920px) {
             .tip-box, .warning-box, .success-box, .info-box {
-                padding: 1.25rem 1.5rem;
-                border-left-width: 5px;
+                padding: 2.25rem;
+                border-left-width: 6px;
             }
         }
         @media (min-width: 2560px) {
             .tip-box, .warning-box, .success-box, .info-box {
-                padding: 1.5rem 2rem;
-                border-left-width: 6px;
+                padding: 2.5rem;
+                border-left-width: 7px;
                 border-radius: 0.75rem;
             }
         }
         @media (min-width: 3440px) {
             .tip-box, .warning-box, .success-box, .info-box {
-                padding: 2rem 2.5rem;
+                padding: 3rem;
                 border-left-width: 8px;
             }
         }
         .code-inline {
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: #e11d48;
-            padding: 0.15rem 0.4rem;
+            padding: 0.3rem 0.6rem;
             border-radius: 0.25rem;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9em;
+            font-size: 1.05em;
             font-weight: 600;
             border: 1px solid rgba(226, 29, 72, 0.1);
         }
         @media (min-width: 1920px) {
             .code-inline {
-                padding: 0.2rem 0.5rem;
-                font-size: 0.92em;
+                padding: 0.35rem 0.7rem;
+                font-size: 1.08em;
             }
         }
         @media (min-width: 2560px) {
             .code-inline {
-                padding: 0.25rem 0.6rem;
-                font-size: 0.95em;
+                padding: 0.4rem 0.8rem;
+                font-size: 1.1em;
                 border-radius: 0.35rem;
             }
         }
         @media (min-width: 3440px) {
             .code-inline {
-                padding: 0.3rem 0.7rem;
-                font-size: 0.98em;
+                padding: 0.45rem 0.9rem;
+                font-size: 1.12em;
             }
         }
         .copy-button {
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
             border: 1px solid rgba(107, 114, 128, 0.3);
             background-color: rgba(31, 41, 55, 0.5);
             color: rgba(107, 114, 128, 1);
-            font-size: 0.85rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -339,7 +346,23 @@
             color: white;
             border-color: rgba(107, 114, 128, 0.6);
         }
-        /* 高分辨率屏幕优化 */
+        /* 高分辨率屏幕容器优化 */
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1500px;
+            }
+        }
+        @media (min-width: 2560px) {
+            .container {
+                max-width: 1800px;
+            }
+        }
+        @media (min-width: 3440px) {
+            .container {
+                max-width: 2200px;
+            }
+        }
+        /* Header 优化 */
         @media (min-width: 1920px) {
             .container {
                 max-width: 1500px;
@@ -514,56 +537,56 @@
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
+        <aside class="w-80 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
             <div class="p-6">
-                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲内容</h3>
-                <nav class="space-y-1">
-                    <a href="#review" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 active">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲目录</h3>
+                <nav class="space-y-2 text-base">
+                    <a href="#review" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 active">
                         <span class="w-6 text-center mr-2"><i class="fas fa-history"></i></span> 1. 知识回顾
                     </a>
-                    <a href="#dockerfile-intro" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#dockerfile-intro" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-file-code"></i></span> 2. 认识 Dockerfile
                     </a>
-                    <a href="#first-dockerfile" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#first-dockerfile" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-play-circle"></i></span> 3. 第一个 Dockerfile
                     </a>
-                    <a href="#build-details" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#build-details" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-cog"></i></span> 4. docker build 详解
                     </a>
-                    <a href="#dockerfile-commands" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#dockerfile-commands" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-code"></i></span> 5. 常用指令实战
                     </a>
-                    <a href="#mini-project" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#mini-project" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-project-diagram"></i></span> 6. 实战：部署网页
                     </a>
-                    <a href="#image-optimize" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#image-optimize" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-rocket"></i></span> 7. 镜像优化技巧
                     </a>
-                    <a href="#troubleshooting" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <a href="#troubleshooting" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
                         <span class="w-6 text-center mr-2"><i class="fas fa-bug"></i></span> 8. 常见错误排查
                     </a>
                 </nav>
             </div>
             <div class="mt-auto p-6 border-t border-gray-100">
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <h4 class="text-sm font-bold text-blue-800 mb-2"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲重点</h4>
-                    <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
-                        <li><span class="font-semibold">编写</span> Dockerfile</li>
-                        <li><span class="font-semibold">构建</span> 自定义镜像</li>
-                        <li><span class="font-semibold">优化</span> 镜像体积</li>
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <h4 class="text-base font-bold text-blue-800 mb-3"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲核心</h4>
+                    <ul class="text-sm text-blue-700 space-y-2 list-disc list-inside">
+                        <li>Dockerfile 编写</li>
+                        <li>自定义镜像构建</li>
+                        <li>镜像体积优化</li>
                     </ul>
                 </div>
             </div>
         </aside>
 
         <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scroll-smooth" id="main-content">
-            <div class="max-w-5xl mx-auto space-y-10 pb-20 lg:max-w-6xl lg:space-y-12 xl:max-w-7xl">
+        <main class="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 scroll-smooth" id="main-content">
+            <div class="max-w-5xl mx-auto space-y-16 pb-32 lg:max-w-6xl xl:max-w-7xl">
 
                 <!-- Section 1: 基础回顾与互动提问 -->
                 <section id="review" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-history text-blue-600 mr-3"></i> 热身回顾：Docker基础知识 & 互动问答
+                        <i class="fas fa-history text-blue-600 mr-3"></i> 1. 热身回顾：Docker基础知识 & 互动问答
                     </h2>
                     <div class="space-y-6">
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
@@ -619,7 +642,7 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
                 <!-- Section 2: Dockerfile原理与对比 -->
                 <section id="dockerfile-intro" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-file-code text-orange-600 mr-3"></i> 认识 Dockerfile：镜像的"施工图纸"
+                        <i class="fas fa-file-code text-orange-600 mr-3"></i> 2. 认识 Dockerfile：镜像的"施工图纸"
                     </h2>
                     <div class="space-y-6">
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6">
@@ -667,7 +690,7 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
                 <!-- Section 3: 第一个Dockerfile实战 -->
                 <section id="first-dockerfile" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-play-circle text-green-600 mr-3"></i> 实战：动手写第一个 Dockerfile
+                        <i class="fas fa-play-circle text-green-600 mr-3"></i> 3. 实战：动手写第一个 Dockerfile
                     </h2>
                     <div class="space-y-6">
                         
@@ -829,7 +852,7 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
                 <!-- Section 4: build命令进阶与排错 -->
                 <section id="build-details" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-cogs text-blue-600 mr-3"></i> docker build 命令深度解析
+                        <i class="fas fa-cogs text-blue-600 mr-3"></i> 4. docker build 命令深度解析
                     </h2>
                     <div class="space-y-6">
                         
@@ -837,7 +860,7 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
                         <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
                             <h3 class="font-bold text-blue-900 mb-3 flex items-center"><i class="fas fa-terminal mr-2"></i> 常用参数一览表</h3>
                             <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
+                                <table class="w-full text-base" style="font-size: 1.2rem;">
                                     <thead class="bg-blue-100">
                                         <tr>
                                             <th class="p-2 text-left">参数</th>
@@ -950,7 +973,7 @@ COPY notexist.html /usr/share/nginx/html/</code></pre>
                 <!-- Section 5: 常用指令实战 -->
                 <section id="dockerfile-commands" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-list-ol text-orange-600 mr-3"></i> Dockerfile 常用指令实战演练
+                        <i class="fas fa-list-ol text-orange-600 mr-3"></i> 5. Dockerfile 常用指令实战演练
                     </h2>
                     <div class="space-y-6">
                         
@@ -1148,7 +1171,7 @@ docker run --rm node-app env | grep NODE_ENV</code></pre>
                 <!-- Section 6: 小项目实战 -->
                 <section id="mini-project" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-project-diagram text-blue-600 mr-3"></i> 完整项目实战：打包个人主页
+                        <i class="fas fa-project-diagram text-blue-600 mr-3"></i> 6. 完整项目实战：打包个人主页
                     </h2>
                     <div class="space-y-6">
                         
@@ -1402,7 +1425,7 @@ my-website    1.0   abc123def456   10 seconds ago   41MB</code></pre>
                 <!-- Section 7: 镜像优化技巧 -->
                 <section id="image-optimize" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-leaf text-green-600 mr-3"></i> 镜像优化：让你的镜像更轻更快
+                        <i class="fas fa-leaf text-green-600 mr-3"></i> 7. 镜像优化：让你的镜像更轻更快
                     </h2>
                     <div class="space-y-6">
                         
@@ -1594,7 +1617,7 @@ CMD ["./myapp"]</code></pre>
                 <!-- Section 8: 常见坑点排查 -->
                 <section id="troubleshooting" class="section-card mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-bug text-red-600 mr-3"></i> 常见错误排查与调试技巧
+                        <i class="fas fa-bug text-red-600 mr-3"></i> 8. 常见错误排查与调试技巧
                     </h2>
                     <div class="space-y-6">
                         
@@ -1921,5 +1944,14 @@ docker build --target builder -t test .</code></pre>
         </main>
     </div>
 
+    <script>
+        // 导航栏点击切换高亮
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
