@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 竞赛培训 - 第三讲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 20% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 80%, rgba(251, 146, 60, 0.08) 0px, transparent 50%);
+            font-size: 16px;
+            line-height: 1.65;
+            color: #0f172a;
+        }
+        @media (min-width: 2560px) {
+            body {
+                font-size: 18px;
+                line-height: 1.75;
+            }
+        }
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .section-card {
+            border-radius: 1.75rem;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 2rem 2.5rem;
+            box-shadow: 0 30px 50px -35px rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            transition: all 0.3s ease;
+        }
+        @media (min-width: 2560px) {
+            .section-card {
+                padding: 2.5rem 3rem;
+            }
+        }
+        @media (min-width: 3440px) {
+            .section-card {
+                padding: 3rem 3.5rem;
+            }
+        }
+        .section-card:hover {
+            box-shadow: 0 40px 60px -30px rgba(15, 23, 42, 0.9);
+            border-color: rgba(37, 99, 235, 0.15);
+        }
+        .section-card h2 {
+            font-size: 2.2rem;
+            letter-spacing: -0.02em;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        @media (min-width: 1920px) {
+            .section-card h2 {
+                font-size: 2.6rem;
+            }
+        }
+        @media (min-width: 2560px) {
+            .section-card h2 {
+                font-size: 3rem;
+            }
+        }
+        .section-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #2563eb, #f97316);
+            border-radius: 2px;
+        }
+        .section-card h3 {
+            font-size: 1.35rem;
+            letter-spacing: -0.01em;
+        }
+        @media (min-width: 1920px) {
+            .section-card h3 {
+                font-size: 1.6rem;
+            }
+        }
+        @media (min-width: 2560px) {
+            .section-card h3 {
+                font-size: 1.85rem;
+            }
+        }
+        .section-card h4 {
+            font-size: 1.15rem;
+        }
+        p,
+        li,
+        td {
+            letter-spacing: 0.02em;
+        }
+        .cmd-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            border: 1.5px solid rgba(37, 99, 235, 0.2);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        @media (min-width: 1920px) {
+            .cmd-card {
+                padding: 1.5rem 1.75rem;
+            }
+        }
+        @media (min-width: 2560px) {
+            .cmd-card {
+                padding: 2rem 2.25rem;
+            }
+        }
+        .cmd-card:hover {
+            border-color: rgba(37, 99, 235, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.15);
+        }
+        @media (min-width: 1920px) {
+            .cmd-card:hover {
+                transform: translateY(-3px);
+            }
+        }
+        @media (min-width: 2560px) {
+            .cmd-card:hover {
+                transform: translateY(-4px);
+            }
+        }
+        .terminal-window {
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -20px rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .terminal-header {
+            background: #334155;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .terminal-output {
+            color: #10b981;
+            line-height: 1.6;
+        }
+        .prompt-symbol {
+            color: #3b82f6;
+            font-weight: bold;
+        }
+        .nav-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+            border-left-color: #3b82f6;
+        }
+        .nav-item:hover i {
+            color: #3b82f6;
+        }
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left-color: #2563eb;
+            color: #1e40af;
+        }
+        .tip-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
+        }
+        .warning-box {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 4px solid #ef4444;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+        }
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid #10b981;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1);
+        }
+        .info-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+        .code-inline {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #e11d48;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 600;
+            border: 1px solid rgba(226, 29, 72, 0.1);
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            background-color: rgba(31, 41, 55, 0.5);
+            color: rgba(107, 114, 128, 1);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .copy-button:hover {
+            background-color: rgba(31, 41, 55, 0.8);
+            color: white;
+            border-color: rgba(107, 114, 128, 0.6);
+        }
+        /* 高分辨率屏幕优化 */
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1400px;
+            }
+        }
+        @media (min-width: 2560px) {
+            .container {
+                max-width: 1600px;
+            }
+        }
+        @media (min-width: 3440px) {
+            .container {
+                max-width: 1800px;
+            }
+        }
+        /* 栅格优化 */
+        @media (min-width: 2560px) {
+            .grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        /* Terminal 窗口优化 */
+        @media (min-width: 2560px) {
+            .terminal-window {
+                max-height: 500px;
+                overflow-y: auto;
+            }
+            .terminal-window .p-4 {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-lg shrink-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fab fa-docker text-3xl text-blue-400"></i>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Docker 容器技术竞赛培训</h1>
+                    <p class="text-xs text-blue-200">第三讲：Dockerfile 自动化构建镜像</p>
+                </div>
+            </div>
+            <div class="hidden md:block text-sm opacity-80">
+                <i class="fas fa-clock mr-1"></i> 预计时长：3小时
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
+            <div class="p-6">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲内容</h3>
+                <nav class="space-y-1">
+                    <a href="#review" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 active">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-history"></i></span> 1. 知识回顾
+                    </a>
+                    <a href="#what-is-dockerfile" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-file-code"></i></span> 2. 认识 Dockerfile
+                    </a>
+                    <a href="#first-dockerfile" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-play-circle"></i></span> 3. 第一个 Dockerfile
+                    </a>
+                    <a href="#build-command" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-cog"></i></span> 4. docker build 详解
+                    </a>
+                    <a href="#dockerfile-instructions" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-code"></i></span> 5. 常用指令实战
+                    </a>
+                    <a href="#project" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-project-diagram"></i></span> 6. 实战：部署网页
+                    </a>
+                    <a href="#optimization" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-rocket"></i></span> 7. 镜像优化技巧
+                    </a>
+                    <a href="#troubleshooting" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <span class="w-6 text-center mr-2"><i class="fas fa-bug"></i></span> 8. 常见错误排查
+                    </a>
+                </nav>
+            </div>
+            <div class="mt-auto p-6 border-t border-gray-100">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h4 class="text-sm font-bold text-blue-800 mb-2"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲重点</h4>
+                    <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                        <li><span class="font-semibold">编写</span> Dockerfile</li>
+                        <li><span class="font-semibold">构建</span> 自定义镜像</li>
+                        <li><span class="font-semibold">优化</span> 镜像体积</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scroll-smooth" id="main-content">
+            <div class="max-w-5xl mx-auto space-y-10 pb-20 lg:max-w-6xl lg:space-y-12 xl:max-w-7xl">
+
+                <!-- Section 1: 基础回顾与互动提问 -->
+                <section id="review" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-history text-blue-600 mr-3"></i> 热身回顾：Docker基础知识 & 互动问答
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
+                            <h3 class="font-bold text-blue-900 mb-2 flex items-center"><i class="fas fa-cube mr-2"></i> 镜像、容器、仓库三大核心</h3>
+                            <ul class="list-disc list-inside text-gray-800 space-y-1 ml-6">
+                                <li><strong>镜像（Image）：</strong> 类似“软件安装包”，包含运行环境和程序</li>
+                                <li><strong>容器（Container）：</strong> 镜像运行后的实例，像“正在运行的软件”</li>
+                                <li><strong>仓库（Registry）：</strong> 存放镜像的云端仓库（如Docker Hub）</li>
+                            </ul>
+                        </div>
+                        <div class="tip-box mt-4">
+                            <strong>小测试：</strong>  
+                            <ul class="list-decimal list-inside ml-6 mt-2 text-gray-700">
+                                <li>启动容器用哪个命令？</li>
+                                <li>如何查看本地所有镜像？</li>
+                                <li>镜像和容器的区别？</li>
+                            </ul>
+                        </div>
+                        <div class="info-box mt-4">
+                            <strong>引出：</strong> 手动做镜像步骤繁琐，<span class="font-bold text-blue-700">Dockerfile</span> 能让一切自动化！
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Dockerfile原理与对比 -->
+                <section id="dockerfile-intro" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-file-code text-orange-600 mr-3"></i> 镜像脚本的魔法：Dockerfile原理
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6">
+                            <h3 class="font-bold text-orange-900 mb-2 flex items-center"><i class="fas fa-magic mr-2"></i> 手动操作 vs 脚本自动化</h3>
+                            <ul class="list-disc list-inside text-orange-800 space-y-1 ml-6">
+                                <li>手动做镜像：每次都要敲命令、复制文件、装依赖，容易出错</li>
+                                <li>Dockerfile：像写剧本一样，一次写好，自动构建，结果可复现</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg border-l-4 border-orange-400">
+                            <p class="text-gray-700 mb-2"><strong>举例：</strong>手动做Nginx镜像要：</p>
+                            <ol class="list-decimal list-inside ml-6 text-gray-700">
+                                <li>拉取nginx镜像</li>
+                                <li>进入容器，手动复制网页</li>
+                                <li>commit生成新镜像</li>
+                                <li>每次都要重复</li>
+                            </ol>
+                            <p class="mt-2 text-orange-700 font-bold">用Dockerfile只需写几行，自动完成！</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: 第一个Dockerfile实战 -->
+                <section id="first-dockerfile" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-play-circle text-green-600 mr-3"></i> 实战：写出你的第一个Dockerfile
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6">
+                            <h3 class="font-bold text-green-900 mb-2 flex items-center"><i class="fas fa-terminal mr-2"></i> 最基础的Nginx Dockerfile</h3>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm overflow-x-auto"><code>FROM nginx:alpine
+RUN echo "hello dockerfile" > /usr/share/nginx/html/index.html
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+                        </div>
+                        <div class="info-box">
+                            <strong>指令详解：</strong>
+                            <ul class="list-disc list-inside ml-6 mt-2 text-gray-700">
+                                <li><span class="code-inline">FROM</span>：选择基础镜像</li>
+                                <li><span class="code-inline">RUN</span>：执行命令（如安装/写文件）</li>
+                                <li><span class="code-inline">CMD</span>：容器启动时默认执行的命令</li>
+                            </ul>
+                        </div>
+                        <div class="tip-box">
+                            <strong>动手练习：</strong> 跟着老师敲一遍，保存为 <span class="code-inline">Dockerfile</span>，用 <span class="code-inline">docker build -t my-nginx .</span> 构建，再 <span class="code-inline">docker run -p 8080:80 my-nginx</span> 访问测试！
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4: build命令进阶与排错 -->
+                <section id="build-details" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-cogs text-blue-600 mr-3"></i> build命令进阶与排错演练
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+                            <h3 class="font-bold text-blue-900 mb-2 flex items-center"><i class="fas fa-tag mr-2"></i> 镜像命名与标签</h3>
+                            <p class="mb-2">用 <span class="code-inline">-t</span> 指定镜像名和标签：</p>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm overflow-x-auto"><code>docker build -t my-nginx:v1 .</code></pre>
+                            <p class="mt-2">用 <span class="code-inline">-f</span> 指定Dockerfile路径：</p>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm overflow-x-auto"><code>docker build -f ./Dockerfile.dev -t dev-nginx .</code></pre>
+                        </div>
+                        <div class="warning-box mt-4">
+                            <strong>排错演练：</strong> 故意写错Dockerfile（如 <span class="code-inline">FRM</span>），观察报错，学会看错误信息定位问题。
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 5: 常用指令实战 -->
+                <section id="dockerfile-commands" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-list-ol text-orange-600 mr-3"></i> Dockerfile常用指令实战
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-l-4 border-blue-500">
+                            <h3 class="font-bold text-blue-900 mb-2 flex items-center"><i class="fas fa-copy mr-2"></i> COPY/ADD</h3>
+                            <p>把本地文件复制到容器。<span class="code-inline">ADD</span> 能自动解压压缩包。</p>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm overflow-x-auto"><code>COPY index.html /usr/share/nginx/html/</code></pre>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border-l-4 border-green-500">
+                            <h3 class="font-bold text-green-900 mb-2 flex items-center"><i class="fas fa-folder-open mr-2"></i> WORKDIR</h3>
+                            <p>指定后续命令的工作目录，避免写长路径。</p>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm overflow-x-auto"><code>WORKDIR /app
+RUN touch test.txt</code></pre>
+                        </div>
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border-l-4 border-yellow-500">
+                            <h3 class="font-bold text-yellow-900 mb-2 flex items-center"><i class="fas fa-bullhorn mr-2"></i> EXPOSE</h3>
+                            <p>声明容器要开放的端口（如 <span class="code-inline">EXPOSE 8080</span>），run时用 <span class="code-inline">-p</span> 做端口映射。</p>
+                        </div>
+                        <div class="tip-box">
+                            <strong>动手练习：</strong> 每讲完一个指令，立刻加进自己的Dockerfile，重新build并测试！
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 6: 小项目实战 -->
+                <section id="mini-project" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-project-diagram text-blue-600 mr-3"></i> 项目实战：打包你的静态网页
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
+                            <h3 class="font-bold text-blue-900 mb-2 flex items-center"><i class="fas fa-globe mr-2"></i> 任务说明</h3>
+                            <ul class="list-disc list-inside text-gray-800 space-y-1 ml-6">
+                                <li>给定一个本地静态网页（html+css）</li>
+                                <li>编写Dockerfile，把网页放进Nginx容器</li>
+                                <li>构建镜像并运行，浏览器访问测试</li>
+                            </ul>
+                        </div>
+                        <div class="success-box">
+                            <strong>展示环节：</strong> 老师巡视，抽1-2位同学展示作品，讲讲遇到的坑和收获。
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 7: 镜像优化技巧 -->
+                <section id="image-optimize" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-leaf text-green-600 mr-3"></i> 镜像优化与体积对比
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
+                            <h3 class="font-bold text-green-900 mb-2 flex items-center"><i class="fas fa-compress-arrows-alt mr-2"></i> 合并RUN指令，减少层数</h3>
+                            <p>对比多条RUN和用<code class="code-inline">&&</code>合并的镜像体积差异：</p>
+                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm overflow-x-auto"><code>RUN apt update
+RUN apt install -y curl
+# VS
+RUN apt update && apt install -y curl</code></pre>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-l-4 border-blue-500">
+                            <h3 class="font-bold text-blue-900 mb-2 flex items-center"><i class="fas fa-weight mr-2"></i> 用alpine镜像减小体积</h3>
+                            <p>把 <span class="code-inline">FROM nginx</span> 改成 <span class="code-inline">FROM nginx:alpine</span>，重新build，看镜像size变化。</p>
+                        </div>
+                        <div class="tip-box">
+                            <strong>动手练习：</strong> build两个版本，<span class="code-inline">docker images</span> 对比体积！
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 8: 常见坑点排查 -->
+                <section id="troubleshooting" class="section-card mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-bug text-red-600 mr-3"></i> 常见坑点与排查练习
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="warning-box">
+                            <strong>常见错误：</strong>
+                            <ul class="list-disc list-inside ml-6 mt-2 text-gray-700">
+                                <li>CMD写多个（只会执行最后一个）</li>
+                                <li>RUN漏写<code class="code-inline">&&</code>导致分层多</li>
+                                <li>COPY路径写错，文件找不到</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <strong>练习：</strong> 给出几个错误Dockerfile，让同学们找错、改对并验证。
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <div class="mt-20 mb-10 text-center border-t border-gray-200 pt-8">
+                    <div class="inline-block bg-blue-50 px-8 py-6 rounded-xl border border-blue-100 shadow-sm">
+                        <p class="text-sm text-gray-600 mb-2">
+                            <i class="fas fa-graduation-cap text-blue-600 mr-2"></i>
+                            <strong>Docker 容器技术竞赛培训</strong>
+                        </p>
+                        <p class="text-xs text-gray-500">第三讲：Dockerfile 自动化构建镜像 | 构建篇</p>
+                        <div class="flex gap-4 justify-center mt-4 text-xs">
+                            <span class="text-gray-500"><i class="fas fa-code-branch mr-1"></i> 镜像自动化</span>
+                            <span class="text-gray-400">•</span>
+                            <span class="text-gray-500"><i class="fas fa-cube mr-1"></i> Dockerfile 实战</span>
+                            <span class="text-gray-400">•</span>
+                            <span class="text-gray-500"><i class="fas fa-rocket mr-1"></i> 镜像优化</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- ...existing code... -->
