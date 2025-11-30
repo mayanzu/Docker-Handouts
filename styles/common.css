@@ -155,6 +155,20 @@ p {
 ul, ol {
     margin-top: 1rem;
     margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+ul {
+    list-style-type: disc;
+}
+
+ol {
+    list-style-type: decimal;
+}
+
+ul.list-inside, ol.list-inside {
+    padding-left: 0;
+    list-style-position: inside;
 }
 
 .text-xs, .text-sm, .text-base, .text-lg, .text-xl {
@@ -180,11 +194,11 @@ ul, ol {
 
 /* ==================== 信息框样式 ==================== */
 .tip-box, .warning-box, .success-box, .info-box {
-    padding: 2.5rem 3rem;
+    padding: 1.5rem 2rem;
     border-radius: 1rem;
     border-left: 6px solid;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
-    margin: 2rem 0;
+    margin: 1.5rem 0;
     clear: both;
 }
 
@@ -208,23 +222,42 @@ ul, ol {
     border-left-color: #3b82f6;
 }
 
-@media (min-width: 1920px) {
-    .tip-box, .warning-box, .success-box, .info-box {
-        padding: 2.25rem 2.75rem;
-    }
+/* 强调样式 */
+.emphasis-box {
+    background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+    border: 1px solid rgba(59,130,246,0.25);
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    margin: 1.5rem 0;
 }
 
-@media (min-width: 2560px) {
-    .tip-box, .warning-box, .success-box, .info-box {
-        padding: 2.5rem 3rem;
-        border-radius: 1.2rem;
-    }
+/* 任务卡片样式 */
+.task-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #3b82f6;
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
 }
 
-@media (min-width: 3440px) {
-    .tip-box, .warning-box, .success-box, .info-box {
-        padding: 2.75rem 3.25rem;
-    }
+/* 核心要点样式 */
+.core-points {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.core-points h4 {
+    color: #15803d;
+    margin-bottom: 1rem;
+}
+
+.core-points ul {
+    color: #166534;
 }
 
 /* ==================== 行内代码 ==================== */
