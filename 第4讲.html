@@ -91,29 +91,35 @@
                         <div class="info-box text-sm leading-relaxed">
                             <strong><i class="fas fa-lightbulb mr-1"></i> 核心理念：</strong> docker-compose.yml = 应用“结构清单”。它描述 <span class="code-inline">服务 (services)</span>、<span class="code-inline">网络 (networks)</span>、<span class="code-inline">卷 (volumes)</span>，让复杂应用栈可复制、可版本化。
                         </div>
-                        <div class="terminal-window">
-                            <div class="terminal-header">
-                                <span class="terminal-dot bg-red-400"></span>
-                                <span class="terminal-dot bg-yellow-400"></span>
-                                <span class="terminal-dot bg-green-400"></span>
-                                <span class="text-white text-xs tracking-wider">手动 VS Compose</span>
-                            </div>
-                            <div class="p-4 text-xs text-green-200 space-y-3">
-<pre class="text-xs text-green-100 overflow-x-auto"><code># 手动方式：每条命令都要敲且顺序不能错
+                        <div class="space-y-4">
+                            <div class="terminal-window">
+                                <div class="terminal-header">
+                                    <div class="terminal-dot bg-red-500"></div>
+                                    <div class="terminal-dot bg-yellow-500"></div>
+                                    <div class="terminal-dot bg-green-500"></div>
+                                    <div class="ml-2 text-sm text-gray-300">Terminal</div>
+                                </div>
+                                <pre class="p-3 text-sm"># 手动方式：每条命令都要敲且顺序不能错
 $ docker network create wp-net
 $ docker run --name wp-db --network wp-net -e MYSQL_ROOT_PASSWORD=rootpass123 \
     -e MYSQL_DATABASE=wordpress -v wp-mysql:/var/lib/mysql -d mysql:8.0
 $ docker run --name wp-app -p 8080:80 --network wp-net \
-    -e WORDPRESS_DB_HOST=wp-db:3306 wordpress:latest
-</code></pre>
-<pre class="text-xs text-green-100 overflow-x-auto"><code># Compose：把参数写进 YAML 后只需一句
+    -e WORDPRESS_DB_HOST=wp-db:3306 wordpress:latest</pre>
+                            </div>
+                            <div class="terminal-window">
+                                <div class="terminal-header">
+                                    <div class="terminal-dot bg-red-500"></div>
+                                    <div class="terminal-dot bg-yellow-500"></div>
+                                    <div class="terminal-dot bg-green-500"></div>
+                                    <div class="ml-2 text-sm text-gray-300">Terminal</div>
+                                </div>
+                                <pre class="p-3 text-sm"># Compose：把参数写进 YAML 后只需一句
 $ docker compose up -d
 [+] Running 2/2
  ✔ Container wp-db     Started
- ✔ Container wp-app    Started
-</code></pre>
-                                <p class="text-[0.7rem] text-gray-300">💡 YAML 可以提交到 Git，所有同学拉到本地直接 <span class="code-inline">docker compose up</span>。</p>
+ ✔ Container wp-app    Started</pre>
                             </div>
+                            <p class="text-sm text-gray-600">💡 YAML 可以提交到 Git，所有同学拉到本地直接 <span class="code-inline">docker compose up</span>。</p>
                         </div>
                         <div class="accent-box text-sm">
                             <h4 class="font-bold text-blue-900 mb-3"><i class="fas fa-lightbulb mr-2"></i>深入理解：Compose 帮我们做了什么？</h4>
@@ -159,7 +165,7 @@ $ docker compose up -d
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="bg-white p-3 rounded border border-indigo-100">
                                     <p class="font-semibold text-xs text-indigo-800 mb-2">✅ 正确写法</p>
-                                    <pre class="bg-gray-900 text-green-300 rounded p-2 text-[0.65rem]"><code>services:
+                                    <pre class="p-3 text-sm"><code>services:
   web:
     image: nginx
     ports:
@@ -168,7 +174,7 @@ $ docker compose up -d
                                 </div>
                                 <div class="bg-white p-3 rounded border border-red-100">
                                     <p class="font-semibold text-xs text-red-800 mb-2">❌ 常见错误</p>
-                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem]"><code>services:
+                                    <pre class="p-3 text-sm"><code>services:
     web:           # Tab缩进（错！）
     image:nginx    # 冒号后无空格（错！）
     ports:
@@ -214,14 +220,22 @@ $ docker compose up -d
                         </div>
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 space-y-4">
                             <h3 class="font-bold text-blue-900 flex items-center"><span class="step mr-2">1</span> 创建工作目录</h3>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="mkdir compose-wp&#10;cd compose-wp">复制</button><code>mkdir compose-wp
-cd compose-wp</code></pre>
+                            <div class="terminal-window">
+                                <div class="terminal-header">
+                                    <div class="terminal-dot bg-red-500"></div>
+                                    <div class="terminal-dot bg-yellow-500"></div>
+                                    <div class="terminal-dot bg-green-500"></div>
+                                    <div class="ml-2 text-sm text-gray-300">Terminal</div>
+                                </div>
+                                <pre class="p-3 text-sm"><button class="copy-button" data-copy="mkdir compose-wp&#10;cd compose-wp">复制</button>mkdir compose-wp
+cd compose-wp</pre>
+                            </div>
                             <p class="text-xs text-gray-600">（保持目录整洁，后续只需一个 YAML 文件即可描述整个应用栈。）</p>
                             <div class="output-block">
                                 <div class="output-header">
                                     <i class="fas fa-check-circle"></i> 预期输出
                                 </div>
-                                <pre><code></code></pre>
+                                <pre><code class="code-inline"></code></pre>
                                 <div class="p-3 bg-green-100 border-t border-green-200 text-xs text-green-800">
                                     终端不会返回额外内容；使用 <span class="code-inline">pwd</span> / <span class="code-inline">cd</span> 验证当前目录已切换到 <span class="code-inline">compose-wp</span>。
                                 </div>
@@ -229,7 +243,7 @@ cd compose-wp</code></pre>
                         </div>
                         <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 space-y-4">
                             <h3 class="font-bold text-green-900 flex items-center"><span class="step mr-2">2</span> 编写 docker-compose.yml</h3>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 overflow-x-auto text-sm"><button class="copy-button">复制</button><code># 可选：指定版本（新版本可省略）
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code># 可选：指定版本（新版本可省略）
 services:
   db:
     image: mysql:8.0
@@ -280,13 +294,13 @@ volumes:
                             <div class="accent-box text-xs">
                                 <h4 class="text-blue-900 text-sm font-semibold mb-1">文件检查</h4>
                                 <p>运行 <span class="code-inline">ls</span> 或 <span class="code-inline">dir</span> 应只看到 <span class="code-inline">docker-compose.yml</span>。</p>
-                                <pre class="bg-gray-900 text-green-200 rounded p-3 mt-2"><code>$ ls
+                                <pre class="p-3 text-sm"><code>$ ls
  docker-compose.yml</code></pre>
                             </div>
                         </div>
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 space-y-4">
                             <h3 class="font-bold text-orange-900 flex items-center"><span class="step mr-2">3</span> 一键启动与验证</h3>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="docker compose up -d&#10;docker compose ps">复制</button><code>docker compose up -d
+                            <pre class="p-3 text-sm"><button class="copy-button" data-copy="docker compose up -d&#10;docker compose ps">复制</button><code>docker compose up -d
 # 或旧版：docker-compose up -d
 
 docker compose ps</code></pre>
@@ -312,7 +326,7 @@ wp-app    wordpress:latest  "docker-entrypoint…"  Up 10s          0.0.0.0:8080
                         </div>
                         <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 space-y-4">
                             <h3 class="font-bold text-purple-900 flex items-center"><span class="step mr-2">4</span> 常用后续命令</h3>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="docker compose logs -f&#10;docker compose exec db mysql -u root -p&#10;docker compose down&#10;docker compose down -v">复制</button><code># 实时所有服务日志
+                            <pre class="p-3 text-sm"><button class="copy-button" data-copy="docker compose logs -f&#10;docker compose exec db mysql -u root -p&#10;docker compose down&#10;docker compose down -v">复制</button><code># 实时所有服务日志
                                     docker compose logs -f
                                     # 进入数据库交互
                                     docker compose exec db mysql -u root -p
@@ -345,7 +359,7 @@ mysql> SHOW DATABASES;
                             </div>
                         <div class="bg-gradient-to-br from-rose-50 to-rose-100 border border-rose-200 rounded-xl p-6 space-y-4">
                             <h3 class="font-bold text-rose-900 flex items-center"><span class="step mr-2">5</span> 验证卷持久化</h3>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-4 text-sm"><button class="copy-button" data-copy="docker compose down&#10;docker compose up -d&#10;docker compose exec db mysql -u root -p -e &quot;SHOW DATABASES;&quot;">复制</button><code># 停止容器（卷仍保留）
+                            <pre class="p-3 text-sm"><button class="copy-button" data-copy="docker compose down&#10;docker compose up -d&#10;docker compose exec db mysql -u root -p -e &quot;SHOW DATABASES;&quot;">复制</button><code># 停止容器（卷仍保留）
 docker compose down
 
 # 再次启动
@@ -383,7 +397,7 @@ Enter password: ********
                                 <div class="output-header">
                                     <i class="fas fa-check-circle"></i> 预期
                                 </div>
-                                <pre><code></code></pre>
+                                <pre><code class="code-inline"></code></pre>
                                 <div class="p-3 bg-green-100 border-t border-green-200 text-xs text-green-800">
                                     输出仍包含 <span class="code-inline">wordpress</span> 数据库；浏览器刷新后网站数据不丢失。若执行 <span class="code-inline">docker compose down -v</span> 再启动，则需要重新安装，说明卷被删除。
                                 </div>
@@ -403,43 +417,43 @@ Enter password: ********
                             <p class="mt-2 text-xs">Compose 配置文件本质上是把<strong>命令行参数</strong>转换成 YAML 格式。下表帮你建立对照：</p>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="text-xs">
+                            <table>
                                 <thead>
-                                    <tr class="bg-blue-50">
-                                        <th class="w-1/4">docker run 参数</th>
-                                        <th class="w-1/4">Compose 字段</th>
-                                        <th class="w-1/2">作用说明</th>
+                                    <tr>
+                                        <th>docker run 参数</th>
+                                        <th>Compose 字段</th>
+                                        <th>作用说明</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="font-mono">--name myapp</td>
-                                        <td class="font-mono">container_name: myapp</td>
+                                        <td>--name myapp</td>
+                                        <td>container_name: myapp</td>
                                         <td>指定容器名（可选，默认用"项目名_服务名_序号"）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">-p 8080:80</td>
-                                        <td class="font-mono">ports:<br>&nbsp;&nbsp;- "8080:80"</td>
+                                        <td>-p 8080:80</td>
+                                        <td>ports:<br>&nbsp;&nbsp;- "8080:80"</td>
                                         <td>端口映射（注意加引号）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">-e KEY=value</td>
-                                        <td class="font-mono">environment:<br>&nbsp;&nbsp;KEY: value</td>
+                                        <td>-e KEY=value</td>
+                                        <td>environment:<br>&nbsp;&nbsp;KEY: value</td>
                                         <td>环境变量注入（也可用列表格式 <span class="code-inline">- KEY=value</span>）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">-v vol:/path</td>
-                                        <td class="font-mono">volumes:<br>&nbsp;&nbsp;- vol:/path</td>
+                                        <td>-v vol:/path</td>
+                                        <td>volumes:<br>&nbsp;&nbsp;- vol:/path</td>
                                         <td>卷挂载（顶层需声明 <span class="code-inline">volumes:</span>）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">--network mynet</td>
-                                        <td class="font-mono">networks:<br>&nbsp;&nbsp;- mynet</td>
+                                        <td>--network mynet</td>
+                                        <td>networks:<br>&nbsp;&nbsp;- mynet</td>
                                         <td>加入指定网络（默认自动创建）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">--restart unless-stopped</td>
-                                        <td class="font-mono">restart: unless-stopped</td>
+                                        <td>--restart unless-stopped</td>
+                                        <td>restart: unless-stopped</td>
                                         <td>重启策略（no / always / on-failure / unless-stopped）</td>
                                     </tr>
                                 </tbody>
@@ -451,7 +465,7 @@ Enter password: ********
                             <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
                                 <h4 class="font-bold text-blue-900 mb-2"><span class="code-inline">services</span> - 定义所有容器服务</h4>
                                 <p class="text-sm text-gray-700 mb-3">这是 Compose 文件的核心，每个服务就是一个容器。服务名可以作为主机名在容器间通信。</p>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   web:        # 服务名，其他容器可用 "web" 访问
     image: nginx:alpine
   db:         # 另一个服务
@@ -463,7 +477,7 @@ Enter password: ********
                             <div class="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
                                 <h4 class="font-bold text-green-900 mb-2"><span class="code-inline">image</span> - 指定使用的镜像</h4>
                                 <p class="text-sm text-gray-700 mb-3">等同于 <span class="code-inline">docker run</span> 后面跟的镜像名。可以是 Docker Hub 或私有仓库的镜像。</p>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   web:
     image: nginx:1.25-alpine    # 推荐指定版本号
   # 或使用私有仓库
@@ -476,7 +490,7 @@ Enter password: ********
                             <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
                                 <h4 class="font-bold text-purple-900 mb-2"><span class="code-inline">ports</span> - 端口映射</h4>
                                 <p class="text-sm text-gray-700 mb-3">将容器端口暴露到主机。格式：<span class="code-inline">"主机端口:容器端口"</span>（必须加引号！）</p>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   web:
     image: nginx
     ports:
@@ -490,7 +504,7 @@ Enter password: ********
                             <div class="bg-white p-4 rounded-lg border-l-4 border-yellow-500 shadow-sm">
                                 <h4 class="font-bold text-yellow-900 mb-2"><span class="code-inline">environment</span> - 环境变量</h4>
                                 <p class="text-sm text-gray-700 mb-3">向容器注入配置，等同于 <span class="code-inline">docker run -e</span>。支持两种写法。</p>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   db:
     image: mysql:8.0
     environment:
@@ -507,7 +521,7 @@ Enter password: ********
                             <div class="bg-white p-4 rounded-lg border-l-4 border-red-500 shadow-sm">
                                 <h4 class="font-bold text-red-900 mb-2"><span class="code-inline">volumes</span> - 数据持久化</h4>
                                 <p class="text-sm text-gray-700 mb-3">挂载卷或目录，等同于 <span class="code-inline">docker run -v</span>。容器删除后数据仍保留。</p>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   db:
     image: mysql:8.0
     volumes:
@@ -525,7 +539,7 @@ volumes:
                             <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-500 shadow-sm">
                                 <h4 class="font-bold text-indigo-900 mb-2"><span class="code-inline">depends_on</span> - 启动顺序</h4>
                                 <p class="text-sm text-gray-700 mb-3">控制启动顺序。⚠️ 只保证容器启动，不保证服务就绪！</p>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   web:
     image: wordpress
     depends_on:
@@ -549,19 +563,19 @@ volumes:
                             <div class="mt-3 space-y-3">
                                 <div class="bg-white p-3 rounded border border-orange-100">
                                     <p class="font-semibold text-xs text-red-700">❌ 错误 1：端口不加引号</p>
-                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem] mt-1"><code>ports:
+                                    <pre class="p-3 text-sm"><code>ports:
   - 8080:80   # YAML 会误解为时间格式！</code></pre>
                                     <p class="text-[0.65rem] text-green-700 mt-2">✅ 正确：<span class="code-inline">- "8080:80"</span> 或 <span class="code-inline">- '8080:80'</span></p>
                                 </div>
                                 <div class="bg-white p-3 rounded border border-orange-100">
                                     <p class="font-semibold text-xs text-red-700">❌ 错误 2：depends_on 不等于"等数据库启动完成"</p>
-                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem] mt-1"><code>depends_on:
+                                    <pre class="p-3 text-sm"><code>depends_on:
   - db   # 只保证 db 容器启动，不保证 MySQL 服务就绪！</code></pre>
                                     <p class="text-[0.65rem] text-green-700 mt-2">✅ 正确：加 <span class="code-inline">condition: service_healthy</span> + healthcheck</p>
                                 </div>
                                 <div class="bg-white p-3 rounded border border-orange-100">
                                     <p class="font-semibold text-xs text-red-700">❌ 错误 3：忘记在顶层声明 volumes</p>
-                                    <pre class="bg-gray-900 text-red-300 rounded p-2 text-[0.65rem] mt-1"><code>services:
+                                    <pre class="p-3 text-sm"><code>services:
   db:
     volumes:
       - db_data:/var/lib/mysql
@@ -583,9 +597,9 @@ volumes:
                             <p class="text-xs mt-2">每条 <span class="code-inline">docker compose</span> 命令背后都是在帮你批量执行对应的 <span class="code-inline">docker</span> 命令。理解这层对应关系，遇到问题就能更快定位。</p>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="text-xs">
+                            <table>
                                 <thead>
-                                    <tr class="bg-gray-50">
+                                    <tr>
                                         <th>Compose 命令</th>
                                         <th>等价的 docker 操作</th>
                                         <th>说明</th>
@@ -593,33 +607,33 @@ volumes:
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="font-mono">docker compose up -d</td>
+                                        <td>docker compose up -d</td>
                                         <td class="font-mono text-[0.65rem]">docker network create ...<br>docker run -d --name db ...<br>docker run -d --name web ...</td>
                                         <td>创建网络 + 按依赖顺序启动所有服务</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">docker compose ps</td>
-                                        <td class="font-mono">docker ps --filter ...</td>
+                                        <td>docker compose ps</td>
+                                        <td>docker ps --filter ...</td>
                                         <td>只显示当前项目的容器状态</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">docker compose logs -f</td>
-                                        <td class="font-mono">docker logs -f db & docker logs -f web</td>
+                                        <td>docker compose logs -f</td>
+                                        <td>docker logs -f db & docker logs -f web</td>
                                         <td>聚合所有服务的日志输出</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">docker compose exec web sh</td>
-                                        <td class="font-mono">docker exec -it web sh</td>
+                                        <td>docker compose exec web sh</td>
+                                        <td>docker exec -it web sh</td>
                                         <td>进入指定服务的容器（自动找容器名）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">docker compose down</td>
+                                        <td>docker compose down</td>
                                         <td class="font-mono text-[0.65rem]">docker stop db web<br>docker rm db web<br>docker network rm ...</td>
                                         <td>停止并删除容器 + 网络（保留卷）</td>
                                     </tr>
                                     <tr>
-                                        <td class="font-mono">docker compose down -v</td>
-                                        <td class="font-mono">... + docker volume rm ...</td>
+                                        <td>docker compose down -v</td>
+                                        <td>... + docker volume rm ...</td>
                                         <td>连同卷一起删除（<strong>慎用！</strong>）</td>
                                     </tr>
                                 </tbody>
@@ -630,7 +644,7 @@ volumes:
                         <!-- up -d -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
                             <h4 class="font-bold text-green-900 mb-2">🚀 启动所有服务（后台运行）</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose up -d</code></pre>
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code class="code-inline">docker compose up -d</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong><span class="code-inline">-d</span> = detached 模式（后台）。会自动创建网络、卷，按依赖顺序启动容器。</p>
                             <div class="output-block">
                                 <div class="output-header">
@@ -648,7 +662,7 @@ volumes:
                         <!-- ps -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
                             <h4 class="font-bold text-blue-900 mb-2">👀 查看容器状态</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose ps</code></pre>
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code class="code-inline">docker compose ps</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>只显示当前项目的容器（不像 <span class="code-inline">docker ps</span> 显示所有容器）。</p>
                             <div class="output-block">
                                 <div class="output-header">
@@ -665,7 +679,7 @@ myproject-web-1       nginx:alpine  Up 2 minutes   0.0.0.0:8080->80/tcp
                         <!-- logs -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-yellow-500 shadow-sm">
                             <h4 class="font-bold text-yellow-900 mb-2">📋 查看日志（实时滚动）</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose logs -f          # 查看所有服务日志
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>docker compose logs -f          # 查看所有服务日志
 docker compose logs -f web      # 只看 web 服务日志
 docker compose logs --tail 50   # 只看最后50行</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong><span class="code-inline">-f</span> = follow（跟随），类似 <span class="code-inline">tail -f</span>。按 <kbd>Ctrl+C</kbd> 退出。</p>
@@ -683,7 +697,7 @@ myproject-web-1  | 192.168.1.10 - - [23/Nov/2025] "GET / HTTP/1.1" 200
                         <!-- exec -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
                             <h4 class="font-bold text-purple-900 mb-2">🔧 进入容器执行命令</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose exec web sh              # 进入 web 容器的 shell
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>docker compose exec web sh              # 进入 web 容器的 shell
 docker compose exec db mysql -u root -p  # 进入 MySQL 交互式客户端
 docker compose exec web cat /etc/hosts   # 执行单条命令</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>不用记容器名，直接用服务名。相当于 <span class="code-inline">docker exec -it 容器名 命令</span>。</p>
@@ -692,7 +706,7 @@ docker compose exec web cat /etc/hosts   # 执行单条命令</code></pre>
                         <!-- down -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-red-500 shadow-sm">
                             <h4 class="font-bold text-red-900 mb-2">🛑 停止并删除容器</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose down       # 删除容器 + 网络，保留卷
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>docker compose down       # 删除容器 + 网络，保留卷
 docker compose down -v    # 连卷一起删（⚠️ 数据会丢失！）</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>默认保留卷（数据持久化）。加 <span class="code-inline">-v</span> 会删除所有数据，慎用！</p>
                             <div class="output-block">
@@ -711,7 +725,7 @@ docker compose down -v    # 连卷一起删（⚠️ 数据会丢失！）</code
                         <!-- restart -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-500 shadow-sm">
                             <h4 class="font-bold text-indigo-900 mb-2">🔄 重启服务</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose restart          # 重启所有服务
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>docker compose restart          # 重启所有服务
 docker compose restart web      # 只重启 web 服务</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>修改配置文件后需要重启。不会重新创建容器，只是 stop + start。</p>
                         </div>
@@ -719,7 +733,7 @@ docker compose restart web      # 只重启 web 服务</code></pre>
                         <!-- config -->
                         <div class="bg-white p-4 rounded-lg border-l-4 border-teal-500 shadow-sm">
                             <h4 class="font-bold text-teal-900 mb-2">✅ 验证配置文件</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>docker compose config   # 检查 YAML 语法是否正确</code></pre>
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code class="code-inline">docker compose config   # 检查 YAML 语法是否正确</code></pre>
                             <p class="text-sm text-gray-700 mt-2"><strong>说明：</strong>启动前先运行这个，可以提前发现缩进、引号等语法错误。</p>
                         </div>
                     </div>
@@ -786,14 +800,14 @@ docker compose restart web      # 只重启 web 服务</code></pre>
                         
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 p-5 rounded-lg">
                             <h4 class="font-bold text-blue-900 mb-3 flex items-center"><span class="step mr-2">1</span> 创建工作目录</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code>mkdir nginx-mysql-demo
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>mkdir nginx-mysql-demo
 cd nginx-mysql-demo</code></pre>
                         </div>
                         
                         <div class="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 p-5 rounded-lg">
                             <h4 class="font-bold text-green-900 mb-3 flex items-center"><span class="step mr-2">2</span> 编写 docker-compose.yml</h4>
                             <p class="text-sm text-gray-700 mb-3">按照以下提示填空完成配置文件：</p>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm overflow-x-auto"><button class="copy-button">复制</button><code>services:
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   web:
     image: nginx:alpine
     container_name: my-nginx
@@ -828,7 +842,7 @@ networks:
                             <h4 class="font-bold text-yellow-900 mb-3 flex items-center"><span class="step mr-2">3</span> 参考答案</h4>
                             <details class="bg-white p-4 rounded">
                                 <summary class="cursor-pointer font-semibold text-gray-800 mb-2">点击查看完整答案</summary>
-                                <pre class="bg-gray-900 text-green-300 rounded p-3 text-sm overflow-x-auto mt-3"><button class="copy-button">复制</button><code>services:
+                                <pre class="p-3 text-sm"><button class="copy-button">复制</button><code>services:
   web:
     image: nginx:alpine
     container_name: my-nginx
@@ -860,7 +874,7 @@ networks:
                         
                         <div class="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500 p-5 rounded-lg">
                             <h4 class="font-bold text-purple-900 mb-3 flex items-center"><span class="step mr-2">4</span> 启动并验证</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code># 1. 检查配置文件语法
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code># 1. 检查配置文件语法
 docker compose config
 
 # 2. 启动服务
@@ -882,7 +896,7 @@ my-mysql    mysql:8.0      Up 12 seconds  3306/tcp
                         
                         <div class="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500 p-5 rounded-lg">
                             <h4 class="font-bold text-pink-900 mb-3 flex items-center"><span class="step mr-2">5</span> 验证服务间通信（重点！）</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded p-3"><button class="copy-button">复制</button><code># 进入 web 容器
+                            <pre class="p-3 text-sm"><button class="copy-button">复制</button><code># 进入 web 容器
 docker compose exec web sh
 
 # 在容器内测试 DNS 解析
@@ -936,7 +950,7 @@ PING db (172.18.0.2): 56 data bytes
                     <div class="space-y-6 mt-6 text-sm">
                         <div class="accent-box text-xs">
                             <h4><i class="fas fa-shield-alt mr-1"></i> 使用 .env 管理敏感变量</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-3 text-[0.7rem]"><code># .env 示例
+                            <pre class="p-3 text-sm"><code># .env 示例
 MYSQL_ROOT_PASSWORD=rootpass123
 MYSQL_DATABASE=wordpress
 MYSQL_USER=wpuser
@@ -945,7 +959,7 @@ MYSQL_PASSWORD=wppass456</code></pre>
                         </div>
                         <div class="accent-box text-xs">
                             <h4><i class="fas fa-network-wired mr-1"></i> 自定义网络隔离</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-3 text-[0.7rem]"><code>networks:
+                            <pre class="p-3 text-sm"><code>networks:
   internal:
     driver: bridge
 services:
@@ -957,7 +971,7 @@ services:
                         </div>
                         <div class="accent-box text-xs">
                             <h4><i class="fas fa-check-circle mr-1"></i> Healthcheck 提升可靠性</h4>
-                            <pre class="bg-gray-900 text-green-300 rounded-lg p-3 text-[0.7rem]"><code>healthcheck:
+                            <pre class="p-3 text-sm"><code>healthcheck:
   test: ["CMD", "curl", "-f", "http://localhost:5000/api/counter"]
   interval: 15s
   retries: 4
@@ -982,3 +996,8 @@ services:
     <script src="scripts/main.js" defer></script>
 </body>
 </html>
+
+
+
+
+

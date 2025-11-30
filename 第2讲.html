@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -378,10 +378,10 @@
                                     <h5 class="font-bold text-yellow-800 text-sm mb-2">⚠️ 注意事项：</h5>
                                     <ul class="text-xs text-yellow-700 space-y-1">
                                         <li>• 参数顺序很重要，一般建议先写选项，再写镜像名，最后写命令</li>
-                                        <li>• 多个短参数可以合并，如 <code>-d -it</code> 可以写成 <code>-dit</code></li>
+                                        <li>• 多个短参数可以合并，如 <code class="code-inline">-d -it</code> 可以写成 <code class="code-inline">-dit</code></li>
                                         <li>• 端口映射时，宿主机端口不能被占用，否则会启动失败</li>
                                         <li>• 挂载目录时，宿主机目录必须存在，否则会被当作文件挂载</li>
-                                        <li>• 使用 <code>--rm</code> 参数时，容器停止后会立即删除，无法恢复</li>
+                                        <li>• 使用 <code class="code-inline">--rm</code> 参数时，容器停止后会立即删除，无法恢复</li>
                                     </ul>
                                 </div>
                             </div>
@@ -400,49 +400,49 @@
                                 <div class="bg-white p-4 rounded-lg border border-blue-200 mb-4">
                                     <h5 class="font-bold text-gray-800 text-sm mb-2">📊 输出结果解析：</h5>
                                     <div class="overflow-x-auto">
-                                        <table class="min-w-full text-xs">
+                                        <table>
                                             <thead>
-                                                <tr class="bg-gray-100">
-                                                    <th class="px-3 py-2 text-left font-bold text-gray-700">列名</th>
-                                                    <th class="px-3 py-2 text-left font-bold text-gray-700">含义</th>
-                                                    <th class="px-3 py-2 text-left font-bold text-gray-700">示例</th>
+                                                <tr>
+                                                    <th>列名</th>
+                                                    <th>含义</th>
+                                                    <th>示例</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>CONTAINER ID</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">容器的唯一标识符</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">abc123def456</td>
+                                                    <td><code class="code-inline">CONTAINER ID</code></td>
+                                                    <td>容器的唯一标识符</td>
+                                                    <td>abc123def456</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>IMAGE</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">创建容器使用的镜像</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">nginx</td>
+                                                    <td><code class="code-inline">IMAGE</code></td>
+                                                    <td>创建容器使用的镜像</td>
+                                                    <td>nginx</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>COMMAND</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">容器启动时执行的命令</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">"nginx"</td>
+                                                    <td><code class="code-inline">COMMAND</code></td>
+                                                    <td>容器启动时执行的命令</td>
+                                                    <td>"nginx"</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>CREATED</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">容器创建的时间</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">2 minutes ago</td>
+                                                    <td><code class="code-inline">CREATED</code></td>
+                                                    <td>容器创建的时间</td>
+                                                    <td>2 minutes ago</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>STATUS</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">容器当前的状态</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">Up 2 minutes</td>
+                                                    <td><code class="code-inline">STATUS</code></td>
+                                                    <td>容器当前的状态</td>
+                                                    <td>Up 2 minutes</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>PORTS</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">端口映射信息</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">0.0.0.0:8080->80/tcp</td>
+                                                    <td><code class="code-inline">PORTS</code></td>
+                                                    <td>端口映射信息</td>
+                                                    <td>0.0.0.0:8080->80/tcp</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="px-3 py-2 border-b border-gray-200"><code>NAMES</code></td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">容器的名称</td>
-                                                    <td class="px-3 py-2 border-b border-gray-200">my-nginx</td>
+                                                    <td><code class="code-inline">NAMES</code></td>
+                                                    <td>容器的名称</td>
+                                                    <td>my-nginx</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -533,7 +533,7 @@
                                                 <p class="text-white opacity-50 mt-1">abc123def456<br>ghi789jkl012</p>
                                             </div>
                                         </div>
-                                        <div class="text-xs text-blue-800 mt-2">💡 实用组合：<code>docker stop $(docker ps -q)</code> - 停止所有运行中的容器</div>
+                                        <div class="text-xs text-blue-800 mt-2">💡 实用组合：<code class="code-inline">docker stop $(docker ps -q)</code> - 停止所有运行中的容器</div>
                                     </div>
                                     
                                     <!-- --size 参数 -->
@@ -606,10 +606,10 @@
                                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4">
                                     <h5 class="font-bold text-yellow-800 text-sm mb-2">⚠️ 注意事项：</h5>
                                     <ul class="text-xs text-yellow-700 space-y-1">
-                                        <li>• 默认情况下，<code>docker ps</code> 只显示运行中的容器</li>
-                                        <li>• 使用 <code>-q</code> 参数可以快速获取容器ID，便于与其他命令结合使用</li>
-                                        <li>• <code>--size</code> 参数会增加命令执行时间，因为需要计算容器的磁盘使用情况</li>
-                                        <li>• 可以同时使用多个过滤条件，如 <code>docker ps -f status=running -f name=my-*</code></li>
+                                        <li>• 默认情况下，<code class="code-inline">docker ps</code> 只显示运行中的容器</li>
+                                        <li>• 使用 <code class="code-inline">-q</code> 参数可以快速获取容器ID，便于与其他命令结合使用</li>
+                                        <li>• <code class="code-inline">--size</code> 参数会增加命令执行时间，因为需要计算容器的磁盘使用情况</li>
+                                        <li>• 可以同时使用多个过滤条件，如 <code class="code-inline">docker ps -f status=running -f name=my-*</code></li>
                                         <li>• 容器名称是唯一的，而容器ID是全局唯一的</li>
                                     </ul>
                                 </div>
@@ -706,8 +706,8 @@
                                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4">
                                     <h5 class="font-bold text-yellow-800 text-sm mb-2">⚠️ 注意事项：</h5>
                                     <ul class="text-xs text-yellow-700 space-y-1">
-                                        <li>• <code>docker stop</code> 会等待容器优雅停止，默认等待 10 秒</li>
-                                        <li>• 可以使用 <code>docker kill</code> 命令强制终止容器（不推荐，可能导致数据丢失）</li>
+                                        <li>• <code class="code-inline">docker stop</code> 会等待容器优雅停止，默认等待 10 秒</li>
+                                        <li>• 可以使用 <code class="code-inline">docker kill</code> 命令强制终止容器（不推荐，可能导致数据丢失）</li>
                                         <li>• 重启容器会保留容器的配置和数据，但会重新执行启动命令</li>
                                         <li>• 批量操作时要小心，确保只操作目标容器</li>
                                     </ul>
@@ -792,10 +792,10 @@
                                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4">
                                     <h5 class="font-bold text-yellow-800 text-sm mb-2">⚠️ 注意事项：</h5>
                                     <ul class="text-xs text-yellow-700 space-y-1">
-                                        <li>• 默认情况下，<code>docker rm</code> 只能删除已停止的容器</li>
-                                        <li>• 使用 <code>-f</code> 参数会强制终止并删除容器，可能导致数据丢失</li>
-                                        <li>• <code>-v</code> 参数只会删除匿名卷，不会删除命名卷</li>
-                                        <li>• 批量删除前，建议先使用 <code>docker ps -a</code> 确认要删除的容器</li>
+                                        <li>• 默认情况下，<code class="code-inline">docker rm</code> 只能删除已停止的容器</li>
+                                        <li>• 使用 <code class="code-inline">-f</code> 参数会强制终止并删除容器，可能导致数据丢失</li>
+                                        <li>• <code class="code-inline">-v</code> 参数只会删除匿名卷，不会删除命名卷</li>
+                                        <li>• 批量删除前，建议先使用 <code class="code-inline">docker ps -a</code> 确认要删除的容器</li>
                                     </ul>
                                 </div>
                             </div>
@@ -896,10 +896,10 @@
                                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4">
                                     <h5 class="font-bold text-yellow-800 text-sm mb-2">⚠️ 注意事项：</h5>
                                     <ul class="text-xs text-yellow-700 space-y-1">
-                                        <li>• <code>docker exec</code> 只能在运行中的容器内执行命令</li>
-                                        <li>• 使用 <code>-it</code> 参数组合可以获得最佳的交互式体验</li>
+                                        <li>• <code class="code-inline">docker exec</code> 只能在运行中的容器内执行命令</li>
+                                        <li>• 使用 <code class="code-inline">-it</code> 参数组合可以获得最佳的交互式体验</li>
                                         <li>• 执行命令的用户默认是容器的 root 用户，除非容器内有其他用户</li>
-                                        <li>• 可以通过 <code>--user</code> 参数指定执行命令的用户</li>
+                                        <li>• 可以通过 <code class="code-inline">--user</code> 参数指定执行命令的用户</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1000,10 +1000,10 @@
                                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4">
                                     <h5 class="font-bold text-yellow-800 text-sm mb-2">⚠️ 注意事项：</h5>
                                     <ul class="text-xs text-yellow-700 space-y-1">
-                                        <li>• <code>docker logs</code> 只能查看容器的标准输出和标准错误输出</li>
-                                        <li>• 使用 <code>-f</code> 参数时，可以按 Ctrl+C 停止跟踪</li>
+                                        <li>• <code class="code-inline">docker logs</code> 只能查看容器的标准输出和标准错误输出</li>
+                                        <li>• 使用 <code class="code-inline">-f</code> 参数时，可以按 Ctrl+C 停止跟踪</li>
                                         <li>• 容器被删除后，其日志也会被删除，除非使用了日志驱动进行持久化</li>
-                                        <li>• 对于长时间运行的容器，日志可能会很大，建议使用 <code>--tail</code> 参数查看最新日志</li>
+                                        <li>• 对于长时间运行的容器，日志可能会很大，建议使用 <code class="code-inline">--tail</code> 参数查看最新日志</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1091,47 +1091,47 @@
                             <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
                                 <h4 class="font-bold text-gray-800 mb-2">任务 1：基础环境检查</h4>
                                 <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
-                                    <li>运行 <code>docker version</code> 检查安装</li>
-                                    <li>运行 <code>docker info</code> 查看系统信息</li>
-                                    <li>运行 <code>docker system df</code> 查看磁盘使用</li>
+                                    <li>运行 <code class="code-inline">docker version</code> 检查安装</li>
+                                    <li>运行 <code class="code-inline">docker info</code> 查看系统信息</li>
+                                    <li>运行 <code class="code-inline">docker system df</code> 查看磁盘使用</li>
                                 </ol>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
                                 <h4 class="font-bold text-gray-800 mb-2">任务 2：镜像操作练习</h4>
                                 <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
-                                    <li>运行 <code>docker pull nginx</code> 下载 Nginx 镜像</li>
-                                    <li>运行 <code>docker images</code> 查看下载的镜像</li>
-                                    <li>运行 <code>docker pull ubuntu:20.04</code> 下载 Ubuntu 镜像</li>
-                                    <li>再次运行 <code>docker images</code> 确认有两个镜像</li>
+                                    <li>运行 <code class="code-inline">docker pull nginx</code> 下载 Nginx 镜像</li>
+                                    <li>运行 <code class="code-inline">docker images</code> 查看下载的镜像</li>
+                                    <li>运行 <code class="code-inline">docker pull ubuntu:20.04</code> 下载 Ubuntu 镜像</li>
+                                    <li>再次运行 <code class="code-inline">docker images</code> 确认有两个镜像</li>
                                 </ol>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500">
                                 <h4 class="font-bold text-gray-800 mb-2">任务 3：容器操作练习</h4>
                                 <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
-                                    <li>运行 <code>docker run -d --name test-web -p 8888:80 nginx</code></li>
-                                    <li>运行 <code>docker ps</code> 查看运行中的容器</li>
-                                    <li>在浏览器访问 <code>http://localhost:8888</code> 确认 Nginx 工作</li>
-                                    <li>运行 <code>docker logs test-web</code> 查看容器日志</li>
-                                    <li>运行 <code>docker exec -it test-web bash</code> 进入容器</li>
-                                    <li>在容器内运行 <code>ls /usr/share/nginx/html</code> 查看网页文件</li>
-                                    <li>输入 <code>exit</code> 退出容器</li>
-                                    <li>运行 <code>docker stop test-web</code> 停止容器</li>
-                                    <li>运行 <code>docker ps -a</code> 查看所有容器（包括停止的）</li>
-                                    <li>运行 <code>docker start test-web</code> 重新启动容器</li>
-                                    <li>运行 <code>docker stop test-web</code> 再次停止容器</li>
-                                    <li>运行 <code>docker rm test-web</code> 删除容器</li>
+                                    <li>运行 <code class="code-inline">docker run -d --name test-web -p 8888:80 nginx</code></li>
+                                    <li>运行 <code class="code-inline">docker ps</code> 查看运行中的容器</li>
+                                    <li>在浏览器访问 <code class="code-inline">http://localhost:8888</code> 确认 Nginx 工作</li>
+                                    <li>运行 <code class="code-inline">docker logs test-web</code> 查看容器日志</li>
+                                    <li>运行 <code class="code-inline">docker exec -it test-web bash</code> 进入容器</li>
+                                    <li>在容器内运行 <code class="code-inline">ls /usr/share/nginx/html</code> 查看网页文件</li>
+                                    <li>输入 <code class="code-inline">exit</code> 退出容器</li>
+                                    <li>运行 <code class="code-inline">docker stop test-web</code> 停止容器</li>
+                                    <li>运行 <code class="code-inline">docker ps -a</code> 查看所有容器（包括停止的）</li>
+                                    <li>运行 <code class="code-inline">docker start test-web</code> 重新启动容器</li>
+                                    <li>运行 <code class="code-inline">docker stop test-web</code> 再次停止容器</li>
+                                    <li>运行 <code class="code-inline">docker rm test-web</code> 删除容器</li>
                                 </ol>
                             </div>
 
                             <div class="bg-white p-4 rounded-lg border-l-4 border-red-500">
                                 <h4 class="font-bold text-gray-800 mb-2">任务 4：清理练习</h4>
                                 <ol class="text-sm text-gray-700 space-y-2 list-decimal list-inside">
-                                    <li>运行 <code>docker ps -a</code> 确认没有运行中的容器</li>
-                                    <li>运行 <code>docker images</code> 查看所有镜像</li>
-                                    <li>运行 <code>docker system prune</code> 清理未使用的资源</li>
-                                    <li>再次运行 <code>docker system df</code> 查看清理后的磁盘使用</li>
+                                    <li>运行 <code class="code-inline">docker ps -a</code> 确认没有运行中的容器</li>
+                                    <li>运行 <code class="code-inline">docker images</code> 查看所有镜像</li>
+                                    <li>运行 <code class="code-inline">docker system prune</code> 清理未使用的资源</li>
+                                    <li>再次运行 <code class="code-inline">docker system df</code> 查看清理后的磁盘使用</li>
                                 </ol>
                             </div>
                         </div>
@@ -1140,8 +1140,8 @@
                             <p class="text-xs font-bold text-green-900 mb-2"><i class="fas fa-lightbulb mr-1"></i> 练习提示：</p>
                             <ul class="text-xs text-green-800 space-y-1">
                                 <li>每个命令执行后，观察输出是否符合预期</li>
-                                <li>练习过程中，可以随时使用 <code>docker ps</code> 和 <code>docker images</code> 检查状态</li>
-                                <li>如果遇到问题，可以使用 <code>docker --help</code> 查看帮助</li>
+                                <li>练习过程中，可以随时使用 <code class="code-inline">docker ps</code> 和 <code class="code-inline">docker images</code> 检查状态</li>
+                                <li>如果遇到问题，可以使用 <code class="code-inline">docker --help</code> 查看帮助</li>
                                 <li>建议多练习几遍，直到熟练掌握这些命令</li>
                             </ul>
                         </div>
@@ -1155,7 +1155,7 @@
                     
                     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                         <p class="text-sm text-yellow-700">
-                            <strong>新手提示：</strong> 如果遇到 <code>permission denied</code> (权限拒绝)，请在命令前加上 <code>sudo</code>。
+                            <strong>新手提示：</strong> 如果遇到 <code class="code-inline">permission denied</code> (权限拒绝)，请在命令前加上 <code class="code-inline">sudo</code>。
                         </p>
                     </div>
 
@@ -1393,7 +1393,7 @@
                     <div class="bg-red-50 border-l-4 border-red-400 p-4">
                         <h4 class="text-red-800 font-bold text-sm mb-2">❌ 问题来了：</h4>
                         <p class="text-sm text-red-700">
-                            容器虽然启动了（你可以用 <code>docker ps</code> 看到它），但是你在浏览器里输入 <code>localhost</code>，发现<strong>什么都打不开</strong>。
+                            容器虽然启动了（你可以用 <code class="code-inline">docker ps</code> 看到它），但是你在浏览器里输入 <code class="code-inline">localhost</code>，发现<strong>什么都打不开</strong>。
                         </p>
                         <p class="text-sm text-red-700 mt-2">
                             <strong>原因：</strong> 容器是一个封闭的盒子。Nginx 在盒子里吆喝，你在盒子外面根本听不见。我们需要“开个窗户”。
@@ -1605,11 +1605,11 @@
                         <div class="mt-4 bg-white p-4 rounded-lg border border-green-200">
                             <p class="text-sm font-bold text-green-900 mb-2">📝 命令详解：</p>
                             <ul class="text-xs text-gray-700 space-y-1">
-                                <li>• <code>docker run</code> - 创建并启动容器</li>
-                                <li>• <code>-d</code> - 后台运行</li>
-                                <li>• <code>-p 8080:80</code> - <strong>端口映射！电脑的8080 → 容器的80</strong></li>
-                                <li>• <code>--name my-web</code> - 给容器起名叫 my-web</li>
-                                <li>• <code>nginx</code> - 使用 nginx 镜像</li>
+                                <li>• <code class="code-inline">docker run</code> - 创建并启动容器</li>
+                                <li>• <code class="code-inline">-d</code> - 后台运行</li>
+                                <li>• <code class="code-inline">-p 8080:80</code> - <strong>端口映射！电脑的8080 → 容器的80</strong></li>
+                                <li>• <code class="code-inline">--name my-web</code> - 给容器起名叫 my-web</li>
+                                <li>• <code class="code-inline">nginx</code> - 使用 nginx 镜像</li>
                             </ul>
                         </div>
                     </div>
@@ -1618,7 +1618,7 @@
                     <div class="mt-6 flex items-center justify-between bg-green-50 border border-green-200 p-4 rounded-lg">
                         <div>
                             <h4 class="font-bold text-green-800">🎉 见证奇迹的时刻</h4>
-                            <p class="text-sm text-green-700">打开浏览器，访问：<code>http://localhost:8080</code></p>
+                            <p class="text-sm text-green-700">打开浏览器，访问：<code class="code-inline">http://localhost:8080</code></p>
                         </div>
                         <a href="http://localhost:8080" target="_blank" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded shadow">
                             立即点击访问 <i class="fas fa-external-link-alt ml-1"></i>
@@ -1635,7 +1635,7 @@
                     <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6">
                         <h4 class="text-indigo-900 font-bold text-sm mb-1">🗝️ 关键命令：docker exec</h4>
                         <p class="text-sm text-indigo-800">
-                            <code>docker exec -it [容器名] bash</code><br>
+                            <code class="code-inline">docker exec -it [容器名] bash</code><br>
                             这行命令相当于给你开了一个“传送门”，让你穿越到容器内部的 Linux 系统里去。
                         </p>
                     </div>
@@ -1675,7 +1675,7 @@
                     </div>
 
                     <div class="mt-6 text-center">
-                        <p class="text-gray-600 mb-2">现在，回到浏览器，<strong>刷新</strong> 刚才的 <code>localhost:8080</code> 页面。</p>
+                        <p class="text-gray-600 mb-2">现在，回到浏览器，<strong>刷新</strong> 刚才的 <code class="code-inline">localhost:8080</code> 页面。</p>
                         <p class="text-xl font-bold text-blue-600">看到了吗？页面变成了你写的内容！</p>
                     </div>
                 </section>
@@ -1785,7 +1785,7 @@
                                         a1b2c3d4e5f6   nginx   ...       5 sec ago   Up 5 sec   0.0.0.0:8080->80/tcp   my-website</p>
                                     </div>
                                 </div>
-                                <p class="text-sm text-green-700 mt-2">✅ 看到 <code>my-website</code> 出现在列表里，STATUS 显示 "Up"，就说明成功了！</p>
+                                <p class="text-sm text-green-700 mt-2">✅ 看到 <code class="code-inline">my-website</code> 出现在列表里，STATUS 显示 "Up"，就说明成功了！</p>
                             </div>
                         </div>
                     </div>
@@ -1818,8 +1818,8 @@
                                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                                     <p class="text-sm text-yellow-800"><strong>🤔 为什么是 localhost:8080？</strong></p>
                                     <ul class="text-xs text-yellow-700 mt-2 space-y-1">
-                                        <li><code>localhost</code> = 你自己的电脑（本地）</li>
-                                        <li><code>8080</code> = 我们刚才用 <code>-p 8080:80</code> 打开的端口号</li>
+                                        <li><code class="code-inline">localhost</code> = 你自己的电脑（本地）</li>
+                                        <li><code class="code-inline">8080</code> = 我们刚才用 <code class="code-inline">-p 8080:80</code> 打开的端口号</li>
                                         <li>合起来就是："访问我电脑的 8080 端口"</li>
                                     </ul>
                                 </div>
@@ -1836,7 +1836,7 @@
                         <div class="p-6">
                             <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-4">
                                 <p class="text-sm text-indigo-800"><strong>🔑  关键理解：</strong></p>
-                                <p class="text-sm text-indigo-700 mt-2">Docker 容器就像一个虚拟的小电脑。<code>docker exec</code> 命令就像一扇传送门，让我们进去操作这个"小电脑"。</p>
+                                <p class="text-sm text-indigo-700 mt-2">Docker 容器就像一个虚拟的小电脑。<code class="code-inline">docker exec</code> 命令就像一扇传送门，让我们进去操作这个"小电脑"。</p>
                             </div>
 
                             <div class="terminal-window mb-4">
@@ -1878,7 +1878,7 @@
                         <div class="p-6">
                             <div class="bg-orange-50 border-l-4 border-orange-400 p-4 mb-4">
                                 <p class="text-sm text-orange-800"><strong>📁 小知识：</strong></p>
-                                <p class="text-sm text-orange-700 mt-2">Nginx 的网页文件默认放在 <code>/usr/share/nginx/html</code> 这个文件夹里。记住这个路径很重要！</p>
+                                <p class="text-sm text-orange-700 mt-2">Nginx 的网页文件默认放在 <code class="code-inline">/usr/share/nginx/html</code> 这个文件夹里。记住这个路径很重要！</p>
                             </div>
 
                             <div class="terminal-window mb-4">
@@ -1919,7 +1919,7 @@
                         <div class="p-6">
                             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
                                 <p class="text-sm text-yellow-800"><strong>⚠️ 注意：</strong></p>
-                                <p class="text-sm text-yellow-700 mt-2">容器里没有安装文本编辑器（nano、vim 都没有），所以我们用 <code>echo</code> 命令直接写入内容。</p>
+                                <p class="text-sm text-yellow-700 mt-2">容器里没有安装文本编辑器（nano、vim 都没有），所以我们用 <code class="code-inline">echo</code> 命令直接写入内容。</p>
                             </div>
 
                             <div class="terminal-window mb-4">
@@ -1968,12 +1968,12 @@
                             <div class="grid md:grid-cols-2 gap-4 mb-4">
                                 <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
                                     <h4 class="font-bold text-blue-900 mb-2">方法1 说明（简单）</h4>
-                                    <p class="text-sm text-blue-800"><code>echo "内容" > 文件</code> 的意思是：把引号里的内容写入文件。</p>
+                                    <p class="text-sm text-blue-800"><code class="code-inline">echo "内容" > 文件</code> 的意思是：把引号里的内容写入文件。</p>
                                     <p class="text-xs text-blue-700 mt-2">优点：简单快速<br>缺点：只有一行</p>
                                 </div>
                                 <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
                                     <h4 class="font-bold text-green-900 mb-2">方法2 说明（完整）</h4>
-                                    <p class="text-sm text-green-800"><code>cat > 文件 << 'EOF'</code> 可以输入多行内容，直到遇到 <code>EOF</code> 为止。</p>
+                                    <p class="text-sm text-green-800"><code class="code-inline">cat > 文件 << 'EOF'</code> 可以输入多行内容，直到遇到 <code class="code-inline">EOF</code> 为止。</p>
                                     <p class="text-xs text-green-700 mt-2">优点：可以写完整的 HTML<br>缺点：稍微复杂一点</p>
                                 </div>
                             </div>
@@ -2151,3 +2151,8 @@
     <script src="scripts/main.js" defer></script>
 </body>
 </html>
+
+
+
+
+
