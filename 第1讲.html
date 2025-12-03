@@ -3,1411 +3,1258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker 竞赛培训 - 第一讲</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>第1讲:环境构建与基础入门</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/common.css">
-    <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+<body class="has-page-toc">
+
+    <!-- Page TOC Navigation -->
+    <nav class="page-toc">
+        <div class="page-toc-title">本讲目录</div>
+        <ul class="page-toc-list">
+            <li><a href="#foundations" class="page-toc-link">0. 计算机基础知识速览</a></li>
+            <li><a href="#intro" class="page-toc-link">1. 为什么是 Docker?</a></li>
+            <li><a href="#wsl" class="page-toc-link">2. 安装 WSL 2</a></li>
+            <li><a href="#docker-desktop-guide" class="page-toc-link">3. Docker Desktop 使用指南</a></li>
+            <li><a href="#vmware-ubuntu" class="page-toc-link">4. VMware + Ubuntu</a></li>
+            <li><a href="#linux-basics" class="page-toc-link">5. Linux 生存指南</a></li>
+            <li><a href="#docker-install" class="page-toc-link">6. 安装 Docker Desktop</a></li>
+            <li><a href="#docker-concepts" class="page-toc-link">7. Docker 核心概念通俗解</a></li>
+            <li><a href="#docker-first-run" class="page-toc-link">8. 初体验:运行第一个容器</a></li>
+        </ul>
+    </nav>
 
     <!-- Header -->
-    <header class="bg-blue-900 text-white shadow-lg shrink-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fab fa-docker text-3xl text-blue-400"></i>
+    <header style="background-color: var(--color-text); color: white; padding: 2rem 0; border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <i class="fab fa-docker" style="font-size: 2rem; color: var(--color-accent);"></i>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide">Docker 容器技术竞赛培训</h1>
-                    <p class="text-xs text-blue-200">第一讲：环境构建与基础入门</p>
+                    <h1 style="color: white; font-size: 1.25rem; margin: 0;">Docker 容器技术竞赛培训</h1>
+                    <p style="color: #e5e7eb; font-size: 0.875rem; margin: 0.25rem 0 0 0;">第一讲：环境构建与基础入门</p>
                 </div>
-            </div>
-            <div class="hidden md:block text-sm opacity-80">
-                <i class="fas fa-clock mr-1"></i> 预计时长：3小时
             </div>
         </div>
     </header>
 
-    <!-- Main Layout -->
-    <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="w-80 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
-            <div class="p-6">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲目录</h3>
-                <nav class="space-y-2 text-base">
-                    <a href="#foundations" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-graduation-cap"></i></span> 0. 基础知识预热
-                    </a>
-                    <a href="#intro" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group active">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-lightbulb"></i></span> 1. 为什么用 Docker
-                    </a>
-                    <a href="#wsl" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fab fa-windows"></i></span> 2. WSL 2 安装
-                    </a>
-                    <a href="#docker-desktop-guide" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-window-maximize"></i></span> 3. Desktop 使用指南
-                    </a>
-                    <a href="#vmware-ubuntu" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-box-open"></i></span> 4. VMware + Ubuntu
-                    </a>
-                    <a href="#linux-basics" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-terminal"></i></span> 5. Linux 生存指南
-                    </a>
-                    <a href="#docker-install" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-download"></i></span> 6. Docker 安装
-                    </a>
-                    <a href="#docker-concepts" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-brain"></i></span> 7. 核心概念通俗解
-                    </a>
-                    <a href="#docker-first-run" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 group">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-play-circle"></i></span> 8. 初体验与命令
-                    </a>
-                </nav>
-            </div>
-            <div class="mt-auto p-6 border-t border-gray-100">
-                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
-                    <h4 class="text-base font-bold text-blue-800 mb-3"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲核心</h4>
-                    <ul class="text-sm text-blue-700 space-y-2 list-disc list-inside">
-                        <li>BIOS 开启虚拟化</li>
-                        <li>Win10 2004+ / Win11</li>
-                        <li>能够连接互联网</li>
+    <!-- Main Content -->
+    <main class="container" style="padding: 2rem 0 3rem 0;">
+
+        <!-- Section 0: 计算机基础 -->
+        <section id="foundations" class="section-card">
+            <h2>
+                <i class="fas fa-graduation-cap" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                0. 计算机基础知识速览
+            </h2>
+
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-server"></i>
+                    <h4>什么是操作系统？</h4>
+                </div>
+                <div class="module-content">
+                    <p>操作系统是管理计算机硬件和软件的程序。就像餐厅经理：协调厨房（CPU）、仓库（内存）、服务员（进程）。</p>
+                    <ul style="margin-top: 0.5rem;">
+                        <li><strong>Windows：</strong>图形化，易用，游戏/办公首选</li>
+                        <li><strong>Linux：</strong>命令行为主，服务器首选，开源免费</li>
+                        <li><strong>macOS：</strong>Unix 核心，设计师/开发者喜爱</li>
                     </ul>
                 </div>
             </div>
-        </aside>
 
-        <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 scroll-smooth" id="main-content">
-            <div class="max-w-5xl mx-auto space-y-16 pb-32 lg:max-w-6xl xl:max-w-7xl">
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-terminal"></i>
+                    <h4>为什么要学 Linux？</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li>全球 90% 以上的服务器运行 Linux</li>
+                        <li>Docker 底层基于 Linux 内核技术</li>
+                        <li>竞赛环境几乎都是 Linux</li>
+                        <li>企业开发必备技能</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-                <!-- Section 0: 基础知识预热 -->
-                <section id="foundations" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">0. 计算机基础知识速览</h2>
-                        <p class="mt-2 text-gray-600">学习 Docker 前，这些概念你必须搞懂。别怕，我们用最通俗的方式讲。</p>
-                    </div>
+        <!-- Section 1: 为什么是 Docker -->
+        <section id="intro" class="section-card">
+            <h2>
+                <i class="fas fa-question-circle" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                1. 为什么是 Docker？
+            </h2>
 
-                    <!-- What is OS -->
-                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 mb-6">
-                        <h3 class="font-bold text-blue-900 mb-3 text-lg"><i class="fas fa-laptop-code mr-2"></i> 什么是操作系统 (Operating System)?</h3>
-                        <p class="text-blue-800 text-sm mb-3">
-                            <strong>简单理解：</strong>操作系统是电脑的"管家"。它管理所有的硬件资源（CPU、内存、硬盘等），让软件能够顺利运行。你现在用的 Windows 就是一个操作系统。
-                        </p>
-                        <div class="bg-white p-3 rounded border-l-4 border-blue-400 text-sm">
-                            <strong>类比：</strong>如果你的电脑是一家餐厅，操作系统就是经理。经理负责分配厨师（CPU）、食材库存（内存）、冷冻库（硬盘）。如果没有经理，一切都乱套了。
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>传统开发的痛点</h4>
+                </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div style="background-color: #fee2e2; padding: 1rem; border-radius: 6px;">
+                            <h5 style="color: var(--color-error);">❌ "在我电脑上能跑"</h5>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">开发环境、测试环境、生产环境配置不一致，导致程序在自己电脑能跑，到服务器就崩溃。</p>
+                        </div>
+                        <div style="background-color: #fee2e2; padding: 1rem; border-radius: 6px;">
+                            <h5 style="color: var(--color-error);">❌ 环境配置地狱</h5>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">装 Python、Node.js、MySQL、Redis……版本冲突，依赖混乱，重装系统要花半天重新配置。</p>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- What is Linux -->
-                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 mb-6">
-                        <h3 class="font-bold text-orange-900 mb-3 text-lg"><i class="fas fa-penguin mr-2"></i> 什么是 Linux?</h3>
-                        <p class="text-orange-800 text-sm mb-3">
-                            <strong>简单理解：</strong>Linux 是一个<strong>免费开源的操作系统</strong>，就像 Windows 一样，但它不是微软做的，而是由全世界的开发者共同维护的。
-                        </p>
-                        <div class="grid md:grid-cols-3 gap-3 text-xs mb-3">
-                            <div class="bg-white p-3 rounded border-l-2 border-orange-400">
-                                <strong>Windows</strong><br>
-                                微软制造，要付费，普通用户用
-                            </div>
-                            <div class="bg-white p-3 rounded border-l-2 border-orange-400">
-                                <strong>macOS</strong><br>
-                                苹果制造，只能装在苹果电脑
-                            </div>
-                            <div class="bg-white p-3 rounded border-l-2 border-orange-400">
-                                <strong>Linux</strong><br>
-                                免费开源，全球 99% 的服务器都用
-                            </div>
-                        </div>
-                        <p class="text-orange-800 text-sm">
-                            <strong>为什么要学 Linux？</strong>全世界的云服务器、网站、竞赛平台几乎都跑在 Linux 上。所以作为程序员，必须懂 Linux。将来工作也离不开它。
-                        </p>
-                    </div>
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-magic"></i>
+                    <h4>Docker 解决方案</h4>
+                </div>
+                <div class="module-content">
+                    <p style="margin-bottom: 0.75rem;"><strong>核心思想：</strong>把应用和环境一起打包，像"集装箱"一样标准化运输。</p>
+                    <ul>
+                        <li><strong>一致性：</strong>开发、测试、生产环境完全一致</li>
+                        <li><strong>隔离性：</strong>每个容器独立运行，互不干扰</li>
+                        <li><strong>便携性：</strong>一次构建，到处运行</li>
+                        <li><strong>高效性：</strong>秒级启动，资源占用少</li>
+                    </ul>
+                </div>
+            </div>
 
-                    <!-- Kernel vs Shell -->
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 mb-6">
-                        <h3 class="font-bold text-green-900 mb-3 text-lg"><i class="fas fa-terminal mr-2"></i> 终端 (Terminal) 和 Shell 是什么?</h3>
-                        <p class="text-green-800 text-sm mb-3">
-                            <strong>终端 (Terminal)：</strong>就是一个黑白的窗口，你可以在里面输入命令。它只是一个"输入输出工具"，本身不执行命令。
-                        </p>
-                        <p class="text-green-800 text-sm mb-3">
-                            <strong>Shell：</strong>是真正理解和执行你的命令的程序。常见的有 <code class="bg-white px-1">bash</code>, <code class="bg-white px-1">zsh</code>, <code class="bg-white px-1">sh</code> 等。
-                        </p>
-                        <div class="bg-white p-3 rounded text-sm text-gray-700">
-                            <strong>类比：</strong>终端是餐厅的传菜口，Shell 是理解你点菜单语言的服务员。你说英文，服务员理解英文；你说中文，服务员理解中文。不同的 Shell 就像不同国籍的服务员。
-                        </div>
-                    </div>
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>生活类比</h4>
+                </div>
+                <div class="module-content">
+                    <p><strong>虚拟机 = 整套房子：</strong>每个虚拟机都有完整的操作系统，像建一整栋房子，占地大、启动慢。</p>
+                    <p style="margin-top: 0.5rem;"><strong>Docker 容器 = 集装箱：</strong>共享主机操作系统内核，只打包应用和依赖，轻量快速。</p>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Package Manager -->
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 mb-6">
-                        <h3 class="font-bold text-purple-900 mb-3 text-lg"><i class="fas fa-cube mr-2"></i> 包管理器 (Package Manager) 是什么?</h3>
-                        <p class="text-purple-800 text-sm mb-3">
-                            <strong>简单理解：</strong>在 Windows 里，你下载软件通常是到官网下载 .exe 文件。在 Linux 里，有个"中央超市"叫<strong>包管理器</strong>，里面什么软件都有，你一条命令就能装，还自动管理依赖。
-                        </p>
-                        <div class="grid md:grid-cols-2 gap-3 text-xs mb-3">
-                            <div class="bg-white p-3 rounded">
-                                <strong>Ubuntu/Debian：</strong>
-                                <code class="block mt-1 bg-gray-100 p-1 rounded">sudo apt install python3</code>
-                                <p class="mt-1 text-gray-600">一条命令，Python3 装好</p>
-                            </div>
-                            <div class="bg-white p-3 rounded">
-                                <strong>CentOS/RedHat：</strong>
-                                <code class="block mt-1 bg-gray-100 p-1 rounded">sudo yum install python3</code>
-                                <p class="mt-1 text-gray-600">类似的功能，不同的系统</p>
-                            </div>
-                        </div>
-                        <p class="text-purple-800 text-sm">
-                            <strong>对竞赛的意义：</strong>Docker 里经常要装各种软件。学会用包管理器，可以快速搭建复杂的环境。
-                        </p>
-                    </div>
+        <!-- Section 2: WSL 安装 -->
+        <section id="wsl" class="section-card">
+            <h2>
+                <i class="fab fa-windows" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                2. 安装 WSL 2 (Windows用户必做)
+            </h2>
 
-                    <!-- File Permissions -->
-                    <div class="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-6">
-                        <h3 class="font-bold text-red-900 mb-3 text-lg"><i class="fas fa-lock mr-2"></i> 文件权限是什么?</h3>
-                        <p class="text-red-800 text-sm mb-3">
-                            <strong>简单理解：</strong>每个文件都有"身份证"，规定了谁可以读它、写它、执行它。
-                        </p>
-                        <div class="bg-white p-3 rounded text-xs font-mono text-gray-700 mb-3">
-                            -rw-r--r-- 1 user group 1024 Nov 19 hello.txt
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-2 text-xs">
-                            <div class="bg-white p-2 rounded border-l-2 border-red-400">
-                                <strong>r (读)</strong><br>
-                                可以看文件内容
-                            </div>
-                            <div class="bg-white p-2 rounded border-l-2 border-red-400">
-                                <strong>w (写)</strong><br>
-                                可以修改文件
-                            </div>
-                            <div class="bg-white p-2 rounded border-l-2 border-red-400">
-                                <strong>x (执行)</strong><br>
-                                可以运行这个文件
-                            </div>
-                        </div>
-                        <p class="text-red-800 text-sm mt-2">
-                            <strong>为什么要学？</strong>在竞赛时，经常需要给文件加执行权限，否则程序跑不了。
-                        </p>
-                    </div>
-                </section>
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h4>什么是 WSL？</h4>
+                </div>
+                <div class="module-content">
+                    <p>Windows Subsystem for Linux（WSL）让你<strong>在 Windows 里运行一个真正的 Linux 环境</strong>，无需双系统，也不需要笨重的虚拟机。简单来说，就是在 Windows 里开了一个 Linux 的窗口。</p>
+                    <p style="margin-top: 0.75rem;">WSL 2 基于微软的 Hyper-V 虚拟化技术，性能接近原生 Linux，与 Windows 深度整合：文件互通、网络共享、图形应用支持。</p>
+                </div>
+            </div>
 
-                <!-- Section 1: Intro -->
-                <section id="intro" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">1. 为什么是 Docker？</h2>
-                        <p class="mt-2 text-gray-600">理解容器化技术在学科竞赛中的真正价值。</p>
+            <div class="grid-auto" style="margin-top: 1.5rem;">
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-layer-group"></i>
+                        <h4>什么是虚拟机？</h4>
                     </div>
-
-                    <!-- 问题场景 -->
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-6 mb-6 rounded">
-                        <h3 class="font-bold text-amber-900 mb-3"><i class="fas fa-warning mr-2"></i> 先说一个困扰许多人的现实问题</h3>
-                        <p class="text-sm text-amber-800 mb-4">
-                            假如一道竞赛题的要求是：<strong>Python 3.8</strong>、<strong>Flask 2.0.1</strong>、<strong>PostgreSQL 12</strong>、<strong>Redis 6.2</strong>、<strong>特定的编译环境</strong>...
-                        </p>
-                        <div class="bg-white p-4 rounded border-l-4 border-red-400 text-sm space-y-3">
-                            <p><strong class="text-red-600">😭 悲剧1：版本冲突</strong><br>你的电脑上已经有 Python 3.9（装过其他项目）、Flask 1.8、PostgreSQL 13。库版本冲突，代码跑不起来！但你不能卸载，因为其他项目依赖它。</p>
-                            <p><strong class="text-red-600">😭😭 悲剧2：时间浪费</strong><br>你花了 2 小时配置环境，下载、安装、配置依赖。最后发现系统不兼容。临近比赛时间还没开始写代码。</p>
-                            <p><strong class="text-red-600">😭😭😭 悲剧3：冤枉啊</strong><br>你的代码在你电脑跑得好好的，本地测试没问题。提交到裁判机上直接 Runtime Error。代码没错，是环境差异导致的问题。</p>
-                        </div>
-                    </div>
-
-                    <!-- Docker 的本质解释 -->
-                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 mb-6">
-                        <h3 class="font-bold text-blue-900 mb-3"><i class="fas fa-lightbulb mr-2"></i> Docker 到底是什么？（超通俗版）</h3>
-                        <p class="text-blue-800 text-sm mb-3">
-                            Docker 就是一个<strong>"虚拟的完整电脑"</strong>。你可以在里面装任意版本的软件，这个"虚拟电脑"是<strong>完全隔离</strong>的，不会干扰你真实电脑上的任何东西。
-                        </p>
-                        <p class="text-blue-800 text-sm mb-3">
-                            更重要的是：你可以<strong>把这个"虚拟电脑"打包成一个文件（Docker 镜像）</strong>，发给任何人、任何电脑、任何操作系统。别人打开这个文件，看到的"电脑"跟你的<strong>完全一样</strong>。没有版本差异，没有兼容性问题。
-                        </p>
-                        <div class="bg-white p-3 rounded text-sm text-blue-700 italic border border-blue-300">
-                            这就是 Docker 的核心价值：<strong>"Write Once, Run Anywhere"</strong>（写一次，到处运行）。这也是为什么全世界的企业和竞赛都用 Docker。
-                        </div>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h3 class="text-lg font-bold text-red-500 mb-3"><i class="fas fa-times-circle mr-2"></i>没有 Docker 的痛点</h3>
-                            <ul class="space-y-3 text-sm text-gray-600">
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> <strong>版本地狱：</strong>"在我电脑上能跑，在裁判机上跑不起来。"</li>
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> <strong>时间浪费：</strong>配置环境花了 3 小时，写代码只剩半小时。</li>
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> <strong>系统污染：</strong>删错一个库，整个系统崩溃要重装。</li>
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> <strong>跨平台问题：</strong>别人用 Mac，你用 Windows，代码跑不了。</li>
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> <strong>隐藏错误：</strong>系统环境的差异导致 BUG，却很难查出原因。</li>
-                            </ul>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h3 class="text-lg font-bold text-green-600 mb-3"><i class="fas fa-check-circle mr-2"></i>Docker 的超能力</h3>
-                            <ul class="space-y-3 text-sm text-gray-600">
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> “在我电脑上能跑，在裁判机上跑不起来。”</li>
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> 配置环境花了3小时，写代码只剩半小时。</li>
-                                <li class="flex items-start"><i class="fas fa-bug mt-1 mr-2 text-gray-400"></i> 删错一个库，整个系统重装。</li>
-                            </ul>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h3 class="text-lg font-bold text-green-600 mb-3"><i class="fas fa-check-circle mr-2"></i>Docker 的超能力</h3>
-                            <ul class="space-y-3 text-sm text-gray-600">
-                                <li class="flex items-start"><i class="fas fa-shield-alt mt-1 mr-2 text-green-500"></i> <strong>环境一致：</strong> 100% 保证。Mac、Linux、Windows 完全一样。</li>
-                                <li class="flex items-start"><i class="fas fa-bolt mt-1 mr-2 text-green-500"></i> <strong>极速启动：</strong> 比虚拟机快 100 倍。（1秒 vs 20秒）</li>
-                                <li class="flex items-start"><i class="fas fa-layer-group mt-1 mr-2 text-green-500"></i> <strong>版本锁定：</strong> Dockerfile 精确记录所有依赖版本。</li>
-                                <li class="flex items-start"><i class="fas fa-cube mt-1 mr-2 text-green-500"></i> <strong>完全隔离：</strong> 不影响主系统，删除时干干净净。</li>
-                                <li class="flex items-start"><i class="fas fa-share-alt mt-1 mr-2 text-green-500"></i> <strong>易于分享：</strong> 一个文件就能共享整个开发环境。</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- 三个关键问题 -->
-                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 mb-6">
-                        <h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-question-circle mr-2"></i> 通常会问的三个问题</h3>
-                        <div class="space-y-4">
-                            <div class="bg-white p-4 rounded border-l-4 border-blue-400">
-                                <strong class="text-blue-600">Q1: Docker 是虚拟机吗？</strong>
-                                <p class="text-sm text-gray-600 mt-1">
-                                    <strong>不完全是。</strong>虚拟机模拟整个电脑（包括 BIOS、驱动程序、完整 OS），启动需要 20 秒，占用 2-5GB 内存。Docker 是轻量级<strong>容器技术</strong>，只封装你的应用程序和它的依赖，启动只需 1 秒，占用 100MB 内存。想象虚拟机是"复制一个工厂"，Docker 是"装集装箱"。
-                                </p>
-                            </div>
-                            <div class="bg-white p-4 rounded border-l-4 border-green-400">
-                                <strong class="text-green-600">Q2: Docker 占用空间大吗？</strong>
-                                <p class="text-sm text-gray-600 mt-1">
-                                    <strong>非常小。</strong>一个完整的 Python + Flask + PostgreSQL 的 Docker 镜像，通常只有 300-500MB。而如果直接装在系统上，往往要 1-2GB，还会污染系统、产生依赖冲突。
-                                </p>
-                            </div>
-                            <div class="bg-white p-4 rounded border-l-4 border-purple-400">
-                                <strong class="text-purple-600">Q3: 学 Docker 难吗？</strong>
-                                <p class="text-sm text-gray-600 mt-1">
-                                    <strong>初级使用非常简单。</strong>就十来个命令，一周就能掌握 Docker 的 90% 功能。这节课我们就从零开始，一步步教你。
-                                </p>
+                    <div class="module-content">
+                        <p>虚拟机（Virtual Machine）通过虚拟化技术，在真实电脑里模拟出一台完整的"第二台电脑"，包含独立的 CPU、内存、硬盘、网卡等。常见例子：VMware、VirtualBox。</p>
+                        <div class="module-warning" style="margin-top: 0.75rem;">
+                            <div class="module-content">
+                                <p><strong>缺点：</strong>启动慢、占用资源多、和主系统隔离严重，需要手动设置共享。</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- 通俗比喻 -->
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200 mb-6">
-                        <h3 class="font-bold text-purple-900 mb-3"><i class="fas fa-theater-masks mr-2"></i> 最核心的一个比喻</h3>
-                        <div class="text-purple-800 text-sm space-y-4">
-                            <div class="bg-white p-4 rounded border-l-4 border-red-400">
-                                <strong>❌ 没有 Docker 的做法：</strong><br>
-                                你把一份"红油火锅配方"给 10 个厨师，让他们自己去做菜参加美食大赛。每个厨师在自己的厨房做菜，厨房的工具不同、调料不同、火候也不同。结果？做出来的菜肯定不一样。
-                            </div>
-                            <div class="bg-white p-4 rounded border-l-4 border-green-400">
-                                <strong>✅ 有了 Docker 的做法：</strong><br>
-                                你不仅给了配方，还给了一个"魔法厨房"（Docker 容器）。这个厨房里的所有工具、调料、火候都<strong>完全锁定</strong>，不能改。无论谁、在哪里、什么时候打开这个厨房，做出来的菜<strong>100% 相同</strong>。公平！🎯
-                            </div>
-                        </div>
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-microchip"></i>
+                        <h4>Hyper-V 是什么？</h4>
                     </div>
-
-                    <!-- 数字对比 -->
-                    <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200">
-                        <h3 class="font-bold text-yellow-900 mb-3"><i class="fas fa-chart-bar mr-2"></i> 数据对比一览表</h3>
-                        <div class="overflow-x-auto">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>对比项</th>
-                                        <th>虚拟机</th>
-                                        <th>Docker 容器</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="font-bold">启动时间</td>
-                                        <td>20-30 秒</td>
-                                        <td class="text-green-600">1-2 秒 ⚡</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="font-bold">占用内存</td>
-                                        <td>2-5 GB</td>
-                                        <td class="text-green-600">100-500 MB ⚡</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="font-bold">镜像文件大小</td>
-                                        <td>3-10 GB</td>
-                                        <td class="text-green-600">100-1000 MB ⚡</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="font-bold">部署复杂度</td>
-                                        <td>复杂，需配置</td>
-                                        <td class="text-green-600">简单，一个文件 ⚡</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="font-bold">环境一致性</td>
-                                        <td>较难保证</td>
-                                        <td class="text-green-600">100% 保证 ⚡</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section 2: WSL Setup -->
-                <section id="wsl" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">2. 安装 WSL 2 (Windows Subsystem for Linux)</h2>
-                        <p class="mt-2 text-gray-600">在 Windows 上获得原生的 Linux 体验，是运行 Docker 的最佳伴侣。</p>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-gray-100 bg-blue-50">
-                            <h3 class="text-lg font-semibold text-blue-900 mb-2">🧐 什么是 WSL？</h3>
-                            <p class="text-sm text-blue-800">简单来说，就是<strong>在 Windows 里开了一个 Linux 的窗口</strong>。你不需要装双系统，也不需要装笨重的虚拟机，就能像使用普通的 Windows 软件一样使用 Linux 命令。</p>
-                        </div>
-                    </div>
-
-                    <!-- WSL 深入背景介绍 -->
-                    <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                            <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-layer-group text-blue-500 mr-2"></i>什么是虚拟机？</h4>
-                            <p class="text-sm text-gray-600">虚拟机（Virtual Machine）通过一层<strong>虚拟化技术</strong>，在真实电脑里模拟出一台完整的“第二台电脑”，包含独立的 CPU、内存、硬盘、网卡等。常见例子有 VMware、VirtualBox。</p>
-                            <p class="text-xs text-gray-500 mt-2 bg-blue-50 px-3 py-2 rounded">缺点：启动慢、占用资源多、和主系统隔离严重，需要手动设置共享。</p>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                            <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-microchip text-indigo-500 mr-2"></i>Hyper-V 是什么？</h4>
-                            <p class="text-sm text-gray-600">Hyper-V 是微软官方的<strong>一级虚拟化引擎</strong>（Hypervisor）。它负责管理虚拟机如何共享 CPU 和内存。Windows 10/11 专业版自带 Hyper-V，WSL 2 就是基于它来运行的。</p>
-                            <p class="text-xs text-gray-500 mt-2 bg-indigo-50 px-3 py-2 rounded">提示：如果电脑 BIOS 没开启硬件虚拟化 (Intel VT-x/AMD-V)，Hyper-V 和 WSL 都无法启动。</p>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                            <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-exchange-alt text-green-500 mr-2"></i>WSL 2 如何运行 Ubuntu？</h4>
-                            <p class="text-sm text-gray-600">WSL 2 会在 Hyper-V 之上启动一个轻量级的 Linux 内核，实质上是一个高度优化的虚拟机。但它与 Windows 深度整合：文件系统互通（<code class="code-inline">/mnt/c</code>）、网络共享、图形应用支持。</p>
-                            <p class="text-xs text-gray-500 mt-2 bg-green-50 px-3 py-2 rounded">效果：近乎原生的 Linux 性能，命令行体验和真机一样，却能和 Windows 工具无缝协作。</p>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                            <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-penguin text-orange-500 mr-2"></i>为什么是 Ubuntu？</h4>
-                            <ul class="text-sm text-gray-600 space-y-2">
-                                <li>社区庞大、资料全，遇到问题容易查到答案。</li>
-                                <li>包管理器 <code class="code-inline">apt</code> 简单易用，对新手友好。</li>
-                                <li>LTS 版本稳定可靠，云平台、竞赛环境大量采用。</li>
-                                <li>预装常用工具（Python、Git、build-essential），无需二次配置。</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded mr-2">步骤 1</span>
-                                开启功能并安装
-                            </h3>
-                            <p class="text-sm text-gray-500 mt-1">请以 <strong>管理员身份</strong> 打开 PowerShell。</p>
-                        </div>
-                        <div class="p-6 bg-gray-50">
-                            <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <div class="terminal-dot bg-red-500"></div>
-                                        <div class="terminal-dot bg-yellow-500"></div>
-                                        <div class="terminal-dot bg-green-500"></div>
-                                        <div class="ml-2 text-sm text-gray-300">Terminal</div>
-                                    </div>
-                                    <pre class="p-3 text-sm">wsl --install</pre>
-                                </div>
-                            <div class="mt-4 text-sm text-gray-600 border-l-4 border-yellow-400 pl-4 py-1 bg-yellow-50">
-                                <strong>注意：</strong> 如果提示无法识别命令，请确保 Windows 更新至最新版本。安装完成后，<strong>必须重启电脑</strong>。
+                    <div class="module-content">
+                        <p>Hyper-V 是微软官方的<strong>一级虚拟化引擎</strong>（Hypervisor），负责管理虚拟机如何共享 CPU 和内存。Windows 10/11 专业版自带 Hyper-V，WSL 2 就是基于它运行的。</p>
+                        <div class="module-tip" style="margin-top: 0.75rem;">
+                            <div class="module-content">
+                                <p><strong>重要：</strong>如果电脑 BIOS 没开启硬件虚拟化（Intel VT-x / AMD-V），Hyper-V 和 WSL 都无法启动。</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded mr-2">步骤 2</span>
-                                初始化 Ubuntu
-                            </h3>
-                        </div>
-                        <div class="p-6">
-                            <ol class="list-decimal list-inside text-sm text-gray-700 space-y-3">
-                                <li>重启后，Ubuntu 终端窗口会自动弹出（如果没有，在开始菜单搜索 "Ubuntu" 打开）。</li>
-                                <li>等待几分钟进行初始化安装。</li>
-                                <li>根据提示输入 <strong>Username</strong> (推荐全小写，如: <code class="code-inline">user</code>)。</li>
-                                <li>输入 <strong>Password</strong> (注意：<span class="text-red-500 font-bold">输入密码时屏幕不会显示任何字符，连星星*都没有</span>，这是正常的 Linux 安全机制，输完直接回车即可)。</li>
-                            </ol>
-                        </div>
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-exchange-alt"></i>
+                        <h4>WSL 2 如何运行 Ubuntu？</h4>
                     </div>
-
-                    <!-- WSL Tips Card -->
-                    <div class="mt-6 bg-indigo-50 border border-indigo-100 rounded-xl p-6">
-                        <h3 class="font-bold text-indigo-900 mb-4 flex items-center"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> 小白必看：WSL 使用小技巧</h3>
-                        <div class="grid md:grid-cols-2 gap-6 text-sm">
-                            <div>
-                                <h4 class="font-bold text-indigo-800 mb-1">1. 怎么复制粘贴？</h4>
-                                <p class="text-gray-600 mb-3">在 Ubuntu 终端里，<code class="code-inline">Ctrl+C</code> 并不是复制，而是“终止程序”。</p>
-                                <ul class="list-disc list-inside text-gray-600 space-y-1">
-                                    <li><strong>复制：</strong> 选中文字 -> 点击鼠标右键</li>
-                                    <li><strong>粘贴：</strong> 点击鼠标右键</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-indigo-800 mb-1">2. Windows 的文件在哪里？</h4>
-                                <p class="text-gray-600">WSL 可以直接访问你的 C 盘、D 盘。</p>
-                                <div class="mt-1 bg-white p-2 rounded border font-mono text-xs text-gray-700">
-                                    C盘路径: /mnt/c/<br>
-                                    D盘路径: /mnt/d/<br>
-                                    桌面路径: /mnt/c/Users/你的用户名/Desktop/
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 电脑不支持 WSL 的替代方案 -->
-                    <div class="mt-6 bg-red-50 border border-red-200 rounded-xl p-6">
-                        <h3 class="font-bold text-red-900 mb-4 flex items-center"><i class="fas fa-tools mr-2"></i> 电脑不支持 WSL 2？可以这样解决</h3>
-                        <p class="text-sm text-red-800 mb-3">常见原因包括：Windows 版本过低（1903 以下）、CPU 不支持虚拟化、BIOS 虚拟化被关闭、企业电脑禁用了 Hyper-V。以下是可行的替代方案：</p>
-                        <div class="space-y-4 text-sm text-gray-700">
-                            <div class="bg-white border-l-4 border-blue-400 p-4 rounded">
-                                <strong class="text-blue-700">方案 1：升级系统或开启虚拟化</strong>
-                                <ul class="list-disc list-inside text-xs text-gray-600 mt-2 space-y-1">
-                                    <li>将 Windows 更新至 21H2 及以上，或直接升级到 Windows 11。</li>
-                                    <li>进入 BIOS，确认 <code class="code-inline">Intel VT-x</code> / <code class="code-inline">AMD-V</code> 已启用。</li>
-                                    <li>在“启用或关闭 Windows 功能”中勾选 <code class="code-inline">Virtual Machine Platform</code> 与 <code class="code-inline">Hyper-V</code>。</li>
-                                </ul>
-                            </div>
-                            <div class="bg-white border-l-4 border-green-400 p-4 rounded">
-                                <strong class="text-green-700">方案 2：使用传统虚拟机跑 Ubuntu（推荐 VMware）</strong>
-                                <p class="text-xs text-gray-600 mt-2">步骤：</p>
-                                <ol class="list-decimal list-inside text-xs text-gray-600 space-y-1">
-                                    <li>访问 <a class="text-blue-600" href="https://www.vmware.com/products/workstation-player.html" target="_blank" rel="noreferrer">VMware Workstation Player</a> 页面，下载适用于 Windows 的安装程序（免费个人用途）。</li>
-                                    <li>右键以管理员身份运行安装程序，保留默认选项即可，安装完成后重启电脑。</li>
-                                    <li>打开 Player，点击 <code class="code-inline">Create a New Virtual Machine</code> -> 选择已下载的 Ubuntu ISO。</li>
-                                    <li>分配虚拟机资源：推荐 4GB 内存、2 核 CPU、30GB 虚拟磁盘，启用“Unity 统一剪贴板”和“拖放文件”共享功能。</li>
-                                    <li>完成后启动虚拟机，按照屏幕提示安装 Ubuntu：选择语言、键盘、网络、用户名/密码，安装时勾选“安装第三方软件”，最后重启。</li>
-                                    <li>在 Ubuntu 内执行 <code class="code-inline">sudo apt update && sudo apt install docker.io</code>，再运行 <code class="code-inline">sudo systemctl enable --now docker</code>。</li>
-                                </ol>
-                                <p class="text-xs text-gray-500 mt-1 bg-green-50 px-3 py-1 rounded">提示：VMware Player 的虚拟网卡默认桥接到宿主机，Ubuntu 可直接访问互联网；Docker 在虚拟机内运行，适合网络/硬件受限的设备。</p>
-                            </div>
-                            <div class="bg-white border-l-4 border-purple-400 p-4 rounded">
-                                <strong class="text-purple-700">方案 3：远程开发环境</strong>
-                                <p class="text-xs text-gray-600 mt-2">申请学校/企业的云服务器，或使用阿里云、华为云、腾讯云等租一台按量计费的云主机，直接远程连接（SSH）进行开发与 Docker 实验。</p>
-                                <p class="text-xs text-gray-500 mt-1 bg-purple-50 px-3 py-1 rounded">如果担心费用，可以利用 GitHub Codespaces、容器化在线实验平台等免费额度。</p>
-                            </div>
-                            <div class="bg-white border-l-4 border-orange-400 p-4 rounded">
-                                <strong class="text-orange-700">方案 4：Docker Desktop + Hyper-V 模式</strong>
-                                <p class="text-xs text-gray-600 mt-2">部分旧机器虽无法升级 WSL 2，但仍能启用 Hyper-V。安装 Docker Desktop 时选择 Hyper-V 引擎即可运行 Linux 容器。</p>
-                                <p class="text-xs text-gray-500 mt-1 bg-orange-50 px-3 py-1 rounded">注意：Hyper-V 与 VMware/VirtualBox 不能同时使用，切换时需启用/禁用功能或使用 bcdedit 关闭。</p>
-                            </div>
-                        </div>
-                        <p class="text-xs text-red-700 mt-4 bg-red-100 px-3 py-2 rounded">课堂务必让同学们提前测试：在 PowerShell 输入 <code class="code-inline">wsl --status</code>，根据输出判断是否需要采取上述方案。</p>
-                    </div>
-
-                </section>
-
-                <!-- Section 3: Docker Desktop 使用指南 -->
-                <section class="scroll-mt-8 mb-12 section-card" id="docker-desktop-guide">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">3. Docker Desktop 使用指南</h2>
-                        <p class="mt-2 text-gray-600">详细了解 Docker Desktop 的功能和与 WSL 的配合方式。</p>
-                    </div>
-
-                    <!-- Understanding Docker Desktop -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-                        <h3 class="font-bold text-blue-900 mb-3 text-lg"><i class="fas fa-info-circle mr-2"></i> 什么是 Docker Desktop?</h3>
-                        <p class="text-blue-800 text-sm mb-3">
-                            Docker Desktop 是 Docker 官方提供的桌面应用程序。它提供了：
-                        </p>
-                        <ul class="text-blue-800 text-sm space-y-2 list-disc list-inside">
-                            <li><strong>可视化界面</strong>：用图形界面管理镜像和容器</li>
-                            <li><strong>命令行工具</strong>：在终端使用 docker 命令</li>
-                            <li><strong>WSL 2 集成</strong>：在 Windows 上运行原生 Linux 容器</li>
-                            <li><strong>资源管理</strong>：控制 Docker 使用的 CPU、内存、磁盘空间</li>
+                    <div class="module-content">
+                        <p>WSL 2 在 Hyper-V 之上启动一个轻量级的 Linux 内核，实质是一个高度优化的虚拟机。但它与 Windows 深度整合：</p>
+                        <ul style="margin-top: 0.5rem;">
+                            <li>文件系统互通（<code>/mnt/c</code> 访问 C 盘）</li>
+                            <li>网络自动共享</li>
+                            <li>图形应用支持（WSLg）</li>
+                            <li>近乎原生的 Linux 性能</li>
                         </ul>
                     </div>
+                </div>
 
-                    <!-- Docker Desktop & WSL 关系 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-gray-100 bg-purple-50">
-                            <h3 class="text-lg font-semibold text-purple-900 mb-2">🔗 Docker Desktop 与 WSL 2 的关系</h3>
-                            <p class="text-sm text-purple-800">Docker Desktop 依赖 WSL 2 作为底层引擎来运行容器。</p>
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-penguin"></i>
+                        <h4>为什么选择 Ubuntu？</h4>
+                    </div>
+                    <div class="module-content">
+                        <ul>
+                            <li><strong>社区庞大：</strong>资料全，遇到问题容易查到答案</li>
+                            <li><strong>易用友好：</strong>包管理器 <code>apt</code> 简单，对新手友好</li>
+                            <li><strong>稳定可靠：</strong>LTS 版本长期支持，企业级可靠</li>
+                            <li><strong>预装齐全：</strong>自带 Python、Git、build-essential</li>
+                            <li><strong>行业标准：</strong>云平台、竞赛环境大量采用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-steps" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>安装步骤</h4>
+                </div>
+                <div class="module-content">
+                    
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                        <div class="step-content">
+                            <h5>启用 WSL</h5>
+                            <p style="margin-bottom: 0.5rem;">以管理员身份打开 PowerShell，运行：</p>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>wsl --install</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">这会自动安装 WSL 2 和 Ubuntu。</p>
                         </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</div>
-                                    <div>
-                                        <h4 class="font-bold text-gray-800">WSL 2 是基础</h4>
-                                        <p class="text-sm text-gray-600 mt-1">WSL 2 提供了轻量级 Linux 环境。Docker 容器就运行在 WSL 2 的 Linux 系统中。</p>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h5>重启电脑</h5>
+                            <p>安装完成后必须重启。</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h5>首次启动 Ubuntu</h5>
+                            <p style="margin-bottom: 0.5rem;">在开始菜单找到 "Ubuntu"，首次启动会要求设置用户名和密码。</p>
+                            <div class="module-tip">
+                                <div class="module-content">
+                                    <p><strong>重要：</strong>密码输入时不显示任何字符，这是正常的！</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h5>验证安装</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>wsl --version
+wsl --list --verbose</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">确认 WSL 版本为 2，Ubuntu 状态为 Running。</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <h5>测试 Linux 命令</h5>
+                            <p style="margin-bottom: 0.5rem;">在 Ubuntu 终端运行：</p>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>pwd
+ls -la
+uname -a</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">如果能看到输出，说明安装成功！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-faq" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-question-circle"></i>
+                    <h4>常见问题排查</h4>
+                </div>
+                <div class="module-content">
+                    <div style="margin-bottom: 1rem;">
+                        <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ "需要启用虚拟机平台"</h5>
+                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>原因：</strong>BIOS 未开启虚拟化或 Windows 功能未启用</p>
+                        <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
+                        <ol style="font-size: 0.875rem; margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>重启电脑进入 BIOS（开机按 F2/F12/Delete）</li>
+                            <li>找到 "Virtualization Technology" 或 "Intel VT-x" / "AMD-V"，设置为 Enabled</li>
+                            <li>保存退出，进入 Windows 后以管理员运行：
+                                <div class="module-command" style="margin-top: 0.5rem;">
+                                    <div class="module-content">
+                                        <pre><code>dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart</code></pre>
                                     </div>
                                 </div>
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</div>
-                                    <div>
-                                        <h4 class="font-bold text-gray-800">Docker Desktop 是管理器</h4>
-                                        <p class="text-sm text-gray-600 mt-1">Docker Desktop 负责启动 WSL 2，并管理所有的容器和镜像。</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</div>
-                                    <div>
-                                        <h4 class="font-bold text-gray-800">两者必须配合</h4>
-                                        <p class="text-sm text-gray-600 mt-1">如果 WSL 2 没装或有问题，Docker Desktop 无法正常运行。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Docker Desktop 界面介绍 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded mr-2">功能介绍</span>
-                                Docker Desktop 的主要界面
-                            </h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div class="border-l-4 border-blue-400 pl-4">
-                                    <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-box-open mr-2 text-blue-500"></i> Containers 标签</h4>
-                                    <p class="text-sm text-gray-600 mb-2">显示所有容器（运行中和已停止的）。</p>
-                                    <p class="text-xs bg-blue-50 p-2 rounded text-gray-700"><strong>你可以：</strong> 启动、停止、删除、查看日志、进入容器</p>
-                                </div>
-
-                                <div class="border-l-4 border-green-400 pl-4">
-                                    <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-compact-disc mr-2 text-green-500"></i> Images 标签</h4>
-                                    <p class="text-sm text-gray-600 mb-2">显示本地的所有镜像。</p>
-                                    <p class="text-xs bg-green-50 p-2 rounded text-gray-700"><strong>你可以：</strong> 运行镜像、删除镜像、查看镜像信息</p>
-                                </div>
-
-                                <div class="border-l-4 border-purple-400 pl-4">
-                                    <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-database mr-2 text-purple-500"></i> Volumes 标签</h4>
-                                    <p class="text-sm text-gray-600 mb-2">管理数据卷（容器与主机共享的存储）。</p>
-                                    <p class="text-xs bg-purple-50 p-2 rounded text-gray-700"><strong>用途：</strong> 保存容器数据，容器删除后数据仍保留</p>
-                                </div>
-
-                                <div class="border-l-4 border-orange-400 pl-4">
-                                    <h4 class="font-bold text-gray-800 mb-2"><i class="fas fa-cog mr-2 text-orange-500"></i> Settings 标签</h4>
-                                    <p class="text-sm text-gray-600 mb-2">配置 Docker Desktop 的各种设置。</p>
-                                    <p class="text-xs bg-orange-50 p-2 rounded text-gray-700"><strong>常用：</strong> 内存、CPU、镜像源、启动设置</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 从 Docker Desktop 使用命令行 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded mr-2">命令行</span>
-                                从终端使用 docker 命令
-                            </h3>
-                        </div>
-                        <div class="p-6">
-                            <p class="text-sm text-gray-700 mb-4">安装 Docker Desktop 后，就可以在 WSL 的终端中使用 docker 命令了。</p>
-                            
-                            <div class="space-y-4">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 mb-2">方式 1：在 WSL Ubuntu 终端中使用（推荐）</h4>
-                                    <div class="relative group">
-                                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onclick="copyToClipboard(this)" class="bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                                <i class="far fa-copy mr-1"></i> 复制
-                                            </button>
-                                        </div>
-                                        <pre class="p-3 text-sm">$ docker ps
-$ docker images
-$ docker run -it ubuntu bash</pre>
-                                    </div>
-                                    <p class="text-xs text-gray-600 mt-2">在 WSL 中运行的命令会自动连接到 Docker Desktop。</p>
-                                </div>
-
-                                <div>
-                                    <h4 class="font-bold text-gray-800 mb-2">方式 2：在 Windows PowerShell 中使用</h4>
-                                    <div class="relative group">
-                                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onclick="copyToClipboard(this)" class="bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                                <i class="far fa-copy mr-1"></i> 复制
-                                            </button>
-                                        </div>
-                                        <pre class="p-3 text-sm">> docker ps
-> docker images
-> docker run -it ubuntu bash</pre>
-                                    </div>
-                                    <p class="text-xs text-gray-600 mt-2">也可以在 PowerShell 中直接使用 docker 命令。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 常见操作指南 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold">常见 Docker Desktop 操作</h3>
-                        </div>
-                        <div class="p-6 space-y-6">
-                            <!-- 启动和停止 -->
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-3"><i class="fas fa-play-circle mr-2 text-blue-500"></i> 1. 启动和停止容器</h4>
-                                <div class="grid md:grid-cols-2 gap-4">
-                                    <div class="bg-blue-50 p-4 rounded-lg">
-                                        <p class="text-xs font-bold text-blue-900 mb-2">在 GUI 中：</p>
-                                        <ol class="text-xs text-blue-800 space-y-1 list-decimal list-inside">
-                                            <li>点击 "Containers" 标签</li>
-                                            <li>找到要操作的容器</li>
-                                            <li>点击播放按钮启动或停止按钮停止</li>
-                                        </ol>
-                                    </div>
-                                    <div class="bg-green-50 p-4 rounded-lg">
-                                        <p class="text-xs font-bold text-green-900 mb-2">在命令行中：</p>
-                                        <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700 mb-1">docker start [容器名]</code>
-                                        <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700">docker stop [容器名]</code>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 查看日志 -->
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-3"><i class="fas fa-file-alt mr-2 text-green-500"></i> 2. 查看容器日志</h4>
-                                <div class="grid md:grid-cols-2 gap-4">
-                                    <div class="bg-green-50 p-4 rounded-lg">
-                                        <p class="text-xs font-bold text-green-900 mb-2">在 GUI 中：</p>
-                                        <ol class="text-xs text-green-800 space-y-1 list-decimal list-inside">
-                                            <li>在 Containers 中找到容器</li>
-                                            <li>点击容器名称打开详情</li>
-                                            <li>选择 "Logs" 标签查看输出</li>
-                                        </ol>
-                                    </div>
-                                    <div class="bg-purple-50 p-4 rounded-lg">
-                                        <p class="text-xs font-bold text-purple-900 mb-2">在命令行中：</p>
-                                        <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700">docker logs [容器名]</code>
-                                        <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700">docker logs -f [容器名]</code>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 删除资源 -->
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-3"><i class="fas fa-trash mr-2 text-red-500"></i> 3. 删除容器和镜像</h4>
-                                <div class="bg-red-50 p-4 rounded-lg">
-                                    <p class="text-xs font-bold text-red-900 mb-2">警告：删除操作不可撤销！</p>
-                                    <p class="text-xs text-red-800 mb-3">建议：先备份重要数据</p>
-                                    <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700 mb-2">docker rm [容器名]         # 删除已停止的容器</code>
-                                    <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700 mb-2">docker rmi [镜像名]        # 删除镜像</code>
-                                    <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700">docker system prune        # 清理未使用的资源</code>
-                                </div>
-                            </div>
-
-                            <!-- 进入容器 -->
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-3"><i class="fas fa-terminal mr-2 text-gray-600"></i> 4. 进入运行中的容器</h4>
-                                <div class="bg-gray-100 p-4 rounded-lg">
-                                    <p class="text-xs text-gray-700 mb-2">想在运行中的容器里执行命令？</p>
-                                    <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700 mb-2">docker exec -it [容器名] bash</code>
-                                    <p class="text-xs text-gray-600 mt-2">这会打开一个 bash 终端，让你在容器内部操作。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 资源配置 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold">配置 Docker Desktop 资源</h3>
-                        </div>
-                        <div class="p-6">
-                            <p class="text-sm text-gray-700 mb-4">如果电脑运行缓慢，可能是 Docker 占用了太多资源。可以在 Settings 中调整：</p>
-                            
-                            <div class="space-y-3">
-                                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded border border-blue-200">
-                                    <i class="fas fa-microchip text-blue-600 mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-bold text-blue-900 text-sm">CPU 数量</h4>
-                                        <p class="text-xs text-blue-800">Docker 最多可以使用的 CPU 核心数。建议设为总核心数的一半。</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start space-x-3 p-3 bg-green-50 rounded border border-green-200">
-                                    <i class="fas fa-memory text-green-600 mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-bold text-green-900 text-sm">内存</h4>
-                                        <p class="text-xs text-green-800">Docker 最多可以使用的内存大小。8GB 电脑建议设为 4GB。</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start space-x-3 p-3 bg-purple-50 rounded border border-purple-200">
-                                    <i class="fas fa-hdd text-purple-600 mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-bold text-purple-900 text-sm">磁盘镜像</h4>
-                                        <p class="text-xs text-purple-800">Docker 存储镜像和容器的大小限制。不够用会影响性能。</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-4 text-sm bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                                <p class="text-yellow-800"><strong>提示：</strong> 设置后需要重启 Docker Desktop 才能生效。点击托盘图标 -> Quit Docker Desktop -> 重新打开。</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Docker Desktop 实操练习 -->
-                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-6 mb-6">
-                        <h3 class="text-lg font-bold text-indigo-900 mb-4"><i class="fas fa-mouse mr-2"></i> 🎮 Docker Desktop GUI 实操指南</h3>
-                        <p class="text-sm text-indigo-800 mb-4">如果你更喜欢点点点而不是敲命令，Docker Desktop 的 GUI 可以帮你。这些操作会帮你更深刻理解容器的概念。</p>
-
-                        <div class="space-y-4">
-                            <!-- GUI Practice 1: View Images -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-indigo-500 text-white px-2 py-1 rounded-full text-xs mr-2">操作 1</span>在 GUI 中查看镜像</h4>
-                                <ol class="text-xs text-gray-700 space-y-2 mb-3">
-                                    <li><strong>第 1 步：</strong> 打开 Docker Desktop</li>
-                                    <li><strong>第 2 步：</strong> 点击左侧菜单的 <code class="bg-gray-100 px-1">Images</code> 标签</li>
-                                    <li><strong>第 3 步：</strong> 看到 <code class="bg-gray-100 px-1">hello-world</code> 的镜像了吗？它显示镜像大小、创建时间等信息</li>
-                                    <li><strong>第 4 步：</strong> 点击镜像右边的三个点 ⋮ 按钮，可以删除或查看详情</li>
-                                </ol>
-                                <p class="text-xs text-gray-600 bg-blue-50 p-2 rounded">💡 <strong>这说明了什么：</strong> GUI 只是把命令 <code class="code-inline">docker images</code> 的输出用漂亮的卡片展示出来。</p>
-                            </div>
-
-                            <!-- GUI Practice 2: View Containers -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs mr-2">操作 2</span>在 GUI 中查看容器</h4>
-                                <ol class="text-xs text-gray-700 space-y-2 mb-3">
-                                    <li><strong>第 1 步：</strong> 点击左侧菜单的 <code class="bg-gray-100 px-1">Containers</code> 标签</li>
-                                    <li><strong>第 2 步：</strong> 如果列表是空的，说明没有容器在运行。但不用急，我们接下来会创建一个</li>
-                                    <li><strong>第 3 步：</strong> 返回 <code class="bg-gray-100 px-1">Images</code> 标签，找到 <code class="bg-gray-100 px-1">hello-world</code></li>
-                                    <li><strong>第 4 步：</strong> 点击镜像的运行按钮（播放图标），会创建并运行一个容器</li>
-                                </ol>
-                                <p class="text-xs text-gray-600 bg-blue-50 p-2 rounded">💡 <strong>观察：</strong> 容器会立刻完成任务并停止。回到 Containers 标签，看到它的状态是 "Exited" 吗？</p>
-                            </div>
-
-                            <!-- GUI Practice 3: Logs & Inspection -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs mr-2">操作 3</span>查看容器日志</h4>
-                                <ol class="text-xs text-gray-700 space-y-2 mb-3">
-                                    <li><strong>第 1 步：</strong> 在 Containers 标签中，找到刚才运行的容器</li>
-                                    <li><strong>第 2 步：</strong> 点击容器名称，打开详情窗口</li>
-                                    <li><strong>第 3 步：</strong> 点击 <code class="bg-gray-100 px-1">Logs</code> 标签，看到容器的输出信息</li>
-                                    <li><strong>第 4 步：</strong> 这就是 <code class="bg-gray-100 px-1">docker logs [容器名]</code> 的图形化版本！</li>
-                                </ol>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded">💡 <strong>比较：</strong> 这和你在命令行看到的输出是一样的，只是显示方式不同。</p>
-                            </div>
-
-                            <!-- GUI Practice 4: Cleanup -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-red-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs mr-2">操作 4</span>清理资源</h4>
-                                <ol class="text-xs text-gray-700 space-y-2 mb-3">
-                                    <li><strong>第 1 步：</strong> 在 Containers 标签中选择一个已停止的容器</li>
-                                    <li><strong>第 2 步：</strong> 点击删除按钮（垃圾桶图标），会弹出确认对话框</li>
-                                    <li><strong>第 3 步：</strong> 确认删除。容器就从列表中消失了</li>
-                                    <li><strong>第 4 步：</strong> 同样可以在 Images 标签中删除不需要的镜像</li>
-                                </ol>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded">⚠️ <strong>注意：</strong> 删除后不可恢复。如果镜像还要用，就别删。</p>
-                            </div>
-                        </div>
-
-                        <!-- CMD vs GUI Comparison -->
-                        <div class="mt-4 p-4 bg-indigo-100 border border-indigo-300 rounded-lg">
-                            <p class="text-xs font-bold text-indigo-900 mb-2"><i class="fas fa-lightbulb mr-1"></i> 命令行 vs GUI：怎么选？</p>
-                            <div class="grid md:grid-cols-2 gap-3 text-xs">
-                                <div class="bg-white p-2 rounded">
-                                    <strong class="text-blue-700">命令行（推荐）</strong>
-                                    <ul class="text-gray-700 mt-1 space-y-1 list-disc list-inside">
-                                        <li>更快、更灵活</li>
-                                        <li>可以写脚本自动化</li>
-                                        <li>竞赛环境就用这个</li>
-                                    </ul>
-                                </div>
-                                <div class="bg-white p-2 rounded">
-                                    <strong class="text-purple-700">GUI（辅助）</strong>
-                                    <ul class="text-gray-700 mt-1 space-y-1 list-disc list-inside">
-                                        <li>直观，不容易出错</li>
-                                        <li>快速浏览镜像和容器</li>
-                                        <li>调试时很方便</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Docker Desktop 与 WSL 的同步 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="p-6 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold">理解 Docker Desktop 和 WSL 的关系</h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
-                                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-                                    <h4 class="font-bold text-indigo-900 mb-2"><i class="fas fa-info-circle mr-2"></i> Docker Desktop 启动后会做什么</h4>
-                                    <ol class="text-sm text-indigo-800 space-y-2 list-decimal list-inside">
-                                        <li>启动 WSL 2 虚拟机（如果还没启动的话）</li>
-                                        <li>在 WSL 2 中运行 Docker daemon（后台服务）</li>
-                                        <li>让你可以通过 GUI 或命令行与 Docker 交互</li>
-                                        <li>所有容器都运行在 WSL 2 的 Linux 中</li>
-                                    </ol>
-                                </div>
-
-                                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                                    <h4 class="font-bold text-green-900 mb-2"><i class="fas fa-check-circle mr-2"></i> 文件系统的访问</h4>
-                                    <p class="text-sm text-green-800 mb-2">Docker Desktop 可以访问你的 Windows 文件系统：</p>
-                                    <code class="text-xs bg-white p-2 rounded block font-mono text-gray-700 mb-2">/mnt/c/Users/[用户名]/  # C 盘</code>
-                                    <p class="text-xs text-green-800">你可以在 Windows 中修改文件，Docker 容器也能看到。</p>
-                                </div>
-
-                                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                                    <h4 class="font-bold text-orange-900 mb-2"><i class="fas fa-warning mr-2"></i> 注意事项</h4>
-                                    <ul class="text-sm text-orange-800 space-y-1 list-disc list-inside">
-                                        <li>Docker Desktop 占用 WSL 2 的资源，会影响电脑性能</li>
-                                        <li>WSL 2 没启动的话，Docker Desktop 无法工作</li>
-                                        <li>重启 Docker Desktop 时，所有运行中的容器会停止</li>
-                                        <li>Docker 数据存储在 WSL 2 的虚拟磁盘中，不会占用 Windows 系统盘</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-12 flex justify-center pb-8">
-                        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:-translate-y-1 transition-all duration-200">
-                            <i class="fas fa-trophy mr-2"></i> 我已理解并完成所有步骤
-                        </a>
-                    </div>
-                </section>
-                <section id="vmware-ubuntu" class="scroll-mt-8 mb-12 section-card">
-                    <div class="flex flex-wrap items-center justify-between mb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">4. VMware 安装 Ubuntu 环境</h2>
-                        <span class="text-xs uppercase tracking-widest text-gray-500">可替代 WSL 的传统虚拟机方案</span>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-4">在无法启用 WSL 的设备上，使用 VMware Workstation Player 装一台 Ubuntu 虚拟机，再在里面配置 Docker，是最稳定的备选方案。</p>
-                    <div class="grid gap-4">
-                        <div class="bg-white rounded-xl border border-gray-200 p-4">
-                            <h4 class="text-sm font-semibold text-blue-800 mb-2">步骤 1：下载并安装 VMware</h4>
-                            <ol class="list-decimal list-inside text-xs text-gray-600 space-y-1">
-                                <li>访问 <a class="text-blue-600 underline" href="https://www.vmware.com/products/workstation-player.html" target="_blank" rel="noreferrer">VMware Workstation Player 官网</a> 下载 Windows 版本。</li>
-                                <li>右键以管理员身份运行安装程序，接受默认配置，安装完成后重启宿主机。</li>
-                                <li>启动 VMware Player，选择 <code class="code-inline">Create a New Virtual Machine</code> 并载入已下载的 Ubuntu LTS ISO。</li>
-                            </ol>
-                        </div>
-                        <div class="bg-white rounded-xl border border-gray-200 p-4">
-                            <h4 class="text-sm font-semibold text-indigo-800 mb-2">步骤 2：虚拟机资源配置</h4>
-                            <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
-                                <li>资源建议：4GB 内存、2 个逻辑核心、30GB 动态磁盘。</li>
-                                <li>启用 Unity 统一剪贴板与拖放共享，提升主机与虚拟机间协作。</li>
-                                <li>安装时勾选“安装第三方软件”以获得额外网络/显卡支持。</li>
-                            </ul>
-                        </div>
-                        <div class="bg-white rounded-xl border border-gray-200 p-4">
-                            <h4 class="text-sm font-semibold text-green-800 mb-2">步骤 3：Ubuntu 内安装 Docker</h4>
-                            <p class="text-xs text-gray-600 mb-3">在 Ubuntu 终端输入以下命令，添加官方源并安装 Docker、构建工具和 compose 插件：</p>
-                            <div class="bg-gray-900 text-green-400 rounded-lg p-3 font-mono text-xs space-y-3">
-                                <pre>sudo apt update && sudo apt install -y ca-certificates curl gnupg</pre>
-                                <pre>sudo install -m 0755 -d /etc/apt/keyrings</pre>
-                                <pre>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg</pre>
-                                <pre>echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \ 
-  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \ 
-  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</pre>
-                                <pre>sudo apt update</pre>
-                                <pre>sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</pre>
-                                <pre>sudo systemctl enable --now docker</pre>
-                                <pre>sudo usermod -aG docker $USER</pre>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">运行 <code class="code-inline">newgrp docker</code> 或重启虚拟机以应用权限后，再执行 <code class="code-inline">docker version</code> 与 <code class="code-inline">docker run hello-world</code> 验证安装。</p>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-xs text-blue-800 bg-blue-50 border border-blue-100 p-3 rounded">
-                        <strong>小贴士：</strong>虚拟机网络默认桥接，可直接上网；镜像下载慢时可通过宿主机代理或提前导入镜像 tar 包。</div>
-                </section>
-
-                <!-- Section 3: Linux Basics -->
-                <section id="linux-basics" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">5. Linux 生存指南</h2>
-                        <p class="mt-2 text-gray-600">忘掉鼠标，开始习惯键盘。掌握这 6 个最常用的竞赛命令。</p>
-                    </div>
-
-                    <!-- Concept: File System -->
-                    <div class="mb-6 bg-gray-100 p-5 rounded-lg border border-gray-200">
-                        <h3 class="font-bold text-gray-800 mb-2">🌍 核心概念：Linux 没有 C 盘</h3>
-                        <p class="text-sm text-gray-600">Windows 是分盘符的（C:\, D:\），而 Linux 是一棵树，所有的文件都从根目录 <code class="code-inline">/</code> 开始。</p>
-                        <div class="mt-3 flex items-center text-xs font-mono space-x-4 overflow-x-auto">
-                            <div class="bg-white px-3 py-2 rounded shadow-sm border"><span class="text-red-500">/</span> (根目录)</div>
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                            <div class="bg-white px-3 py-2 rounded shadow-sm border"><span class="text-blue-500">home</span> (用户家目录)</div>
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                            <div class="bg-white px-3 py-2 rounded shadow-sm border"><span class="text-green-500">user</span> (你的地盘 ~)</div>
-                        </div>
-                    </div>
-
-                    <!-- Magic Key -->
-                    <div class="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                        <h4 class="font-bold text-yellow-800 text-sm mb-1"><i class="fas fa-magic mr-1"></i> 只有高手知道的秘密：Tab 键</h4>
-                        <p class="text-sm text-yellow-700">在终端输入文件名或命令时，输前几个字母，然后按 <strong>Tab 键</strong>，系统会自动补全剩下的内容。如果没反应，就按两下 Tab，会列出所有可能的选项。<strong>永远不要手动把长文件名打完！</strong></p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- ls -->
-                        <div class="cmd-card bg-white border border-gray-200 p-5 rounded-lg transition-all shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <code class="text-lg font-bold text-purple-600">ls</code>
-                                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">查看</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mb-2">List. 看看当前目录下有哪些文件。</p>
-                            <code class="block bg-gray-100 p-2 rounded text-xs text-gray-700">ls -la <span class="text-gray-400 ml-2"># 显示详细信息(包括隐藏文件)</span></code>
-                        </div>
-
-                        <!-- pwd -->
-                        <div class="cmd-card bg-white border border-gray-200 p-5 rounded-lg transition-all shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <code class="text-lg font-bold text-purple-600">pwd</code>
-                                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">定位</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mb-2">Print Working Directory. 我现在在哪里？</p>
-                            <code class="block bg-gray-100 p-2 rounded text-xs text-gray-700">pwd</code>
-                        </div>
-
-                        <!-- cd -->
-                        <div class="cmd-card bg-white border border-gray-200 p-5 rounded-lg transition-all shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <code class="text-lg font-bold text-purple-600">cd</code>
-                                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">移动</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mb-2">Change Directory. 切换文件夹。</p>
-                            <code class="block bg-gray-100 p-2 rounded text-xs text-gray-700">cd /mnt/c <span class="text-gray-400 ml-2"># 去C盘</span><br>cd .. <span class="text-gray-400 ml-2"># 返回上一级</span></code>
-                        </div>
-
-                        <!-- mkdir -->
-                        <div class="cmd-card bg-white border border-gray-200 p-5 rounded-lg transition-all shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <code class="text-lg font-bold text-purple-600">mkdir</code>
-                                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">新建</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mb-2">Make Directory. 创建一个新的文件夹。</p>
-                            <code class="block bg-gray-100 p-2 rounded text-xs text-gray-700">mkdir my_project</code>
-                        </div>
-
-                        <!-- touch -->
-                        <div class="cmd-card bg-white border border-gray-200 p-5 rounded-lg transition-all shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <code class="text-lg font-bold text-purple-600">touch</code>
-                                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">新建</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mb-2">创建一个空白文件。</p>
-                            <code class="block bg-gray-100 p-2 rounded text-xs text-gray-700">touch main.py</code>
-                        </div>
-
-                         <!-- cat -->
-                         <div class="cmd-card bg-white border border-gray-200 p-5 rounded-lg transition-all shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <code class="text-lg font-bold text-purple-600">cat</code>
-                                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">阅读</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mb-2">Concatenate. 直接在终端显示文件内容。</p>
-                            <code class="block bg-gray-100 p-2 rounded text-xs text-gray-700">cat main.py</code>
-                        </div>
-                    </div>
-
-                    <!-- Nano Tutorial -->
-                    <div class="mt-6 bg-gray-800 text-white rounded-xl p-6 shadow-lg mb-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-lg"><i class="fas fa-edit mr-2"></i> 实操：用 Nano 编辑文件</h3>
-                            <span class="text-xs bg-gray-700 px-2 py-1 rounded">新手推荐</span>
-                        </div>
-                        <p class="text-sm text-gray-300 mb-4">在 Linux 里没有鼠标点点点的记事本。我们用 <code class="code-inline">nano</code> 编辑器。</p>
-                        <ol class="list-decimal list-inside text-sm space-y-2 text-gray-300 font-mono">
-                            <li>输入 <span class="text-green-400">nano hello.txt</span> 并回车。</li>
-                            <li>像在记事本里一样输入一段话，比如 "Hello Linux"。</li>
-                            <li><strong>保存：</strong> 按 <span class="bg-gray-600 px-1 rounded">Ctrl + O</span>，然后按 <span class="bg-gray-600 px-1 rounded">Enter</span> 确认文件名。</li>
-                            <li><strong>退出：</strong> 按 <span class="bg-gray-600 px-1 rounded">Ctrl + X</span>。</li>
+                            </li>
+                            <li>重启电脑后再次运行 <code>wsl --install</code></li>
                         </ol>
                     </div>
 
-                    <!-- 练习区间 -->
-                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200 p-6 mb-6">
-                        <h3 class="text-lg font-bold text-blue-900 mb-4"><i class="fas fa-dumbbell mr-2"></i> 🎯 现在就来练习吧！</h3>
-                        <p class="text-sm text-blue-800 mb-4">打开你的 WSL Ubuntu 终端，一个命令一个命令地输入。不要复制粘贴！手工打一遍，才能真正记住。</p>
+                    <div style="margin-bottom: 1rem;">
+                        <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ "找不到 wsl 命令"</h5>
+                        <p style="font-size: 0.875rem;"><strong>原因：</strong>Windows 版本过旧（需要 Windows 10 2004 以上）</p>
+                        <p style="font-size: 0.875rem;"><strong>解决：</strong>更新 Windows 到最新版本，或手动下载 WSL 2 Linux 内核更新包：<br>
+                        <a href="https://aka.ms/wsl2kernel" target="_blank" rel="noopener" style="color: var(--color-accent);">https://aka.ms/wsl2kernel</a></p>
+                    </div>
 
-                        <div class="space-y-4">
-                            <!-- Practice 1: Navigation -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs mr-2">练习 1</span>文件夹导航</h4>
-                                <div class="terminal-window mb-3">
-                                    <div class="terminal-header">
-                                        <div class="terminal-dot bg-red-500"></div>
-                                        <div class="terminal-dot bg-yellow-500"></div>
-                                        <div class="terminal-dot bg-green-500"></div>
-                                        <div class="ml-2 text-sm text-gray-300">Terminal</div>
+                    <div style="margin-bottom: 1rem;">
+                        <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ Ubuntu 启动卡住或闪退</h5>
+                        <p style="font-size: 0.875rem;"><strong>解决方法：</strong></p>
+                        <ol style="font-size: 0.875rem; margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>重置 WSL：
+                                <div class="module-command" style="margin-top: 0.5rem;">
+                                    <div class="module-content">
+                                        <pre><code>wsl --shutdown
+wsl --unregister Ubuntu
+wsl --install -d Ubuntu</code></pre>
                                     </div>
-                                    <pre class="p-3 text-sm">pwd                           # 看看你现在在哪儿
+                                </div>
+                            </li>
+                            <li>检查杀毒软件是否拦截 WSL</li>
+                            <li>确保 C 盘有足够空间（至少 5GB）</li>
+                        </ol>
+                    </div>
+
+                    <div>
+                        <h5 style="color: var(--color-warning); margin-bottom: 0.5rem;">⚠️ 网络连接问题</h5>
+                        <p style="font-size: 0.875rem;"><strong>症状：</strong>WSL 内无法 ping 通外网或 apt update 失败</p>
+                        <p style="font-size: 0.875rem;"><strong>解决：</strong>在 PowerShell（管理员）运行：</p>
+                        <div class="module-command" style="margin-top: 0.5rem;">
+                            <div class="module-content">
+                                <pre><code>wsl --shutdown
+netsh winsock reset
+netsh int ip reset
+ipconfig /flushdns</code></pre>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.875rem; margin-top: 0.5rem;">然后重启电脑。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-rocket"></i>
+                    <h4>性能优化建议</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li><strong>限制内存占用：</strong>创建 <code>C:\Users\你的用户名\.wslconfig</code> 文件，写入：
+                            <div class="module-command" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre><code>[wsl2]
+memory=4GB
+processors=2
+swap=2GB</code></pre>
+                                </div>
+                            </div>
+                        </li>
+                        <li><strong>文件存储位置：</strong>尽量把项目文件放在 WSL 文件系统内（<code>~</code> 目录），而不是 <code>/mnt/c/</code>，可获得 2-5 倍的 I/O 性能提升</li>
+                        <li><strong>终端工具：</strong>推荐使用 Windows Terminal，支持多标签、主题、GPU 加速</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-docker"></i>
+                    <h4>Docker Desktop 与 WSL 的关系</h4>
+                </div>
+                <div class="module-content">
+                    <p><strong>Docker Desktop 启动后会做什么：</strong></p>
+                    <ol style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                        <li>启动 WSL 2 虚拟机（如果还没启动的话）</li>
+                        <li>在 WSL 2 中运行 Docker daemon（后台服务）</li>
+                        <li>让你可以通过 GUI 或命令行与 Docker 交互</li>
+                        <li>所有容器都运行在 WSL 2 的 Linux 内核中</li>
+                    </ol>
+
+                    <div class="module-tip" style="margin-top: 1rem;">
+                        <div class="module-content">
+                            <p><strong>文件系统访问：</strong>Docker Desktop 可以访问你的 Windows 文件系统，路径是 <code>/mnt/c/Users/[用户名]/</code>。你可以在 Windows 中修改文件，Docker 容器也能看到。</p>
+                        </div>
+                    </div>
+
+                    <div class="module-warning" style="margin-top: 1rem;">
+                        <div class="module-content">
+                            <p><strong>注意事项：</strong></p>
+                            <ul style="margin-top: 0.5rem;">
+                                <li>Docker Desktop 占用 WSL 2 的资源，会影响电脑性能</li>
+                                <li>WSL 2 没启动的话，Docker Desktop 无法工作</li>
+                                <li>重启 Docker Desktop 时，所有运行中的容器会停止</li>
+                                <li>Docker 数据存储在 WSL 2 的虚拟磁盘中，不会占用 Windows 系统盘</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Docker Desktop 使用指南 -->
+        <section id="docker-desktop-guide" class="section-card">
+            <h2>
+                <i class="fas fa-window-maximize" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                3. Docker Desktop 使用指南
+            </h2>
+
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-desktop"></i>
+                    <h4>什么是 Docker Desktop？</h4>
+                </div>
+                <div class="module-content">
+                    <p>Docker Desktop 是 Docker 官方提供的<strong>图形化管理工具</strong>，让你在 Windows/macOS 上轻松使用 Docker。它包括：</p>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>Docker Engine（核心引擎）</li>
+                        <li>Docker CLI（命令行工具）</li>
+                        <li>Docker Compose（多容器编排）</li>
+                        <li>Kubernetes（容器编排平台，可选）</li>
+                        <li>图形化管理界面</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-steps" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-cog"></i>
+                    <h4>界面功能介绍</h4>
+                </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div class="module-concept">
+                            <div class="module-header">
+                                <i class="fas fa-boxes"></i>
+                                <h4>Containers 容器</h4>
+                            </div>
+                            <div class="module-content">
+                                <p>查看所有容器的运行状态、日志、资源占用。可以启动/停止/删除容器，进入容器执行命令。</p>
+                            </div>
+                        </div>
+
+                        <div class="module-concept">
+                            <div class="module-header">
+                                <i class="fas fa-layer-group"></i>
+                                <h4>Images 镜像</h4>
+                            </div>
+                            <div class="module-content">
+                                <p>管理本地镜像，查看镜像大小、创建时间。可以拉取、删除镜像，从镜像创建容器。</p>
+                            </div>
+                        </div>
+
+                        <div class="module-concept">
+                            <div class="module-header">
+                                <i class="fas fa-hdd"></i>
+                                <h4>Volumes 数据卷</h4>
+                            </div>
+                            <div class="module-content">
+                                <p>管理持久化存储，查看哪些容器使用了哪些卷，清理无用的卷释放空间。</p>
+                            </div>
+                        </div>
+
+                        <div class="module-concept">
+                            <div class="module-header">
+                                <i class="fas fa-network-wired"></i>
+                                <h4>Networks 网络</h4>
+                            </div>
+                            <div class="module-content">
+                                <p>查看和管理 Docker 网络，创建自定义网络让容器之间通信。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-sliders-h"></i>
+                    <h4>重要设置项</h4>
+                </div>
+                <div class="module-content">
+                    <p style="margin-bottom: 0.75rem;"><strong>Resources（资源限制）：</strong></p>
+                    <ul style="margin-bottom: 1rem;">
+                        <li><strong>CPUs：</strong>分配给 Docker 的 CPU 核心数（建议：总核心数的一半）</li>
+                        <li><strong>Memory：</strong>内存限制（建议：4-8GB，至少 2GB）</li>
+                        <li><strong>Disk image size：</strong>虚拟磁盘大小（用于存储镜像和容器数据）</li>
+                    </ul>
+
+                    <p style="margin-bottom: 0.75rem;"><strong>Docker Engine（高级配置）：</strong></p>
+                    <div class="module-command">
+                        <div class="module-content">
+                            <pre><code>{
+  "registry-mirrors": [
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://hub-mirror.c.163.com"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">配置镜像加速器可大幅提升下载速度，日志限制可防止磁盘被占满。</p>
+                </div>
+            </div>
+
+            <div class="module-warning" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>使用注意事项</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li><strong>资源占用：</strong>Docker Desktop 会持续占用内存，不用时可以退出释放资源</li>
+                        <li><strong>自动启动：</strong>默认开机自启，可在设置中关闭 "Start Docker Desktop when you log in"</li>
+                        <li><strong>磁盘清理：</strong>定期运行 <code>docker system prune -a</code> 清理无用镜像和容器</li>
+                        <li><strong>WSL 2 集成：</strong>确保在 Settings → Resources → WSL Integration 中勾选了 Ubuntu</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: VMware + Ubuntu -->
+        <section id="vmware-ubuntu" class="section-card">
+            <h2>
+                <i class="fas fa-box-open" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                4. VMware 安装 Ubuntu 环境（WSL 替代方案）
+            </h2>
+
+            <div class="module-warning">
+                <div class="module-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h4>何时使用这个方案？</h4>
+                </div>
+                <div class="module-content">
+                    <p>如果你的电脑无法启用 WSL 2（Windows 家庭版、学校/公司电脑限制等），使用 VMware Workstation Player 安装 Ubuntu 虚拟机是最稳定的替代方案。</p>
+                </div>
+            </div>
+
+            <div class="module-steps" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>安装步骤</h4>
+                </div>
+                <div class="module-content">
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                        <div class="step-content">
+                            <h5>下载并安装 VMware</h5>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>访问 <a href="https://www.vmware.com/products/workstation-player.html" target="_blank" rel="noopener" style="color: var(--color-accent);">VMware Workstation Player 官网</a> 下载 Windows 版本</li>
+                                <li>右键以管理员身份运行安装程序</li>
+                                <li>接受默认配置，完成后重启电脑</li>
+                            </ol>
+                            <div class="module-tip" style="margin-top: 0.75rem;">
+                                <div class="module-content">
+                                    <p><strong>免费版足够：</strong>VMware Workstation Player 个人非商业使用完全免费。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h5>下载 Ubuntu ISO 镜像</h5>
+                            <p>访问 <a href="https://ubuntu.com/download/desktop" target="_blank" rel="noopener" style="color: var(--color-accent);">Ubuntu 官网</a>，下载 Ubuntu 22.04 LTS Desktop 版本（约 4GB）。</p>
+                            <div class="module-tip" style="margin-top: 0.75rem;">
+                                <div class="module-content">
+                                    <p><strong>为什么选 Desktop 版？</strong>带图形界面，新手友好，方便操作。Server 版是纯命令行。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h5>创建虚拟机</h5>
+                            <p style="margin-bottom: 0.5rem;">启动 VMware Player，选择 "Create a New Virtual Machine"：</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>选择 "Installer disc image file (iso)"，浏览到下载的 Ubuntu ISO</li>
+                                <li>设置用户名和密码（会自动安装，无需手动操作）</li>
+                                <li><strong>推荐配置：</strong>
+                                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                                        <li>内存：4GB（最少 2GB）</li>
+                                        <li>处理器：2 核</li>
+                                        <li>硬盘：30GB 动态分配</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="module-warning" style="margin-top: 0.75rem;">
+                                <div class="module-content">
+                                    <p><strong>注意：</strong>动态分配硬盘不会立即占用 30GB，而是按实际使用逐渐增长。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h5>等待自动安装</h5>
+                            <p>VMware 会自动安装 Ubuntu，大约需要 10-15 分钟。安装完成后会自动重启进入桌面。</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <h5>安装 VMware Tools</h5>
+                            <p style="margin-bottom: 0.5rem;">在 Ubuntu 桌面打开终端（Ctrl+Alt+T），运行：</p>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>sudo apt update
+sudo apt install -y open-vm-tools open-vm-tools-desktop</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">这会启用剪贴板共享、文件拖放、自动调整分辨率等功能。</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-content">
+                            <h5>在 Ubuntu 中安装 Docker</h5>
+                            <p style="margin-bottom: 0.5rem;">运行以下命令（复制整段一起运行）：</p>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code># 更新系统并安装依赖
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg
+
+# 添加 Docker 官方 GPG 密钥
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# 添加 Docker 软件源
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 安装 Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 启动 Docker 服务
+sudo systemctl enable --now docker
+
+# 添加当前用户到 docker 组（免 sudo）
+sudo usermod -aG docker $USER
+
+# 应用组权限（或者重启虚拟机）
+newgrp docker</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">7</span>
+                        <div class="step-content">
+                            <h5>验证安装</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker --version
+docker run hello-world</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem;">如果看到 "Hello from Docker!"，说明安装成功！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>使用技巧</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li><strong>共享文件夹：</strong>在 VMware 中配置 Shared Folders，可以让 Windows 和 Ubuntu 互相访问文件</li>
+                        <li><strong>快照功能：</strong>在关键节点创建快照，出问题可一键恢复</li>
+                        <li><strong>网络模式：</strong>默认 NAT 模式可直接上网，桥接模式可获得独立 IP</li>
+                        <li><strong>性能优化：</strong>关闭 Ubuntu 动画效果，禁用不需要的后台服务</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-warning" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>注意事项</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li><strong>资源占用：</strong>虚拟机运行时会占用设定的全部内存，不用时记得挂起或关闭</li>
+                        <li><strong>磁盘空间：</strong>虚拟机文件通常存储在 C:\Users\用户名\Documents\Virtual Machines，注意预留空间</li>
+                        <li><strong>镜像下载：</strong>国内下载 Docker 镜像较慢，建议配置镜像加速器（见下一节）</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Linux 生存指南 -->
+        <section id="linux-basics" class="section-card">
+            <h2>
+                <i class="fab fa-linux" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                5. Linux 生存指南
+            </h2>
+
+            <div class="module-command">
+                <div class="module-header">
+                    <i class="fas fa-terminal"></i>
+                    <h4>必会命令 Top 10</h4>
+                </div>
+                <div class="module-content">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--color-border);">
+                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">命令</th>
+                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">说明</th>
+                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">示例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>ls</code></td>
+                                <td style="padding: 0.75rem;">列出文件</td>
+                                <td style="padding: 0.75rem;"><code>ls -la</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>cd</code></td>
+                                <td style="padding: 0.75rem;">切换目录</td>
+                                <td style="padding: 0.75rem;"><code>cd /home</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>pwd</code></td>
+                                <td style="padding: 0.75rem;">显示当前路径</td>
+                                <td style="padding: 0.75rem;"><code>pwd</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>mkdir</code></td>
+                                <td style="padding: 0.75rem;">创建目录</td>
+                                <td style="padding: 0.75rem;"><code>mkdir test</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>rm</code></td>
+                                <td style="padding: 0.75rem;">删除文件</td>
+                                <td style="padding: 0.75rem;"><code>rm file.txt</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>cp</code></td>
+                                <td style="padding: 0.75rem;">复制文件</td>
+                                <td style="padding: 0.75rem;"><code>cp a.txt b.txt</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>mv</code></td>
+                                <td style="padding: 0.75rem;">移动/重命名</td>
+                                <td style="padding: 0.75rem;"><code>mv old.txt new.txt</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>cat</code></td>
+                                <td style="padding: 0.75rem;">查看文件内容</td>
+                                <td style="padding: 0.75rem;"><code>cat file.txt</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>sudo</code></td>
+                                <td style="padding: 0.75rem;">以管理员权限执行</td>
+                                <td style="padding: 0.75rem;"><code>sudo apt update</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.75rem;"><code>clear</code></td>
+                                <td style="padding: 0.75rem;">清屏</td>
+                                <td style="padding: 0.75rem;"><code>clear</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-sitemap"></i>
+                    <h4>核心概念：Linux 没有 C 盘</h4>
+                </div>
+                <div class="module-content">
+                    <p>Windows 是分盘符的（C:\, D:\），而 Linux 是一棵树，所有文件都从根目录 <code>/</code> 开始。</p>
+                    <div style="margin-top: 0.75rem; padding: 1rem; background-color: var(--color-bg); border-radius: 6px;">
+                        <code style="font-size: 0.875rem;">
+                            <span style="color: var(--color-error);">/</span> (根目录) 
+                            → <span style="color: var(--color-accent);">home</span> (用户家目录) 
+                            → <span style="color: var(--color-success);">user</span> (你的地盘 ~)
+                        </code>
+                    </div>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;"><strong>重要路径：</strong></p>
+                    <ul style="font-size: 0.875rem; margin-top: 0.25rem;">
+                        <li><code>~</code> - 你的主目录（如 /home/username）</li>
+                        <li><code>/mnt/c</code> - Windows 的 C 盘（WSL 中）</li>
+                        <li><code>..</code> - 上级目录</li>
+                        <li><code>.</code> - 当前目录</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-magic"></i>
+                    <h4>只有高手知道的秘密：Tab 键</h4>
+                </div>
+                <div class="module-content">
+                    <p>在终端输入文件名或命令时，输入前几个字母，然后按 <kbd>Tab</kbd> 键，系统会自动补全剩下的内容。如果没反应，就按两下 Tab，会列出所有可能的选项。</p>
+                    <p style="margin-top: 0.5rem; color: var(--color-accent); font-weight: 600;"><strong>永远不要手动把长文件名打完！</strong></p>
+                </div>
+            </div>
+
+            <div class="module-command" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-edit"></i>
+                    <h4>实操：用 Nano 编辑文件</h4>
+                </div>
+                <div class="module-content">
+                    <p>在 Linux 里没有鼠标点点点的记事本，我们用 <code>nano</code> 编辑器（新手推荐）。</p>
+                    <ol style="margin-top: 0.75rem; margin-left: 1.5rem;">
+                        <li>输入 <code>nano hello.txt</code> 并回车</li>
+                        <li>像在记事本里一样输入一段话，比如 "Hello Linux"</li>
+                        <li><strong>保存：</strong>按 <kbd>Ctrl + O</kbd>，然后按 <kbd>Enter</kbd> 确认文件名</li>
+                        <li><strong>退出：</strong>按 <kbd>Ctrl + X</kbd></li>
+                    </ol>
+                    <div class="module-tip" style="margin-top: 1rem;">
+                        <div class="module-content">
+                            <p><strong>高级编辑器：</strong>熟练后可以学习 <code>vim</code>，功能更强大但学习曲线陡峭。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-practice" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-dumbbell"></i>
+                    <h4>现在就来练习吧！</h4>
+                </div>
+                <div class="module-content">
+                    <p style="margin-bottom: 1rem;">打开你的 WSL Ubuntu 终端，一个命令一个命令地输入。<strong>不要复制粘贴！</strong>手工打一遍，才能真正记住。</p>
+
+                    <div class="module-steps">
+                        <div class="module-content">
+                            <div class="step-item">
+                                <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                                <div class="step-content">
+                                    <h5>练习 1：文件夹导航</h5>
+                                    <div class="module-command">
+                                        <div class="module-content">
+                                            <pre><code>pwd                           # 看看你现在在哪儿
 cd /mnt/c                     # 跳到 C 盘
 pwd                           # 再看一遍，应该是 /mnt/c
 ls                            # 列出 C 盘的文件
 cd ~                          # 回家（主目录）
-pwd                           # 应该看到 /home/你的用户名</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded">💡 <strong>预期结果：</strong> 每条命令都会有输出，你应该看到不同的路径。</p>
-                            </div>
-
-                            <!-- Practice 2: File Operations -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs mr-2">练习 2</span>创建和查看文件</h4>
-                                <div class="terminal-window mb-3">
-                                    <div class="terminal-header">
-                                        <div class="terminal-dot bg-red-500"></div>
-                                        <div class="terminal-dot bg-yellow-500"></div>
-                                        <div class="terminal-dot bg-green-500"></div>
-                                        <div class="ml-2 text-sm text-gray-300">Terminal</div>
+pwd                           # 应该看到 /home/你的用户名</code></pre>
+                                        </div>
                                     </div>
-                                    <pre class="p-3 text-sm">mkdir my_first_project        # 创建一个文件夹
-cd my_first_project           # 进入这个文件夹
-touch hello.txt               # 创建一个空文件
-ls                            # 看看文件是否创建成功
-cat hello.txt                 # 查看文件内容（应该是空的）</pre>
+                                    <p style="margin-top: 0.5rem; font-size: 0.875rem;"><strong>预期结果：</strong>每条命令都会有输出，你应该看到不同的路径。</p>
                                 </div>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded">💡 <strong>预期结果：</strong> <code class="code-inline">ls</code> 应该显示 <code class="code-inline">hello.txt</code>，<code class="code-inline">cat</code> 不会打印任何内容。</p>
                             </div>
 
-                            <!-- Practice 3: Nano Editing -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs mr-2">练习 3</span>编辑文件内容</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">nano hello.txt                # 打开编辑器</pre>
-                                </div>
-                                <p class="text-sm text-gray-700 mb-2">在编辑器中：</p>
-                                <ol class="text-xs text-gray-700 list-decimal list-inside space-y-1 mb-3">
-                                    <li>输入：<code class="bg-gray-100 px-1">Hello, Docker World!</code></li>
-                                    <li>按 <code class="bg-gray-100 px-1">Ctrl + O</code> 保存</li>
-                                    <li>按 <code class="bg-gray-100 px-1">Enter</code> 确认文件名</li>
-                                    <li>按 <code class="bg-gray-100 px-1">Ctrl + X</code> 退出</li>
-                                </ol>
-                                <div class="relative group">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">cat hello.txt                 # 验证文件内容是否已保存</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded mt-2">💡 <strong>预期结果：</strong> 应该看到 <code class="code-inline">Hello, Docker World!</code> 的内容。</p>
-                            </div>
-
-                            <!-- Practice 4: Advanced -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-red-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs mr-2">练习 4</span>组合操作</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">mkdir scripts                 # 创建 scripts 文件夹
-cd scripts                    # 进入
-touch script.py               # 创建 Python 脚本
-ls -la                        # 查看详细信息（包括权限）
-cd ..                         # 返回上级
-pwd                           # 验证位置
-ls my_first_project/          # 不进入文件夹，直接查看其内容</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded">💡 <strong>预期结果：</strong> 能够在不同文件夹之间灵活切换，并查看各文件夹的内容。</p>
-                            </div>
-                        </div>
-
-                        <!-- Completion Checklist -->
-                        <div class="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-lg">
-                            <p class="text-xs font-bold text-blue-900 mb-2">✅ 完成这些练习后，你应该会：</p>
-                            <ul class="text-xs text-blue-800 space-y-1 list-disc list-inside">
-                                <li>用 <code class="code-inline">cd</code> 快速移动到任何文件夹</li>
-                                <li>用 <code class="code-inline">mkdir</code> 和 <code class="code-inline">touch</code> 创建项目结构</li>
-                                <li>用 <code class="code-inline">nano</code> 编辑文件而不害怕</li>
-                                <li>理解 Linux 文件系统的树形结构</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section 5: Docker Install -->
-                <section id="docker-install" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">6. 安装 Docker Desktop</h2>
-                        <p class="mt-2 text-gray-600">可视化管理容器，并提供 WSL 2 核心引擎支持。</p>
-                    </div>
-
-                    <div class="space-y-6">
-                        <!-- Download -->
-                        <div class="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                            <i class="fas fa-cloud-download-alt text-2xl text-blue-600 mt-1"></i>
-                            <div>
-                                <h4 class="font-bold text-blue-900">下载安装包</h4>
-                                <p class="text-sm text-blue-800 mt-1">前往 Docker 官网下载 Docker Desktop for Windows。<br>安装时务必勾选 <strong>"Use WSL 2 instead of Hyper-V"</strong>。</p>
-                            </div>
-                        </div>
-
-                        <!-- Configuration -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                            <div class="p-6 border-b border-gray-100">
-                                <h3 class="font-bold text-gray-800">关键配置：配置国内镜像源</h3>
-                                <p class="text-xs text-gray-500 mt-1">如果不配置这一步，拉取镜像可能会非常慢甚至失败。</p>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-sm mb-3">1. 打开 Docker Desktop 设置 (齿轮图标) -> <strong>Docker Engine</strong>。</p>
-                                <p class="text-sm mb-3">2. 将下方的配置 JSON 完整覆盖编辑框内容：</p>
-                                
-                                <div class="relative group">
-                                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onclick="copyToClipboard(this)" class="bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                            <i class="far fa-copy mr-1"></i> 复制 JSON
-                                        </button>
+                            <div class="step-item">
+                                <span class="step-number">2</span>
+                                <div class="step-content">
+                                    <h5>练习 2：创建和查看文件</h5>
+                                    <div class="module-command">
+                                        <div class="module-content">
+                                            <pre><code>mkdir test_folder             # 创建文件夹
+cd test_folder                # 进入文件夹
+touch hello.txt               # 创建空文件
+echo "Hello Linux" > hello.txt  # 写入内容
+cat hello.txt                 # 查看内容
+ls -la                        # 看看文件详情</code></pre>
+                                        </div>
                                     </div>
-                                    <pre class="p-3 text-sm">{
-  "builder": {
-    "gc": {
-      "defaultKeepStorage": "20GB",
-      "enabled": true
-    }
-  },
-  "experimental": false,
-  "registry-mirrors": [
-    "https://docker.1ms.run",
-    "https://docker.xuanyuan.me"
-  ]
-}</pre>
+                                    <p style="margin-top: 0.5rem; font-size: 0.875rem;"><strong>预期结果：</strong>最后应该看到 "Hello Linux" 被输出到终端。</p>
                                 </div>
-                                <p class="text-sm mt-3">3. 点击右下角的 <strong>Apply & restart</strong>。</p>
+                            </div>
+
+                            <div class="step-item">
+                                <span class="step-number">3</span>
+                                <div class="step-content">
+                                    <h5>练习 3：复制、移动和删除</h5>
+                                    <div class="module-command">
+                                        <div class="module-content">
+                                            <pre><code>cp hello.txt hello_backup.txt  # 复制文件
+ls                             # 现在应该有两个文件
+mv hello_backup.txt backup.txt # 重命名
+rm hello.txt                   # 删除原文件
+ls                             # 现在只剩 backup.txt</code></pre>
+                                        </div>
+                                    </div>
+                                    <div class="module-warning" style="margin-top: 0.5rem;">
+                                        <div class="module-content">
+                                            <p><strong>警告：</strong>Linux 的 <code>rm</code> 命令没有回收站，删除就是永久删除！使用 <code>rm -rf</code> 时要特别小心。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="step-item">
+                                <span class="step-number">4</span>
+                                <div class="step-content">
+                                    <h5>练习 4：清理环境</h5>
+                                    <div class="module-command">
+                                        <div class="module-content">
+                                            <pre><code>cd ..                          # 回到上级目录
+rm -r test_folder              # 删除文件夹及其内容
+ls                             # 确认已删除</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </section>
-
-                <!-- Section 6: Docker Concepts (New Detailed Section) -->
-                <section id="docker-concepts" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">7. Docker 核心概念通俗解</h2>
-                        <p class="mt-2 text-gray-600">不要背定义，用三个比喻听懂 Docker 到底在干什么。</p>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <!-- Concept 1: Image -->
-                        <div class="concept-card bg-white p-6 rounded-xl border border-gray-200">
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                                <i class="fas fa-compact-disc text-blue-600 text-xl"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900 mb-2">镜像 (Image)</h3>
-                            <p class="text-sm text-gray-500 mb-3 font-mono">相当于：游戏安装包 / 类(Class)</p>
-                            <p class="text-sm text-gray-600 leading-relaxed">
-                                它是<strong>静止的、只读的</strong>。就像你的《英雄联盟》安装包，它躺在硬盘里，不会自己动，也不会自己产生数据。你不能修改镜像本身，只能利用它去“运行”出一个程序。
-                            </p>
-                        </div>
-
-                        <!-- Concept 2: Container -->
-                        <div class="concept-card bg-white p-6 rounded-xl border border-gray-200">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                                <i class="fas fa-box-open text-green-600 text-xl"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900 mb-2">容器 (Container)</h3>
-                            <p class="text-sm text-gray-500 mb-3 font-mono">相当于：运行中的游戏窗口 / 对象(Object)</p>
-                            <p class="text-sm text-gray-600 leading-relaxed">
-                                它是<strong>动态的、有生命的</strong>。当你双击图标，游戏启动了，这就变成了一个容器。你可以同时双开两个账号，就是用同一个“镜像”启动了两个“容器”。容器关了，数据可能就没了。
-                            </p>
-                        </div>
-
-                        <!-- Concept 3: Repository -->
-                        <div class="concept-card bg-white p-6 rounded-xl border border-gray-200">
-                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                                <i class="fas fa-store text-purple-600 text-xl"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900 mb-2">仓库 (Repository)</h3>
-                            <p class="text-sm text-gray-500 mb-3 font-mono">相当于：应用商店 / App Store</p>
-                            <p class="text-sm text-gray-600 leading-relaxed">
-                                我们去哪里下载镜像？通常是 <strong>Docker Hub</strong>。它是全球最大的镜像集市，里面有官方认证的 nginx, python, mysql 等镜像，大家都可以直接拉取使用。
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Visual Flow -->
-                    <div class="mt-8 bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-                        <div class="bg-white p-3 rounded shadow-sm">
-                            <div class="text-xs text-gray-400 mb-1">Docker Hub</div>
-                            <div class="font-bold text-purple-600"><i class="fas fa-cloud-download-alt mr-1"></i> pull (拉取)</div>
-                        </div>
-                        <i class="fas fa-arrow-right text-gray-400 hidden md:block"></i>
-                        <i class="fas fa-arrow-down text-gray-400 md:hidden"></i>
-                        <div class="bg-white p-3 rounded shadow-sm">
-                            <div class="text-xs text-gray-400 mb-1">本地镜像 (Images)</div>
-                            <div class="font-bold text-blue-600"><i class="fas fa-play mr-1"></i> run (运行)</div>
-                        </div>
-                        <i class="fas fa-arrow-right text-gray-400 hidden md:block"></i>
-                        <i class="fas fa-arrow-down text-gray-400 md:hidden"></i>
-                        <div class="bg-white p-3 rounded shadow-sm">
-                            <div class="text-xs text-gray-400 mb-1">运行容器 (Containers)</div>
-                            <div class="font-bold text-green-600"><i class="fas fa-server mr-1"></i> 服务上线</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section 7: Verification & Commands -->
-                <section id="docker-first-run" class="scroll-mt-8 mb-12 section-card">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-3xl font-bold text-gray-900">8. 初体验与命令详解</h2>
-                        <p class="mt-2 text-gray-600">不要只会复制粘贴，看懂每一行输出。</p>
-                    </div>
-
-                    <div class="bg-gray-900 rounded-xl overflow-hidden shadow-xl mb-8">
-                        <div class="flex items-center justify-between px-4 py-2 bg-gray-800">
-                            <div class="flex space-x-2">
-                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                            </div>
-                            <span class="text-gray-400 text-xs">WSL: Ubuntu</span>
-                        </div>
-                        <div class="p-6 text-green-400 font-mono text-sm space-y-4">
-                            
-                            <!-- Command 1 -->
-                            <div class="mb-6">
-                                <div class="flex justify-between items-center group mb-2">
-                                    <span>$ docker run hello-world</span>
-                                    <button onclick="copyCodeText('docker run hello-world')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"><i class="far fa-copy"></i></button>
-                                </div>
-                                <div class="text-gray-400 border-l-2 border-gray-700 pl-3">
-                                    <p>Unable to find image 'hello-world:latest' locally</p>
-                                    <p class="text-blue-400 text-xs mb-2">// 解释：Docker 发现你本地没有这个镜像，准备去下载。</p>
-                                    
-                                    <p>latest: Pulling from library/hello-world</p>
-                                    <p>719385e32844: Pull complete</p>
-                                    <p class="text-blue-400 text-xs mb-2">// 解释：正在从 Docker Hub 拉取层 (Layer)。</p>
-
-                                    <p class="text-white font-bold mt-2">Hello from Docker!</p>
-                                    <p>This message shows that your installation appears to be working correctly.</p>
-                                    <p class="text-blue-400 text-xs">// 解释：容器启动成功，打印了这句话，然后立刻退出了。</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Command Cheatsheet -->
-                    <h3 class="font-bold text-xl text-gray-800 mb-4">常用命令速查表</h3>
-                    <div class="grid md:grid-cols-2 gap-4 mb-6">
-                        <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                            <code class="text-blue-600 font-bold">docker pull [镜像名]</code>
-                            <p class="text-xs text-gray-500 mt-1">去超市买菜（下载镜像）。<br>例如：<code class="code-inline">docker pull nginx</code></p>
-                        </div>
-                        <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                            <code class="text-green-600 font-bold">docker run [参数] [镜像名]</code>
-                            <p class="text-xs text-gray-500 mt-1">开始做菜（启动容器）。<br>例如：<code class="code-inline">docker run -d nginx</code></p>
-                        </div>
-                        <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                            <code class="text-purple-600 font-bold">docker images</code>
-                            <p class="text-xs text-gray-500 mt-1">看看冰箱里有哪些菜（查看本地镜像列表）。</p>
-                        </div>
-                        <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                            <code class="text-red-600 font-bold">docker ps</code>
-                            <p class="text-xs text-gray-500 mt-1">看看炉子上正在煮什么（查看正在运行的容器）。<br>加 <code class="code-inline">-a</code> 可以看包括已经关掉的容器。</p>
-                        </div>
-                    </div>
-
-                    <!-- 实操练习：Docker 基础命令 -->
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-6 mb-6">
-                        <h3 class="text-lg font-bold text-green-900 mb-4"><i class="fas fa-flask mr-2"></i> 🚀 Docker 初体验：跟着做</h3>
-                        <p class="text-sm text-green-800 mb-4">确保 Docker Desktop 已启动（任务栏看得到 Docker 图标）。然后在 WSL 终端中执行这些命令：</p>
-
-                        <div class="space-y-4">
-                            <!-- Practice 1: Check Docker -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs mr-2">第 1 步</span>检查 Docker 是否正常</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">docker version</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-blue-50 p-2 rounded">💡 <strong>期望输出：</strong> 显示 Docker 客户端版本和服务器版本。如果看到版本号说明连接成功。</p>
-                            </div>
-
-                            <!-- Practice 2: Hello World -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs mr-2">第 2 步</span>运行第一个容器</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">docker run hello-world</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 mb-2 bg-blue-50 p-2 rounded">💡 <strong>期望输出：</strong> 看到 "Hello from Docker!" 的欢迎信息。第一次运行时会自动下载镜像，可能需要 30 秒到 1 分钟。</p>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded"><strong>⚠️ 常见问题：</strong> 如果显示 "Cannot connect to Docker daemon"，说明 Docker Desktop 没启动。请点击任务栏的 Docker 图标启动它。</p>
-                            </div>
-
-                            <!-- Practice 3: View Images -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs mr-2">第 3 步</span>查看你的镜像</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">docker images</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-blue-50 p-2 rounded">💡 <strong>期望输出：</strong> 你应该看到一个表格，至少包含一行 <code class="code-inline">hello-world</code> 的信息。这证明镜像已经下载到你的电脑里了。</p>
-                            </div>
-
-                            <!-- Practice 4: View Containers -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-orange-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-orange-500 text-white px-2 py-1 rounded-full text-xs mr-2">第 4 步</span>查看运行过的容器</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">docker ps -a              # 列出所有容器（包括已停止的）
-docker ps                 # 只列出正在运行的容器</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-blue-50 p-2 rounded">💡 <strong>期望输出：</strong> 应该看到你刚才运行的 hello-world 容器（状态是 "Exited"，因为它已经完成了任务并自动停止）。</p>
-                            </div>
-
-                            <!-- Practice 5: Run Interactive Container -->
-                            <div class="bg-white p-4 rounded-lg border-l-4 border-red-500">
-                                <h4 class="font-bold text-gray-800 mb-2"><span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs mr-2">第 5 步</span>进入交互式容器</h4>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">docker run -it ubuntu bash</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 mb-2 bg-blue-50 p-2 rounded">💡 <strong>期望输出：</strong> 会看到一个新的命令提示符，显示 <code class="code-inline">root@[某个ID]:/# </code>。你现在在 Ubuntu 容器内部了！</p>
-                                <p class="text-xs text-gray-600 mb-2 bg-green-50 p-2 rounded"><strong>✨ 在容器内尝试这些命令：</strong></p>
-                                <div class="relative group mb-3">
-                                    <button onclick="copyToClipboard(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-3 rounded shadow-sm flex items-center">
-                                        <i class="far fa-copy mr-1"></i> 复制
-                                    </button>
-                                    <pre class="p-3 text-sm">pwd                  # 看你在哪儿
-ls                   # 列出容器内的文件
-cat /etc/os-release  # 查看操作系统信息（证明这真的是 Ubuntu）
-echo "Hello Docker"  # 打印一条消息
-exit                 # 退出容器</pre>
-                                </div>
-                                <p class="text-xs text-gray-600 bg-yellow-50 p-2 rounded"><strong>⚠️ 重要：</strong> 当你 <code class="code-inline">exit</code> 后，容器会停止。这很正常，容器的使命就是运行一个程序，程序结束后容器就关闭了。</p>
-                            </div>
-                        </div>
-
-                        <!-- Completion Checklist -->
-                        <div class="mt-4 p-3 bg-green-100 border border-green-300 rounded-lg">
-                            <p class="text-xs font-bold text-green-900 mb-2">✅ 完成这些练习后，你应该会：</p>
-                            <ul class="text-xs text-green-800 space-y-1 list-disc list-inside">
-                                <li>知道如何验证 Docker 的安装</li>
-                                <li>会下载和运行一个镜像</li>
-                                <li>能够列出本地的镜像和容器</li>
-                                <li>可以进入容器内部执行命令</li>
-                                <li>理解容器的生命周期（启动 → 运行 → 停止）</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
+                </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Scripts -->
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-keyboard"></i>
+                    <h4>快捷键技巧</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li><kbd>Tab</kbd> - 自动补全命令/文件名（最重要！）</li>
+                        <li><kbd>Ctrl + C</kbd> - 终止当前程序</li>
+                        <li><kbd>Ctrl + L</kbd> - 清屏（等同于 clear）</li>
+                        <li><kbd>Ctrl + D</kbd> - 退出当前 shell</li>
+                        <li><kbd>Ctrl + R</kbd> - 搜索历史命令</li>
+                        <li><kbd>上/下箭头</kbd> - 浏览历史命令</li>
+                        <li><kbd>Ctrl + A</kbd> - 光标移到行首</li>
+                        <li><kbd>Ctrl + E</kbd> - 光标移到行尾</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-faq" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-question-circle"></i>
+                    <h4>常见问题</h4>
+                </div>
+                <div class="module-content">
+                    <div style="margin-bottom: 1rem;">
+                        <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ "权限不够"（Permission denied）</h5>
+                        <p style="font-size: 0.875rem;"><strong>解决：</strong>在命令前加 <code>sudo</code>（以管理员权限运行）。例如：<code>sudo apt update</code></p>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ "命令未找到"（Command not found）</h5>
+                        <p style="font-size: 0.875rem;"><strong>原因：</strong>命令拼写错误，或者软件未安装。<br>
+                        <strong>解决：</strong>仔细检查拼写，或用 <code>sudo apt install 软件名</code> 安装。</p>
+                    </div>
+
+                    <div>
+                        <h5 style="color: var(--color-warning); margin-bottom: 0.5rem;">⚠️ 如何停止一个卡住的程序？</h5>
+                        <p style="font-size: 0.875rem;"><strong>解决：</strong>按 <kbd>Ctrl + C</kbd> 强制终止。如果还不行，按 <kbd>Ctrl + Z</kbd> 暂停程序，然后输入 <code>kill %1</code> 杀死进程。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Docker 安装 -->
+        <section id="docker-install" class="section-card">
+            <h2>
+                <i class="fas fa-download" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                6. 安装 Docker Desktop
+            </h2>
+
+            <div class="module-steps">
+                <div class="module-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>Windows/Mac 安装步骤</h4>
+                </div>
+                <div class="module-content">
+                    
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                        <div class="step-content">
+                            <h5>下载 Docker Desktop</h5>
+                            <p>访问官网：<code>https://www.docker.com/products/docker-desktop</code></p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h5>运行安装程序</h5>
+                            <p>双击下载的 .exe 文件，按提示安装（保持默认选项）。</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h5>启动 Docker Desktop</h5>
+                            <p>安装后会自动启动，任务栏会显示 Docker 图标。</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h5>验证安装</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker --version
+docker run hello-world</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem;">如果看到 "Hello from Docker!" 就说明安装成功！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Docker 核心概念 -->
+        <section id="docker-concepts" class="section-card">
+            <h2>
+                <i class="fas fa-cubes" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                7. Docker 核心概念通俗解
+            </h2>
+
+            <div class="grid-auto">
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-box"></i>
+                        <h4>镜像 (Image)</h4>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>类比：</strong>游戏安装包</p>
+                        <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <li>只读模板，包含运行环境</li>
+                            <li>可以从 Docker Hub 下载</li>
+                            <li>一个镜像可以创建多个容器</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-play"></i>
+                        <h4>容器 (Container)</h4>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>类比：</strong>正在运行的游戏</p>
+                        <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <li>镜像的运行实例</li>
+                            <li>可以启动、停止、删除</li>
+                            <li>相互隔离，互不影响</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="module-concept">
+                    <div class="module-header">
+                        <i class="fas fa-warehouse"></i>
+                        <h4>仓库 (Registry)</h4>
+                    </div>
+                    <div class="module-content">
+                        <p><strong>类比：</strong>应用商店</p>
+                        <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <li>存放镜像的地方</li>
+                            <li>Docker Hub 是官方仓库</li>
+                            <li>可以推送自己的镜像</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>关系图</h4>
+                </div>
+                <div class="module-content">
+                    <div class="module-command">
+                        <div class="module-content">
+                            <pre><code>仓库 (Docker Hub)
+    ↓ pull 拉取
+镜像 (nginx:latest)
+    ↓ run 运行
+容器 (正在运行的 nginx)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: 初体验 -->
+        <section id="docker-first-run" class="section-card">
+            <h2>
+                <i class="fas fa-rocket" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                8. 初体验：运行第一个容器
+            </h2>
+
+            <div class="module-steps">
+                <div class="module-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>实战演练</h4>
+                </div>
+                <div class="module-content">
+                    
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                        <div class="step-content">
+                            <h5>拉取 Nginx 镜像</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker pull nginx</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h5>查看本地镜像</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker images</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h5>运行容器</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker run -d -p 8080:80 --name my-nginx nginx</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem;"><strong>参数解释：</strong></p>
+                            <ul style="font-size: 0.875rem;">
+                                <li><code>-d</code> - 后台运行</li>
+                                <li><code>-p 8080:80</code> - 端口映射（主机8080→容器80）</li>
+                                <li><code>--name</code> - 给容器命名</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h5>访问测试</h5>
+                            <p>浏览器打开 <code>http://localhost:8080</code>，应该看到 "Welcome to nginx!"</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <h5>查看运行中的容器</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker ps</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-content">
+                            <h5>停止并删除容器</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker stop my-nginx
+docker rm my-nginx</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section-card">
+            <div class="module-summary">
+                <div class="module-header">
+                    <i class="fas fa-bookmark"></i>
+                    <h4>本讲总结</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li>理解 Docker 解决的核心问题：环境一致性</li>
+                        <li>掌握三大核心概念：镜像、容器、仓库</li>
+                        <li>成功安装 WSL 2 + Docker Desktop</li>
+                        <li>掌握 Linux 基础命令</li>
+                        <li>运行第一个 Docker 容器</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-practice" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-tasks"></i>
+                    <h4>课后作业</h4>
+                </div>
+                <div class="module-content">
+                    <div class="practice-task">
+                        <h5>作业 1：熟悉命令</h5>
+                        <p>练习至少 10 遍 <code>docker run/stop/rm</code> 命令，直到不看笔记也能流畅操作。</p>
+                    </div>
+                    <div class="practice-task">
+                        <h5>作业 2：探索镜像</h5>
+                        <p>尝试运行不同的镜像：<code>docker run -d -p 3000:3000 hello-world</code></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer style="background-color: var(--color-text); color: var(--color-text-lighter); padding: 2rem 0; margin-top: 3rem; border-top: 1px solid var(--color-border);">
+        <div class="container text-center">
+            <p style="font-size: 0.875rem;">Docker 容器技术竞赛培训 - 第一讲：环境构建与基础入门</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.7;">
+                <i class="fas fa-cog" style="margin-right: 0.25rem;"></i> 环境搭建 • 
+                <i class="fab fa-linux" style="margin: 0 0.25rem;"></i> Linux 基础 • 
+                <i class="fab fa-docker" style="margin: 0 0.25rem;"></i> Docker 入门
+            </p>
+        </div>
+    </footer>
+
     <script src="scripts/main.js" defer></script>
 </body>
 </html>
-
-
-
-
-
-
-
