@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker 竞赛培训 - 第三讲</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>第3讲:Dockerfile 自动化构建镜像</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/common.css">
     <style>
@@ -24,71 +23,61 @@
         }
     </style>
 </head>
+<body class="has-page-toc">
 
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+    <!-- Page TOC Navigation -->
+    <nav class="page-toc">
+        <div class="page-toc-title">本讲目录</div>
+        <ul class="page-toc-list">
+            <li><a href="#review" class="page-toc-link">1. 知识回顾:Docker 基础</a></li>
+            <li><a href="#dockerfile-intro" class="page-toc-link">2. 认识 Dockerfile</a></li>
+            <li><a href="#first-dockerfile" class="page-toc-link">3. 实战:动手写第一个 Dockerfile</a></li>
+            <li><a href="#build-details" class="page-toc-link">4. docker build 命令详解</a></li>
+            <li><a href="#dockerfile-commands" class="page-toc-link">5. Dockerfile 常用指令实战</a></li>
+            <li><a href="#mini-project" class="page-toc-link">6. 完整项目实战:打包个人主页</a></li>
+            <li><a href="#image-optimize" class="page-toc-link">7. 镜像优化技巧</a></li>
+            <li><a href="#troubleshooting" class="page-toc-link">8. 常见错误排查</a></li>
+        </ul>
+    </nav>
 
     <!-- Header -->
-    <header class="bg-blue-900 text-white shadow-lg shrink-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fab fa-docker text-3xl text-blue-400"></i>
+    <header style="background-color: var(--color-text); color: white; padding: 2rem 0; border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <i class="fab fa-docker" style="font-size: 2rem; color: var(--color-accent);"></i>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide">Docker 容器技术竞赛培训</h1>
-                    <p class="text-xs text-blue-200">第三讲：Dockerfile 自动化构建镜像</p>
+                    <h1 style="color: white; font-size: 1.25rem; margin: 0;">Docker 容器技术竞赛培训</h1>
+                    <p style="color: #e5e7eb; font-size: 0.875rem; margin: 0.25rem 0 0 0;">第三讲：Dockerfile 自动化构建镜像</p>
                 </div>
-            </div>
-            <div class="hidden md:block text-sm opacity-80">
-                <i class="fas fa-clock mr-1"></i> 预计时长：3小时
             </div>
         </div>
     </header>
 
-    <!-- Main Layout -->
-    <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="w-80 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
-            <div class="p-6">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">本讲目录</h3>
-                <nav class="space-y-2 text-base">
-                    <a href="#review" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50 active">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-history"></i></span> 1. 知识回顾
-                    </a>
-                    <a href="#dockerfile-intro" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-file-code"></i></span> 2. 认识 Dockerfile
-                    </a>
-                    <a href="#first-dockerfile" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-play-circle"></i></span> 3. 第一个 Dockerfile
-                    </a>
-                    <a href="#build-details" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-cog"></i></span> 4. docker build 详解
-                    </a>
-                    <a href="#dockerfile-commands" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-code"></i></span> 5. 常用指令实战
-                    </a>
-                    <a href="#mini-project" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-project-diagram"></i></span> 6. 实战：部署网页
-                    </a>
-                    <a href="#image-optimize" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-rocket"></i></span> 7. 镜像优化技巧
-                    </a>
-                    <a href="#troubleshooting" class="nav-item flex items-center px-3 py-2 font-medium text-gray-700 hover:bg-gray-50">
-                        <span class="w-6 text-center mr-2"><i class="fas fa-bug"></i></span> 8. 常见错误排查
-                    </a>
-                </nav>
+    <!-- Main Content -->
+    <main class="container" style="padding: 2rem 0 3rem 0;">
+
+        <!-- Section 1: 知识回顾 -->
+        <section id="review" class="section-card">
+            <h2>
+                <i class="fas fa-history" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                1. 知识回顾：Docker 基础
+            </h2>
+
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-cube"></i>
+                    <h4>三大核心概念</h4>
             </div>
-            <div class="mt-auto p-6 border-t border-gray-100">
-                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
-                    <h4 class="text-base font-bold text-blue-800 mb-3"><i class="fas fa-star text-yellow-400 mr-1"></i> 本讲核心</h4>
-                    <ul class="text-sm text-blue-700 space-y-2 list-disc list-inside">
-                        <li>Dockerfile 编写</li>
-                        <li>自定义镜像构建</li>
-                        <li>镜像体积优化</li>
+                <div class="module-content">
+                    <ul>
+                        <li><strong>镜像（Image）：</strong>类似"软件安装包"，包含运行环境和程序</li>
+                        <li><strong>容器（Container）：</strong>镜像运行后的实例，像"正在运行的软件"</li>
+                        <li><strong>仓库（Registry）：</strong>存放镜像的云端仓库（如Docker Hub）</li>
                     </ul>
                 </div>
             </div>
-        </aside>
 
+<<<<<<< HEAD
         <!-- Content Area -->
         <main class="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 scroll-smooth" id="main-content">
             <div class="max-w-5xl mx-auto space-y-16 pb-32 lg:max-w-6xl xl:max-w-7xl">
@@ -166,23 +155,33 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
                                     <div class="p-3 bg-blue-50 border-t border-blue-100 text-xs text-blue-700 mt-2">
                                         💡 如果没有输出，说明当前没有运行中的容器，这是正常的。
                                     </div>
+=======
+            <div class="module-steps" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>验证命令回顾</h4>
                                 </div>
+                <div class="module-content">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h5>查看所有本地镜像</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker images</code></pre>
                             </div>
                         </div>
-                        
-                        <div class="tip-box">
-                            <strong><i class="fas fa-question-circle mr-1"></i> 互动提问（请同学举手回答）：</strong>  
-                            <ul class="list-decimal list-inside ml-6 mt-2 text-gray-700 space-y-1">
-                                <li>如果 <code class="code-inline">docker ps</code> 什么都不显示，说明什么？</li>
-                                <li>镜像和容器的关系，像什么和什么的关系？（提示：软件安装包和运行中的软件）</li>
-                                <li>第二讲中我们用 <code class="code-inline">docker run -p 8080:80 nginx</code> 做了什么？</li>
-                            </ul>
+                            <div class="module-output" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre><code>REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+nginx        latest    605c77e624dd   2 weeks ago    141MB
+nginx        alpine    8e75cbc5b25c   2 weeks ago    41MB</code></pre>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                         </div>
-                        
-                        <div class="info-box">
-                            <strong><i class="fas fa-lightbulb mr-1"></i> 引出本讲核心：</strong> 上节课我们手动进入容器修改文件，但每次重启容器改动就丢失了。有没有办法把修改"固化"到镜像里？<span class="font-bold text-blue-700">Dockerfile</span> 就是答案！它能让我们像写脚本一样，自动化构建镜像。
                         </div>
                     </div>
+                    </div>
+<<<<<<< HEAD
                 </section>
 
                 <!-- Section 2: Dockerfile原理与对比 -->
@@ -224,6 +223,107 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
                             <p class="text-gray-700 mb-3">Dockerfile 采用分层构建的方式，每一条指令都会在基础镜像上创建一个新的层，这些层堆叠在一起形成最终的镜像。这种分层设计是 Dockerfile 的核心特性之一，理解分层构建对于编写高效的 Dockerfile 至关重要。</p>
                             <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg mb-4">
                                 <pre class="text-sm text-gray-800"><code>基础镜像 (FROM)      → 第1层
+=======
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h5>查看正在运行的容器</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker ps</code></pre>
+                                </div>
+                            </div>
+                            <div class="module-output" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre><code>CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS
+a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes</code></pre>
+                                </div>
+                            </div>
+                            <div class="module-tip" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <p><strong>💡 提示：</strong>如果没有输出，说明当前没有运行中的容器，这是正常的。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-content">
+                    <p><strong>🤔 互动提问（请同学举手回答）：</strong></p>
+                    <ul>
+                        <li>如果 `docker ps` 什么都不显示，说明什么？</li>
+                        <li>镜像和容器的关系，像什么和什么的关系？（提示：软件安装包和运行中的软件）</li>
+                        <li>第二讲中我们用 `docker run -p 8080:80 nginx` 做了什么？</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-note" style="margin-top: 1.5rem;">
+                <div class="module-content">
+                    <p><strong>💡 引出本讲核心：</strong>上节课我们手动进入容器修改文件，但每次重启容器改动就丢失了。有没有办法把修改"固化"到镜像里？<strong>Dockerfile</strong> 就是答案！它能让我们像写脚本一样，自动化构建镜像。</p>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>引出本讲核心</h4>
+                </div>
+                <div class="module-content">
+                    <p>上节课我们手动进入容器修改文件，但每次重启容器改动就丢失了。有没有办法把修改"固化"到镜像里？<strong>Dockerfile</strong> 就是答案！它能让我们像写脚本一样，自动化构建镜像。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: 认识 Dockerfile -->
+        <section id="dockerfile-intro" class="section-card">
+            <h2>
+                <i class="fas fa-file-code" style="color: var(--color-warning); margin-right: 0.75rem;"></i>
+                2. 认识 Dockerfile：镜像的"施工图纸"
+            </h2>
+
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-magic"></i>
+                    <h4>为什么需要 Dockerfile？</h4>
+                </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div style="background-color: #fee2e2; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-error);">
+                            <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ 手动做镜像的问题</h5>
+                            <ul style="font-size: 0.875rem;">
+                                <li>每次都要敲一遍命令</li>
+                                <li>容易遗漏步骤或打错</li>
+                                <li>无法记录修改历史</li>
+                                <li>难以分享给别人复现</li>
+                            </ul>
+                        </div>
+                        <div style="background-color: #dcfce7; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success);">
+                            <h5 style="color: var(--color-success); margin-bottom: 0.5rem;">✅ Dockerfile 的优势</h5>
+                            <ul style="font-size: 0.875rem;">
+                                <li>一次编写，自动化构建</li>
+                                <li>每一步都有文档记录</li>
+                                <li>可以版本管理（git）</li>
+                                <li>团队协作，完全一致</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-sitemap"></i>
+                    <h4>Dockerfile 就像搭积木</h4>
+                </div>
+                <div class="module-content">
+                    <p style="margin-bottom: 0.75rem;">每一条指令都是在上一层基础上"叠加"一层新内容：</p>
+                    <div class="module-command">
+                        <div class="module-content">
+                            <pre><code>基础镜像 (FROM)
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
     ↓
 安装软件 (RUN)       → 第2层
     ↓
@@ -234,6 +334,37 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
 设置启动命令 (CMD)    → 第5层
     ↓
 最终镜像</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: 第一个 Dockerfile -->
+        <section id="first-dockerfile" class="section-card">
+            <h2>
+                <i class="fas fa-play-circle" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                3. 实战：动手写第一个 Dockerfile
+            </h2>
+
+            <div class="module-steps">
+                <div class="module-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>完整操作步骤</h4>
+                </div>
+                <div class="module-content">
+                    
+                    <!-- 步骤1 -->
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                        <div class="step-content">
+                            <h5>创建工作目录</h5>
+                            <p style="margin-bottom: 0.5rem;">先创建一个文件夹，用来存放我们的 Dockerfile：</p>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>mkdir ~/my-first-dockerfile
+cd ~/my-first-dockerfile</code></pre>
+                                </div>
                             </div>
                             <div class="bg-blue-50 p-4 rounded-lg mb-4">
                                 <h5 class="font-bold text-blue-900 text-sm mb-2">💡 分层构建的优势</h5>
@@ -258,8 +389,8 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
                             </div>
                         </div>
                     </div>
-                </section>
 
+<<<<<<< HEAD
                 <!-- Section 3: 第一个Dockerfile实战 -->
                 <section id="first-dockerfile" class="scroll-mt-8 mb-12 section-card">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
@@ -312,10 +443,27 @@ a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes
                                         </div>
                                     </div>
                                     <p class="text-xs text-gray-600 mt-2">💡 或者用 <code class="code-inline">vi Dockerfile</code> / <code class="code-inline">vim Dockerfile</code></p>
+=======
+                    <!-- 步骤2 -->
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-success);">2</span>
+                        <div class="step-content">
+                            <h5>创建并编辑 Dockerfile</h5>
+                            <p style="margin-bottom: 0.5rem;">用文本编辑器创建一个名为 <code>Dockerfile</code> 的文件（注意：没有扩展名）：</p>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>nano Dockerfile</code></pre>
+                                </div>
+                            </div>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                             
-                            <div class="mt-4 p-4 bg-white rounded-lg border-2 border-green-400">
-                                <p class="text-sm font-bold text-green-800 mb-2">在 Dockerfile 中输入以下内容：</p>
-                                <pre class="p-3 text-sm"><code># 使用官方 nginx 镜像作为基础
+                            <div class="module-code-file" style="margin-top: 1rem;">
+                                <div class="module-header">
+                                    <i class="fas fa-file-code"></i>
+                                    <h4>Dockerfile 内容</h4>
+                                </div>
+                                <div class="module-content">
+                                    <pre><code># 使用官方 nginx 镜像作为基础
 FROM nginx:alpine
 
 # 创建一个简单的 HTML 文件
@@ -323,6 +471,7 @@ RUN echo '&lt;h1&gt;Hello from Dockerfile!&lt;/h1&gt;' > /usr/share/nginx/html/i
 
 # 容器启动时运行 nginx
 CMD ["nginx", "-g", "daemon off;"]</code></pre>
+<<<<<<< HEAD
                             </div>
                             
                             <div class="mt-3 p-3 bg-blue-50 rounded border-l-4 border-blue-400">
@@ -440,10 +589,14 @@ RUN apt-get install -y git</code></pre>
                                             </div>
                                         </div>
                                     </div>
+=======
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+<<<<<<< HEAD
                         <!-- 步骤4：构建镜像 -->
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6">
                             <h3 class="font-bold text-orange-900 mb-3 flex items-center">
@@ -565,11 +718,22 @@ RUN apt-get install -y git</code></pre>
                                 <li><strong>问题：</strong>端口 8080 被占用
                                     <br><span class="text-xs">→ 解决：换个端口，比如 <code class="code-inline">-p 8081:80</code></span>
                                 </li>
+=======
+                    <!-- 步骤3 -->
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-warning);">3</span>
+                        <div class="step-content">
+                            <h5>理解每一行指令</h5>
+                            <ul style="font-size: 0.875rem;">
+                                <li><code style="color: var(--color-accent);">FROM nginx:alpine</code> - 选择 nginx:alpine 作为"起点"，alpine 是精简版</li>
+                                <li><code style="color: var(--color-success);">RUN echo '...'</code> - 在构建过程中执行命令，创建新的首页文件</li>
+                                <li><code style="color: var(--color-warning);">CMD ["nginx", ...]</code> - 容器启动时要运行的命令</li>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                             </ul>
                         </div>
                     </div>
-                </section>
 
+<<<<<<< HEAD
                 <!-- Section 4: build命令进阶与排错 -->
                 <section id="build-details" class="scroll-mt-8 mb-12 section-card">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
@@ -802,10 +966,28 @@ COPY notexist.html /usr/share/nginx/html/</code></pre>
                                     </div>
                                 </div>
                             </div>
+=======
+                    <!-- 步骤4 -->
+                    <div class="step-item">
+                        <span class="step-number" style="background-color: var(--color-error);">4</span>
+                        <div class="step-content">
+                            <h5>构建镜像（关键步骤！）</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker build -t my-nginx:v1 .</code></pre>
                         </div>
                     </div>
-                </section>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;"><strong>命令解析：</strong></p>
+                            <ul style="font-size: 0.875rem;">
+                                <li><code>docker build</code> - 构建镜像的命令</li>
+                                <li><code>-t my-nginx:v1</code> - 给镜像起名字和标签</li>
+                                <li><code>.</code> - 点号表示当前目录</li>
+                            </ul>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                        </div>
+                    </div>
 
+<<<<<<< HEAD
                 <!-- Section 5: 常用指令实战 -->
                 <section id="dockerfile-commands" class="scroll-mt-8 mb-12 section-card">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
@@ -841,10 +1023,26 @@ COPY notexist.html /usr/share/nginx/html/</code></pre>
                                 <div class="bg-white p-3 rounded-lg border-l-4 border-indigo-400">
                                     <code class="font-bold text-indigo-600">CMD</code>
                                     <p class="text-xs text-gray-600 mt-1">容器启动时执行的命令</p>
+=======
+                    <!-- 步骤5 -->
+                    <div class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <h5>运行容器测试</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>docker run -d -p 8080:80 --name test-nginx my-nginx:v1</code></pre>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                                 </div>
                             </div>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">访问 <code>http://localhost:8080</code>，应该看到 "Hello from Dockerfile!"</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
+<<<<<<< HEAD
                         <!-- COPY/ADD 详解 -->
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
                             <h3 class="font-bold text-blue-900 mb-3 flex items-center">
@@ -917,17 +1115,137 @@ COPY notexist.html /usr/share/nginx/html/</code></pre>
                                         </div>
                                     </div>
                                 </div>
+=======
+        <!-- Section 4: docker build 详解 -->
+        <section id="build-details" class="section-card">
+            <h2>
+                <i class="fas fa-cog" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                4. docker build 命令详解
+            </h2>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
 
-                                <div>
-                                    <p class="text-sm font-bold text-gray-700 mb-2">步骤 2: 修改 Dockerfile，使用 COPY</p>
-                                    <pre class="p-3 text-sm"><code>FROM nginx:alpine
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-terminal"></i>
+                    <h4>常用构建参数</h4>
+                </div>
+                <div class="module-content">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--color-border);">
+                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">参数</th>
+                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">说明</th>
+                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">示例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>-t</code></td>
+                                <td style="padding: 0.75rem;">指定镜像名称和标签</td>
+                                <td style="padding: 0.75rem;"><code>-t myapp:v1</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>-f</code></td>
+                                <td style="padding: 0.75rem;">指定 Dockerfile 文件名</td>
+                                <td style="padding: 0.75rem;"><code>-f Dockerfile.prod</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.75rem;"><code>--no-cache</code></td>
+                                <td style="padding: 0.75rem;">不使用缓存，强制重新构建</td>
+                                <td style="padding: 0.75rem;"><code>--no-cache</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.75rem;"><code>.</code></td>
+                                <td style="padding: 0.75rem;">构建上下文（当前目录）</td>
+                                <td style="padding: 0.75rem;"><code>.</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-# 复制本地文件到容器
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>什么是"构建上下文"？</h4>
+                </div>
+                <div class="module-content">
+                    <p>构建上下文是指 <code>docker build</code> 命令最后指定的路径（通常是 <code>.</code>）。Docker 会把这个目录下的所有文件打包发送给 Docker 守护进程，所以 <code>COPY</code> 指令只能访问这个目录下的文件。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: 常用指令实战 -->
+        <section id="dockerfile-commands" class="section-card">
+            <h2>
+                <i class="fas fa-code" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                5. Dockerfile 常用指令实战
+            </h2>
+
+            <!-- FROM -->
+            <div class="module-concept">
+                <div class="module-header">
+                    <i class="fas fa-layer-group"></i>
+                    <h4>FROM：指定基础镜像</h4>
+                                </div>
+                <div class="module-content">
+                    <p>每个 Dockerfile 必须以 FROM 开头，指定从哪个镜像开始构建。</p>
+                    <div class="module-code-file" style="margin-top: 0.75rem;">
+                        <div class="module-content">
+                            <pre><code># 使用官方镜像
+FROM nginx:alpine
+
+# 使用特定版本
+FROM python:3.9
+
+# 从零开始（很少用）
+FROM scratch</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUN -->
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-terminal"></i>
+                    <h4>RUN：执行命令</h4>
+                </div>
+                <div class="module-content">
+                    <p>在镜像构建时执行命令，常用于安装软件、创建文件等。</p>
+                    <div class="module-code-file" style="margin-top: 0.75rem;">
+                        <div class="module-content">
+                            <pre><code>FROM ubuntu:20.04
+
+# 单条命令
+RUN apt-get update
+
+# 多条命令用 && 连接（推荐）
+RUN apt-get update && apt-get install -y nginx curl</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COPY & ADD -->
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-copy"></i>
+                    <h4>COPY & ADD：复制文件</h4>
+                </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div>
+                            <h5>COPY（推荐）</h5>
+                            <div class="module-code-file" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre><code># 复制单个文件
 COPY index.html /usr/share/nginx/html/
 
-CMD ["nginx", "-g", "daemon off;"]</code></pre>
-                                </div>
+# 复制整个目录
+COPY ./app /app/
 
+<<<<<<< HEAD
                                 <div>
                                     <p class="text-sm font-bold text-gray-700 mb-2">步骤 3: 重新构建镜像</p>
                                     <div class="terminal-window">
@@ -1026,6 +1344,10 @@ RUN cat /app/file.txt</code></pre>
                                             </div>
                                         </div>
                                     </div>
+=======
+# 复制多个文件
+COPY file1.txt file2.txt /app/</code></pre>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                                 </div>
                             </div>
 
@@ -1102,7 +1424,14 @@ COPY . /app/</code></pre>
                             </div>
                         </div>
                         </div>
+                        <div>
+                            <h5>ADD（扩展功能）</h5>
+                            <div class="module-code-file" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre><code># 自动解压 tar 包
+ADD archive.tar.gz /app/
 
+<<<<<<< HEAD
                         <!-- WORKDIR 详解 -->
                         <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6">
                             <h3 class="font-bold text-green-900 mb-3 flex items-center">
@@ -1174,6 +1503,10 @@ CMD ["node", "server.js"]</code></pre>
                                         <li><strong>减少镜像大小：</strong> 使用 <code class="code-inline">--production</code> 标志只安装生产依赖，减少镜像体积</li>
                                         <li><strong>使用环境变量：</strong> 便于配置和管理，提高灵活性</li>
                                     </ul>
+=======
+# 从 URL 下载（不推荐）
+ADD https://example.com/file.txt /app/</code></pre>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                                 </div>
                             </div>
                             
@@ -1264,6 +1597,7 @@ COPY . .</code></pre>
                                 </ul>
                             </div>
                         </div>
+<<<<<<< HEAD
 
                         <!-- EXPOSE 详解 -->
                         <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-xl p-6">
@@ -1613,9 +1947,14 @@ docker run --rm node-app env | grep NODE_ENV</code></pre>
                             </ul>
                             <p class="text-xs text-gray-600 mt-3">💡 完成后，构建并运行，确保能正常访问。</p>
                         </div>
+=======
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                     </div>
-                </section>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--color-text-light);"><strong>建议：</strong>优先使用 COPY，更清晰简单。</p>
+                </div>
+            </div>
 
+<<<<<<< HEAD
                 <!-- Section 6: 小项目实战 -->
                 <section id="mini-project" class="scroll-mt-8 mb-12 section-card">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
@@ -1626,8 +1965,32 @@ docker run --rm node-app env | grep NODE_ENV</code></pre>
                         <div class="info-box">
                             <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-target mr-2"></i> 项目目标</h4>
                             <p class="text-gray-700">创建一个包含 HTML、CSS、图片的完整网站，用 Dockerfile 打包成镜像，一键部署。</p>
+=======
+            <!-- WORKDIR -->
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-folder"></i>
+                    <h4>WORKDIR：设置工作目录</h4>
                         </div>
+                <div class="module-content">
+                    <p>设置后续指令的工作目录，类似 <code>cd</code> 命令。</p>
+                    <div class="module-code-file" style="margin-top: 0.75rem;">
+                        <div class="module-content">
+                            <pre><code>FROM node:alpine
 
+WORKDIR /app
+
+# 后续 COPY、RUN 都在 /app 目录下
+COPY package.json .
+RUN npm install
+COPY . .</code></pre>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<<<<<<< HEAD
                         <!-- 步骤1：创建项目结构 -->
                         <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
                             <h3 class="font-bold text-blue-900 mb-3 flex items-center">
@@ -1654,9 +2017,122 @@ cd ~/my-website</code></pre>
                                     <li><strong>保持结构扁平：</strong> 不要创建过深的目录结构，一般不超过 3 层</li>
                                     <li><strong>使用标准命名：</strong> 使用行业标准的目录名称，如 css、images、js 等</li>
                                 </ul>
+=======
+            <!-- CMD & ENTRYPOINT -->
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-rocket"></i>
+                    <h4>CMD & ENTRYPOINT：启动命令</h4>
+                            </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div>
+                            <h5>CMD（推荐）</h5>
+                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">容器启动时执行的默认命令</p>
+                            <div class="module-code-file">
+                                <div class="module-content">
+                                    <pre><code># JSON 数组格式（推荐）
+CMD ["nginx", "-g", "daemon off;"]
+
+# Shell 格式
+CMD nginx -g "daemon off;"</code></pre>
+                        </div>
                             </div>
                         </div>
+                        <div>
+                            <h5>ENTRYPOINT（固定入口）</h5>
+                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">不能被 <code>docker run</code> 覆盖</p>
+                            <div class="module-code-file">
+                                <div class="module-content">
+                                    <pre><code>ENTRYPOINT ["python", "app.py"]
 
+# docker run 时传入的参数会追加
+# docker run myapp --port 8000
+# 实际执行: python app.py --port 8000</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENV & EXPOSE -->
+            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-cog"></i>
+                    <h4>ENV 和 EXPOSE</h4>
+                </div>
+                <div class="module-content">
+                    <div class="module-code-file">
+                        <div class="module-content">
+                            <pre><code>FROM nginx:alpine
+
+# 设置环境变量
+ENV APP_VERSION=1.0
+ENV NODE_ENV=production
+
+# 声明端口（文档作用）
+EXPOSE 80 443
+
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+                        </div>
+                    </div>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;"><strong>注意：</strong>EXPOSE 只是声明，实际端口映射仍需 <code>docker run -p</code>。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: 实战项目 -->
+        <section id="mini-project" class="section-card">
+            <h2>
+                <i class="fas fa-project-diagram" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                6. 完整项目实战：打包个人主页
+            </h2>
+
+            <div class="module-practice">
+                <div class="module-header">
+                    <i class="fas fa-target"></i>
+                    <h4>项目目标</h4>
+                </div>
+                <div class="module-content">
+                    <p>创建一个包含 HTML、CSS、图片的完整网站，用 Dockerfile 打包成镜像，一键部署。</p>
+                </div>
+            </div>
+
+            <div class="module-steps" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>实战步骤</h4>
+                </div>
+                <div class="module-content">
+                    
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h5>创建项目结构</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code>mkdir -p ~/my-website/css ~/my-website/images
+cd ~/my-website</code></pre>
+                                </div>
+                            </div>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">项目结构：</p>
+                            <div class="module-output">
+                                <div class="module-content">
+                                    <pre><code>my-website/
+├── Dockerfile
+├── index.html
+├── css/
+│   └── style.css
+└── images/
+    └── logo.png</code></pre>
+                                </div>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                            </div>
+                        </div>
+                    </div>
+
+<<<<<<< HEAD
                         <!-- 步骤2：创建HTML -->
                         <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6">
                             <h3 class="font-bold text-green-900 mb-3 flex items-center">
@@ -1666,15 +2142,28 @@ cd ~/my-website</code></pre>
                             <p class="text-gray-700 mb-4">HTML 是网站的骨架，一个结构清晰、语义化的 HTML 文件不仅有利于搜索引擎优化（SEO），也便于后续维护和扩展。让我们创建一个标准的 HTML 5 主页：</p>
                             <pre class="p-3 text-sm"><code>cat > index.html &lt;&lt;'EOF'
 &lt;!DOCTYPE html&gt;
+=======
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h5>创建 HTML 文件</h5>
+                            <div class="module-code-file">
+                                <div class="module-header">
+                                    <i class="fas fa-file-code"></i>
+                                    <h4>index.html</h4>
+                                </div>
+                                <div class="module-content">
+                                    <pre><code>&lt;!DOCTYPE html&gt;
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
     &lt;title&gt;我的 Docker 主页&lt;/title&gt;
     &lt;meta name="description" content="这是一个使用 Docker 构建和部署的静态网站示例"&gt;
     &lt;link rel="stylesheet" href="css/style.css"&gt;
 &lt;/head&gt;
 &lt;body&gt;
+<<<<<<< HEAD
     &lt;div class="container"&gt;
         &lt;header class="header"&gt;
             &lt;h1&gt;🚀 欢迎来到我的 Docker 主页！&lt;/h1&gt;
@@ -1727,9 +2216,18 @@ EOF</code></pre>
                                     <li><strong>保持代码简洁：</strong> 避免不必要的嵌套和冗余代码，提高页面加载速度</li>
                                     <li><strong>添加注释：</strong> 对复杂代码块添加注释，便于后续维护</li>
                                 </ul>
+=======
+    &lt;h1&gt;🚀 欢迎来到我的 Docker 主页！&lt;/h1&gt;
+    &lt;p&gt;这个网站是用 Docker 构建和部署的&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                                </div>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                            </div>
                             </div>
                         </div>
 
+<<<<<<< HEAD
                         <!-- 步骤3：创建CSS -->
                         <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6">
                             <h3 class="font-bold text-purple-900 mb-3 flex items-center">
@@ -1747,11 +2245,26 @@ EOF</code></pre>
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+=======
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h5>创建 CSS 文件</h5>
+                            <div class="module-code-file">
+                                <div class="module-header">
+                                    <i class="fas fa-file-code"></i>
+                                    <h4>css/style.css</h4>
+                                </div>
+                                <div class="module-content">
+                                    <pre><code>body {
+    font-family: -apple-system, sans-serif;
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+<<<<<<< HEAD
     padding: 20px;
     color: #333;
     line-height: 1.6;
@@ -2065,46 +2578,17 @@ my-website    1.0   abc123def456   10 seconds ago   41MB</code></pre>
                                         <p class="text-gray-500">✅ 预期输出：</p>
                                         <pre class="text-gray-700 mt-1"><code class="code-inline">abc123   my-website:1.0   "nginx -g 'daemon of…"   Up 5 seconds   0.0.0.0:8888->80/tcp</code></pre>
                                     </div>
+=======
+    color: white;
+    text-align: center;
+}</code></pre>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                                </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 步骤6：测试和验证 -->
-                        <div class="success-box">
-                            <h4 class="font-bold text-green-800 mb-3 flex items-center">
-                                <i class="fas fa-check-circle mr-2"></i> 最终测试
-                            </h4>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-sm text-gray-700"><strong>1. 浏览器访问：</strong></p>
-                                    <p class="text-lg font-bold text-blue-600 ml-4">http://localhost:8888</p>
-                                    <p class="text-xs text-gray-600 ml-4 mt-1">✅ 应该看到漂亮的渐变背景和白色卡片</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-700"><strong>2. 检查 CSS 是否加载：</strong></p>
-                                    <p class="text-sm text-gray-600 ml-4">打开浏览器开发者工具（F12），查看 Network 标签，应该能看到 style.css 被成功加载</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-700"><strong>3. 进入容器验证文件：</strong></p>
-                                    <pre class="p-3 text-sm"><code class="code-inline">docker exec my-site ls -la /usr/share/nginx/html/</code></pre>
-                                    <p class="text-xs text-gray-600 ml-4 mt-1">✅ 应该看到 index.html 和 css 目录</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 课堂展示 -->
-                        <div class="tip-box">
-                            <h4 class="font-bold mb-2"><i class="fas fa-users mr-2"></i> 课堂展示环节</h4>
-                            <p class="text-sm text-gray-700 mb-2">请完成的同学：</p>
-                            <ul class="text-sm text-gray-700 ml-4 list-decimal space-y-1">
-                                <li>举手示意老师</li>
-                                <li>准备分享：你的镜像大小是多少？遇到了什么问题？如何解决的？</li>
-                                <li>老师会抽取 2-3 位同学上台展示并讲解</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
+<<<<<<< HEAD
                 <!-- Section 7: 镜像优化技巧 -->
                 <section id="image-optimize" class="scroll-mt-8 mb-12 section-card">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
@@ -2123,158 +2607,150 @@ my-website    1.0   abc123def456   10 seconds ago   41MB</code></pre>
                                 <li><strong>高效缓存：</strong> 优化的镜像层结构更容易被 Docker 缓存机制利用，加速后续构建过程</li>
                                 <li><strong>环境一致性：</strong> 优化后的镜像结构更清晰，减少了环境差异导致的问题</li>
                             </ul>
+=======
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h5>编写 Dockerfile</h5>
+                            <div class="module-code-file">
+                                <div class="module-header">
+                                    <i class="fas fa-file-code"></i>
+                                    <h4>Dockerfile</h4>
                         </div>
+                                <div class="module-content">
+                                    <pre><code>FROM nginx:alpine
 
-                        <!-- 优化技巧1：合并RUN指令 -->
-                        <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6">
-                            <h3 class="font-bold text-green-900 mb-3 flex items-center">
-                                <i class="fas fa-compress-arrows-alt mr-2"></i> 技巧 1: 合并 RUN 指令，减少镜像层数
-                            </h3>
-                            <p class="text-gray-700 mb-3">Docker 每执行一条 RUN，就会创建一层。层数越多，镜像越大！</p>
-                            
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="bg-white p-4 rounded-lg border-2 border-red-200">
-                                    <h4 class="font-bold text-red-700 mb-2 flex items-center">
-                                        <i class="fas fa-times-circle mr-1"></i> ❌ 不好的写法
-                                    </h4>
-                                    <pre class="p-3 text-sm"><code>FROM ubuntu:20.04
+# 复制所有文件到 nginx 默认目录
+COPY . /usr/share/nginx/html/
 
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get install -y vim
-RUN apt-get install -y git
-RUN apt-get clean</code></pre>
-                                    <p class="text-xs text-gray-600 mt-2">❌ 创建了 5 层，每层都保存了完整状态</p>
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
                                 </div>
-                                
-                                <div class="bg-white p-4 rounded-lg border-2 border-green-200">
-                                    <h4 class="font-bold text-green-700 mb-2 flex items-center">
-                                        <i class="fas fa-check-circle mr-1"></i> ✅ 优化后的写法
-                                    </h4>
-                                    <pre class="p-3 text-sm"><code>FROM ubuntu:20.04
-
-RUN apt-get update && \
-    apt-get install -y \
-        curl \
-        vim \
-        git && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*</code></pre>
-                                    <p class="text-xs text-green-600 mt-2 font-bold">✅ 只创建 1 层，而且清理了缓存！</p>
+                            </div>
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                                 </div>
                             </div>
 
-                            <div class="mt-4 p-4 bg-blue-50 rounded border-l-4 border-blue-400">
-                                <p class="text-sm font-bold text-gray-800 mb-2">🧪 实验：对比镜像大小</p>
-                                <div class="space-y-2">
-                                    <div>
-                                        <p class="text-xs text-gray-700"><strong>步骤 1:</strong> 创建两个 Dockerfile</p>
-                                        <pre class="p-3 text-sm"><code># Dockerfile.bad - 不好的写法
-FROM ubuntu:20.04
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get install -y vim
+                    <div class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <h5>构建并运行</h5>
+                            <div class="module-command">
+                                <div class="module-content">
+                                    <pre><code># 构建镜像
+docker build -t my-website:v1 .
 
-# Dockerfile.good - 优化的写法
-FROM ubuntu:20.04
-RUN apt-get update && apt-get install -y curl vim && rm -rf /var/lib/apt/lists/*</code></pre>
+# 运行容器
+docker run -d -p 8080:80 --name my-site my-website:v1</code></pre>
                                     </div>
-                                    <div>
-                                        <p class="text-xs text-gray-700"><strong>步骤 2:</strong> 分别构建</p>
-                                        <pre class="p-3 text-sm"><code>docker build -f Dockerfile.bad -t test:bad .
-docker build -f Dockerfile.good -t test:good .</code></pre>
                                     </div>
-                                    <div>
-                                        <p class="text-xs text-gray-700"><strong>步骤 3:</strong> 对比大小</p>
-                                        <pre class="p-3 text-sm"><code class="code-inline">docker images | grep test</code></pre>
-                                        <div class="mt-1 p-2 bg-gray-50 rounded text-xs">
-                                            <pre class="text-gray-700"><code>test    bad    abc123   2 minutes ago   185MB
-test    good   def456   1 minute ago    168MB</code></pre>
-                                            <p class="text-green-600 mt-1 font-bold">✅ good 版本小了约 17MB！</p>
+                            <p style="margin-top: 0.5rem;">访问 <code>http://localhost:8080</code> 查看效果！</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+        </section>
 
-                        <!-- 优化技巧2：使用alpine -->
-                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
-                            <h3 class="font-bold text-blue-900 mb-3 flex items-center">
-                                <i class="fas fa-weight mr-2"></i> 技巧 2: 使用 Alpine Linux 镜像
-                            </h3>
-                            <p class="text-gray-700 mb-3">Alpine 是一个超轻量级 Linux 发行版，基础镜像只有 5MB！</p>
-                            
-                            <div class="bg-white p-4 rounded-lg">
-                                <h4 class="font-bold text-gray-800 mb-2">常见基础镜像大小对比：</h4>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                        <span class="font-mono text-sm">ubuntu:20.04</span>
-                                        <span class="text-red-600 font-bold">72 MB</span>
+        <!-- Section 7: 镜像优化 -->
+        <section id="image-optimize" class="section-card">
+            <h2>
+                <i class="fas fa-rocket" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                7. 镜像优化技巧
+            </h2>
+
+            <div class="module-tip">
+                <div class="module-header">
+                    <i class="fas fa-compress"></i>
+                    <h4>技巧 1：合并 RUN 指令</h4>
                                     </div>
-                                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                        <span class="font-mono text-sm">python:3.9</span>
-                                        <span class="text-orange-600 font-bold">915 MB</span>
+                <div class="module-content">
+                    <p>每个 RUN 都会创建一层，合并可以减少层数。</p>
+                    <div class="grid-auto" style="margin-top: 0.75rem;">
+                        <div>
+                            <h5 style="color: var(--color-error);">❌ 不好的写法</h5>
+                            <div class="module-code-file">
+                                <div class="module-content">
+                                    <pre><code>FROM ubuntu:20.04
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt-get install -y vim</code></pre>
                                     </div>
-                                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                        <span class="font-mono text-sm">nginx:latest</span>
-                                        <span class="text-yellow-600 font-bold">141 MB</span>
                                     </div>
-                                    <div class="flex justify-between items-center p-2 bg-green-50 rounded border-2 border-green-400">
-                                        <span class="font-mono text-sm font-bold">nginx:alpine</span>
-                                        <span class="text-green-600 font-bold">✨ 23 MB</span>
                                     </div>
-                                    <div class="flex justify-between items-center p-2 bg-green-50 rounded border-2 border-green-400">
-                                        <span class="font-mono text-sm font-bold">python:3.9-alpine</span>
-                                        <span class="text-green-600 font-bold">✨ 45 MB</span>
+                        <div>
+                            <h5 style="color: var(--color-success);">✅ 优化后</h5>
+                            <div class="module-code-file">
+                                <div class="module-content">
+                                    <pre><code>FROM ubuntu:20.04
+RUN apt-get update && \
+    apt-get install -y curl vim && \
+    rm -rf /var/lib/apt/lists/*</code></pre>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="mt-4 p-4 bg-yellow-50 rounded border-l-4 border-yellow-400">
-                                <p class="text-sm font-bold text-gray-800 mb-2">⚠️ 使用 Alpine 的注意事项</p>
-                                <ul class="text-xs text-gray-700 ml-4 list-disc space-y-1">
-                                    <li>Alpine 使用 <code class="code-inline">apk</code> 而不是 <code class="code-inline">apt</code> 作为包管理器</li>
-                                    <li>有些软件可能没有 Alpine 版本，需要额外编译</li>
-                                    <li>适合生产环境，但调试时功能较少</li>
-                                </ul>
+                    </div>
+                </div>
                             </div>
 
-                            <div class="mt-4 p-4 bg-white rounded-lg">
-                                <p class="text-sm font-bold text-gray-700 mb-2">🧪 练习：对比镜像大小</p>
-                                <pre class="p-3 text-sm"><code># 拉取并对比两个版本的 nginx
-docker pull nginx:latest
-docker pull nginx:alpine
-docker images | grep nginx</code></pre>
-                                <div class="mt-2 p-2 bg-gray-50 rounded text-xs">
-                                    <p class="text-gray-500">✅ 预期输出：</p>
-                                    <pre class="text-gray-700 mt-1"><code>nginx    latest   605c77e624dd   2 weeks ago   141MB
-nginx    alpine   8e75cbc5b25c   2 weeks ago   23MB</code></pre>
-                                    <p class="text-green-600 mt-1 font-bold">💡 alpine 版本节省了 118MB，约 84% 的空间！</p>
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-weight"></i>
+                    <h4>技巧 2：使用 Alpine 镜像</h4>
                                 </div>
+                <div class="module-content">
+                    <p>Alpine 是超轻量级 Linux 发行版，基础镜像只有 5MB！</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 0.75rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--color-border);">
+                                <th style="text-align: left; padding: 0.5rem;">镜像</th>
+                                <th style="text-align: right; padding: 0.5rem;">大小</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.5rem;"><code>ubuntu:20.04</code></td>
+                                <td style="text-align: right; padding: 0.5rem; color: var(--color-error);">72 MB</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 0.5rem;"><code>nginx:latest</code></td>
+                                <td style="text-align: right; padding: 0.5rem; color: var(--color-warning);">141 MB</td>
+                            </tr>
+                            <tr style="background-color: #dcfce7;">
+                                <td style="padding: 0.5rem;"><code><strong>nginx:alpine</strong></code></td>
+                                <td style="text-align: right; padding: 0.5rem; color: var(--color-success); font-weight: 700;">23 MB ✨</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;">节省了 <strong>84%</strong> 的空间！</p>
                             </div>
                         </div>
 
-                        <!-- 优化技巧3：多阶段构建 -->
-                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6">
-                            <h3 class="font-bold text-purple-900 mb-3 flex items-center">
-                                <i class="fas fa-layer-group mr-2"></i> 技巧 3: 多阶段构建（进阶）
-                            </h3>
-                            <p class="text-gray-700 mb-3">编译型语言（如 Go、Java）的镜像，可以分成"构建阶段"和"运行阶段"，最终镜像只包含运行所需的文件。</p>
-                            
-                            <div class="bg-white p-4 rounded-lg">
-                                <p class="text-sm font-bold text-gray-700 mb-2">示例：Go 应用的多阶段构建</p>
-                                <pre class="p-3 text-sm"><code># 阶段 1: 构建阶段
+            <div class="module-tip" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-layer-group"></i>
+                    <h4>技巧 3：多阶段构建（进阶）</h4>
+                </div>
+                <div class="module-content">
+                    <p>编译型语言可以分成"构建阶段"和"运行阶段"，最终镜像只包含运行所需的文件。</p>
+                    <div class="module-code-file" style="margin-top: 0.75rem;">
+                        <div class="module-header">
+                            <i class="fas fa-file-code"></i>
+                            <h4>Go 应用示例</h4>
+                        </div>
+                        <div class="module-content">
+                            <pre><code># 阶段 1: 构建
 FROM golang:1.20 AS builder
 WORKDIR /app
 COPY . .
 RUN go build -o myapp
 
-# 阶段 2: 运行阶段（最终镜像）
+# 阶段 2: 运行（最终镜像）
 FROM alpine:latest
 WORKDIR /app
-# 只复制编译好的二进制文件
 COPY --from=builder /app/myapp .
 CMD ["./myapp"]</code></pre>
+<<<<<<< HEAD
                                 <div class="mt-3 p-3 bg-purple-50 rounded">
                                     <p class="text-xs text-gray-700"><strong>💡 效果：</strong></p>
                                     <ul class="text-xs text-gray-700 ml-4 list-disc space-y-1 mt-1">
@@ -2445,10 +2921,16 @@ CHANGELOG.md</code></pre>
                                 <li>🔄 尝试使用多阶段构建（如果适用）</li>
                             </ul>
                             <p class="text-xs text-gray-600 mt-3">💡 提示：使用 <code class="code-inline">docker images</code> 命令查看镜像大小，使用 <code class="code-inline">docker history</code> 命令查看镜像层信息。</p>
+=======
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
+                        </div>
+                    </div>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;"><strong>效果：</strong>构建阶段 800MB → 最终镜像仅 10MB！</p>
                         </div>
                     </div>
                 </section>
 
+<<<<<<< HEAD
                 <!-- Section 8: 常见坑点排查 -->
                 <section id="troubleshooting" class="scroll-mt-8 mb-12 section-card">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
@@ -2464,26 +2946,46 @@ CHANGELOG.md</code></pre>
                             <div class="bg-white p-4 rounded-lg mb-3">
                                 <p class="text-sm font-bold text-gray-700 mb-2">❌ 错误示例：</p>
                                 <pre class="p-3 text-sm"><code>FROM nginx:alpine
+=======
+        <!-- Section 8: 常见错误 -->
+        <section id="troubleshooting" class="section-card">
+            <h2>
+                <i class="fas fa-bug" style="color: var(--color-error); margin-right: 0.75rem;"></i>
+                8. 常见错误排查
+            </h2>
+
+            <div class="module-warning">
+                <div class="module-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>错误 1：CMD 写多个，只执行最后一个</h4>
+                </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div>
+                            <h5 style="color: var(--color-error);">❌ 错误</h5>
+                            <div class="module-code-file">
+                                <div class="module-content">
+                                    <pre><code>FROM nginx:alpine
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
 CMD ["echo", "Hello"]
 CMD ["nginx", "-g", "daemon off;"]</code></pre>
-                                <p class="text-xs text-gray-600 mt-2">问题：只会执行最后一个 CMD，前面的会被覆盖</p>
                             </div>
-                            <div class="bg-white p-4 rounded-lg">
-                                <p class="text-sm font-bold text-green-700 mb-2">✅ 正确做法：</p>
-                                <pre class="p-3 text-sm"><code>FROM nginx:alpine
-# 在构建时执行
+                            </div>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">问题：只会执行最后一个 CMD</p>
+                        </div>
+                        <div>
+                            <h5 style="color: var(--color-success);">✅ 正确</h5>
+                            <div class="module-code-file">
+                                <div class="module-content">
+                                    <pre><code>FROM nginx:alpine
+# 构建时执行
 RUN echo "Hello"
-# 容器启动时执行
+# 启动时执行
 CMD ["nginx", "-g", "daemon off;"]</code></pre>
-                                <div class="mt-2 p-2 bg-green-50 rounded text-xs">
-                                    <p class="text-gray-700"><strong>💡 记住：</strong></p>
-                                    <ul class="ml-4 list-disc text-gray-700 space-y-1">
-                                        <li><code class="code-inline">RUN</code>: 构建镜像时执行（可以有多个）</li>
-                                        <li><code class="code-inline">CMD</code>: 容器启动时执行（只有一个生效）</li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
+<<<<<<< HEAD
 
                         <!-- 错误2：COPY路径错误 -->
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6">
@@ -2916,11 +3418,119 @@ docker cp config.json my-web:/app/</code></pre>
                             <span class="text-gray-400">•</span>
                             <span class="text-gray-500"><i class="fas fa-rocket mr-1"></i> 镜像优化</span>
                         </div>
+=======
+>>>>>>> 4a72d2ecfce6be276d2cbee86ed0339290671719
                     </div>
                 </div>
             </div>
+
+            <div class="module-warning" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-folder-open"></i>
+                    <h4>错误 2：COPY 找不到文件</h4>
+                </div>
+                <div class="module-content">
+                    <p style="margin-bottom: 0.75rem;"><strong>常见问题：</strong>COPY 不能访问 Dockerfile 所在目录的父目录。</p>
+                    <div class="module-code-file">
+                        <div class="module-content">
+                            <pre><code># ❌ 错误：不能访问父目录
+COPY ../config.json /app/
+
+# ✅ 正确：使用相对路径
+COPY ./config/app.json /app/
+COPY *.html /usr/share/nginx/html/</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-warning" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-network-wired"></i>
+                    <h4>错误 3：浏览器访问不了</h4>
+                </div>
+                <div class="module-content">
+                    <p style="margin-bottom: 0.5rem;"><strong>排查步骤：</strong></p>
+                    <ol style="font-size: 0.875rem;">
+                        <li>检查容器是否在运行：<code>docker ps</code></li>
+                        <li>检查端口映射是否正确：<code>docker port 容器名</code></li>
+                        <li>查看容器日志：<code>docker logs 容器名</code></li>
+                        <li>确认防火墙没有阻止端口</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section-card">
+            <div class="module-summary">
+                <div class="module-header">
+                    <i class="fas fa-bookmark"></i>
+                    <h4>本讲总结</h4>
+                </div>
+                <div class="module-content">
+                    <ul>
+                        <li><strong>Dockerfile</strong> 是镜像的"施工图纸"，实现自动化构建</li>
+                        <li>核心指令：<code>FROM</code>、<code>RUN</code>、<code>COPY</code>、<code>WORKDIR</code>、<code>CMD</code></li>
+                        <li>优化技巧：合并 RUN、使用 Alpine、多阶段构建</li>
+                        <li>调试方法：查看日志、进入容器、检查端口</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-practice" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-tasks"></i>
+                    <h4>课后作业</h4>
+                </div>
+                <div class="module-content">
+                    <div class="practice-task">
+                        <h5>作业 1：基础练习</h5>
+                        <p>创建一个 Python Flask 应用的 Dockerfile，要求：</p>
+                        <ul style="font-size: 0.875rem;">
+                            <li>使用 <code>python:3.9-alpine</code> 基础镜像</li>
+                            <li>复制 <code>requirements.txt</code> 并安装依赖</li>
+                            <li>复制应用代码到 <code>/app</code></li>
+                            <li>暴露 5000 端口</li>
+                            <li>启动命令：<code>python app.py</code></li>
+                        </ul>
+                    </div>
+                    <div class="practice-task">
+                        <h5>作业 2：优化挑战</h5>
+                        <p>对比以下两种写法的镜像大小，记录结果并分析原因。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Lecture -->
+        <div class="section-card" style="text-align: center; background-color: var(--color-subtle);">
+            <h3 style="margin-bottom: 1rem;">
+                <i class="fas fa-forward" style="color: var(--color-accent); margin-right: 0.5rem;"></i>
+                下节课预告
+            </h3>
+            <p style="margin-bottom: 0.5rem;"><strong>第四讲：Docker Compose 多容器编排</strong></p>
+            <ul style="text-align: left; max-width: 600px; margin: 1rem auto; color: var(--color-text-light);">
+                <li>什么是 Docker Compose？</li>
+                <li>用 YAML 文件管理多个容器</li>
+                <li>实战：搭建 Web 应用 + 数据库</li>
+                <li>容器间网络通信</li>
+            </ul>
+        </div>
+
         </main>
+
+    <!-- Footer -->
+    <footer style="background-color: var(--color-text); color: var(--color-text-lighter); padding: 2rem 0; margin-top: 3rem; border-top: 1px solid var(--color-border);">
+        <div class="container text-center">
+            <p style="font-size: 0.875rem;">Docker 容器技术竞赛培训 - 第三讲：Dockerfile 自动化构建镜像</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.7;">
+                <i class="fas fa-cube" style="margin-right: 0.25rem;"></i> 镜像自动化 • 
+                <i class="fas fa-code" style="margin: 0 0.25rem;"></i> Dockerfile 实战 • 
+                <i class="fas fa-rocket" style="margin: 0 0.25rem;"></i> 镜像优化
+            </p>
     </div>
+    </footer>
 
     <script src="scripts/main.js" defer></script>
     <script>
