@@ -3,401 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第N课：课程标题</title>
-    
-    <!-- 统一样式引用 -->
-    <link rel='stylesheet' href='../统一讲义样式模板.css'>
-    <!-- 通用工具函数库 -->
-    <script src='../js/lecture-utils.js'></script>
+    <title>第N讲：课程标题</title>
+    <link rel="stylesheet" href="../统一讲义样式模板.css">
+    <script src="../js/lecture-utils.js" defer></script>
 </head>
 <body>
 
-<!-- ============================================
-     侧边栏导航 - 课程目录
-     ============================================ -->
+<!-- 侧边栏导航 -->
 <nav class="sidebar">
     <div class="sidebar-nav">
         <h3>课程导航</h3>
-        <a class="sidebar-link" href="#intro">👋 课程概览</a>
+        <a class="sidebar-link" href="#intro">📖 课程概览</a>
         
-        <!-- Part 1: 一级章节使用中文数字 -->
-        <h3>Part 1: 第一部分标题</h3>
-        <a class="sidebar-link sub-link" href="#chapter-1">一、第一章标题</a>
+        <h3>Part 1: 第一部分</h3>
+        <a class="sidebar-link sub-link" href="#chapter-1">一、章节标题</a>
         <a class="sidebar-link sub-link" href="#section-1-1">1.1 小节标题</a>
-        <a class="sidebar-link sub-link" href="#section-1-2">1.2 小节标题</a>
-        <a class="sidebar-link sub-link" href="#lab-1">🔬 实验 01</a>
         
-        <!-- Part 2: 第二部分 -->
-        <h3>Part 2: 第二部分标题</h3>
-        <a class="sidebar-link sub-link" href="#chapter-2">二、第二章标题</a>
-        <a class="sidebar-link sub-link" href="#section-2-1">2.1 小节标题</a>
-        <a class="sidebar-link sub-link" href="#section-2-2">2.2 小节标题</a>
-        <a class="sidebar-link sub-link" href="#lab-2">🔬 实验 02</a>
+        <h3>Part 2: 第二部分</h3>
+        <a class="sidebar-link sub-link" href="#chapter-2">二、章节标题</a>
+        <a class="sidebar-link sub-link" href="#lab-1">🔬 实验练习</a>
         
-        <!-- Part 3: 第三部分 -->
-        <h3>Part 3: 第三部分标题</h3>
-        <a class="sidebar-link sub-link" href="#chapter-3">三、第三章标题</a>
-        <a class="sidebar-link sub-link" href="#section-3-1">3.1 小节标题</a>
-        <a class="sidebar-link sub-link" href="#lab-3">🔬 实验 03</a>
-        
-        <!-- 总结 -->
-        <h3>总结与练习</h3>
+        <h3>总结</h3>
         <a class="sidebar-link sub-link" href="#summary">📝 课程小结</a>
     </div>
 </nav>
 
-
-<!-- ============================================
-     主内容区域
-     ============================================ -->
+<!-- 主内容区 -->
 <main class="content">
 
-    <!-- ============================================
-         课程头部 - 概览区域
-         ============================================ -->
+    <!-- 课程头部 -->
     <header id="intro">
-        <h1>第N课：课程标题</h1>
-        <p class="intro">这里是课程简介，用一两句话概括本课的核心内容和学习目标。让学生了解学完这一课之后能够掌握什么技能或知识。</p>
+        <h1>第N讲：课程标题</h1>
+        <p class="intro">课程简介：用一两句话概括本课核心内容和学习目标。</p>
         
-        <!-- 知识点标签列表 -->
         <div class="pill-list">
             <span class="pill">知识点1</span>
             <span class="pill">知识点2</span>
             <span class="pill">知识点3</span>
-            <span class="pill">知识点4</span>
-            <span class="pill">知识点5</span>
-            <span class="pill">知识点6</span>
         </div>
     </header>
 
-
-    <!-- ============================================
-         第一部分：第一章内容
-         ============================================ -->
-    
-    <!-- 一级章节：使用 h2 + 中文数字 -->
+    <!-- 第一章 -->
     <section id="chapter-1">
-        <h2>一、第一章标题</h2>
-        <p>这是普通段落文本。段落是讲义的基础组成部分，用于解释概念、描述知识点。段落之间会有适当的间距，保持良好的阅读体验。</p>
-        <p>第二个段落示例。可以在段落中使用<strong>粗体</strong>来强调重要内容，使用<code>行内代码</code>来表示代码片段、属性名或关键字。</p>
+        <h2>一、章节标题</h2>
+        <p>正文段落。使用 <code>行内代码</code> 和 <strong>加粗</strong> 强调重点。</p>
+        
+        <div class="concept-box">
+            <span class="tip-title">核心概念</span>
+            <p>用于解释重要概念或原理。</p>
+        </div>
     </section>
 
-    <!-- 二级小节：使用 h3 + 数字编号 -->
     <section id="section-1-1">
         <h3>1.1 小节标题</h3>
-        <p>二级小节用于将一个大章节进一步细分。每个小节应该聚焦于一个具体的知识点。</p>
+        <p>二级小节内容。</p>
         
-        <!-- 提示框组件 tip-box -->
         <div class="tip-box">
-            <span class="tip-title">小技巧 / 类比说明</span>
-            <p>tip-box 用于提供额外的小技巧、生活类比或辅助理解的内容。</p>
+            <span class="tip-title">💡 小技巧</span>
+            <p>提供实用技巧或建议。</p>
+        </div>
+        
+        <div class="warning-box">
+            <span class="tip-title">⚠️ 注意</span>
+            <p>提醒常见错误或注意事项。</p>
+        </div>
+    </section>
+
+    <!-- 第二章 -->
+    <section id="chapter-2">
+        <h2>二、章节标题</h2>
+        
+        <h4>代码示例</h4>
+        <pre class="bash"><code>$ docker run -d nginx
+$ docker ps</code></pre>
+        
+        <h4>表格示例</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>命令</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>docker ps</code></td>
+                    <td>查看运行中的容器</td>
+                </tr>
+                <tr>
+                    <td><code>docker images</code></td>
+                    <td>查看本地镜像</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 实验卡片 -->
+    <section id="lab-1">
+        <div class="lab-card">
+            <div class="lab-header">
+                🔬 实验：实验标题
+                <span class="status-badge beginner">入门</span>
+            </div>
+            <div class="lab-body">
+                <p><strong>目标：</strong>描述实验目标</p>
+                <p><strong>步骤：</strong></p>
+                <ol class="lab-steps">
+                    <li>第一步操作</li>
+                    <li>第二步操作</li>
+                    <li>验证结果</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- 课程小结 -->
+    <section id="summary">
+        <h2>📝 课程小结</h2>
+        
+        <div class="note-box">
+            <span class="tip-title">本课要点</span>
             <ul class="checklist">
-                <li>可以包含无序列表</li>
-                <li>用于列举要点</li>
-                <li>每项保持简洁</li>
+                <li>要点一：简要描述</li>
+                <li>要点二：简要描述</li>
+                <li>要点三：简要描述</li>
             </ul>
         </div>
-        
-        <!-- 三级标题：使用 h4 -->
-        <h4>更细分的内容（三级标题）</h4>
-        <p>当需要在二级小节下进一步细分时，可以使用三级标题 h4。</p>
     </section>
-
-    <section id="section-1-2">
-        <h3>1.2 小节标题</h3>
-        <p>这是另一个二级小节的内容。</p>
-        
-        <!-- 笔记框组件 note-box -->
-        <div class="note-box">
-            <strong>核心概念 / 重要定义：</strong>
-            <p>note-box 用于强调重要的概念或定义。学生应该特别注意并记住这些内容。</p>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>// 示例代码
-const example = '这是一个示例';
-console.log(example);
-</code></pre>
-        </div>
-        
-        <!-- 警告框组件 warning-box -->
-        <div class="warning-box">
-            <strong>常见错误 / 易错点！</strong>
-            <p>warning-box 用于警告学生常见的错误或需要特别注意的陷阱。</p>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>// ❌ 错误示例
-const wrong = 'mistake';
-
-// ✅ 正确示例  
-const right = 'correct';
-</code></pre>
-        </div>
-    </section>
-
-    <!-- ============================================
-         实验 01：Docker 基础命令
-         ============================================ -->
-    <section id="lab-1">
-        <h2>实验 01：Docker 基础命令</h2>
-        <p>这是一个 Docker 终端模拟实验，展示了如何运行一个简单的容器。</p>
-        
-        <div class="lab-card">
-            <div class="lab-header">
-                <span>实验 01：运行 Hello World</span>
-                <span class="status-badge beginner">终端操作</span>
-            </div>
-            
-            <div class="lab-body">
-                <p>在终端中输入以下命令来验证 Docker 是否安装成功：</p>
-                
-                <!-- 终端模拟器 -->
-                <div class="terminal-window">
-                    <div class="terminal-header">
-                        <span class="terminal-btn red"></span>
-                        <span class="terminal-btn yellow"></span>
-                        <span class="terminal-btn green"></span>
-                        <span class="terminal-title">bash</span>
-                    </div>
-                    <div class="terminal-body">
-                        <div class="command-line">
-                            <span class="prompt">$</span> <span class="command">docker run hello-world</span>
-                        </div>
-                        <div class="output">
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
- 3. The Docker daemon created a new container from that image which runs the executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it to your terminal.
-                        </div>
-                        <div class="command-line">
-                            <span class="prompt">$</span> <span class="command">_</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ============================================
-         第二部分：第二章内容
-         ============================================ -->
-    
-    <section id="chapter-2">
-        <h2>二、Dockerfile 编写</h2>
-        <p>Dockerfile 是用于构建 Docker 镜像的文本文件。</p>
-    </section>
-
-    <section id="section-2-1">
-        <h3>2.1 常用指令</h3>
-        
-        <table class="prop-table">
-            <thead>
-                <tr>
-                    <th>指令</th>
-                    <th>说明</th>
-                    <th>示例</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>FROM</code></td>
-                    <td>指定基础镜像</td>
-                    <td><code>FROM node:14</code></td>
-                </tr>
-                <tr>
-                    <td><code>WORKDIR</code></td>
-                    <td>设置工作目录</td>
-                    <td><code>WORKDIR /app</code></td>
-                </tr>
-                <tr>
-                    <td><code>COPY</code></td>
-                    <td>复制文件到镜像</td>
-                    <td><code>COPY . .</code></td>
-                </tr>
-                <tr>
-                    <td><code>CMD</code></td>
-                    <td>容器启动命令</td>
-                    <td><code>CMD ["node", "app.js"]</code></td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <section id="section-2-2">
-        <h3>2.2 示例：Node.js 应用</h3>
-        
-        <h4>Dockerfile 示例</h4>
-<pre class="dockerfile"><code># 使用官方 Node.js 镜像
-FROM node:14
-
-# 设置工作目录
-WORKDIR /usr/src/app
-
-# 复制 package.json
-COPY package*.json ./
-
-# 安装依赖
-RUN npm install
-
-# 复制源代码
-COPY . .
-
-# 暴露端口
-EXPOSE 8080
-
-# 启动应用
-CMD [ "node", "server.js" ]
-</code></pre>
-    </section>
-
-    <!-- ============================================
-         实验 02：K8S 部署
-         ============================================ -->
-    <section id="lab-2">
-        <h2>实验 02：K8S 部署配置</h2>
-        <p>编写 Deployment YAML 文件来部署应用。</p>
-        
-        <div class="lab-card">
-            <div class="lab-header">
-                <span>实验 02：Nginx Deployment</span>
-                <span class="status-badge beginner">YAML 配置</span>
-            </div>
-            
-            <div class="lab-body">
-<pre class="yaml"><code>apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-  labels:
-    app: nginx
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
-</code></pre>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ============================================
-         第三部分：第三章内容
-         ============================================ -->
-    
-    <section id="chapter-3">
-        <h2>三、Docker Compose</h2>
-        <p>Docker Compose 用于定义和运行多容器 Docker 应用程序。</p>
-        
-        <!-- 终端模拟器示例 -->
-        <div class="terminal-window">
-            <div class="terminal-header">
-                <span class="terminal-btn red"></span>
-                <span class="terminal-btn yellow"></span>
-                <span class="terminal-btn green"></span>
-                <span class="terminal-title">bash</span>
-            </div>
-            <div class="terminal-body">
-                <div class="command-line">
-                    <span class="prompt">$</span> <span class="command">docker-compose up -d</span>
-                </div>
-                <div class="output">
-Creating network "web_default" with the default driver
-Creating web_db_1 ... done
-Creating web_app_1 ... done
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="section-3-1">
-        <h3>3.1 docker-compose.yml</h3>
-        <p>Compose 文件是一个 YAML 文件，定义了服务、网络和卷。</p>
-    </section>
-
-    <!-- ============================================
-         实验 03：Compose 实践
-         ============================================ -->
-    <section id="lab-3">
-        <h2>实验 03：Compose 实践</h2>
-        <p>编写 docker-compose.yml 文件。</p>
-        
-        <div class="lab-card">
-            <div class="lab-header">
-                <span>实验 03：Web + Redis</span>
-                <span class="status-badge beginner">Compose</span>
-            </div>
-            
-            <div class="lab-body">
-<pre class="yaml"><code>version: '3'
-services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-  redis:
-    image: "redis:alpine"
-</code></pre>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ============================================
-         课程小结区域
-         ============================================ -->
-    <section id="summary">
-        <h2>四、本课小结</h2>
-        
-        <h3>知识点回顾</h3>
-        <ul class="checklist">
-            <li><strong>知识点1</strong>：对第一个知识点的简要总结</li>
-            <li><strong>知识点2</strong>：对第二个知识点的简要总结</li>
-            <li><strong>知识点3</strong>：对第三个知识点的简要总结</li>
-            <li><strong>知识点4</strong>：对第四个知识点的简要总结</li>
-            <li><strong>知识点5</strong>：对第五个知识点的简要总结</li>
-        </ul>
-        
-        <h3>重点记忆</h3>
-        <table class="prop-table">
-            <thead>
-                <tr>
-                    <th>概念</th>
-                    <th>要点</th>
-                    <th>示例</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>概念1</td>
-                    <td>需要记住的要点</td>
-                    <td><code>示例代码</code></td>
-                </tr>
-                <tr>
-                    <td>概念2</td>
-                    <td>需要记住的要点</td>
-                    <td><code>示例代码</code></td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <!-- 下一课预告 -->
-        <div class="note-box">
-            <strong>下一课预告：</strong>
-            <p>下一课我们将学习【下一课主题】。预告内容简介，让学生对接下来的学习内容有所期待。</p>
-        </div>
-    </section>
-
 
 </main>
 

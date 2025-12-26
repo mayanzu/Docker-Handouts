@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第5讲：K8S的理论知识</title>
-    
-    <!-- 统一样式引用 -->
-    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
-    <!-- 通用工具函数库 -->
-    <script src='../模板/js/lecture-utils.js'></script>
+    <title>第5讲：Kubernetes 理论知识</title>
+    <link rel="stylesheet" href="模板/统一讲义样式模板.css">
+    <script src="模板/js/lecture-utils.js" defer></script>
 </head>
 <body>
 
-<!-- ============================================
-     侧边栏导航 - 课程目录
-     ============================================ -->
+<!-- 侧边栏导航 -->
 <nav class="sidebar">
     <div class="sidebar-nav">
         <h3>课程导航</h3>
         <a class="sidebar-link" href="#intro">👋 课程概览</a>
         
-        <!-- Part 1: K8S 基础概念 -->
         <h3>Part 1: K8S 基础概念</h3>
         <a class="sidebar-link sub-link" href="#chapter-1">一、什么是 Kubernetes</a>
         <a class="sidebar-link sub-link" href="#section-1-1">1.1 容器编排</a>
@@ -29,43 +23,33 @@
         <a class="sidebar-link sub-link" href="#section-1-4">1.4 K8S 的语言：YAML</a>
         <a class="sidebar-link sub-link" href="#section-1-5">1.5 K8S 的遥控器：kubectl</a>
         
-        <!-- Part 2: K8S 核心对象 -->
         <h3>Part 2: K8S 核心对象</h3>
         <a class="sidebar-link sub-link" href="#chapter-2">二、Pod 与 Controller</a>
         <a class="sidebar-link sub-link" href="#section-2-1">2.1 Pod 详解</a>
         <a class="sidebar-link sub-link" href="#section-2-2">2.2 Deployment</a>
         
-        <!-- Part 3: 网络与存储 -->
         <h3>Part 3: 网络与存储</h3>
         <a class="sidebar-link sub-link" href="#chapter-3">三、Service 与 Volume</a>
         <a class="sidebar-link sub-link" href="#section-3-1">3.1 Service</a>
         <a class="sidebar-link sub-link" href="#section-3-2">3.2 Pod 访问指南</a>
         <a class="sidebar-link sub-link" href="#section-3-3">3.3 Volume</a>
         
-        <!-- Part 4: 动手实战 -->
         <h3>Part 4: 动手实战</h3>
         <a class="sidebar-link sub-link" href="#chapter-4">🔬 四、快速上手实验</a>
 
-        <!-- 总结 -->
         <h3>总结与练习</h3>
         <a class="sidebar-link sub-link" href="#summary">📝 课程小结</a>
     </div>
 </nav>
 
-
-<!-- ============================================
-     主内容区域
-     ============================================ -->
+<!-- 主内容区 -->
 <main class="content">
 
-    <!-- ============================================
-         课程头部 - 概览区域
-         ============================================ -->
+    <!-- 课程头部 -->
     <header id="intro">
         <h1>第5讲：K8S的理论知识</h1>
         <p class="intro">别被 Kubernetes (K8S) 这个高大上的名字吓到了！简单来说，如果 Docker 是一个个集装箱，那 K8S 就是管理这些集装箱的<strong>自动化码头操作系统</strong>。本课我们将用通俗易懂的方式，带你理解这个“容器大管家”是如何工作的。</p>
         
-        <!-- 知识点标签列表 -->
         <div class="pill-list">
             <span class="pill">Kubernetes</span>
             <span class="pill">容器管家</span>
@@ -76,10 +60,6 @@
     </header>
 
 
-    <!-- ============================================
-         第一部分：K8S 基础概念
-         ============================================ -->
-    
     <section id="chapter-1">
         <h2>一、什么是 Kubernetes (K8S)？</h2>
         <p>想象一下，你有一台电脑，上面运行着几个软件，你手动管理完全没问题。但如果你有 100 台电脑，运行着 1000 个软件，有的挂了需要重启，有的太忙了需要加机器，这时候手动管理就崩溃了。</p>
@@ -184,7 +164,7 @@ k8s-node-2     Ready    &lt;none&gt;          10d   v1.28.0
             </div>
         </div>
 
-<pre style="font-family: monospace; background: #ffffff; border: 1px solid #e1e4e8; padding: 25px; border-radius: 8px; overflow-x: auto; line-height: 1.4; font-size: 22px; font-weight: bold; color: #24292e;">
+<pre class="ascii-diagram">
 +-----------------------------------+       +-----------------------------------------------------------+
 |  管理层 (Control Plane / Master)  |       |                   员工层 (Worker Nodes)                   |
 |                                   |       |                                                           |
@@ -217,7 +197,7 @@ k8s-node-2     Ready    &lt;none&gt;          10d   v1.28.0
         <div class="tip-box">
             <span class="tip-title">全景故事：一个 Pod 的诞生记</span>
             <p>为了让你明白这些组件是怎么配合的，我们来看一个<strong>“老板下达任务”</strong>的流程：</p>
-            <ol style="margin-left: 20px; line-height: 1.8;">
+            <ol>
                 <li><strong>你 (老板)</strong> 对 <strong>API Server (大秘书)</strong> 说：“给我启动一个 Nginx！”（执行 <code>kubectl apply</code>）。</li>
                 <li><strong>API Server</strong> 把这个需求记在 <strong>etcd (档案室)</strong> 里，然后贴出招聘启事。</li>
                 <li><strong>Scheduler (HR)</strong> 看到启事，发现 Node 1 机器比较空闲，就决定：“把它安排在 Node 1 吧！”。</li>
@@ -245,8 +225,8 @@ k8s-node-2     Ready    &lt;none&gt;          10d   v1.28.0
         </div>
 
         <h4>对比一下：JSON vs YAML</h4>
-        <div style="display: flex; gap: 20px;">
-            <div style="flex: 1;">
+        <div class="two-col">
+            <div>
                 <p><strong>JSON (给机器看)</strong></p>
 <pre><code class="language-json">{
   "name": "zhangsan",
@@ -254,7 +234,7 @@ k8s-node-2     Ready    &lt;none&gt;          10d   v1.28.0
   "skills": ["docker", "k8s"]
 }</code></pre>
             </div>
-            <div style="flex: 1;">
+            <div>
                 <p><strong>YAML (给人看)</strong></p>
 <pre class="yaml"><code>name: zhangsan
 age: 18
@@ -273,8 +253,8 @@ skills:
         <h4>命令公式</h4>
         <p>kubectl 的命令非常符合直觉，基本遵循这个公式：</p>
         <div class="note-box">
-            <code style="font-size: 1.2em; font-weight: bold;">kubectl [动作] [资源类型] [资源名称]</code>
-            <p style="margin-top: 10px;">例如：<code>kubectl get pod my-pod</code> （获取 名为 my-pod 的 pod 的信息）</p>
+            <code>kubectl [动作] [资源类型] [资源名称]</code>
+            <p>例如：<code>kubectl get pod my-pod</code> （获取 名为 my-pod 的 pod 的信息）</p>
         </div>
 
         <h4>六大高频命令速查</h4>
@@ -321,10 +301,6 @@ skills:
         </table>
     </section>
 
-    <!-- ============================================
-         第二部分：K8S 核心对象
-         ============================================ -->
-    
     <section id="chapter-2">
         <h2>二、Pod 与 Controller</h2>
         <p>Kubernetes 中有一系列核心对象，用于表示系统的状态。</p>
@@ -364,7 +340,7 @@ mysql-pod      1/1     Running   0          2h    10.244.2.3   k8s-node-2
             </div>
         </div>
 
-<pre style="font-family: monospace; background: #ffffff; border: 1px solid #e1e4e8; padding: 25px; border-radius: 8px; overflow-x: auto; line-height: 1.4; font-size: 22px; font-weight: bold; color: #24292e;">
+<pre class="ascii-diagram">
 +--------------------------------------------------------------------------------------------------+
 |                                       Pod (豌豆荚)                                               |
 |                                    共享 IP: 10.244.1.5                                           |
@@ -566,10 +542,6 @@ spec:
 </code></pre>
     </section>
 
-    <!-- ============================================
-         第三部分：网络与存储
-         ============================================ -->
-    
     <section id="chapter-3">
         <h2>三、Service 与 Volume</h2>
         <p>为了解决 Pod 的动态变化带来的访问和存储问题，K8S 引入了 Service 和 Volume。</p>
@@ -610,7 +582,7 @@ my-service   ClusterIP   10.96.100.110   &lt;none&gt;        80/TCP    5m
             </div>
         </div>
 
-<pre style="font-family: monospace; background: #ffffff; border: 1px solid #e1e4e8; padding: 25px; border-radius: 8px; overflow-x: auto; line-height: 1.4; font-size: 22px; font-weight: bold; color: #24292e;">
+<pre class="ascii-diagram">
                                +-------------------------------------+
                                |               Service               |
                                |       (固定 IP: 10.96.100.110)      |
@@ -858,9 +830,6 @@ spec:
         </table>
     </section>
 
-    <!-- ============================================
-         第四部分：动手实战
-         ============================================ -->
     <section id="chapter-4">
         <h2>四、动手实战：体验 K8S 的“自愈能力”</h2>
         <p>光说不练假把式。我们将通过一个真实的实验，亲手体验 K8S 是如何通过 YAML 管理应用，并在故障发生时自动修复的。</p>
@@ -989,9 +958,6 @@ kubectl delete service nginx-service</code></pre>
         </div>
     </section>
 
-    <!-- ============================================
-         课程小结区域
-         ============================================ -->
     <section id="summary">
         <h2>五、本课小结</h2>
         

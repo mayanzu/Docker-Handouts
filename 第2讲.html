@@ -1,62 +1,47 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第2讲：玩转容器网络与修改网页</title>
-    
-    <!-- 统一样式引用 -->
-    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
-    <!-- 通用工具函数库 -->
-    <script src='../模板/js/lecture-utils.js'></script>
+    <link rel="stylesheet" href="模板/统一讲义样式模板.css">
+    <script src="模板/js/lecture-utils.js" defer></script>
 </head>
 <body>
 
-<!-- ============================================
-     侧边栏导航 - 课程目录
-     ============================================ -->
+<!-- 侧边栏导航 -->
 <nav class="sidebar">
     <div class="sidebar-nav">
         <h3>课程导航</h3>
         <a class="sidebar-link" href="#intro">👋 课程概览</a>
         
-        <!-- Part 1: 基础命令 -->
         <h3>Part 1: 基础准备</h3>
         <a class="sidebar-link sub-link" href="#docker-commands">一、命令速查手册</a>
         <a class="sidebar-link sub-link" href="#warmup">二、课前热身</a>
         
-        <!-- Part 2: Web服务 -->
         <h3>Part 2: Web服务部署</h3>
         <a class="sidebar-link sub-link" href="#concept-web">三、什么是Web服务</a>
         <a class="sidebar-link sub-link" href="#nginx-run">四、启动Nginx</a>
         <a class="sidebar-link sub-link" href="#port-mapping">五、端口映射</a>
         
-        <!-- Part 3: 进阶操作 -->
         <h3>Part 3: 进阶技巧</h3>
         <a class="sidebar-link sub-link" href="#hack-container">六、潜入容器改网页</a>
         <a class="sidebar-link sub-link" href="#lifecycle">七、生命周期管理</a>
         <a class="sidebar-link sub-link" href="#final-challenge">八、完整实战</a>
         
-        <!-- 总结 -->
         <h3>总结</h3>
         <a class="sidebar-link sub-link" href="#summary">📝 课程小结</a>
     </div>
 </nav>
 
-
-<!-- ============================================
-     主内容区域
-     ============================================ -->
+<!-- 主内容区 -->
 <main class="content">
 
-    <!-- ============================================
-         课程头部 - 概览区域
-         ============================================ -->
+    <!-- 课程头部 -->
     <header id="intro">
         <h1>第2讲：玩转容器网络与修改网页</h1>
         <p class="intro">学习 Docker 常用命令、容器网络通信原理、端口映射技术，掌握如何进入容器修改网页内容。通过实战演练，完成从启动容器到发布网页的完整流程。</p>
         
-        <!-- 知识点标签列表 -->
         <div class="pill-list">
             <span class="pill">Docker命令</span>
             <span class="pill">端口映射</span>
@@ -67,10 +52,6 @@
         </div>
     </header>
 
-    <!-- ============================================
-         第一部分：基础准备
-         ============================================ -->
-    
     <section id="docker-commands">
         <h2>一、Docker 常用命令速查手册</h2>
 
@@ -486,7 +467,7 @@ $ docker cp my-nginx:/var/log/nginx ./nginx-logs</code></pre>
         <!-- Section 2: 热身 -->
         <section id="warmup" class="section-card">
             <h2>
-                <i class="fas fa-dumbbell" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                <i class="fas fa-dumbbell"></i>
                 2. 课前热身：找回手感
             </h2>
 
@@ -550,11 +531,11 @@ test-nginx</code></pre>
         <!-- Section 3: Web 基础 -->
         <section id="concept-web" class="section-card">
             <h2>
-                <i class="fas fa-globe" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                <i class="fas fa-globe"></i>
                 3. 什么是 Web 服务？深入理解互联网的基础
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">在学习Docker部署Web应用前，我们需要先理解Web服务的本质和工作原理。这是计算机网络的核心知识，也是后续所有实战的理论基础。</p>
+            <p>在学习Docker部署Web应用前，我们需要先理解Web服务的本质和工作原理。这是计算机网络的核心知识，也是后续所有实战的理论基础。</p>
 
             <!-- HTTP协议基础 -->
             <div class="module-concept">
@@ -563,18 +544,18 @@ test-nginx</code></pre>
                     <h4>HTTP协议：浏览器和服务器的"通用语言"</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>HTTP (HyperText Transfer Protocol)</strong> 是超文本传输协议，定义了浏览器和服务器之间如何交换数据。</p>
+                    <p><strong>HTTP (HyperText Transfer Protocol)</strong> 是超文本传输协议，定义了浏览器和服务器之间如何交换数据。</p>
                     
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">核心概念：</h5>
-                    <ul style="font-size: 0.875rem;">
+                    <h5>核心概念：</h5>
+                    <ul>
                         <li><strong>请求-响应模型：</strong>客户端发请求，服务器返回响应</li>
                         <li><strong>无状态协议：</strong>每次请求都是独立的，服务器不记住上次的请求（通过Cookie/Session解决）</li>
                         <li><strong>基于TCP：</strong>可靠传输，保证数据不丢失、不乱序</li>
                     </ul>
 
-                    <div class="module-command" style="margin-top: 1rem;">
+                    <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>一次HTTP请求的完整过程：
+                            <pre><code>一次HTTP请求的完整过程：
 
 1. 浏览器输入网址：http://example.com/index.html
    ↓
@@ -604,8 +585,7 @@ test-nginx</code></pre>
                 </div>
             </div>
 
-            <!-- 客户端-服务器模型 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+                <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-server"></i>
                     <h4>客户端-服务器模型 (Client-Server Model)</h4>
@@ -614,18 +594,18 @@ test-nginx</code></pre>
                     <div class="module-tip">
                         <div class="module-content">
                             <p><strong>生活类比：</strong>餐厅点餐系统</p>
-                            <div class="grid-auto" style="margin-top: 0.75rem;">
+                            <div class="grid-auto">
                                 <div>
-                                    <p style="font-weight: 600; margin-bottom: 0.25rem;">👤 客户端（浏览器）</p>
-                                    <ul style="font-size: 0.875rem;">
+                                    <p>👤 客户端（浏览器）</p>
+                                    <ul>
                                         <li>顾客点餐（发送请求）</li>
                                         <li>等待上菜（等待响应）</li>
                                         <li>享用美食（渲染页面）</li>
                                     </ul>
                                 </div>
                                 <div>
-                                    <p style="font-weight: 600; margin-bottom: 0.25rem;">🏪 服务器（Nginx）</p>
-                                    <ul style="font-size: 0.875rem;">
+                                    <p>🏪 服务器（Nginx）</p>
+                                    <ul>
                                         <li>接收订单（接收HTTP请求）</li>
                                         <li>准备菜品（处理请求）</li>
                                         <li>送到桌上（返回HTML）</li>
@@ -635,8 +615,8 @@ test-nginx</code></pre>
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">为什么需要Web服务器？</h5>
-                    <ul style="font-size: 0.875rem;">
+                    <h5>为什么需要Web服务器？</h5>
+                    <ul>
                         <li><strong>监听端口：</strong>持续监听80/443端口，等待客户端连接</li>
                         <li><strong>处理请求：</strong>解析HTTP请求，找到对应的文件</li>
                         <li><strong>返回内容：</strong>读取文件内容，组装HTTP响应</li>
@@ -647,96 +627,96 @@ test-nginx</code></pre>
             </div>
 
             <!-- 静态 vs 动态网站 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-file-code"></i>
                     <h4>静态网站 vs 动态网站</h4>
                 </div>
                 <div class="module-content">
                     <div class="grid-auto">
-                        <div style="background-color: #e3f2fd; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-accent);">
-                            <h6 style="margin-bottom: 0.5rem;">📄 静态网站</h6>
-                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>定义：</strong>服务器直接返回存储的HTML/CSS/JS文件，内容固定不变</p>
-                            <p style="font-size: 0.875rem; font-weight: 600;">适用场景：</p>
-                            <ul style="font-size: 0.875rem;">
+                        <div>
+                            <h6>📄 静态网站</h6>
+                            <p><strong>定义：</strong>服务器直接返回存储的HTML/CSS/JS文件，内容固定不变</p>
+                            <p>适用场景：</p>
+                            <ul>
                                 <li>公司官网、产品展示页</li>
                                 <li>个人博客（如用Hexo生成）</li>
                                 <li>文档网站</li>
                             </ul>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>优点：</strong>速度快、安全、易部署</p>
+                            <p><strong>优点：</strong>速度快、安全、易部署</p>
                         </div>
-                        <div style="background-color: #fff3e0; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-warning);">
-                            <h6 style="margin-bottom: 0.5rem;">🔄 动态网站</h6>
-                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>定义：</strong>服务器运行程序（如PHP/Python）动态生成HTML，内容因人而异</p>
-                            <p style="font-size: 0.875rem; font-weight: 600;">适用场景：</p>
-                            <ul style="font-size: 0.875rem;">
+                        <div>
+                            <h6>🔄 动态网站</h6>
+                            <p><strong>定义：</strong>服务器运行程序（如PHP/Python）动态生成HTML，内容因人而异</p>
+                            <p>适用场景：</p>
+                            <ul>
                                 <li>社交网络（微博、Facebook）</li>
                                 <li>电商网站（淘宝、京东）</li>
                                 <li>在线论坛</li>
                             </ul>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>优点：</strong>个性化、交互性强</p>
+                            <p><strong>优点：</strong>个性化、交互性强</p>
                         </div>
                     </div>
-                    <p style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--color-text-light);"><strong>本讲重点：</strong>我们先学习部署静态网站，第3讲再学习动态应用。</p>
+                    <p><strong>本讲重点：</strong>我们先学习部署静态网站，第3讲再学习动态应用。</p>
                 </div>
             </div>
 
             <!-- 常见Web服务器对比 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-balance-scale"></i>
                     <h4>常见 Web 服务器对比</h4>
                 </div>
                 <div class="module-content">
-                    <table style="width: 100%; border-collapse: collapse;">
+                    <table>
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--color-border);">
-                                <th style="text-align: left; padding: 0.75rem;">服务器</th>
-                                <th style="text-align: left; padding: 0.75rem;">特点</th>
-                                <th style="text-align: left; padding: 0.75rem;">市场份额</th>
-                                <th style="text-align: left; padding: 0.75rem;">适用场景</th>
+                            <tr>
+                                <th>服务器</th>
+                                <th>特点</th>
+                                <th>市场份额</th>
+                                <th>适用场景</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><strong>Nginx</strong></td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">
+                            <tr>
+                                <td><strong>Nginx</strong></td>
+                                <td>
                                     • 高性能、低内存<br>
                                     • 事件驱动架构<br>
                                     • 配置简洁
                                 </td>
-                                <td style="padding: 0.75rem;">~35%</td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">静态网站、反向代理、负载均衡</td>
+                                <td>~35%</td>
+                                <td>静态网站、反向代理、负载均衡</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><strong>Apache</strong></td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">
+                            <tr>
+                                <td><strong>Apache</strong></td>
+                                <td>
                                     • 功能丰富<br>
                                     • 模块化设计<br>
                                     • .htaccess 支持
                                 </td>
-                                <td style="padding: 0.75rem;">~30%</td>
-                                <td style="padding: 0.875rem; font-size: 0.875rem;">传统Web应用、共享主机</td>
+                                <td>~30%</td>
+                                <td>传统Web应用、共享主机</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><strong>Tomcat</strong></td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">
+                            <tr>
+                                <td><strong>Tomcat</strong></td>
+                                <td>
                                     • Java Servlet容器<br>
                                     • JSP支持<br>
                                     • 企业级应用
                                 </td>
-                                <td style="padding: 0.75rem;">~5%</td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">Java Web应用</td>
+                                <td>~5%</td>
+                                <td>Java Web应用</td>
                             </tr>
                             <tr>
-                                <td style="padding: 0.75rem;"><strong>IIS</strong></td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">
+                                <td><strong>IIS</strong></td>
+                                <td>
                                     • Windows原生<br>
                                     • ASP.NET支持<br>
                                     • 图形化管理
                                 </td>
-                                <td style="padding: 0.75rem;">~10%</td>
-                                <td style="padding: 0.75rem; font-size: 0.875rem;">Windows服务器、.NET应用</td>
+                                <td>~10%</td>
+                                <td>Windows服务器、.NET应用</td>
                             </tr>
                         </tbody>
                     </table>
@@ -744,10 +724,10 @@ test-nginx</code></pre>
             </div>
 
             <!-- 为什么选Nginx -->
-            <div class="module-tip" style="margin-top: 1.5rem; background-color: #e8f5e9; border-left: 3px solid var(--color-success);">
+            <div class="module-tip">
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.75rem;">🎯 为什么本课选择 Nginx？</h5>
-                    <ol style="font-size: 0.875rem;">
+                    <h5>🎯 为什么本课选择 Nginx？</h5>
+                    <ol>
                         <li><strong>轻量高效：</strong>内存占用约5-10MB，适合容器化部署</li>
                         <li><strong>学习曲线平缓：</strong>配置文件简单易懂</li>
                         <li><strong>行业标准：</strong>大厂都在用（Netflix、淘宝、京东）</li>
@@ -761,34 +741,34 @@ test-nginx</code></pre>
         <!-- Section 4: 启动 Nginx -->
         <section id="nginx-run" class="section-card">
             <h2>
-                <i class="fas fa-play-circle" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                <i class="fas fa-play-circle"></i>
                 4. 启动 Nginx：从失败到成功的完整过程
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">这一节我们将通过“失败-分析-解决”的方式，深入理解Docker网络隔离和端口映射的原理。这是每个初学者都会遇到的问题！</p>
+            <p>这一节我们将通过“失败-分析-解决”的方式，深入理解Docker网络隔离和端口映射的原理。这是每个初学者都会遇到的问题！</p>
 
             <!-- 第一次尝试 -->
             <div class="module-steps">
                 <div class="module-header">
-                    <i class="fas fa-times-circle" style="color: var(--color-error);"></i>
+                    <i class="fas fa-times-circle"></i>
                     <h4>第一次尝试：没有端口映射（失败）</h4>
                 </div>
                 <div class="module-content">
                     <div class="step-item">
-                        <span class="step-number" style="background-color: var(--color-error);">1</span>
+                        <span class="step-number">1</span>
                         <div class="step-content">
                             <h5>执行命令</h5>
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --name web nginx</code></pre>
+                                    <pre><code>$ docker run -d --name web nginx</code></pre>
                                 </div>
                             </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
+                            <div class="module-output">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456</code></pre>
+                                    <pre><code>a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456</code></pre>
                                 </div>
                             </div>
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">✅ 容器启动成功！</p>
+                            <p>✅ 容器启动成功！</p>
                         </div>
                     </div>
 
@@ -798,16 +778,16 @@ test-nginx</code></pre>
                             <h5>查看容器状态</h5>
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker ps</code></pre>
+                                    <pre><code>$ docker ps</code></pre>
                                 </div>
                             </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
+                            <div class="module-output">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>CONTAINER ID   IMAGE   COMMAND                  CREATED   STATUS       PORTS      NAMES
+                                    <pre><code>CONTAINER ID   IMAGE   COMMAND                  CREATED   STATUS       PORTS      NAMES
 a1b2c3d4e5f6   nginx   "/docker-entrypoint.…"   5s ago    Up 4 seconds 80/tcp     web</code></pre>
                                 </div>
                             </div>
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem;"><strong>注意看 PORTS 列：</strong><code>80/tcp</code> - 说明Nginx在容器内监听80端口，但<strong>没有映射到主机</strong></p>
+                            <p><strong>注意看 PORTS 列：</strong><code>80/tcp</code> - 说明Nginx在容器内监听80端口，但<strong>没有映射到主机</strong></p>
                         </div>
                     </div>
 
@@ -815,11 +795,11 @@ a1b2c3d4e5f6   nginx   "/docker-entrypoint.…"   5s ago    Up 4 seconds 80/tcp 
                         <span class="step-number">3</span>
                         <div class="step-content">
                             <h5>浏览器访问测试</h5>
-                            <p style="margin-bottom: 0.5rem;">打开浏览器，访问：<code>http://localhost</code> 或 <code>http://localhost:80</code></p>
-                            <div style="background-color: #fee2e2; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-error); margin-top: 0.75rem;">
-                                <p style="color: var(--color-error); font-weight: 600; margin-bottom: 0.5rem;">❌ 结果：访问失败！</p>
-                                <p style="font-size: 0.875rem;">浏览器显示：<br>
-                                <code style="font-size: 0.75rem;">无法访问此网站</code> 或 <code style="font-size: 0.75rem;">ERR_CONNECTION_REFUSED</code></p>
+                            <p>打开浏览器，访问：<code>http://localhost</code> 或 <code>http://localhost:80</code></p>
+                            <div>
+                                <p>❌ 结果：访问失败！</p>
+                                <p>浏览器显示：<br>
+                                <code>无法访问此网站</code> 或 <code>ERR_CONNECTION_REFUSED</code></p>
                             </div>
                         </div>
                     </div>
@@ -827,17 +807,17 @@ a1b2c3d4e5f6   nginx   "/docker-entrypoint.…"   5s ago    Up 4 seconds 80/tcp 
             </div>
 
             <!-- 失败原因分析 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-question-circle"></i>
                     <h4>🔍 为什么会失败？深入理解Docker网络隔离</h4>
                 </div>
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.75rem;">原因：Docker容器有独立的网络空间</h5>
+                    <h5>原因：Docker容器有独立的网络空间</h5>
                     
-                    <div class="module-command" style="margin-bottom: 1rem;">
+                    <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>网络隔离原理图：
+                            <pre><code>网络隔离原理图：
 
 ┌─────────────────────────┐
 │   💻 主机 (Host)            │
@@ -864,8 +844,8 @@ a1b2c3d4e5f6   nginx   "/docker-entrypoint.…"   5s ago    Up 4 seconds 80/tcp 
 
                     <div class="module-tip">
                         <div class="module-content">
-                            <p style="font-weight: 600; margin-bottom: 0.5rem;">💡 三个关键概念：</p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>💡 三个关键概念：</p>
+                            <ul>
                                 <li><strong>Network Namespace（网络命名空间）：</strong>Linux内核的网络隔离技术，让容器有独立的网络栈</li>
                                 <li><strong>Docker Bridge（桥接网络）：</strong>Docker创建的虚拟网络，连接主机和容器</li>
                                 <li><strong>Port Mapping（端口映射）：</strong>将主机端口转发到容器端口的机制</li>
@@ -873,10 +853,10 @@ a1b2c3d4e5f6   nginx   "/docker-entrypoint.…"   5s ago    Up 4 seconds 80/tcp 
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">验证：容器内部Nginx是正常工作的</h5>
+                    <h5>验证：容器内部Nginx是正常工作的</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 进入容器
+                            <pre><code># 进入容器
 docker exec -it web bash
 
 # 在容器内测试
@@ -896,20 +876,20 @@ curl http://localhost
             </div>
 
             <!-- 清理失败的容器 -->
-            <div class="module-warning" style="margin-top: 1.5rem;">
+            <div class="module-warning">
                 <div class="module-header">
                     <i class="fas fa-broom"></i>
                     <h4>清理失败的容器</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.5rem;">在开始下一步操作前，先删除这个失败的容器：</p>
+                    <p>在开始下一步操作前，先删除这个失败的容器：</p>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker rm -f web
+                            <pre><code>$ docker rm -f web
 web</code></pre>
                         </div>
                     </div>
-                    <p style="font-size: 0.875rem; margin-top: 0.5rem; color: var(--color-text-light);"><code>-f</code> 参数表示强制删除，即使容器还在运行中也会被停止并删除。</p>
+                    <p><code>-f</code> 参数表示强制删除，即使容器还在运行中也会被停止并删除。</p>
                 </div>
             </div>
         </section>
@@ -917,11 +897,11 @@ web</code></pre>
         <!-- Section 5: 端口映射 -->
         <section id="port-mapping" class="section-card">
             <h2>
-                <i class="fas fa-network-wired" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                <i class="fas fa-network-wired"></i>
                 5. 核心概念：端口映射完全指南
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">端口映射是Docker网络的核心知识点，也是每个初学者必须掌握的技能。这一节我们将全面讲解端口的概念、映射原理和多种实战场景。</p>
+            <p>端口映射是Docker网络的核心知识点，也是每个初学者必须掌握的技能。这一节我们将全面讲解端口的概念、映射原理和多种实战场景。</p>
 
             <!-- 端口基础 -->
             <div class="module-concept">
@@ -930,25 +910,25 @@ web</code></pre>
                     <h4>什么是端口？深入理解</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>官方定义：</strong>端口是传输层协议(TCP/UDP)用于区分不同服务的数字标识,范围0-65535。</p>
+                    <p><strong>官方定义：</strong>端口是传输层协议(TCP/UDP)用于区分不同服务的数字标识,范围0-65535。</p>
                     
                     <div class="module-tip">
                         <div class="module-content">
-                            <p style="font-weight: 600; margin-bottom: 0.5rem;">🏢 生活类比：大楼的房间号</p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>🏢 生活类比：大楼的房间号</p>
+                            <ul>
                                 <li><strong>IP地址</strong> = 大楼地址(如"中关村大街1号")</li>
                                 <li><strong>端口</strong> = 房间号(如1001室、1002室)</li>
                                 <li><strong>服务程序</strong> = 房间里的人(如张三住1001、李四住1002)</li>
                             </ul>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">客人想找张三：到"中关村大街1号楼1001室" → 对应"192.168.1.100:80"</p>
+                            <p>客人想找张三：到"中关村大街1号楼1001室" → 对应"192.168.1.100:80"</p>
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">端口的分类：</h5>
+                    <h5>端口的分类：</h5>
                     <div class="grid-auto">
                         <div>
-                            <p style="font-weight: 600;">🔴 周知端口 (0-1023)</p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>🔴 周知端口 (0-1023)</p>
+                            <ul>
                                 <li><code>80</code> - HTTP</li>
                                 <li><code>443</code> - HTTPS</li>
                                 <li><code>22</code> - SSH</li>
@@ -957,8 +937,8 @@ web</code></pre>
                             </ul>
                         </div>
                         <div>
-                            <p style="font-weight: 600;">🟡 注册端口 (1024-49151)</p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>🟡 注册端口 (1024-49151)</p>
+                            <ul>
                                 <li><code>3306</code> - MySQL</li>
                                 <li><code>5432</code> - PostgreSQL</li>
                                 <li><code>6379</code> - Redis</li>
@@ -967,15 +947,15 @@ web</code></pre>
                             </ul>
                         </div>
                         <div>
-                            <p style="font-weight: 600;">🟢 动态端口 (49152-65535)</p>
-                            <p style="font-size: 0.875rem;">系统自动分配，临时连接使用</p>
+                            <p>🟢 动态端口 (49152-65535)</p>
+                            <p>系统自动分配，临时连接使用</p>
                         </div>
                     </div>
 
-                    <div class="module-warning" style="margin-top: 1rem;">
+                    <div class="module-warning">
                         <div class="module-content">
                             <p><strong>重要：</strong>同一台电脑上，一个端口同时只能被一个程序占用！</p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <ul>
                                 <li>✅ 允许：Nginx监听80，MySQL监听3306</li>
                                 <li>❌ 不允许：两个Nginx同时监听80端口</li>
                             </ul>
@@ -985,18 +965,18 @@ web</code></pre>
             </div>
 
             <!-- 端口映射原理 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-exchange-alt"></i>
                     <h4>端口映射原理：从主机到容器的"桥梁"</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>为什么需要端口映射？</strong></p>
-                    <p style="font-size: 0.875rem; margin-bottom: 1rem;">Docker容器有独立的网络命名空间，容器内部的IP和端口对外界不可见。要让外部能访问容器内的服务，必须把主机端口"转发"到容器端口。</p>
+                    <p><strong>为什么需要端口映射？</strong></p>
+                    <p>Docker容器有独立的网络命名空间，容器内部的IP和端口对外界不可见。要让外部能访问容器内的服务，必须把主机端口"转发"到容器端口。</p>
 
-                    <div class="module-command" style="margin-bottom: 1rem;">
+                    <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>端口映射完整流程图：
+                            <pre><code>端口映射完整流程图：
 
 ┌────────────────────────────────────────────────┐
 │  💻 外部网络 (Internet)                         │
@@ -1037,7 +1017,7 @@ web</code></pre>
             </div>
 
             <!-- 端口映射语法 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-code"></i>
                     <h4>端口映射语法详解：-p 参数的多种写法</h4>
@@ -1052,10 +1032,10 @@ web</code></pre>
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">常用写法示例：</h5>
+                    <h5>常用写法示例：</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 最常用：主机端口 → 容器端口
+                            <pre><code># 1. 最常用：主机端口 → 容器端口
 docker run -d -p 8080:80 nginx
 # 效果：访问 localhost:8080 → 容器的80端口
 
@@ -1085,10 +1065,10 @@ docker run -d -p 8080-8090:80-90 nginx
                         </div>
                     </div>
 
-                    <div class="module-warning" style="margin-top: 1rem;">
+                    <div class="module-warning">
                         <div class="module-content">
                             <p><strong>注意顺序：</strong><code>-p 主机端口:容器端口</code></p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <ul>
                                 <li>✅ 正确：<code>-p 8080:80</code> (外部:8080 → 内部:80)</li>
                                 <li>❌ 错误：<code>-p 80:8080</code> (会导致混淆)</li>
                             </ul>
@@ -1098,7 +1078,7 @@ docker run -d -p 8080-8090:80-90 nginx
             </div>
 
             <!-- 实战演示 -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-rocket"></i>
                     <h4>实战：正确启动Nginx并验证</h4>
@@ -1108,7 +1088,7 @@ docker run -d -p 8080-8090:80-90 nginx
                         <h5>步骤 1：清理环境</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 删除所有名为 web 的容器
+                                <pre><code># 删除所有名为 web 的容器
 docker rm -f web</code></pre>
                             </div>
                         </div>
@@ -1118,12 +1098,12 @@ docker rm -f web</code></pre>
                         <h5>步骤 2：启动容器（带端口映射）</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d -p 8080:80 --name web nginx</code></pre>
+                                <pre><code>$ docker run -d -p 8080:80 --name web nginx</code></pre>
                             </div>
                         </div>
-                        <div class="module-output" style="margin-top: 0.5rem;">
+                        <div class="module-output">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>abc123def456789...</code></pre>
+                                <pre><code>abc123def456789...</code></pre>
                             </div>
                         </div>
                     </div>
@@ -1132,17 +1112,17 @@ docker rm -f web</code></pre>
                         <h5>步骤 3：验证端口映射</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker ps</code></pre>
+                                <pre><code>$ docker ps</code></pre>
                             </div>
                         </div>
-                        <div class="module-output" style="margin-top: 0.5rem;">
+                        <div class="module-output">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>CONTAINER ID   IMAGE   COMMAND   CREATED   STATUS   PORTS                  NAMES
+                                <pre><code>CONTAINER ID   IMAGE   COMMAND   CREATED   STATUS   PORTS                  NAMES
 abc123def456   nginx   ...       5s ago    Up 4s    0.0.0.0:8080->80/tcp   web</code></pre>
                             </div>
                         </div>
-                        <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>关键看 PORTS 列：</strong><code>0.0.0.0:8080->80/tcp</code></p>
-                        <ul style="font-size: 0.875rem;">
+                        <p><strong>关键看 PORTS 列：</strong><code>0.0.0.0:8080->80/tcp</code></p>
+                        <ul>
                             <li><code>0.0.0.0</code> - 所有IP地址(包括localhost和外网IP)</li>
                             <li><code>8080</code> - 主机端口</li>
                             <li><code>80</code> - 容器端口</li>
@@ -1152,16 +1132,16 @@ abc123def456   nginx   ...       5s ago    Up 4s    0.0.0.0:8080->80/tcp   web</
 
                     <div class="practice-task">
                         <h5>步骤 4：浏览器测试</h5>
-                        <p style="margin-bottom: 0.5rem;">打开浏览器，访问以下任意一个网址：</p>
-                        <ul style="font-size: 0.875rem;">
+                        <p>打开浏览器，访问以下任意一个网址：</p>
+                        <ul>
                             <li><code>http://localhost:8080</code></li>
                             <li><code>http://127.0.0.1:8080</code></li>
                             <li><code>http://[你的内网IP]:8080</code>(如 http://192.168.1.100:8080)</li>
                         </ul>
-                        <div style="background-color: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success); margin-top: 0.75rem;">
-                            <p style="color: var(--color-success); font-weight: 600; margin-bottom: 0.5rem;">✅ 预期结果：</p>
-                            <p style="font-size: 0.875rem;">浏览器显示：<strong>"Welcome to nginx!"</strong></p>
-                            <p style="font-size: 0.875rem; margin-top: 0.25rem;">如果看到这个页面，说明端口映射配置成功！</p>
+                        <div>
+                            <p>✅ 预期结果：</p>
+                            <p>浏览器显示：<strong>"Welcome to nginx!"</strong></p>
+                            <p>如果看到这个页面，说明端口映射配置成功！</p>
                         </div>
                     </div>
 
@@ -1169,7 +1149,7 @@ abc123def456   nginx   ...       5s ago    Up 4s    0.0.0.0:8080->80/tcp   web</
                         <h5>步骤 5：命令行测试(可选)</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows (PowerShell)
+                                <pre><code># Windows (PowerShell)
 curl http://localhost:8080
 
 # Linux/Mac
@@ -1187,7 +1167,7 @@ Content-Type: text/html
             </div>
 
             <!-- 常见问题排查 -->
-            <div class="module-warning" style="margin-top: 1.5rem;">
+            <div class="module-warning">
                 <div class="module-header">
                     <i class="fas fa-tools"></i>
                     <h4>常见问题排查</h4>
@@ -1195,12 +1175,12 @@ Content-Type: text/html
                 <div class="module-content">
                     <div class="grid-auto">
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 问题1：端口被占用</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">错误信息：<code>port is already allocated</code></p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ 问题1：端口被占用</p>
+                            <p>错误信息：<code>port is already allocated</code></p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看端口占用 (Windows)
+                                    <pre><code># 查看端口占用 (Windows)
 netstat -ano | findstr :8080
 
 # 查看端口占用 (Linux/Mac)
@@ -1216,12 +1196,12 @@ docker rm -f [容器名]</code></pre>
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 问题2：容器启动但访问不了</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">浏览器显示：<code>ERR_CONNECTION_REFUSED</code></p>
-                            <p style="font-size: 0.875rem;"><strong>排查步骤：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ 问题2：容器启动但访问不了</p>
+                            <p>浏览器显示：<code>ERR_CONNECTION_REFUSED</code></p>
+                            <p><strong>排查步骤：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 确认容器运行中
+                                    <pre><code># 1. 确认容器运行中
 docker ps
 
 # 2. 检查端口映射是否正确
@@ -1238,31 +1218,31 @@ docker logs web
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 问题3：混淆主机和容器端口</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">常见错误：<code>-p 80:8080</code>(写反了)</p>
-                            <p style="font-size: 0.875rem;"><strong>记忆法：</strong></p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>❌ 问题3：混淆主机和容器端口</p>
+                            <p>常见错误：<code>-p 80:8080</code>(写反了)</p>
+                            <p><strong>记忆法：</strong></p>
+                            <ul>
                                 <li><strong>外部:内部</strong> → <code>-p 外部端口:容器端口</code></li>
                                 <li><strong>主机:容器</strong> → <code>-p 主机:80</code></li>
                             </ul>
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 问题4：Docker Desktop未启动</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">错误信息：<code>Cannot connect to Docker daemon</code></p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong>Windows用户启动Docker Desktop，Linux用户执行 <code>sudo systemctl start docker</code></p>
+                            <p>❌ 问题4：Docker Desktop未启动</p>
+                            <p>错误信息：<code>Cannot connect to Docker daemon</code></p>
+                            <p><strong>解决：</strong>Windows用户启动Docker Desktop，Linux用户执行 <code>sudo systemctl start docker</code></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 高级技巧 -->
-            <div class="module-tip" style="margin-top: 1.5rem; background-color: #fef3c7; border-left: 3px solid var(--color-warning);">
+            <div class="module-tip">
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.75rem;">🎯 高级技巧：动态查看容器端口</h5>
+                    <h5>🎯 高级技巧：动态查看容器端口</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看容器的所有端口映射
+                            <pre><code># 查看容器的所有端口映射
 docker port web
 
 # 输出：
@@ -1283,11 +1263,11 @@ docker exec web netstat -tuln</code></pre>
         <!-- Section 6: 修改网页 -->
         <section id="hack-container" class="section-card">
             <h2>
-                <i class="fas fa-edit" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                <i class="fas fa-edit"></i>
                 6. 进阶：容器内文件操作完整指南
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">现在我们已经让Nginx运行起来了，但显示的还是官方默认页面。这一节我们学习如何<strong>进入容器内部</strong>，修改网页文件，让它显示我们自己的内容。</p>
+            <p>现在我们已经让Nginx运行起来了，但显示的还是官方默认页面。这一节我们学习如何<strong>进入容器内部</strong>，修改网页文件，让它显示我们自己的内容。</p>
 
             <!-- Nginx文件结构 -->
             <div class="module-concept">
@@ -1296,10 +1276,10 @@ docker exec web netstat -tuln</code></pre>
                     <h4>Nginx容器文件结构</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;">在开始操作之前，先了解Nginx容器内的关键目录：</p>
+                    <p>在开始操作之前，先了解Nginx容器内的关键目录：</p>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>Nginx 容器文件结构：
+                            <pre><code>Nginx 容器文件结构：
 /usr/share/nginx/html/          # 📁 网页根目录（重点！）
 ├── index.html                  # 默认首页
 └── 50x.html                    # 错误页面
@@ -1314,17 +1294,17 @@ docker exec web netstat -tuln</code></pre>
 └── error.log                   # 错误日志</code></pre>
                         </div>
                     </div>
-                    <div class="module-tip" style="margin-top: 0.75rem;">
+                    <div class="module-tip">
                         <div class="module-content">
                             <p><strong>记忆关键路径：</strong><code>/usr/share/nginx/html/index.html</code></p>
-                            <p style="font-size: 0.875rem; margin-top: 0.25rem;">这是我们要修改的目标文件！</p>
+                            <p>这是我们要修改的目标文件！</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 方法1：docker exec进入容器 -->
-            <div class="module-steps" style="margin-top: 1.5rem;">
+            <div class="module-steps">
                 <div class="module-header">
                     <i class="fas fa-terminal"></i>
                     <h4>方法1：使用docker exec进入容器交互式修改</h4>
@@ -1332,27 +1312,27 @@ docker exec web netstat -tuln</code></pre>
                 <div class="module-content">
                     
                     <div class="step-item">
-                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
+                        <span class="step-number">1</span>
                         <div class="step-content">
                             <h5>进入容器</h5>
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker exec -it web bash</code></pre>
+                                    <pre><code>$ docker exec -it web bash</code></pre>
                                 </div>
                             </div>
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem;"><strong>参数详解：</strong></p>
-                            <ul style="font-size: 0.875rem;">
+                            <p><strong>参数详解：</strong></p>
+                            <ul>
                                 <li><code>-i</code> - Interactive，保持STDIN开启</li>
                                 <li><code>-t</code> - TTY，分配伪终端</li>
                                 <li><code>web</code> - 容器名称</li>
                                 <li><code>bash</code> - 要执行的命令(进入Bash Shell)</li>
                             </ul>
-                            <div class="module-output" style="margin-top: 0.5rem;">
+                            <div class="module-output">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>root@abc123def456:/# _</code></pre>
+                                    <pre><code>root@abc123def456:/# _</code></pre>
                                 </div>
                             </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>提示符变化：</strong><code>root@容器ID:/#</code> 表示已进入容器内部</p>
+                            <p><strong>提示符变化：</strong><code>root@容器ID:/#</code> 表示已进入容器内部</p>
                         </div>
                     </div>
 
@@ -1362,13 +1342,13 @@ docker exec web netstat -tuln</code></pre>
                             <h5>导航到网页目录</h5>
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ cd /usr/share/nginx/html
+                                    <pre><code>$ cd /usr/share/nginx/html
 $ ls -lh</code></pre>
                                 </div>
                             </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
+                            <div class="module-output">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>total 8.0K
+                                    <pre><code>total 8.0K
 -rw-r--r-- 1 root root 497 Oct 24 12:00 50x.html
 -rw-r--r-- 1 root root 615 Oct 24 12:00 index.html</code></pre>
                                 </div>
@@ -1382,10 +1362,10 @@ $ ls -lh</code></pre>
                             <h5>查看原始内容(可选)</h5>
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ cat index.html</code></pre>
+                                    <pre><code>$ cat index.html</code></pre>
                                 </div>
                             </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">会显示默认的"Welcome to nginx!"页面的HTML源码</p>
+                            <p>会显示默认的"Welcome to nginx!"页面的HTML源码</p>
                         </div>
                     </div>
 
@@ -1393,11 +1373,11 @@ $ ls -lh</code></pre>
                         <span class="step-number">4</span>
                         <div class="step-content">
                             <h5>修改网页内容</h5>
-                            <p style="margin-bottom: 0.5rem; font-size: 0.875rem;">有多种方法可以修改文件：</p>
+                            <p>有多种方法可以修改文件：</p>
                             
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 方法A：直接覆盖(简单快速，注意中文需要设置UTF-8)
+                                    <pre><code># 方法A：直接覆盖(简单快速，注意中文需要设置UTF-8)
 echo '&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Hello Docker!&lt;/h1&gt;&lt;p&gt;这是我修改的页面&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;' &gt; index.html
 
 # 方法B：使用cat写入多行内容(推荐，支持中文)
@@ -1423,10 +1403,10 @@ nano index.html</code></pre>
                                 </div>
                             </div>
 
-                            <div class="module-tip" style="margin-top: 0.75rem;">
+                            <div class="module-tip">
                                 <div class="module-content">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;">💡 Vi编辑器快速指南：</p>
-                                    <ul style="font-size: 0.875rem;">
+                                    <p>💡 Vi编辑器快速指南：</p>
+                                    <ul>
                                         <li><code>i</code> - 进入插入模式</li>
                                         <li><code>Esc</code> - 退出插入模式</li>
                                         <li><code>:wq</code> - 保存并退出</li>
@@ -1435,10 +1415,10 @@ nano index.html</code></pre>
                                 </div>
                             </div>
 
-                            <div class="module-warning" style="margin-top: 0.75rem;">
+                            <div class="module-warning">
                                 <div class="module-content">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ 中文编码注意事项：</p>
-                                    <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                                    <p>⚠️ 中文编码注意事项：</p>
+                                    <ul>
                                         <li><strong>必须添加：</strong><code>&lt;meta charset="UTF-8"&gt;</code> 标签</li>
                                         <li><strong>方法A：</strong>简单的 <code>echo</code> 命令可能导致中文乱码</li>
                                         <li><strong>推荐方法：</strong>使用 <code>cat &gt; file &lt;&lt;EOF</code> 写入多行内容（方法B）</li>
@@ -1455,10 +1435,10 @@ nano index.html</code></pre>
                             <h5>退出容器</h5>
                             <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ exit</code></pre>
+                                    <pre><code>$ exit</code></pre>
                                 </div>
                             </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">或者按 <code>Ctrl+D</code> 快捷键</p>
+                            <p>或者按 <code>Ctrl+D</code> 快捷键</p>
                         </div>
                     </div>
 
@@ -1467,9 +1447,9 @@ nano index.html</code></pre>
                         <div class="step-content">
                             <h5>验证修改</h5>
                             <p>刷新浏览器 <code>http://localhost:8080</code>，应该看到新内容！</p>
-                            <div style="background-color: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success); margin-top: 0.75rem;">
-                                <p style="color: var(--color-success); font-weight: 600; margin-bottom: 0.5rem;">✅ 成功标志：</p>
-                                <p style="font-size: 0.875rem;">页面显示 "Hello Docker! 这是我修改的页面"</p>
+                            <div>
+                                <p>✅ 成功标志：</p>
+                                <p>页面显示 "Hello Docker! 这是我修改的页面"</p>
                             </div>
                         </div>
                     </div>
@@ -1477,16 +1457,16 @@ nano index.html</code></pre>
             </div>
 
             <!-- 方法2：docker exec单行命令 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-bolt"></i>
                     <h4>方法2：不进入容器，直接执行单行命令</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;">如果只需要快速修改，可以不进入容器，直接执行命令：</p>
+                    <p>如果只需要快速修改，可以不进入容器，直接执行命令：</p>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 在主机上直接执行（包含完整HTML结构）
+                            <pre><code># 在主机上直接执行（包含完整HTML结构）
 docker exec web bash -c "cat &gt; /usr/share/nginx/html/index.html &lt;&lt;'EOF'
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -1505,7 +1485,7 @@ EOF"
 docker exec web cat /usr/share/nginx/html/index.html</code></pre>
                         </div>
                     </div>
-                    <div class="module-tip" style="margin-top: 0.75rem;">
+                    <div class="module-tip">
                         <div class="module-content">
                             <p><strong>优点：</strong>一行命令完成，适合自动化脚本</p>
                             <p><strong>缺点：</strong>不适合特别复杂的多文件修改</p>
@@ -1515,23 +1495,23 @@ docker exec web cat /usr/share/nginx/html/index.html</code></pre>
             </div>
 
             <!-- 方法3：docker cp文件拷贝 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-copy"></i>
                     <h4>方法3：使用docker cp在主机和容器间拷贝文件(推荐)</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>最佳实践：</strong>在主机上编辑好HTML文件，然后拷贝到容器内</p>
+                    <p><strong>最佳实践：</strong>在主机上编辑好HTML文件，然后拷贝到容器内</p>
                     
                     <div class="module-steps">
                         <div class="module-content">
                             <div class="step-item">
-                                <span class="step-number" style="background-color: #10b981;">1</span>
+                                <span class="step-number">1</span>
                                 <div class="step-content">
                                     <h5>在主机创建HTML文件</h5>
                                     <div class="module-command">
                                         <div class="module-content">
-                                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell
+                                            <pre><code># Windows PowerShell
 echo '&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;我的网页&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Hello from Host!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;' &gt; index.html
 
 # Linux/Mac
@@ -1554,12 +1534,12 @@ EOF</code></pre>
                             </div>
 
                             <div class="step-item">
-                                <span class="step-number" style="background-color: #10b981;">2</span>
+                                <span class="step-number">2</span>
                                 <div class="step-content">
                                     <h5>拷贝到容器</h5>
                                     <div class="module-command">
                                         <div class="module-content">
-                                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 语法：docker cp 主机路径 容器名:容器路径
+                                            <pre><code># 语法：docker cp 主机路径 容器名:容器路径
 docker cp index.html web:/usr/share/nginx/html/index.html</code></pre>
                                         </div>
                                     </div>
@@ -1567,7 +1547,7 @@ docker cp index.html web:/usr/share/nginx/html/index.html</code></pre>
                             </div>
 
                             <div class="step-item">
-                                <span class="step-number" style="background-color: #10b981;">3</span>
+                                <span class="step-number">3</span>
                                 <div class="step-content">
                                     <h5>验证</h5>
                                     <p>刷新浏览器查看效果</p>
@@ -1576,18 +1556,18 @@ docker cp index.html web:/usr/share/nginx/html/index.html</code></pre>
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">反向操作：从容器拷贝文件到主机</h5>
+                    <h5>反向操作：从容器拷贝文件到主机</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 备份容器内的文件到主机
+                            <pre><code># 备份容器内的文件到主机
 docker cp web:/usr/share/nginx/html/index.html ./backup.html</code></pre>
                         </div>
                     </div>
 
-                    <div class="module-tip" style="margin-top: 0.75rem; background-color: #fef3c7; border-left: 3px solid var(--color-warning);">
+                    <div class="module-tip">
                         <div class="module-content">
                             <p><strong>🎯 为什么推荐docker cp方法？</strong></p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <ul>
                                 <li>✅ 可以使用主机上的编辑器(VSCode/Notepad++)</li>
                                 <li>✅ 支持中文无乱码</li>
                                 <li>✅ 可以拷贝整个目录</li>
@@ -1599,17 +1579,17 @@ docker cp web:/usr/share/nginx/html/index.html ./backup.html</code></pre>
             </div>
 
             <!-- 持久化警告 -->
-            <div class="module-warning" style="margin-top: 1.5rem;">
+            <div class="module-warning">
                 <div class="module-header">
                     <i class="fas fa-exclamation-triangle"></i>
                     <h4>⚠️ 重要：容器内修改的持久性问题</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem; font-weight: 600;">以上三种方法修改的文件都是<strong style="color: var(--color-error);">临时的</strong>！</p>
+                    <p>以上三种方法修改的文件都是<strong>临时的</strong>！</p>
                     
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 演示：删除容器后修改会丢失
+                            <pre><code># 演示：删除容器后修改会丢失
 docker rm -f web
 
 # 重新启动同样的镜像
@@ -1619,36 +1599,36 @@ docker run -d -p 8080:80 --name web nginx
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">为什么会丢失？</h5>
-                    <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">Docker容器的文件系统是<strong>分层的</strong>。容器运行时会在镜像之上创建一个<strong>可写层</strong>，所有修改都保存在这一层。删除容器后，这个可写层也被删除。</p>
+                    <h5>为什么会丢失？</h5>
+                    <p>Docker容器的文件系统是<strong>分层的</strong>。容器运行时会在镜像之上创建一个<strong>可写层</strong>，所有修改都保存在这一层。删除容器后，这个可写层也被删除。</p>
 
-                    <h5 style="margin-bottom: 0.5rem;">持久化解决方案：</h5>
+                    <h5>持久化解决方案：</h5>
                     <div class="grid-auto">
                         <div class="module-tip">
                             <div class="module-content">
-                                <p style="font-weight: 600;">方案1：数据卷挂载(-v)</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
+                                <p>方案1：数据卷挂载(-v)</p>
+                                <div class="module-command">
                                     <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>docker run -d -p 8080:80 \
+                                        <pre><code>docker run -d -p 8080:80 \
   -v D:/myhtml:/usr/share/nginx/html \
   --name web nginx</code></pre>
                                     </div>
                                 </div>
-                                <p style="font-size: 0.875rem; margin-top: 0.5rem;">把主机目录挂载到容器，修改会实时同步</p>
+                                <p>把主机目录挂载到容器，修改会实时同步</p>
                             </div>
                         </div>
 
                         <div class="module-tip">
                             <div class="module-content">
-                                <p style="font-weight: 600;">方案2：构建自定义镜像</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
+                                <p>方案2：构建自定义镜像</p>
+                                <div class="module-command">
                                     <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Dockerfile
+                                        <pre><code># Dockerfile
 FROM nginx
 COPY index.html /usr/share/nginx/html/</code></pre>
                                     </div>
                                 </div>
-                                <p style="font-size: 0.875rem; margin-top: 0.5rem;">把文件打包到镜像里(下一讲详解)</p>
+                                <p>把文件打包到镜像里(下一讲详解)</p>
                             </div>
                         </div>
                     </div>
@@ -1656,7 +1636,7 @@ COPY index.html /usr/share/nginx/html/</code></pre>
             </div>
 
             <!-- 实战练习 -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-laptop-code"></i>
                     <h4>实战练习：创建一个完整的个人主页</h4>
@@ -1664,10 +1644,10 @@ COPY index.html /usr/share/nginx/html/</code></pre>
                 <div class="module-content">
                     <div class="practice-task">
                         <h5>任务：创建一个包含CSS样式的个人介绍页面</h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">要求：包含姓名、专业、兴趣爱好，使用渐变背景</p>
+                        <p>要求：包含姓名、专业、兴趣爱好，使用渐变背景</p>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+                                <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -1709,13 +1689,13 @@ COPY index.html /usr/share/nginx/html/</code></pre>
         &lt;h1&gt;👋 你好，我是张三&lt;/h1&gt;
         &lt;p class="info"&gt;🎓 专业：计算机科学与技术&lt;/p&gt;
         &lt;p class="info"&gt;📍 学校：XX大学&lt;/p&gt;
-        &lt;div style="margin-top: 2rem;"&gt;
+        &lt;div&gt;
             &lt;p&gt;兴趣爱好：&lt;/p&gt;
             &lt;span class="badge"&gt;💻 编程&lt;/span&gt;
             &lt;span class="badge"&gt;📷 摄影&lt;/span&gt;
             &lt;span class="badge"&gt;✈️ 旅行&lt;/span&gt;
         &lt;/div&gt;
-        &lt;p style="margin-top: 2rem; opacity: 0.7; font-size: 0.9rem;"&gt;
+        &lt;p&gt;
             Powered by Docker + Nginx 🐳
         &lt;/p&gt;
     &lt;/div&gt;
@@ -1725,11 +1705,11 @@ COPY index.html /usr/share/nginx/html/</code></pre>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>about.html (关于页面)</h5>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+                                <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -1749,17 +1729,17 @@ COPY index.html /usr/share/nginx/html/</code></pre>
         &lt;/div&gt;
     &lt;/nav&gt;
 
-    &lt;section class="content" style="padding-top: 6rem;"&gt;
+    &lt;section class="content"&gt;
         &lt;div class="container"&gt;
             &lt;h1&gt;关于我&lt;/h1&gt;
             &lt;p&gt;我是一名热爱编程的开发者，专注于容器化技术和Web开发。这个网站使用Docker + Nginx部署，展示了现代化的DevOps实践。&lt;/p&gt;
             
-            &lt;h2 style="margin-top: 2rem;"&gt;教育背景&lt;/h2&gt;
+            &lt;h2&gt;教育背景&lt;/h2&gt;
             &lt;p&gt;🎓 XX大学 - 计算机科学与技术专业 (2020-2024)&lt;/p&gt;
             
-            &lt;h2 style="margin-top: 2rem;"&gt;项目经验&lt;/h2&gt;
-            &lt;ul style="list-style: none; padding: 0;"&gt;
-                &lt;li style="margin-bottom: 1rem;"&gt;
+            &lt;h2&gt;项目经验&lt;/h2&gt;
+            &lt;ul&gt;
+                &lt;li&gt;
                     &lt;strong&gt;🚀 微服务平台&lt;/strong&gt;&lt;br&gt;
                     使用Docker Compose编排多个微服务，实现高可用架构
                 &lt;/li&gt;
@@ -1782,11 +1762,11 @@ COPY index.html /usr/share/nginx/html/</code></pre>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>contact.html (联系页面)</h5>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+                                <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -1806,7 +1786,7 @@ COPY index.html /usr/share/nginx/html/</code></pre>
         &lt;/div&gt;
     &lt;/nav&gt;
 
-    &lt;section class="content" style="padding-top: 6rem;"&gt;
+    &lt;section class="content"&gt;
         &lt;div class="container"&gt;
             &lt;h1&gt;联系我&lt;/h1&gt;
             &lt;p&gt;如果你有任何问题或合作意向，欢迎通过以下方式联系我：&lt;/p&gt;
@@ -1842,7 +1822,7 @@ COPY index.html /usr/share/nginx/html/</code></pre>
             </div>
 
             <!-- 步骤3：创建CSS -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-palette"></i>
                     <h4>步骤3：创建样式文件</h4>
@@ -1850,10 +1830,10 @@ COPY index.html /usr/share/nginx/html/</code></pre>
                 <div class="module-content">
                     <div class="practice-task">
                         <h5>css/style.css</h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">创建 <code>css/style.css</code> 文件：</p>
+                        <p>创建 <code>css/style.css</code> 文件：</p>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>/* 全局样式 */
+                                <pre><code>/* 全局样式 */
 * {
     margin: 0;
     padding: 0;
@@ -2057,7 +2037,7 @@ body {
             </div>
 
             <!-- 步骤4：部署到Docker -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-docker"></i>
                     <h4>步骤4：使用Docker部署网站</h4>
@@ -2067,7 +2047,7 @@ body {
                         <h5>方法1：使用数据卷挂载(推荐)</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell (假设你在 D:\my-website 目录)
+                                <pre><code># Windows PowerShell (假设你在 D:\my-website 目录)
 docker run -d `
   -p 8080:80 `
   -v D:/my-website:/usr/share/nginx/html `
@@ -2084,18 +2064,18 @@ docker run -d \
   nginx</code></pre>
                             </div>
                         </div>
-                        <div class="module-tip" style="margin-top: 0.75rem;">
+                        <div class="module-tip">
                             <div class="module-content">
                                 <p><strong>优点：</strong>修改主机文件后，刷新浏览器即可看到更新(无需重启容器)</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>方法2：使用docker cp(一次性部署)</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 启动容器
+                                <pre><code># 1. 启动容器
 docker run -d -p 8080:80 --name my-website nginx
 
 # 2. 停止Nginx(避免文件占用)
@@ -2110,11 +2090,11 @@ docker restart my-website</code></pre>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>验证部署</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 检查容器状态
+                                <pre><code># 1. 检查容器状态
 docker ps | grep my-website
 
 # 2. 查看容器日志
@@ -2124,9 +2104,9 @@ docker logs my-website
 # 打开浏览器访问 http://localhost:8080</code></pre>
                             </div>
                         </div>
-                        <div style="background-color: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success); margin-top: 0.75rem;">
-                            <p style="color: var(--color-success); font-weight: 600; margin-bottom: 0.5rem;">✅ 成功标志：</p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        <div>
+                            <p>✅ 成功标志：</p>
+                            <ul>
                                 <li>看到导航栏(紫色渐变背景)</li>
                                 <li>可以点击"首页""关于""联系"切换页面</li>
                                 <li>页面响应式(手机浏览也正常)</li>
@@ -2137,7 +2117,7 @@ docker logs my-website
             </div>
 
             <!-- 故障排查 -->
-            <div class="module-warning" style="margin-top: 1.5rem;">
+            <div class="module-warning">
                 <div class="module-header">
                     <i class="fas fa-wrench"></i>
                     <h4>常见问题排查</h4>
@@ -2145,12 +2125,12 @@ docker logs my-website
                 <div class="module-content">
                     <div class="grid-auto">
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 样式不生效</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：CSS文件路径错误</p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ 样式不生效</p>
+                            <p>原因：CSS文件路径错误</p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 进入容器检查文件结构
+                                    <pre><code># 进入容器检查文件结构
 docker exec my-website ls -R /usr/share/nginx/html
 
 # 确保css目录存在
@@ -2160,12 +2140,12 @@ docker exec my-website ls /usr/share/nginx/html/css</code></pre>
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ Windows路径问题</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：反斜杠 \ 需要改为正斜杠 /</p>
-                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ Windows路径问题</p>
+                            <p>原因：反斜杠 \ 需要改为正斜杠 /</p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 错误
+                                    <pre><code># 错误
 -v C:\Users\...\my-website:/usr/share/nginx/html
 
 # 正确
@@ -2175,12 +2155,12 @@ docker exec my-website ls /usr/share/nginx/html/css</code></pre>
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 403 Forbidden错误</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：没有index.html或权限问题</p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ 403 Forbidden错误</p>
+                            <p>原因：没有index.html或权限问题</p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 检查文件权限
+                                    <pre><code># 检查文件权限
 docker exec my-website ls -l /usr/share/nginx/html/
 
 # 修复权限
@@ -2193,10 +2173,10 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
             </div>
 
             <!-- 进阶挑战 -->
-            <div class="module-tip" style="margin-top: 1.5rem; background-color: #fef3c7; border-left: 3px solid var(--color-warning);">
+            <div class="module-tip">
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.75rem;">🚀 进阶挑战：让网站更专业</h5>
-                    <ul style="font-size: 0.875rem;">
+                    <h5>🚀 进阶挑战：让网站更专业</h5>
+                    <ul>
                         <li><strong>添加图片：</strong>在images目录放入头像图片，修改HTML引用</li>
                         <li><strong>添加JavaScript：</strong>实现导航栏滚动效果、打字机动画</li>
                         <li><strong>添加表单：</strong>在contact.html添加联系表单(纯前端验证)</li>
@@ -2210,11 +2190,11 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
         <!-- Section 7: 生命周期 -->
         <section id="lifecycle" class="section-card">
             <h2>
-                <i class="fas fa-recycle" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
+                <i class="fas fa-recycle"></i>
                 7. 容器生命周期管理：从创建到销毁
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">容器的生命周期管理是Docker运维的核心技能。这一节我们将深入学习容器的各种状态、状态转换命令、以及高级管理技巧。</p>
+            <p>容器的生命周期管理是Docker运维的核心技能。这一节我们将深入学习容器的各种状态、状态转换命令、以及高级管理技巧。</p>
 
             <!-- 容器状态图 -->
             <div class="module-concept">
@@ -2225,7 +2205,7 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
                 <div class="module-content">
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>容器生命周期完整流程：
+                            <pre><code>容器生命周期完整流程：
 
                     docker create
                          ⬇️
@@ -2257,65 +2237,65 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
             </div>
 
             <!-- 核心命令详解 -->
-            <div class="module-command" style="margin-top: 1.5rem;">
+            <div class="module-command">
                 <div class="module-header">
                     <i class="fas fa-terminal"></i>
                     <h4>核心生命周期管理命令</h4>
                 </div>
                 <div class="module-content">
-                    <table style="width: 100%; border-collapse: collapse;">
+                    <table>
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--color-border);">
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">命令</th>
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">说明</th>
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">典型场景</th>
+                            <tr>
+                                <th>命令</th>
+                                <th>说明</th>
+                                <th>典型场景</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker create</code></td>
-                                <td style="padding: 0.75rem;">创建容器但不启动</td>
-                                <td style="padding: 0.75rem;">预创建容器，稍后启动</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker start</code></td>
-                                <td style="padding: 0.75rem;">启动已停止的容器</td>
-                                <td style="padding: 0.75rem;">恢复之前停止的容器</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker stop</code></td>
-                                <td style="padding: 0.75rem;">优雅停止(发送SIGTERM)</td>
-                                <td style="padding: 0.75rem;">正常关闭，保存数据</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker restart</code></td>
-                                <td style="padding: 0.75rem;">重启容器(stop + start)</td>
-                                <td style="padding: 0.75rem;">应用配置修改</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker pause</code></td>
-                                <td style="padding: 0.75rem;">暂停容器(冻结进程)</td>
-                                <td style="padding: 0.75rem;">临时释放CPU资源</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker unpause</code></td>
-                                <td style="padding: 0.75rem;">恢复暂停的容器</td>
-                                <td style="padding: 0.75rem;">继续执行</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker kill</code></td>
-                                <td style="padding: 0.75rem;">强制杀死(发送SIGKILL)</td>
-                                <td style="padding: 0.75rem;">容器无响应时使用</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker rm</code></td>
-                                <td style="padding: 0.75rem;">删除已停止的容器</td>
-                                <td style="padding: 0.75rem;">清理不需要的容器</td>
+                            <tr>
+                                <td><code>docker create</code></td>
+                                <td>创建容器但不启动</td>
+                                <td>预创建容器，稍后启动</td>
                             </tr>
                             <tr>
-                                <td style="padding: 0.75rem;"><code>docker rm -f</code></td>
-                                <td style="padding: 0.75rem;">强制删除(即使运行中)</td>
-                                <td style="padding: 0.75rem;">快速清理</td>
+                                <td><code>docker start</code></td>
+                                <td>启动已停止的容器</td>
+                                <td>恢复之前停止的容器</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker stop</code></td>
+                                <td>优雅停止(发送SIGTERM)</td>
+                                <td>正常关闭，保存数据</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker restart</code></td>
+                                <td>重启容器(stop + start)</td>
+                                <td>应用配置修改</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker pause</code></td>
+                                <td>暂停容器(冻结进程)</td>
+                                <td>临时释放CPU资源</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker unpause</code></td>
+                                <td>恢复暂停的容器</td>
+                                <td>继续执行</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker kill</code></td>
+                                <td>强制杀死(发送SIGKILL)</td>
+                                <td>容器无响应时使用</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker rm</code></td>
+                                <td>删除已停止的容器</td>
+                                <td>清理不需要的容器</td>
+                            </tr>
+                            <tr>
+                                <td><code>docker rm -f</code></td>
+                                <td>强制删除(即使运行中)</td>
+                                <td>快速清理</td>
                             </tr>
                         </tbody>
                     </table>
@@ -2323,7 +2303,7 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
             </div>
 
             <!-- stop vs kill详解 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-question-circle"></i>
                     <h4>🔍 docker stop 与 docker kill 的区别</h4>
@@ -2332,16 +2312,16 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
                     <div class="grid-auto">
                         <div class="module-tip">
                             <div class="module-content">
-                                <p style="font-weight: 600; color: var(--color-success);">✅ docker stop (推荐)</p>
-                                <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                                <p>✅ docker stop (推荐)</p>
+                                <ul>
                                     <li><strong>信号：</strong>SIGTERM (15号信号)</li>
                                     <li><strong>行为：</strong>给容器10秒时间优雅关闭</li>
                                     <li><strong>效果：</strong>程序可以保存数据、关闭连接</li>
                                     <li><strong>超时：</strong>10秒后仍未停止，自动发送SIGKILL</li>
                                 </ul>
-                                <div class="module-command" style="margin-top: 0.5rem;">
+                                <div class="module-command">
                                     <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 默认10秒超时
+                                        <pre><code># 默认10秒超时
 docker stop web
 
 # 自定义超时时间(30秒)
@@ -2353,16 +2333,16 @@ docker stop -t 30 web</code></pre>
 
                         <div class="module-warning">
                             <div class="module-content">
-                                <p style="font-weight: 600; color: var(--color-error);">⚠️ docker kill (慎用)</p>
-                                <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                                <p>⚠️ docker kill (慎用)</p>
+                                <ul>
                                     <li><strong>信号：</strong>SIGKILL (9号信号)</li>
                                     <li><strong>行为：</strong>立即强制终止进程</li>
                                     <li><strong>效果：</strong>类似拔电源，可能丢失数据</li>
                                     <li><strong>适用：</strong>容器卡死、无响应时</li>
                                 </ul>
-                                <div class="module-command" style="margin-top: 0.5rem;">
+                                <div class="module-command">
                                     <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 强制杀死
+                                        <pre><code># 强制杀死
 docker kill web
 
 # 发送自定义信号
@@ -2373,10 +2353,10 @@ docker kill -s SIGINT web</code></pre>
                         </div>
                     </div>
 
-                    <div class="module-tip" style="margin-top: 1rem; background-color: #fef3c7; border-left: 3px solid var(--color-warning);">
+                    <div class="module-tip">
                         <div class="module-content">
-                            <p style="font-weight: 600;">💡 类比理解：</p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <p>💡 类比理解：</p>
+                            <ul>
                                 <li><code>docker stop</code> = 点击"关机"按钮(正常关机流程)</li>
                                 <li><code>docker kill</code> = 直接拔电源(强制断电)</li>
                             </ul>
@@ -2386,50 +2366,50 @@ docker kill -s SIGINT web</code></pre>
             </div>
 
             <!-- 重启策略 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-redo"></i>
                     <h4>容器重启策略：自动恢复机制</h4>
                 </div>
                 <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;">重启策略决定了容器退出后的行为，对于生产环境至关重要。</p>
+                    <p>重启策略决定了容器退出后的行为，对于生产环境至关重要。</p>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 0.75rem;">
+                    <table>
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--color-border);">
-                                <th style="text-align: left; padding: 0.75rem;">策略</th>
-                                <th style="text-align: left; padding: 0.75rem;">说明</th>
-                                <th style="text-align: left; padding: 0.75rem;">适用场景</th>
+                            <tr>
+                                <th>策略</th>
+                                <th>说明</th>
+                                <th>适用场景</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>no</code></td>
-                                <td style="padding: 0.75rem;">不自动重启(默认)</td>
-                                <td style="padding: 0.75rem;">开发测试环境</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>always</code></td>
-                                <td style="padding: 0.75rem;">总是重启</td>
-                                <td style="padding: 0.75rem;">长期运行的服务</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>on-failure</code></td>
-                                <td style="padding: 0.75rem;">非0退出码时重启</td>
-                                <td style="padding: 0.75rem;">可能崩溃的应用</td>
+                            <tr>
+                                <td><code>no</code></td>
+                                <td>不自动重启(默认)</td>
+                                <td>开发测试环境</td>
                             </tr>
                             <tr>
-                                <td style="padding: 0.75rem;"><code>unless-stopped</code></td>
-                                <td style="padding: 0.75rem;">除非手动停止</td>
-                                <td style="padding: 0.75rem;">推荐生产环境</td>
+                                <td><code>always</code></td>
+                                <td>总是重启</td>
+                                <td>长期运行的服务</td>
+                            </tr>
+                            <tr>
+                                <td><code>on-failure</code></td>
+                                <td>非0退出码时重启</td>
+                                <td>可能崩溃的应用</td>
+                            </tr>
+                            <tr>
+                                <td><code>unless-stopped</code></td>
+                                <td>除非手动停止</td>
+                                <td>推荐生产环境</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">实战示例：</h5>
+                    <h5>实战示例：</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 总是重启(适合Web服务器)
+                            <pre><code># 1. 总是重启(适合Web服务器)
 docker run -d --restart=always -p 8080:80 --name web nginx
 
 # 2. 失败时重启，最多尝试3次
@@ -2443,10 +2423,10 @@ docker update --restart=always web</code></pre>
                         </div>
                     </div>
 
-                    <div class="module-tip" style="margin-top: 0.75rem;">
+                    <div class="module-tip">
                         <div class="module-content">
                             <p><strong>always vs unless-stopped 的区别：</strong></p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            <ul>
                                 <li><code>always</code>: Docker daemon重启后，容器也会自动启动</li>
                                 <li><code>unless-stopped</code>: 如果容器是手动停止的，daemon重启后不会自动启动</li>
                             </ul>
@@ -2456,7 +2436,7 @@ docker update --restart=always web</code></pre>
             </div>
 
             <!-- 批量管理 -->
-            <div class="module-tip" style="margin-top: 1.5rem;">
+            <div class="module-tip">
                 <div class="module-header">
                     <i class="fas fa-layer-group"></i>
                     <h4>批量操作：管理多个容器</h4>
@@ -2464,7 +2444,7 @@ docker update --restart=always web</code></pre>
                 <div class="module-content">
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 停止所有运行中的容器
+                            <pre><code># 1. 停止所有运行中的容器
 docker stop $(docker ps -q)
 
 # 2. 删除所有已停止的容器
@@ -2492,16 +2472,16 @@ docker ps -a -n 3</code></pre>
             </div>
 
             <!-- 日志和监控 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
+            <div class="module-concept">
                 <div class="module-header">
                     <i class="fas fa-chart-line"></i>
                     <h4>容器监控与日志管理</h4>
                 </div>
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.5rem;">实时监控容器资源使用：</h5>
+                    <h5>实时监控容器资源使用：</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 实时显示所有容器的CPU、内存、网络、磁盘使用情况
+                            <pre><code># 实时显示所有容器的CPU、内存、网络、磁盘使用情况
 docker stats
 
 # 只监控特定容器
@@ -2512,23 +2492,23 @@ docker stats --no-stream</code></pre>
                         </div>
                     </div>
 
-                    <div class="module-output" style="margin-top: 0.5rem;">
+                    <div class="module-output">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>CONTAINER ID   NAME   CPU %   MEM USAGE / LIMIT   MEM %   NET I/O       BLOCK I/O
+                            <pre><code>CONTAINER ID   NAME   CPU %   MEM USAGE / LIMIT   MEM %   NET I/O       BLOCK I/O
 abc123def456   web    0.01%   3.5MiB / 7.78GiB    0.04%   1.2kB / 0B    0B / 0B</code></pre>
                         </div>
                     </div>
 
-                    <div class="module-warning" style="margin-top: 1rem;">
+                    <div class="module-warning">
                         <div class="module-content">
                             <p><strong>注意：</strong>docker stats 显示的是实时数据，可能会影响容器性能，建议在开发环境使用</p>
                         </div>
                     </div>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">日志管理：</h5>
+                    <h5>日志管理：</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看容器日志(最近100行)
+                            <pre><code># 查看容器日志(最近100行)
 docker logs --tail 100 web
 
 # 实时跟踪日志(类似tail -f)
@@ -2548,12 +2528,12 @@ docker logs -f --tail 50 -t web</code></pre>
             </div>
 
             <!-- 容器详细信息 -->
-            <div class="module-tip" style="margin-top: 1.5rem; background-color: #e0e7ff; border-left: 3px solid var(--color-primary);">
+            <div class="module-tip">
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.75rem;">🔍 查看容器详细信息</h5>
+                    <h5>🔍 查看容器详细信息</h5>
                     <div class="module-command">
                         <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看容器完整配置(JSON格式)
+                            <pre><code># 查看容器完整配置(JSON格式)
 docker inspect web
 
 # 只查看IP地址
@@ -2573,7 +2553,7 @@ docker inspect -f '{{.RestartCount}}' web</code></pre>
             </div>
 
             <!-- 实战场景 -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-flask"></i>
                     <h4>实战场景：常见运维操作</h4>
@@ -2583,7 +2563,7 @@ docker inspect -f '{{.RestartCount}}' web</code></pre>
                         <h5>场景1：应用更新流程</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 停止旧容器
+                                <pre><code># 1. 停止旧容器
 docker stop web
 
 # 2. 备份旧容器(可选)
@@ -2605,7 +2585,7 @@ docker run -d -p 8080:80 --name web --restart=always nginx:latest</code></pre>
                         <h5>场景2：容器故障排查</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 检查容器状态
+                                <pre><code># 1. 检查容器状态
 docker ps -a | grep web
 
 # 2. 查看退出码
@@ -2627,7 +2607,7 @@ docker stats web --no-stream</code></pre>
                         <h5>场景3：清理Docker环境</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 删除所有已停止的容器
+                                <pre><code># 1. 删除所有已停止的容器
 docker container prune -f
 
 # 2. 删除所有未使用的镜像
@@ -2654,11 +2634,11 @@ docker system df</code></pre>
         <!-- Section 8: 完整实战 -->
         <section id="final-challenge" class="section-card">
             <h2>
-                <i class="fas fa-trophy" style="color: var(--color-success); margin-right: 0.75rem;"></i>
+                <i class="fas fa-trophy"></i>
                 8. 完整实战：打造你的第一个专业网站
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">恭喜你已经掌握了Docker + Nginx的核心知识！现在我们来完成一个综合性的实战项目：<strong>创建一个响应式的个人主页</strong>，并使用数据卷实现持久化部署。</p>
+            <p>恭喜你已经掌握了Docker + Nginx的核心知识！现在我们来完成一个综合性的实战项目：<strong>创建一个响应式的个人主页</strong>，并使用数据卷实现持久化部署。</p>
 
             <!-- 项目目标 -->
             <div class="module-concept">
@@ -2669,8 +2649,8 @@ docker system df</code></pre>
                 <div class="module-content">
                     <div class="grid-auto">
                         <div>
-                            <p style="font-weight: 600;">✅ 要实现的功能：</p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>✅ 要实现的功能：</p>
+                            <ul>
                                 <li>响应式个人主页</li>
                                 <li>现代化CSS样式</li>
                                 <li>多个页面(首页、关于、联系)</li>
@@ -2679,8 +2659,8 @@ docker system df</code></pre>
                             </ul>
                         </div>
                         <div>
-                            <p style="font-weight: 600;">🎯 涉及的技术：</p>
-                            <ul style="font-size: 0.875rem;">
+                            <p>🎯 涉及的技术：</p>
+                            <ul>
                                 <li>Docker 容器运行</li>
                                 <li>端口映射 (-p)</li>
                                 <li>数据卷挂载 (-v)</li>
@@ -2693,7 +2673,7 @@ docker system df</code></pre>
             </div>
 
             <!-- 步骤1：项目结构 -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-folder-tree"></i>
                     <h4>步骤1：创建项目目录结构</h4>
@@ -2703,7 +2683,7 @@ docker system df</code></pre>
                         <h5>在主机上创建目录</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                                               <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell
+                                                               <pre><code># Windows PowerShell
 mkdir my-website
 cd my-website
 mkdir css, js, images
@@ -2713,10 +2693,10 @@ mkdir -p my-website/{css,js,images}
 cd my-website</code></pre>
                             </div>
                         </div>
-                        <p style="margin-top: 0.5rem; font-size: 0.875rem;">目标结构：</p>
+                        <p>目标结构：</p>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>my-website/
+                                <pre><code>my-website/
 ├── index.html       # 首页
 ├── about.html       # 关于页面
 ├── contact.html     # 联系页面
@@ -2732,7 +2712,7 @@ cd my-website</code></pre>
             </div>
 
             <!-- 步骤2：创建HTML文件 -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-code"></i>
                     <h4>步骤2：创建HTML文件</h4>
@@ -2740,10 +2720,10 @@ cd my-website</code></pre>
                 <div class="module-content">
                     <div class="practice-task">
                         <h5>index.html (首页)</h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">将以下内容保存为 <code>index.html</code>：</p>
+                        <p>将以下内容保存为 <code>index.html</code>：</p>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+                                <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -2809,11 +2789,11 @@ cd my-website</code></pre>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>about.html (关于页面)</h5>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+                                <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -2833,17 +2813,17 @@ cd my-website</code></pre>
         &lt;/div&gt;
     &lt;/nav&gt;
 
-    &lt;section class="content" style="padding-top: 6rem;"&gt;
+    &lt;section class="content"&gt;
         &lt;div class="container"&gt;
             &lt;h1&gt;关于我&lt;/h1&gt;
             &lt;p&gt;我是一名热爱编程的开发者，专注于容器化技术和Web开发。这个网站使用Docker + Nginx部署，展示了现代化的DevOps实践。&lt;/p&gt;
             
-            &lt;h2 style="margin-top: 2rem;"&gt;教育背景&lt;/h2&gt;
+            &lt;h2&gt;教育背景&lt;/h2&gt;
             &lt;p&gt;🎓 XX大学 - 计算机科学与技术专业 (2020-2024)&lt;/p&gt;
             
-            &lt;h2 style="margin-top: 2rem;"&gt;项目经验&lt;/h2&gt;
-            &lt;ul style="list-style: none; padding: 0;"&gt;
-                &lt;li style="margin-bottom: 1rem;"&gt;
+            &lt;h2&gt;项目经验&lt;/h2&gt;
+            &lt;ul&gt;
+                &lt;li&gt;
                     &lt;strong&gt;🚀 微服务平台&lt;/strong&gt;&lt;br&gt;
                     使用Docker Compose编排多个微服务，实现高可用架构
                 &lt;/li&gt;
@@ -2866,11 +2846,11 @@ cd my-website</code></pre>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>contact.html (联系页面)</h5>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+                                <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -2890,7 +2870,7 @@ cd my-website</code></pre>
         &lt;/div&gt;
     &lt;/nav&gt;
 
-    &lt;section class="content" style="padding-top: 6rem;"&gt;
+    &lt;section class="content"&gt;
         &lt;div class="container"&gt;
             &lt;h1&gt;联系我&lt;/h1&gt;
             &lt;p&gt;如果你有任何问题或合作意向，欢迎通过以下方式联系我：&lt;/p&gt;
@@ -2926,7 +2906,7 @@ cd my-website</code></pre>
             </div>
 
             <!-- 步骤3：创建CSS -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-palette"></i>
                     <h4>步骤3：创建样式文件</h4>
@@ -2934,10 +2914,10 @@ cd my-website</code></pre>
                 <div class="module-content">
                     <div class="practice-task">
                         <h5>css/style.css</h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">创建 <code>css/style.css</code> 文件：</p>
+                        <p>创建 <code>css/style.css</code> 文件：</p>
                         <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>/* 全局样式 */
+                                <pre><code>/* 全局样式 */
 * {
     margin: 0;
     padding: 0;
@@ -3141,7 +3121,7 @@ body {
             </div>
 
             <!-- 步骤4：部署到Docker -->
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-docker"></i>
                     <h4>步骤4：使用Docker部署网站</h4>
@@ -3151,7 +3131,7 @@ body {
                         <h5>方法1：使用数据卷挂载(推荐)</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell (假设你在 D:\my-website 目录)
+                                <pre><code># Windows PowerShell (假设你在 D:\my-website 目录)
 docker run -d `
   -p 8080:80 `
   -v D:/my-website:/usr/share/nginx/html `
@@ -3168,18 +3148,18 @@ docker run -d \
   nginx</code></pre>
                             </div>
                         </div>
-                        <div class="module-tip" style="margin-top: 0.75rem;">
+                        <div class="module-tip">
                             <div class="module-content">
                                 <p><strong>优点：</strong>修改主机文件后，刷新浏览器即可看到更新(无需重启容器)</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>方法2：使用docker cp(一次性部署)</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 启动容器
+                                <pre><code># 1. 启动容器
 docker run -d -p 8080:80 --name my-website nginx
 
 # 2. 停止Nginx(避免文件占用)
@@ -3194,11 +3174,11 @@ docker restart my-website</code></pre>
                         </div>
                     </div>
 
-                    <div class="practice-task" style="margin-top: 1rem;">
+                    <div class="practice-task">
                         <h5>验证部署</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 检查容器状态
+                                <pre><code># 1. 检查容器状态
 docker ps | grep my-website
 
 # 2. 查看容器日志
@@ -3208,9 +3188,9 @@ docker logs my-website
 # 打开浏览器访问 http://localhost:8080</code></pre>
                             </div>
                         </div>
-                        <div style="background-color: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success); margin-top: 0.75rem;">
-                            <p style="color: var(--color-success); font-weight: 600; margin-bottom: 0.5rem;">✅ 成功标志：</p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        <div>
+                            <p>✅ 成功标志：</p>
+                            <ul>
                                 <li>看到导航栏(紫色渐变背景)</li>
                                 <li>可以点击"首页""关于""联系"切换页面</li>
                                 <li>页面响应式(手机浏览也正常)</li>
@@ -3221,7 +3201,7 @@ docker logs my-website
             </div>
 
             <!-- 故障排查 -->
-            <div class="module-warning" style="margin-top: 1.5rem;">
+            <div class="module-warning">
                 <div class="module-header">
                     <i class="fas fa-wrench"></i>
                     <h4>常见问题排查</h4>
@@ -3229,12 +3209,12 @@ docker logs my-website
                 <div class="module-content">
                     <div class="grid-auto">
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 样式不生效</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：CSS文件路径错误</p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ 样式不生效</p>
+                            <p>原因：CSS文件路径错误</p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 进入容器检查文件结构
+                                    <pre><code># 进入容器检查文件结构
 docker exec my-website ls -R /usr/share/nginx/html
 
 # 确保css目录存在
@@ -3244,12 +3224,12 @@ docker exec my-website ls /usr/share/nginx/html/css</code></pre>
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ Windows路径问题</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：反斜杠 \ 需要改为正斜杠 /</p>
-                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ Windows路径问题</p>
+                            <p>原因：反斜杠 \ 需要改为正斜杠 /</p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 错误
+                                    <pre><code># 错误
 -v C:\Users\...\my-website:/usr/share/nginx/html
 
 # 正确
@@ -3259,12 +3239,12 @@ docker exec my-website ls /usr/share/nginx/html/css</code></pre>
                         </div>
 
                         <div>
-                            <p style="font-weight: 600; color: var(--color-error);">❌ 403 Forbidden错误</p>
-                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：没有index.html或权限问题</p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
-                            <div class="module-command" style="margin-top: 0.5rem;">
+                            <p>❌ 403 Forbidden错误</p>
+                            <p>原因：没有index.html或权限问题</p>
+                            <p><strong>解决：</strong></p>
+                            <div class="module-command">
                                 <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 检查文件权限
+                                    <pre><code># 检查文件权限
 docker exec my-website ls -l /usr/share/nginx/html/
 
 # 修复权限
@@ -3277,10 +3257,10 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
             </div>
 
             <!-- 进阶挑战 -->
-            <div class="module-tip" style="margin-top: 1.5rem; background-color: #fef3c7; border-left: 3px solid var(--color-warning);">
+            <div class="module-tip">
                 <div class="module-content">
-                    <h5 style="margin-bottom: 0.75rem;">🚀 进阶挑战：让网站更专业</h5>
-                    <ul style="font-size: 0.875rem;">
+                    <h5>🚀 进阶挑战：让网站更专业</h5>
+                    <ul>
                         <li><strong>添加图片：</strong>在images目录放入头像图片，修改HTML引用</li>
                         <li><strong>添加JavaScript：</strong>实现导航栏滚动效果、打字机动画</li>
                         <li><strong>添加表单：</strong>在contact.html添加联系表单(纯前端验证)</li>
@@ -3309,7 +3289,7 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
                 </div>
             </div>
 
-            <div class="module-practice" style="margin-top: 1.5rem;">
+            <div class="module-practice">
                 <div class="module-header">
                     <i class="fas fa-tasks"></i>
                     <h4>课后作业</h4>
@@ -3330,13 +3310,13 @@ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
     </main>
 
     <!-- Footer -->
-    <footer style="background-color: var(--color-text); color: var(--color-text-lighter); padding: 2rem 0; margin-top: 3rem; border-top: 1px solid var(--color-border);">
+    <footer>
         <div class="container text-center">
-            <p style="font-size: 0.875rem;">Docker 容器技术竞赛培训 - 第二讲：玩转容器网络与修改网页</p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.7;">
-                <i class="fas fa-network-wired" style="margin-right: 0.25rem;"></i> 端口映射 • 
-                <i class="fas fa-terminal" style="margin: 0 0.25rem;"></i> 容器操作 • 
-                <i class="fas fa-edit" style="margin: 0 0.25rem;"></i> 网页修改
+            <p>Docker 容器技术竞赛培训 - 第二讲：玩转容器网络与修改网页</p>
+            <p>
+                <i class="fas fa-network-wired"></i> 端口映射 • 
+                <i class="fas fa-terminal"></i> 容器操作 • 
+                <i class="fas fa-edit"></i> 网页修改
             </p>
         </div>
     </footer>

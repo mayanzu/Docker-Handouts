@@ -4,67 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第4讲：Docker Compose 全栈编排</title>
-    
-    <!-- 统一样式引用 -->
-    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
-    <!-- 通用工具函数库 -->
-    <script src='../模板/js/lecture-utils.js'></script>
+    <link rel="stylesheet" href="模板/统一讲义样式模板.css">
+    <script src="模板/js/lecture-utils.js" defer></script>
 </head>
 <body>
 
-<!-- ============================================
-     侧边栏导航 - 课程目录
-     ============================================ -->
+<!-- 侧边栏导航 -->
 <nav class="sidebar">
     <div class="sidebar-nav">
         <h3>课程导航</h3>
         <a class="sidebar-link" href="#intro">👋 课程概览</a>
         
-        <!-- Part 1: 理论基础 -->
         <h3>Part 1: 理论基础</h3>
         <a class="sidebar-link sub-link" href="#theory">一、从"手动挡"到"自动挡"</a>
         <a class="sidebar-link sub-link" href="#theory-compare">1.1 手动 vs Compose 对比</a>
         
-        <!-- Part 2: 实战演练 -->
         <h3>Part 2: 实战演练</h3>
         <a class="sidebar-link sub-link" href="#wordpress">二、实战：部署 WordPress + MySQL</a>
         <a class="sidebar-link sub-link" href="#yaml-basics">2.1 YAML 基础语法</a>
         <a class="sidebar-link sub-link" href="#wordpress-steps">2.2 完整操作步骤</a>
         
-        <!-- Part 3: 深入理解 -->
         <h3>Part 3: 深入理解</h3>
         <a class="sidebar-link sub-link" href="#compose-file">三、docker-compose.yml 完全解析</a>
         <a class="sidebar-link sub-link" href="#commands">四、Docker Compose 常用命令</a>
         
-        <!-- Part 4: 问题排查 -->
         <h3>Part 4: 问题排查</h3>
         <a class="sidebar-link sub-link" href="#troubleshoot">五、常见问题排查</a>
         
-        <!-- Part 5: 竞赛与进阶 -->
         <h3>Part 5: 竞赛与进阶</h3>
         <a class="sidebar-link sub-link" href="#challenge">六、竞赛模拟题</a>
         <a class="sidebar-link sub-link" href="#extras">七、进阶优化</a>
         
-        <!-- 总结 -->
         <h3>总结与练习</h3>
         <a class="sidebar-link sub-link" href="#summary">📝 本讲总结</a>
     </div>
 </nav>
 
-
-<!-- ============================================
-     主内容区域
-     ============================================ -->
+<!-- 主内容区 -->
 <main class="content">
 
-    <!-- ============================================
-         课程头部 - 概览区域
-         ============================================ -->
+    <!-- 课程头部 -->
     <header id="intro">
         <h1>第4讲：Docker Compose 全栈编排</h1>
         <p class="intro">本讲将学习使用 Docker Compose 进行多容器应用的编排与管理，从"手动挡"升级到"自动挡"，实现一键部署复杂应用栈。</p>
         
-        <!-- 知识点标签列表 -->
         <div class="pill-list">
             <span class="pill">Docker Compose</span>
             <span class="pill">YAML 配置</span>
@@ -76,10 +59,6 @@
     </header>
 
 
-    <!-- ============================================
-         第一部分：从"手动挡"到"自动挡"
-         ============================================ -->
-    
     <section id="theory">
         <h2>一、从"手动挡"到"自动挡"</h2>
         
@@ -97,7 +76,7 @@
         <div class="warning-box">
             <strong>现在的问题</strong>
             <p>当部署<strong>多容器应用</strong>（如 WordPress = 前端 + MySQL），需要敲很多条命令，顺序不能错，参数容易漏……</p>
-            <p style="font-weight: 600; margin-top: 0.5rem;">👉 就像每次开车都要手动打火、挂挡——能开，但太累了！</p>
+            <p><strong>👉 就像每次开车都要手动打火、挂挡——能开，但太累了！</p>
         </div>
 
         <h4>手动方式 vs Compose 优势对比</h4>
@@ -138,7 +117,7 @@
         <h3>1.1 手动 vs Compose 对比</h3>
         
         <h4>手动方式</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code># 每条命令都要敲且顺序不能错
+<pre><code># 每条命令都要敲且顺序不能错
 docker network create wp-net
 docker run --name wp-db --network wp-net \
   -e MYSQL_ROOT_PASSWORD=rootpass123 \
@@ -148,15 +127,11 @@ docker run --name wp-app -p 8080:80 --network wp-net \
   -e WORDPRESS_DB_HOST=wp-db:3306 wordpress:latest</code></pre>
         
         <h4>Compose 方式</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code># 把参数写进 YAML 后只需一句
+<pre><code># 把参数写进 YAML 后只需一句
 docker compose up -d</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第二部分：实战：部署 WordPress + MySQL
-         ============================================ -->
-    
     <section id="wordpress">
         <h2>二、实战：部署 WordPress + MySQL</h2>
         
@@ -180,14 +155,14 @@ docker compose up -d</code></pre>
             <tbody>
                 <tr>
                     <td>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px; margin: 0;"><code>services:
+<pre><code>services:
   web:
     image: nginx
     ports:
       - "80:80"</code></pre>
                     </td>
                     <td>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px; margin: 0;"><code>services:
+<pre><code>services:
     web:        # Tab缩进（错！）
     image:nginx # 冒号后无空格（错！）
     ports:
@@ -212,11 +187,11 @@ docker compose up -d</code></pre>
         <h3>2.2 完整操作步骤</h3>
         
         <h4>步骤 1：创建工作目录</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>mkdir compose-wp
+<pre><code>mkdir compose-wp
 cd compose-wp</code></pre>
 
         <h4>步骤 2：编写 docker-compose.yml</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>services:
+<pre><code>services:
   db:
     image: mysql:8.0
     container_name: wp-db
@@ -264,10 +239,10 @@ volumes:
         </div>
 
         <h4>步骤 3：启动服务栈</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>docker compose up -d</code></pre>
+<pre><code>docker compose up -d</code></pre>
 
         <p><strong>预期输出：</strong></p>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>[+] Running 3/3
+<pre><code>[+] Running 3/3
  ✔ Network compose-wp_default  Created
  ✔ Container wp-db             Started
  ✔ Container wp-app            Started</code></pre>
@@ -277,15 +252,11 @@ volumes:
     </section>
 
 
-    <!-- ============================================
-         第三部分：docker-compose.yml 完全解析
-         ============================================ -->
-    
     <section id="compose-file">
         <h2>三、docker-compose.yml 完全解析</h2>
         
         <h3>3.1 文件结构</h3>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>services:        # 服务定义
+<pre><code>services:        # 服务定义
   service1:
     ...
   service2:
@@ -349,10 +320,6 @@ volumes:         # 卷定义（可选）
     </section>
 
 
-    <!-- ============================================
-         第四部分：Docker Compose 常用命令
-         ============================================ -->
-    
     <section id="commands">
         <h2>四、Docker Compose 常用命令</h2>
         
@@ -403,10 +370,6 @@ volumes:         # 卷定义（可选）
     </section>
 
 
-    <!-- ============================================
-         第五部分：常见问题排查
-         ============================================ -->
-    
     <section id="troubleshoot">
         <h2>五、常见问题排查</h2>
         
@@ -433,10 +396,6 @@ volumes:         # 卷定义（可选）
     </section>
 
 
-    <!-- ============================================
-         第六部分：竞赛模拟题
-         ============================================ -->
-    
     <section id="challenge">
         <h2>六、竞赛模拟题</h2>
         
@@ -461,10 +420,6 @@ volumes:         # 卷定义（可选）
     </section>
 
 
-    <!-- ============================================
-         第七部分：进阶优化
-         ============================================ -->
-    
     <section id="extras">
         <h2>七、进阶优化</h2>
         
@@ -480,11 +435,11 @@ volumes:         # 卷定义（可选）
 
         <h3>7.1 使用 .env 文件示例</h3>
         <h4>.env 文件</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>MYSQL_ROOT_PASSWORD=secret123
+<pre><code>MYSQL_ROOT_PASSWORD=secret123
 MYSQL_DATABASE=myapp</code></pre>
         
         <h4>docker-compose.yml</h4>
-<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>services:
+<pre><code>services:
   db:
     image: mysql:8.0
     environment:
@@ -493,10 +448,6 @@ MYSQL_DATABASE=myapp</code></pre>
     </section>
 
 
-    <!-- ============================================
-         总结与练习
-         ============================================ -->
-    
     <section id="summary">
         <h2>📝 本讲总结</h2>
         

@@ -3,65 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第3课：Dockerfile 自动化构建镜像</title>
-    
-    <!-- 统一样式引用 -->
-    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
-    <!-- 通用工具函数库 -->
-    <script src='../模板/js/lecture-utils.js'></script>
+    <title>第3讲：Dockerfile 自动化构建镜像</title>
+    <link rel="stylesheet" href="模板/统一讲义样式模板.css">
+    <script src="模板/js/lecture-utils.js" defer></script>
 </head>
 <body>
 
-<!-- ============================================
-     侧边栏导航 - 课程目录
-     ============================================ -->
+<!-- 侧边栏导航 -->
 <nav class="sidebar">
     <div class="sidebar-nav">
         <h3>课程导航</h3>
         <a class="sidebar-link" href="#intro">👋 课程概览</a>
         
-        <!-- Part 1: 回顾与引入 -->
         <h3>Part 1: 知识回顾</h3>
         <a class="sidebar-link sub-link" href="#review">一、Docker 基础回顾</a>
         
-        <!-- Part 2: Dockerfile 基础 -->
         <h3>Part 2: Dockerfile 基础</h3>
         <a class="sidebar-link sub-link" href="#dockerfile-intro">二、认识 Dockerfile</a>
         <a class="sidebar-link sub-link" href="#first-dockerfile">三、第一个 Dockerfile</a>
         <a class="sidebar-link sub-link" href="#lab-1">🔬 实验 01</a>
         
-        <!-- Part 3: 深入学习 -->
         <h3>Part 3: 指令详解</h3>
         <a class="sidebar-link sub-link" href="#build-details">四、docker build 详解</a>
         <a class="sidebar-link sub-link" href="#dockerfile-commands">五、常用指令实战</a>
         <a class="sidebar-link sub-link" href="#lab-2">🔬 实验 02</a>
         
-        <!-- Part 4: 项目实战 -->
         <h3>Part 4: 项目实战</h3>
         <a class="sidebar-link sub-link" href="#mini-project">六、打包个人主页</a>
         <a class="sidebar-link sub-link" href="#image-optimize">七、镜像优化技巧</a>
         <a class="sidebar-link sub-link" href="#troubleshooting">八、常见错误排查</a>
         
-        <!-- 总结 -->
         <h3>总结与练习</h3>
         <a class="sidebar-link sub-link" href="#summary">📝 课程小结</a>
     </div>
 </nav>
 
-
-<!-- ============================================
-     主内容区域
-     ============================================ -->
+<!-- 主内容区 -->
 <main class="content">
 
-    <!-- ============================================
-         课程头部 - 概览区域
-         ============================================ -->
+    <!-- 课程头部 -->
     <header id="intro">
         <h1>第3课：Dockerfile 自动化构建镜像</h1>
         <p class="intro">上节课我们手动进入容器修改文件，但每次重启容器改动就丢失了。本课将学习使用 Dockerfile 自动化构建镜像，让修改"固化"到镜像里，实现一次编写、随处运行。</p>
         
-        <!-- 知识点标签列表 -->
         <div class="pill-list">
             <span class="pill">Dockerfile</span>
             <span class="pill">FROM</span>
@@ -76,10 +60,6 @@
     </header>
 
 
-    <!-- ============================================
-         第一部分：知识回顾
-         ============================================ -->
-    
     <section id="review">
         <h2>一、知识回顾：Docker 基础</h2>
         
@@ -170,10 +150,6 @@ nginx        alpine    8e75cbc5b25c   2 weeks ago    41MB</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第二部分：认识 Dockerfile
-         ============================================ -->
-    
     <section id="dockerfile-intro">
         <h2>二、认识 Dockerfile：镜像的"施工图纸"</h2>
         
@@ -232,10 +208,6 @@ nginx        alpine    8e75cbc5b25c   2 weeks ago    41MB</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第三部分：第一个 Dockerfile
-         ============================================ -->
-    
     <section id="first-dockerfile">
         <h2>三、实战：动手写第一个 Dockerfile</h2>
         
@@ -296,9 +268,6 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
     </section>
 
 
-    <!-- ============================================
-         实验 01：构建并运行第一个镜像
-         ============================================ -->
     <section id="lab-1">
         <h2>实验 01：构建并运行第一个镜像</h2>
         
@@ -334,10 +303,6 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第四部分：docker build 详解
-         ============================================ -->
-    
     <section id="build-details">
         <h2>四、docker build 命令详解</h2>
         
@@ -395,10 +360,6 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第五部分：Dockerfile 常用指令
-         ============================================ -->
-    
     <section id="dockerfile-commands">
         <h2>五、Dockerfile 常用指令实战</h2>
         
@@ -572,9 +533,6 @@ EXPOSE 8080 443       # 可以声明多个端口</code></pre>
     </section>
 
 
-    <!-- ============================================
-         实验 02：综合练习
-         ============================================ -->
     <section id="lab-2">
         <h2>实验 02：Dockerfile 指令综合练习</h2>
         
@@ -612,10 +570,6 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第六部分：完整项目实战
-         ============================================ -->
-    
     <section id="mini-project">
         <h2>六、完整项目实战：打包个人主页</h2>
         
@@ -774,10 +728,6 @@ docker ps</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第七部分：镜像优化技巧
-         ============================================ -->
-    
     <section id="image-optimize">
         <h2>七、镜像优化技巧</h2>
         
@@ -889,10 +839,6 @@ CMD ["npm", "start"]</code></pre>
     </section>
 
 
-    <!-- ============================================
-         第八部分：常见错误排查
-         ============================================ -->
-    
     <section id="troubleshooting">
         <h2>八、常见错误排查</h2>
         
@@ -959,9 +905,6 @@ docker run -it 镜像名 sh</code></pre>
     </section>
 
 
-    <!-- ============================================
-         课程小结区域
-         ============================================ -->
     <section id="summary">
         <h2>九、本课小结</h2>
         

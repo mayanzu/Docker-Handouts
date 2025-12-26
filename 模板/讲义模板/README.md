@@ -1,98 +1,179 @@
-# 讲义模板使用说明
+# Docker/K8s 讲义模板使用说明
 
-## 一、文件结构
+## 文件结构
 
 ```
-讲义模板/
-├── 讲义模板.html      # 完整的讲义模板文件
-└── README.md          # 本说明文档
+模板/
+├── 统一讲义样式模板.css    # 简约风格的统一样式
+├── 讲义模板/
+│   └── 讲义模板.html       # HTML 模板文件
+└── js/
+    └── lecture-utils.js    # 通用工具函数
 ```
 
-## 二、模板元素清单
+## 设计理念
 
-### 1. 页面结构
-- **侧边栏导航** (`<nav class="sidebar">`)：课程目录和快速跳转
-- **主内容区** (`<main class="content">`)：所有正文内容
-- **课程头部** (`<header id="intro">`)：标题、简介和知识点标签
+- **简约风格**：清晰的视觉层次，减少视觉干扰
+- **Docker 主题色**：使用 Docker 蓝 (#0db7ed) 作为主色调
+- **响应式设计**：支持桌面和移动端浏览
+- **易于维护**：统一的 CSS 变量，方便全局调整
 
-### 2. 标题层级
-- **h1**：课程主标题，每页仅一个
-- **h2**：大章节标题（一、二、三...）
-- **h3**：二级小节标题（1.1、1.2...）
-- **h4**：三级细分标题
-
-### 3. 提示框组件
-| 组件 | CSS类名 | 用途 |
-|------|---------|------|
-| 提示框 | `.tip-box` | 小技巧、类比说明、辅助理解 |
-| 笔记框 | `.note-box` | 重要概念、核心定义 |
-| 警告框 | `.warning-box` | 常见错误、易错点 |
-
-### 4. 表格组件
-- **属性表格** (`.prop-table`)：用于属性列表、概念对比
-
-### 5. 列表组件
-- **普通列表** (`<ul>`, `<ol>`)
-- **步骤列表** (`.lab-steps`)：有序步骤说明
-- **清单列表** (`.checklist`)：检查项列表
-
-### 6. 代码块组件
-- **HTML代码** (`<pre class="html">`)
-- **CSS代码** (`<pre class="css">`)
-- **JavaScript代码** (`<pre class="js">`)
-
-### 7. 实验卡片组件
-| 类型 | 用途 | 状态徽章 |
-|------|------|----------|
-| 只读展示型 | 示例展示 | `readonly` |
-| HTML实验型 | HTML编辑预览 | `beginner` |
-| JS交互型 | DOM操作实验 | `beginner` |
-| 进阶实验型 | 带输入的复杂实验 | `advanced` |
-| 综合案例型 | 整合所有知识点 | `advanced` |
-
-### 8. 知识点标签
-- **pill-list**：课程概览的知识点标签列表
-
-## 三、使用方法
+## 使用方法
 
 ### 1. 创建新讲义
-1. 复制 `讲义模板.html` 到新的课程文件夹
-2. 重命名为 `讲义.html`
-3. 修改 `<title>` 和 `<h1>` 为课程标题
-4. 更新侧边栏导航链接
-5. 填充正文内容
 
-### 2. 添加内容时的注意事项
-- 每个 `<section>` 必须有唯一的 `id` 属性
-- 侧边栏链接的 `href` 必须与 section 的 `id` 对应
-- 代码块使用正确的类名以显示语言标签
-- 实验卡片的各个元素 ID 必须保持一致
+复制 `讲义模板.html`，修改以下内容：
 
-### 3. 交互实验的函数
-- `runHtmlExperiment(editorId, previewId, statusId)` - 运行HTML实验
-- `resetHtmlExperiment(editorId, previewId, statusId)` - 重置HTML实验
-- `runJsDomExperiment(editorId, statusId)` - 运行JS DOM实验
-- `resetJsDomExperiment(editorId, previewId, statusId)` - 重置JS DOM实验
-
-## 四、样式引用
-
-确保以下文件路径正确：
 ```html
-<link rel='stylesheet' href='../统一讲义样式模板.css'>
-<script src='../js/lecture-utils.js'></script>
+<title>第N讲：课程标题</title>
+<h1>第N讲：课程标题</h1>
+<p class="intro">课程简介...</p>
 ```
 
-## 五、最佳实践
+### 2. 标题层级
 
-1. **内容组织**：按照"引入 → 概念 → 示例 → 实验 → 总结"的结构组织
-2. **代码示例**：先展示简单示例，再逐步增加复杂度
-3. **实验设计**：每个实验聚焦于一个具体的知识点
-4. **提示框使用**：
-   - `tip-box`：辅助理解，非核心内容
-   - `note-box`：核心概念，需要记忆
-   - `warning-box`：易错点，特别注意
-5. **表格使用**：用于结构化对比和总结
+| 标签 | 用途 | 示例 |
+|------|------|------|
+| `h1` | 课程主标题 | 第1讲：环境搭建 |
+| `h2` | 大章节 | 一、Docker 简介 |
+| `h3` | 二级小节 | 1.1 安装步骤 |
+| `h4` | 三级标题 | 具体操作项 |
 
-## 六、版本更新
+### 3. 提示框组件
 
-- **v1.0** (2025-12-21)：初始版本，包含所有基础组件
+```html
+<!-- 提示/技巧 -->
+<div class="tip-box">
+    <span class="tip-title">💡 小技巧</span>
+    <p>内容...</p>
+</div>
+
+<!-- 重要概念 -->
+<div class="concept-box">
+    <span class="tip-title">核心概念</span>
+    <p>内容...</p>
+</div>
+
+<!-- 笔记/成功 -->
+<div class="note-box">
+    <span class="tip-title">✓ 要点</span>
+    <p>内容...</p>
+</div>
+
+<!-- 警告/注意 -->
+<div class="warning-box">
+    <span class="tip-title">⚠️ 注意</span>
+    <p>内容...</p>
+</div>
+```
+
+### 4. 代码块
+
+```html
+<!-- Bash 命令 -->
+<pre class="bash"><code>$ docker run -d nginx</code></pre>
+
+<!-- YAML 配置 -->
+<pre class="yaml"><code>version: '3'
+services:
+  web:
+    image: nginx</code></pre>
+
+<!-- Dockerfile -->
+<pre class="dockerfile"><code>FROM nginx:alpine
+COPY . /usr/share/nginx/html</code></pre>
+```
+
+### 5. 表格
+
+```html
+<table>
+    <thead>
+        <tr>
+            <th>命令</th>
+            <th>说明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>docker ps</code></td>
+            <td>查看运行中的容器</td>
+        </tr>
+    </tbody>
+</table>
+```
+
+### 6. 实验卡片
+
+```html
+<div class="lab-card">
+    <div class="lab-header">
+        🔬 实验：标题
+        <span class="status-badge beginner">入门</span>
+    </div>
+    <div class="lab-body">
+        <p><strong>目标：</strong>描述</p>
+        <ol class="lab-steps">
+            <li>步骤一</li>
+            <li>步骤二</li>
+        </ol>
+    </div>
+</div>
+```
+
+### 7. 知识点标签
+
+```html
+<div class="pill-list">
+    <span class="pill">Docker</span>
+    <span class="pill">Kubernetes</span>
+</div>
+```
+
+### 8. 清单列表
+
+```html
+<ul class="checklist">
+    <li>要点一</li>
+    <li>要点二</li>
+</ul>
+```
+
+## CSS 变量
+
+可在 `统一讲义样式模板.css` 中调整：
+
+```css
+:root {
+    --color-primary: #0db7ed;        /* 主色调 */
+    --color-primary-dark: #066da5;   /* 深色主调 */
+    --color-text: #374151;           /* 正文颜色 */
+    --color-heading: #111827;        /* 标题颜色 */
+    --border-radius: 8px;            /* 圆角大小 */
+}
+```
+
+## 侧边栏结构
+
+```html
+<nav class="sidebar">
+    <div class="sidebar-nav">
+        <h3>课程导航</h3>
+        <a class="sidebar-link" href="#intro">📖 课程概览</a>
+        
+        <h3>Part 1: 章节名</h3>
+        <a class="sidebar-link sub-link" href="#chapter-1">一、标题</a>
+        <a class="sidebar-link sub-link" href="#section-1-1">1.1 小节</a>
+        
+        <h3>总结</h3>
+        <a class="sidebar-link sub-link" href="#summary">📝 课程小结</a>
+    </div>
+</nav>
+```
+
+## 注意事项
+
+1. 讲义文件放在 `Docker-Handouts/` 根目录
+2. CSS 路径使用 `模板/统一讲义样式模板.css`
+3. JS 路径使用 `模板/js/lecture-utils.js`
+4. 添加 `defer` 属性延迟加载 JS

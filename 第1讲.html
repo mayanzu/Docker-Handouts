@@ -4,60 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第1讲：环境构建与基础入门</title>
-    
-    <!-- 统一样式引用 -->
-    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
-    <!-- 通用工具函数库 -->
-    <script src='../模板/js/lecture-utils.js'></script>
+    <link rel="stylesheet" href="模板/统一讲义样式模板.css">
+    <script src="模板/js/lecture-utils.js" defer></script>
 </head>
 <body>
 
-<!-- ============================================
-     侧边栏导航 - 课程目录
-     ============================================ -->
+<!-- 侧边栏导航 -->
 <nav class="sidebar">
     <div class="sidebar-nav">
         <h3>课程导航</h3>
         <a class="sidebar-link" href="#intro">👋 课程概览</a>
         
-        <!-- Part 1: 基础知识 -->
         <h3>Part 1: 基础知识</h3>
         <a class="sidebar-link sub-link" href="#foundations">一、计算机基础知识速览</a>
         <a class="sidebar-link sub-link" href="#intro-docker">二、为什么是 Docker？</a>
         
-        <!-- Part 2: 环境搭建 -->
         <h3>Part 2: 环境搭建</h3>
         <a class="sidebar-link sub-link" href="#wsl">三、安装 WSL 2</a>
         <a class="sidebar-link sub-link" href="#docker-desktop-guide">四、Docker Desktop 使用指南</a>
         <a class="sidebar-link sub-link" href="#vmware-ubuntu">五、VMware + Ubuntu</a>
         <a class="sidebar-link sub-link" href="#docker-install">六、安装 Docker Desktop</a>
         
-        <!-- Part 3: 入门实践 -->
         <h3>Part 3: 入门实践</h3>
         <a class="sidebar-link sub-link" href="#linux-basics">七、Linux 生存指南</a>
         <a class="sidebar-link sub-link" href="#docker-concepts">八、Docker 核心概念通俗解</a>
         <a class="sidebar-link sub-link" href="#docker-first-run">九、初体验：运行第一个容器</a>
         
-        <!-- 总结 -->
         <h3>总结与练习</h3>
         <a class="sidebar-link sub-link" href="#summary">📝 本讲总结</a>
     </div>
 </nav>
 
-
-<!-- ============================================
-     主内容区域
-     ============================================ -->
+<!-- 主内容区 -->
 <main class="content">
 
-    <!-- ============================================
-         课程头部 - 概览区域
-         ============================================ -->
+    <!-- 课程头部 -->
     <header id="intro">
         <h1>第1讲：环境构建与基础入门</h1>
         <p class="intro">Docker 容器技术竞赛培训第一讲，帮助你从零开始搭建 Docker 开发环境，掌握 Linux 基础命令，理解容器核心概念，并成功运行第一个容器。</p>
         
-        <!-- 知识点标签列表 -->
         <div class="pill-list">
             <span class="pill">操作系统</span>
             <span class="pill">WSL 2</span>
@@ -69,9 +54,6 @@
     </header>
 
 
-    <!-- ============================================
-         一、计算机基础知识速览
-         ============================================ -->
     <section id="foundations">
         <h2>一、计算机基础知识速览</h2>
 
@@ -97,9 +79,6 @@
     </section>
 
 
-    <!-- ============================================
-         二、为什么是 Docker？
-         ============================================ -->
     <section id="intro-docker">
         <h2>二、为什么是 Docker？</h2>
 
@@ -134,9 +113,6 @@
     </section>
 
 
-    <!-- ============================================
-         三、安装 WSL 2 (Windows用户必做)
-         ============================================ -->
     <section id="wsl">
         <h2>三、安装 WSL 2 (Windows用户必做)</h2>
 
@@ -297,9 +273,6 @@ swap=2GB</code></pre>
     </section>
 
 
-    <!-- ============================================
-         四、Docker Desktop 使用指南
-         ============================================ -->
     <section id="docker-desktop-guide">
         <h2>四、Docker Desktop 使用指南</h2>
 
@@ -368,9 +341,6 @@ swap=2GB</code></pre>
     </section>
 
 
-    <!-- ============================================
-         五、VMware + Ubuntu（WSL 替代方案）
-         ============================================ -->
     <section id="vmware-ubuntu">
         <h2>五、VMware 安装 Ubuntu 环境（WSL 替代方案）</h2>
 
@@ -481,9 +451,6 @@ docker run hello-world</code></pre>
     </section>
 
 
-    <!-- ============================================
-         六、安装 Docker Desktop
-         ============================================ -->
     <section id="docker-install">
         <h2>六、安装 Docker Desktop</h2>
 
@@ -505,9 +472,6 @@ docker run hello-world</code></pre>
     </section>
 
 
-    <!-- ============================================
-         七、Linux 生存指南
-         ============================================ -->
     <section id="linux-basics">
         <h2>七、Linux 生存指南</h2>
 
@@ -678,9 +642,6 @@ ls                             # 确认已删除</code></pre>
     </section>
 
 
-    <!-- ============================================
-         八、Docker 核心概念通俗解
-         ============================================ -->
     <section id="docker-concepts">
         <h2>八、Docker 核心概念通俗解</h2>
 
@@ -728,9 +689,6 @@ ls                             # 确认已删除</code></pre>
     </section>
 
 
-    <!-- ============================================
-         九、初体验：运行第一个容器
-         ============================================ -->
     <section id="docker-first-run">
         <h2>九、初体验：运行第一个容器</h2>
 
@@ -763,9 +721,6 @@ docker rm my-nginx</code></pre>
     </section>
 
 
-    <!-- ============================================
-         本讲总结
-         ============================================ -->
     <section id="summary">
         <h2>十、本讲总结</h2>
 
