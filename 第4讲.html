@@ -3,115 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第4讲:Docker Compose 全栈编排</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles/common.css">
+    <title>第4讲：Docker Compose 全栈编排</title>
+    
+    <!-- 统一样式引用 -->
+    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
+    <!-- 通用工具函数库 -->
+    <script src='../模板/js/lecture-utils.js'></script>
 </head>
-<body class="has-page-toc">
+<body>
 
-    <!-- Page TOC Navigation -->
-    <nav class="page-toc">
-        <div class="page-toc-title">本讲目录</div>
-        <ul class="page-toc-list">
-            <li><a href="#theory" class="page-toc-link">1. 从"手动挡"到"自动挡"</a></li>
-            <li><a href="#wordpress" class="page-toc-link">2. 实战:部署 WordPress + MySQL</a></li>
-            <li><a href="#compose-file" class="page-toc-link">3. docker-compose.yml 完全解析</a></li>
-            <li><a href="#commands" class="page-toc-link">4. Docker Compose 常用命令</a></li>
-            <li><a href="#troubleshoot" class="page-toc-link">5. 常见问题排查</a></li>
-            <li><a href="#challenge" class="page-toc-link">6. 竞赛模拟题</a></li>
-            <li><a href="#extras" class="page-toc-link">7. 进阶优化</a></li>
-        </ul>
-    </nav>
+<!-- ============================================
+     侧边栏导航 - 课程目录
+     ============================================ -->
+<nav class="sidebar">
+    <div class="sidebar-nav">
+        <h3>课程导航</h3>
+        <a class="sidebar-link" href="#intro">👋 课程概览</a>
+        
+        <!-- Part 1: 理论基础 -->
+        <h3>Part 1: 理论基础</h3>
+        <a class="sidebar-link sub-link" href="#theory">一、从"手动挡"到"自动挡"</a>
+        <a class="sidebar-link sub-link" href="#theory-compare">1.1 手动 vs Compose 对比</a>
+        
+        <!-- Part 2: 实战演练 -->
+        <h3>Part 2: 实战演练</h3>
+        <a class="sidebar-link sub-link" href="#wordpress">二、实战：部署 WordPress + MySQL</a>
+        <a class="sidebar-link sub-link" href="#yaml-basics">2.1 YAML 基础语法</a>
+        <a class="sidebar-link sub-link" href="#wordpress-steps">2.2 完整操作步骤</a>
+        
+        <!-- Part 3: 深入理解 -->
+        <h3>Part 3: 深入理解</h3>
+        <a class="sidebar-link sub-link" href="#compose-file">三、docker-compose.yml 完全解析</a>
+        <a class="sidebar-link sub-link" href="#commands">四、Docker Compose 常用命令</a>
+        
+        <!-- Part 4: 问题排查 -->
+        <h3>Part 4: 问题排查</h3>
+        <a class="sidebar-link sub-link" href="#troubleshoot">五、常见问题排查</a>
+        
+        <!-- Part 5: 竞赛与进阶 -->
+        <h3>Part 5: 竞赛与进阶</h3>
+        <a class="sidebar-link sub-link" href="#challenge">六、竞赛模拟题</a>
+        <a class="sidebar-link sub-link" href="#extras">七、进阶优化</a>
+        
+        <!-- 总结 -->
+        <h3>总结与练习</h3>
+        <a class="sidebar-link sub-link" href="#summary">📝 本讲总结</a>
+    </div>
+</nav>
 
-    <!-- Header -->
-    <header style="background-color: var(--color-text); color: white; padding: 2rem 0; border-bottom: 1px solid var(--color-border);">
-        <div class="container">
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                <i class="fab fa-docker" style="font-size: 2rem; color: var(--color-accent);"></i>
-                <div>
-                    <h1 style="color: white; font-size: 1.25rem; margin: 0;">Docker 容器技术竞赛培训</h1>
-                    <p style="color: #e5e7eb; font-size: 0.875rem; margin: 0.25rem 0 0 0;">第四讲：全栈编排 Docker Compose 实战</p>
-                </div>
-            </div>
+
+<!-- ============================================
+     主内容区域
+     ============================================ -->
+<main class="content">
+
+    <!-- ============================================
+         课程头部 - 概览区域
+         ============================================ -->
+    <header id="intro">
+        <h1>第4讲：Docker Compose 全栈编排</h1>
+        <p class="intro">本讲将学习使用 Docker Compose 进行多容器应用的编排与管理，从"手动挡"升级到"自动挡"，实现一键部署复杂应用栈。</p>
+        
+        <!-- 知识点标签列表 -->
+        <div class="pill-list">
+            <span class="pill">Docker Compose</span>
+            <span class="pill">YAML 配置</span>
+            <span class="pill">多容器编排</span>
+            <span class="pill">服务依赖</span>
+            <span class="pill">健康检查</span>
+            <span class="pill">数据持久化</span>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container" style="padding: 2rem 0 3rem 0;">
 
-        <!-- Section 1: 理论 -->
-        <section id="theory" class="section-card">
-            <h2>
-                <i class="fas fa-gears" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
-                1. 从"手动挡"到"自动挡"
-            </h2>
+    <!-- ============================================
+         第一部分：从"手动挡"到"自动挡"
+         ============================================ -->
+    
+    <section id="theory">
+        <h2>一、从"手动挡"到"自动挡"</h2>
+        
+        <div class="tip-box">
+            <span class="tip-title">前置知识回顾</span>
+            <ul class="checklist">
+                <li><strong>容器基础：</strong>用 <code>docker run</code> 启动单个容器</li>
+                <li><strong>网络通信：</strong>容器间需要 <code>--network</code> 连接同一网络</li>
+                <li><strong>数据持久化：</strong>用 <code>-v</code> 挂载卷</li>
+                <li><strong>端口映射：</strong>用 <code>-p</code> 暴露端口</li>
+                <li><strong>环境变量：</strong>用 <code>-e</code> 注入配置</li>
+            </ul>
+        </div>
 
-            <div class="module-tip">
-                <div class="module-header">
-                    <i class="fas fa-book-open"></i>
-                    <h4>前置知识回顾</h4>
-                </div>
-                <div class="module-content">
-                    <ul>
-                        <li><strong>容器基础：</strong>用 <code>docker run</code> 启动单个容器</li>
-                        <li><strong>网络通信：</strong>容器间需要 <code>--network</code> 连接同一网络</li>
-                        <li><strong>数据持久化：</strong>用 <code>-v</code> 挂载卷</li>
-                        <li><strong>端口映射：</strong>用 <code>-p</code> 暴露端口</li>
-                        <li><strong>环境变量：</strong>用 <code>-e</code> 注入配置</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="warning-box">
+            <strong>现在的问题</strong>
+            <p>当部署<strong>多容器应用</strong>（如 WordPress = 前端 + MySQL），需要敲很多条命令，顺序不能错，参数容易漏……</p>
+            <p style="font-weight: 600; margin-top: 0.5rem;">👉 就像每次开车都要手动打火、挂挡——能开，但太累了！</p>
+        </div>
 
-            <div class="module-warning" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-question-circle"></i>
-                    <h4>现在的问题</h4>
-                </div>
-                <div class="module-content">
-                    <p>当部署<strong>多容器应用</strong>（如 WordPress = 前端 + MySQL），需要敲很多条命令，顺序不能错，参数容易漏……</p>
-                    <p style="font-weight: 600; color: var(--color-warning); margin-top: 0.5rem;">👉 就像每次开车都要手动打火、挂挡——能开，但太累了！</p>
-                </div>
-            </div>
+        <h4>手动方式 vs Compose 优势对比</h4>
+        <table class="prop-table">
+            <thead>
+                <tr>
+                    <th>❌ 手动方式痛点</th>
+                    <th>✅ Compose 优势</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>多个 docker run 命令顺序复杂</td>
+                    <td>单一 YAML 描述全部服务</td>
+                </tr>
+                <tr>
+                    <td>端口/网络/环境变量容易写错</td>
+                    <td>内建网络，服务名即域名</td>
+                </tr>
+                <tr>
+                    <td>无法一眼看出整体结构</td>
+                    <td>统一管理卷与环境变量</td>
+                </tr>
+                <tr>
+                    <td>团队成员难以复现</td>
+                    <td>一键启动/停止/日志聚合</td>
+                </tr>
+            </tbody>
+        </table>
 
-            <div class="grid-auto" style="margin-top: 1.5rem;">
-                <div style="background-color: #fee2e2; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-error);">
-                    <h5 style="color: var(--color-error); margin-bottom: 0.5rem;">❌ 手动方式痛点</h5>
-                    <ul style="font-size: 0.875rem;">
-                        <li>多个 docker run 命令顺序复杂</li>
-                        <li>端口/网络/环境变量容易写错</li>
-                        <li>无法一眼看出整体结构</li>
-                        <li>团队成员难以复现</li>
-                    </ul>
-                </div>
-                <div style="background-color: #dcfce7; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success);">
-                    <h5 style="color: var(--color-success); margin-bottom: 0.5rem;">✅ Compose 优势</h5>
-                    <ul style="font-size: 0.875rem;">
-                        <li>单一 YAML 描述全部服务</li>
-                        <li>内建网络，服务名即域名</li>
-                        <li>统一管理卷与环境变量</li>
-                        <li>一键启动/停止/日志聚合</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="note-box">
+            <strong>核心理念</strong>
+            <p><code>docker-compose.yml</code> = 应用"结构清单"。它描述服务、网络、卷，让复杂应用栈可复制、可版本化。</p>
+        </div>
+    </section>
 
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-lightbulb"></i>
-                    <h4>核心理念</h4>
-                </div>
-                <div class="module-content">
-                    <p><code>docker-compose.yml</code> = 应用"结构清单"。它描述服务、网络、卷，让复杂应用栈可复制、可版本化。</p>
-                </div>
-            </div>
-
-            <div class="module-command" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-terminal"></i>
-                    <h4>手动 vs Compose 对比</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.5rem;"><strong>手动方式：</strong></p>
-                    <pre><code># 每条命令都要敲且顺序不能错
+    <section id="theory-compare">
+        <h3>1.1 手动 vs Compose 对比</h3>
+        
+        <h4>手动方式</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code># 每条命令都要敲且顺序不能错
 docker network create wp-net
 docker run --name wp-db --network wp-net \
   -e MYSQL_ROOT_PASSWORD=rootpass123 \
@@ -119,100 +146,77 @@ docker run --name wp-db --network wp-net \
   -v wp-mysql:/var/lib/mysql -d mysql:8.0
 docker run --name wp-app -p 8080:80 --network wp-net \
   -e WORDPRESS_DB_HOST=wp-db:3306 wordpress:latest</code></pre>
-                    
-                    <p style="margin: 1rem 0 0.5rem 0;"><strong>Compose 方式：</strong></p>
-                    <pre><code># 把参数写进 YAML 后只需一句
+        
+        <h4>Compose 方式</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code># 把参数写进 YAML 后只需一句
 docker compose up -d</code></pre>
-                </div>
-            </div>
-        </section>
+    </section>
 
-        <!-- Section 2: WordPress 实战 -->
-        <section id="wordpress" class="section-card">
-            <h2>
-                <i class="fab fa-wordpress" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
-                2. 实战：部署 WordPress + MySQL
-            </h2>
 
-            <div class="module-practice">
-                <div class="module-header">
-                    <i class="fas fa-target"></i>
-                    <h4>目标</h4>
-                </div>
-                <div class="module-content">
-                    <p>一条指令启动包含数据库 + CMS 的栈，并保证数据库有持久化。</p>
-                </div>
-            </div>
+    <!-- ============================================
+         第二部分：实战：部署 WordPress + MySQL
+         ============================================ -->
+    
+    <section id="wordpress">
+        <h2>二、实战：部署 WordPress + MySQL</h2>
+        
+        <div class="note-box">
+            <strong>目标</strong>
+            <p>一条指令启动包含数据库 + CMS 的栈，并保证数据库有持久化。</p>
+        </div>
+    </section>
 
-            <div class="module-tip" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h4>YAML 基础语法速成</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;">YAML 是<strong>缩进敏感</strong>的配置语言，比 JSON 更易读。</p>
-                    <div class="grid-auto">
-                        <div>
-                            <h5 style="color: var(--color-success);">✅ 正确写法</h5>
-                            <div class="module-code-file">
-                                <div class="module-content">
-                                    <pre><code>services:
+    <section id="yaml-basics">
+        <h3>2.1 YAML 基础语法速成</h3>
+        <p>YAML 是<strong>缩进敏感</strong>的配置语言，比 JSON 更易读。</p>
+        
+        <table class="prop-table">
+            <thead>
+                <tr>
+                    <th>✅ 正确写法</th>
+                    <th>❌ 常见错误</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px; margin: 0;"><code>services:
   web:
     image: nginx
     ports:
       - "80:80"</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.75rem; margin-top: 0.5rem;">• 用<strong>空格</strong>缩进<br>• 冒号后必须有空格<br>• 列表用 <code>-</code> 开头</p>
-                        </div>
-                        <div>
-                            <h5 style="color: var(--color-error);">❌ 常见错误</h5>
-                            <div class="module-code-file">
-                                <div class="module-content">
-                                    <pre><code>services:
+                    </td>
+                    <td>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px; margin: 0;"><code>services:
     web:        # Tab缩进（错！）
     image:nginx # 冒号后无空格（错！）
     ports:
     - 80:80     # 缺引号（错！）</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.75rem; margin-top: 0.5rem;">• <strong>禁用 Tab</strong><br>• 端口映射要加引号<br>• 冒号后必须空格</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="tip-box">
+            <span class="tip-title">YAML 语法要点</span>
+            <ul class="checklist">
+                <li>用<strong>空格</strong>缩进，<strong>禁用 Tab</strong></li>
+                <li>冒号后必须有空格</li>
+                <li>端口映射要加引号</li>
+                <li>列表用 <code>-</code> 开头</li>
+            </ul>
+        </div>
+    </section>
 
-            <div class="module-steps" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-list-ol"></i>
-                    <h4>完整操作步骤</h4>
-                </div>
-                <div class="module-content">
-                    
-                    <div class="step-item">
-                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
-                        <div class="step-content">
-                            <h5>创建工作目录</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre><code>mkdir compose-wp
+    <section id="wordpress-steps">
+        <h3>2.2 完整操作步骤</h3>
+        
+        <h4>步骤 1：创建工作目录</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>mkdir compose-wp
 cd compose-wp</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="step-item">
-                        <span class="step-number" style="background-color: var(--color-success);">2</span>
-                        <div class="step-content">
-                            <h5>编写 docker-compose.yml</h5>
-                            <div class="module-code-file">
-                                <div class="module-header">
-                                    <i class="fas fa-file-code"></i>
-                                    <h4>docker-compose.yml</h4>
-                                </div>
-                                <div class="module-content">
-                                    <pre><code>services:
+        <h4>步骤 2：编写 docker-compose.yml</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>services:
   db:
     image: mysql:8.0
     container_name: wp-db
@@ -249,68 +253,39 @@ cd compose-wp</code></pre>
 volumes:
   db_data:
   wp_data:</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-tip" style="margin-top: 0.75rem;">
-                                <div class="module-content">
-                                    <p><strong>关键解释：</strong></p>
-                                    <ul style="font-size: 0.875rem;">
-                                        <li><code>depends_on + healthcheck</code>：确保 WordPress 等数据库健康后再启动</li>
-                                        <li><code>volumes</code>：<code>db_data</code> 持久化 MySQL，<code>wp_data</code> 持久化站点文件</li>
-                                        <li><code>WORDPRESS_DB_HOST: db</code>：服务名直接作为主机名（Compose 自带 DNS）</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="step-item">
-                        <span class="step-number" style="background-color: var(--color-warning);">3</span>
-                        <div class="step-content">
-                            <h5>启动服务栈</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre><code>docker compose up -d</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre><code>[+] Running 3/3
+        <div class="tip-box">
+            <span class="tip-title">关键解释</span>
+            <ul class="checklist">
+                <li><code>depends_on + healthcheck</code>：确保 WordPress 等数据库健康后再启动</li>
+                <li><code>volumes</code>：<code>db_data</code> 持久化 MySQL，<code>wp_data</code> 持久化站点文件</li>
+                <li><code>WORDPRESS_DB_HOST: db</code>：服务名直接作为主机名（Compose 自带 DNS）</li>
+            </ul>
+        </div>
+
+        <h4>步骤 3：启动服务栈</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>docker compose up -d</code></pre>
+
+        <p><strong>预期输出：</strong></p>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>[+] Running 3/3
  ✔ Network compose-wp_default  Created
  ✔ Container wp-db             Started
  ✔ Container wp-app            Started</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="step-item">
-                        <span class="step-number">4</span>
-                        <div class="step-content">
-                            <h5>访问测试</h5>
-                            <p>打开浏览器访问 <code>http://localhost:8080</code>，应该看到 WordPress 安装向导。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <h4>步骤 4：访问测试</h4>
+        <p>打开浏览器访问 <code>http://localhost:8080</code>，应该看到 WordPress 安装向导。</p>
+    </section>
 
-        <!-- Section 3: compose file 详解 -->
-        <section id="compose-file" class="section-card">
-            <h2>
-                <i class="fas fa-file-code" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
-                3. docker-compose.yml 完全解析
-            </h2>
 
-            <div class="module-concept">
-                <div class="module-header">
-                    <i class="fas fa-sitemap"></i>
-                    <h4>文件结构</h4>
-                </div>
-                <div class="module-content">
-                    <div class="module-code-file">
-                        <div class="module-content">
-                            <pre><code>services:        # 服务定义
+    <!-- ============================================
+         第三部分：docker-compose.yml 完全解析
+         ============================================ -->
+    
+    <section id="compose-file">
+        <h2>三、docker-compose.yml 完全解析</h2>
+        
+        <h3>3.1 文件结构</h3>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>services:        # 服务定义
   service1:
     ...
   service2:
@@ -323,310 +298,232 @@ networks:        # 网络定义（可选）
 volumes:         # 卷定义（可选）
   data1:
   data2:</code></pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-cube"></i>
-                    <h4>常用服务配置项</h4>
-                </div>
-                <div class="module-content">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--color-border);">
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">配置项</th>
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">说明</th>
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">示例</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>image</code></td>
-                                <td style="padding: 0.75rem;">使用的镜像</td>
-                                <td style="padding: 0.75rem;"><code>nginx:alpine</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>build</code></td>
-                                <td style="padding: 0.75rem;">从 Dockerfile 构建</td>
-                                <td style="padding: 0.75rem;"><code>build: ./app</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>ports</code></td>
-                                <td style="padding: 0.75rem;">端口映射</td>
-                                <td style="padding: 0.75rem;"><code>"8080:80"</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>environment</code></td>
-                                <td style="padding: 0.75rem;">环境变量</td>
-                                <td style="padding: 0.75rem;"><code>DB_HOST: mysql</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>volumes</code></td>
-                                <td style="padding: 0.75rem;">卷挂载</td>
-                                <td style="padding: 0.75rem;"><code>data:/data</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>depends_on</code></td>
-                                <td style="padding: 0.75rem;">依赖关系</td>
-                                <td style="padding: 0.75rem;"><code>depends_on: [db]</code></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.75rem;"><code>restart</code></td>
-                                <td style="padding: 0.75rem;">重启策略</td>
-                                <td style="padding: 0.75rem;"><code>unless-stopped</code></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        <h3>3.2 常用服务配置项</h3>
+        <table class="prop-table">
+            <thead>
+                <tr>
+                    <th>配置项</th>
+                    <th>说明</th>
+                    <th>示例</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>image</code></td>
+                    <td>使用的镜像</td>
+                    <td><code>nginx:alpine</code></td>
+                </tr>
+                <tr>
+                    <td><code>build</code></td>
+                    <td>从 Dockerfile 构建</td>
+                    <td><code>build: ./app</code></td>
+                </tr>
+                <tr>
+                    <td><code>ports</code></td>
+                    <td>端口映射</td>
+                    <td><code>"8080:80"</code></td>
+                </tr>
+                <tr>
+                    <td><code>environment</code></td>
+                    <td>环境变量</td>
+                    <td><code>DB_HOST: mysql</code></td>
+                </tr>
+                <tr>
+                    <td><code>volumes</code></td>
+                    <td>卷挂载</td>
+                    <td><code>data:/data</code></td>
+                </tr>
+                <tr>
+                    <td><code>depends_on</code></td>
+                    <td>依赖关系</td>
+                    <td><code>depends_on: [db]</code></td>
+                </tr>
+                <tr>
+                    <td><code>restart</code></td>
+                    <td>重启策略</td>
+                    <td><code>unless-stopped</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-        <!-- Section 4: 常用命令 -->
-        <section id="commands" class="section-card">
-            <h2>
-                <i class="fas fa-terminal" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
-                4. Docker Compose 常用命令
-            </h2>
 
-            <div class="module-command">
-                <div class="module-header">
-                    <i class="fas fa-terminal"></i>
-                    <h4>核心命令速查</h4>
-                </div>
-                <div class="module-content">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--color-border);">
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">命令</th>
-                                <th style="text-align: left; padding: 0.75rem; font-weight: 600;">说明</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker compose up -d</code></td>
-                                <td style="padding: 0.75rem;">后台启动所有服务</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker compose down</code></td>
-                                <td style="padding: 0.75rem;">停止并删除容器、网络</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker compose ps</code></td>
-                                <td style="padding: 0.75rem;">查看服务状态</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker compose logs -f</code></td>
-                                <td style="padding: 0.75rem;">实时查看所有服务日志</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker compose restart</code></td>
-                                <td style="padding: 0.75rem;">重启所有服务</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker compose exec db bash</code></td>
-                                <td style="padding: 0.75rem;">进入 db 服务的容器</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.75rem;"><code>docker compose down -v</code></td>
-                                <td style="padding: 0.75rem;">停止并删除卷（数据）</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <!-- ============================================
+         第四部分：Docker Compose 常用命令
+         ============================================ -->
+    
+    <section id="commands">
+        <h2>四、Docker Compose 常用命令</h2>
+        
+        <h3>4.1 核心命令速查</h3>
+        <table class="prop-table">
+            <thead>
+                <tr>
+                    <th>命令</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>docker compose up -d</code></td>
+                    <td>后台启动所有服务</td>
+                </tr>
+                <tr>
+                    <td><code>docker compose down</code></td>
+                    <td>停止并删除容器、网络</td>
+                </tr>
+                <tr>
+                    <td><code>docker compose ps</code></td>
+                    <td>查看服务状态</td>
+                </tr>
+                <tr>
+                    <td><code>docker compose logs -f</code></td>
+                    <td>实时查看所有服务日志</td>
+                </tr>
+                <tr>
+                    <td><code>docker compose restart</code></td>
+                    <td>重启所有服务</td>
+                </tr>
+                <tr>
+                    <td><code>docker compose exec db bash</code></td>
+                    <td>进入 db 服务的容器</td>
+                </tr>
+                <tr>
+                    <td><code>docker compose down -v</code></td>
+                    <td>停止并删除卷（数据）</td>
+                </tr>
+            </tbody>
+        </table>
 
-            <div class="module-warning" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h4>危险操作警告</h4>
-                </div>
-                <div class="module-content">
-                    <p><code>docker compose down -v</code> 会<strong>删除所有数据</strong>！生产环境慎用。</p>
-                </div>
-            </div>
-        </section>
+        <div class="warning-box">
+            <strong>危险操作警告</strong>
+            <p><code>docker compose down -v</code> 会<strong>删除所有数据</strong>！生产环境慎用。</p>
+        </div>
+    </section>
 
-        <!-- Section 5: 常见问题 -->
-        <section id="troubleshoot" class="section-card">
-            <h2>
-                <i class="fas fa-bug" style="color: var(--color-error); margin-right: 0.75rem;"></i>
-                5. 常见问题排查
-            </h2>
 
-            <div class="module-faq">
-                <div class="module-header">
-                    <i class="fas fa-question-circle"></i>
-                    <h4>问题 1：服务启动失败</h4>
-                </div>
-                <div class="module-content">
-                    <p><strong>排查步骤：</strong></p>
-                    <ol style="font-size: 0.875rem;">
-                        <li>查看日志：<code>docker compose logs db</code></li>
-                        <li>检查端口占用：<code>netstat -ano | findstr 8080</code></li>
-                        <li>验证 YAML 语法：<code>docker compose config</code></li>
-                    </ol>
-                </div>
-            </div>
+    <!-- ============================================
+         第五部分：常见问题排查
+         ============================================ -->
+    
+    <section id="troubleshoot">
+        <h2>五、常见问题排查</h2>
+        
+        <h3>5.1 问题 1：服务启动失败</h3>
+        <p><strong>排查步骤：</strong></p>
+        <ol>
+            <li>查看日志：<code>docker compose logs db</code></li>
+            <li>检查端口占用：<code>netstat -ano | findstr 8080</code></li>
+            <li>验证 YAML 语法：<code>docker compose config</code></li>
+        </ol>
 
-            <div class="module-faq" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-question-circle"></i>
-                    <h4>问题 2：服务间无法通信</h4>
-                </div>
-                <div class="module-content">
-                    <p><strong>原因：</strong></p>
-                    <ul style="font-size: 0.875rem;">
-                        <li>服务名拼写错误（区分大小写）</li>
-                        <li>服务未在同一网络</li>
-                        <li>健康检查未通过，依赖服务未就绪</li>
-                    </ul>
-                    <p style="margin-top: 0.5rem;"><strong>解决：</strong>检查 <code>depends_on</code> 和 <code>healthcheck</code> 配置。</p>
-                </div>
-            </div>
+        <h3>5.2 问题 2：服务间无法通信</h3>
+        <p><strong>原因：</strong></p>
+        <ul>
+            <li>服务名拼写错误（区分大小写）</li>
+            <li>服务未在同一网络</li>
+            <li>健康检查未通过，依赖服务未就绪</li>
+        </ul>
+        <p><strong>解决：</strong>检查 <code>depends_on</code> 和 <code>healthcheck</code> 配置。</p>
 
-            <div class="module-faq" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-question-circle"></i>
-                    <h4>问题 3：数据丢失</h4>
-                </div>
-                <div class="module-content">
-                    <p><strong>原因：</strong>使用了 <code>docker compose down -v</code> 删除了卷。</p>
-                    <p style="margin-top: 0.5rem;"><strong>解决：</strong>停止服务用 <code>docker compose stop</code>，数据会保留。</p>
-                </div>
-            </div>
-        </section>
+        <h3>5.3 问题 3：数据丢失</h3>
+        <p><strong>原因：</strong>使用了 <code>docker compose down -v</code> 删除了卷。</p>
+        <p><strong>解决：</strong>停止服务用 <code>docker compose stop</code>，数据会保留。</p>
+    </section>
 
-        <!-- Section 6: 竞赛模拟 -->
-        <section id="challenge" class="section-card">
-            <h2>
-                <i class="fas fa-rocket" style="color: var(--color-success); margin-right: 0.75rem;"></i>
-                6. 竞赛模拟题
-            </h2>
 
-            <div class="module-practice">
-                <div class="module-header">
-                    <i class="fas fa-tasks"></i>
-                    <h4>挑战任务</h4>
-                </div>
-                <div class="module-content">
-                    <div class="practice-task">
-                        <h5>任务 1：部署 3 层架构</h5>
-                        <p>编写 docker-compose.yml 部署：</p>
-                        <ul style="font-size: 0.875rem;">
-                            <li><strong>前端：</strong>Nginx 容器，映射 80 端口</li>
-                            <li><strong>后端：</strong>Python Flask 应用（自定义镜像）</li>
-                            <li><strong>数据库：</strong>PostgreSQL，数据持久化</li>
-                        </ul>
-                    </div>
-                    <div class="practice-task">
-                        <h5>任务 2：添加缓存层</h5>
-                        <p>在上述架构中增加 Redis 服务，确保：</p>
-                        <ul style="font-size: 0.875rem;">
-                            <li>Redis 数据持久化</li>
-                            <li>后端能访问 Redis（服务名：redis）</li>
-                            <li>所有服务健康检查配置正确</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- ============================================
+         第六部分：竞赛模拟题
+         ============================================ -->
+    
+    <section id="challenge">
+        <h2>六、竞赛模拟题</h2>
+        
+        <div class="note-box">
+            <strong>挑战任务</strong>
+            <h4>任务 1：部署 3 层架构</h4>
+            <p>编写 docker-compose.yml 部署：</p>
+            <ul>
+                <li><strong>前端：</strong>Nginx 容器，映射 80 端口</li>
+                <li><strong>后端：</strong>Python Flask 应用（自定义镜像）</li>
+                <li><strong>数据库：</strong>PostgreSQL，数据持久化</li>
+            </ul>
+            
+            <h4>任务 2：添加缓存层</h4>
+            <p>在上述架构中增加 Redis 服务，确保：</p>
+            <ul>
+                <li>Redis 数据持久化</li>
+                <li>后端能访问 Redis（服务名：redis）</li>
+                <li>所有服务健康检查配置正确</li>
+            </ul>
+        </div>
+    </section>
 
-        <!-- Section 7: 进阶 -->
-        <section id="extras" class="section-card">
-            <h2>
-                <i class="fas fa-layer-group" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
-                7. 进阶优化
-            </h2>
 
-            <div class="module-tip">
-                <div class="module-header">
-                    <i class="fas fa-lightbulb"></i>
-                    <h4>优化技巧</h4>
-                </div>
-                <div class="module-content">
-                    <ul>
-                        <li><strong>使用 .env 文件：</strong>敏感信息不写在 YAML 中</li>
-                        <li><strong>资源限制：</strong>用 <code>deploy.resources</code> 限制 CPU/内存</li>
-                        <li><strong>健康检查：</strong>所有服务都应配置 healthcheck</li>
-                        <li><strong>日志配置：</strong>用 <code>logging</code> 控制日志大小和驱动</li>
-                    </ul>
-                </div>
-            </div>
+    <!-- ============================================
+         第七部分：进阶优化
+         ============================================ -->
+    
+    <section id="extras">
+        <h2>七、进阶优化</h2>
+        
+        <div class="tip-box">
+            <span class="tip-title">优化技巧</span>
+            <ul class="checklist">
+                <li><strong>使用 .env 文件：</strong>敏感信息不写在 YAML 中</li>
+                <li><strong>资源限制：</strong>用 <code>deploy.resources</code> 限制 CPU/内存</li>
+                <li><strong>健康检查：</strong>所有服务都应配置 healthcheck</li>
+                <li><strong>日志配置：</strong>用 <code>logging</code> 控制日志大小和驱动</li>
+            </ul>
+        </div>
 
-            <div class="module-code-file" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-file-code"></i>
-                    <h4>使用 .env 文件示例</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.5rem;"><strong>.env 文件：</strong></p>
-                    <pre><code>MYSQL_ROOT_PASSWORD=secret123
+        <h3>7.1 使用 .env 文件示例</h3>
+        <h4>.env 文件</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>MYSQL_ROOT_PASSWORD=secret123
 MYSQL_DATABASE=myapp</code></pre>
-                    
-                    <p style="margin: 1rem 0 0.5rem 0;"><strong>docker-compose.yml：</strong></p>
-                    <pre><code>services:
+        
+        <h4>docker-compose.yml</h4>
+<pre style="background: var(--code-bg); padding: 10px; border-radius: 6px;"><code>services:
   db:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}</code></pre>
-                </div>
-            </div>
-        </section>
+    </section>
 
-        <!-- Summary -->
-        <section class="section-card">
-            <div class="module-summary">
-                <div class="module-header">
-                    <i class="fas fa-bookmark"></i>
-                    <h4>本讲总结</h4>
-                </div>
-                <div class="module-content">
-                    <ul>
-                        <li><strong>Docker Compose</strong> 用 YAML 文件管理多容器应用</li>
-                        <li>核心概念：服务、网络、卷、依赖关系</li>
-                        <li>常用命令：<code>up</code>、<code>down</code>、<code>logs</code>、<code>ps</code></li>
-                        <li>服务名自动 DNS 解析，无需手动配置网络</li>
-                        <li>健康检查 + 依赖确保启动顺序正确</li>
-                    </ul>
-                </div>
-            </div>
 
-            <div class="module-practice" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-tasks"></i>
-                    <h4>课后作业</h4>
-                </div>
-                <div class="module-content">
-                    <div class="practice-task">
-                        <h5>作业 1：完整部署</h5>
-                        <p>独立完成 WordPress + MySQL 的完整部署，包括数据持久化和健康检查。</p>
-                    </div>
-                    <div class="practice-task">
-                        <h5>作业 2：多服务编排</h5>
-                        <p>参考竞赛模拟题，部署一个包含前端、后端、数据库、缓存的完整应用栈。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer style="background-color: var(--color-text); color: var(--color-text-lighter); padding: 2rem 0; margin-top: 3rem; border-top: 1px solid var(--color-border);">
-        <div class="container text-center">
-            <p style="font-size: 0.875rem;">Docker 容器技术竞赛培训 - 第四讲：Docker Compose 全栈编排</p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.7;">
-                <i class="fas fa-gears" style="margin-right: 0.25rem;"></i> YAML 配置 • 
-                <i class="fas fa-network-wired" style="margin: 0 0.25rem;"></i> 服务编排 • 
-                <i class="fas fa-database" style="margin: 0 0.25rem;"></i> 数据持久化
-            </p>
+    <!-- ============================================
+         总结与练习
+         ============================================ -->
+    
+    <section id="summary">
+        <h2>📝 本讲总结</h2>
+        
+        <div class="note-box">
+            <strong>核心知识点</strong>
+            <ul>
+                <li><strong>Docker Compose</strong> 用 YAML 文件管理多容器应用</li>
+                <li>核心概念：服务、网络、卷、依赖关系</li>
+                <li>常用命令：<code>up</code>、<code>down</code>、<code>logs</code>、<code>ps</code></li>
+                <li>服务名自动 DNS 解析，无需手动配置网络</li>
+                <li>健康检查 + 依赖确保启动顺序正确</li>
+            </ul>
         </div>
-    </footer>
 
-    <script src="scripts/main.js" defer></script>
+        <h3>课后作业</h3>
+        <div class="tip-box">
+            <span class="tip-title">作业 1：完整部署</span>
+            <p>独立完成 WordPress + MySQL 的完整部署，包括数据持久化和健康检查。</p>
+        </div>
+        
+        <div class="tip-box">
+            <span class="tip-title">作业 2：多服务编排</span>
+            <p>参考竞赛模拟题，部署一个包含前端、后端、数据库、缓存的完整应用栈。</p>
+        </div>
+    </section>
+
+</main>
+
 </body>
 </html>

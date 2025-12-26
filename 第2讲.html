@@ -3,67 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第2讲:玩转容器网络与修改网页</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles/common.css">
+    <title>第2讲：玩转容器网络与修改网页</title>
+    
+    <!-- 统一样式引用 -->
+    <link rel='stylesheet' href='../模板/统一讲义样式模板.css'>
+    <!-- 通用工具函数库 -->
+    <script src='../模板/js/lecture-utils.js'></script>
 </head>
-<body class="has-page-toc">
+<body>
 
-    <!-- Page TOC Navigation -->
-    <nav class="page-toc">
-        <div class="page-toc-title">本讲目录</div>
-        <ul class="page-toc-list">
-            <li><a href="#docker-commands" class="page-toc-link">1. Docker 常用命令速查</a></li>
-            <li><a href="#warmup" class="page-toc-link">2. 课前热身:找回手感</a></li>
-            <li><a href="#concept-web" class="page-toc-link">3. 什么是 Web 服务?</a></li>
-            <li><a href="#nginx-run" class="page-toc-link">4. 启动 Nginx(失败的尝试)</a></li>
-            <li><a href="#port-mapping" class="page-toc-link">5. 核心概念:端口映射</a></li>
-            <li><a href="#hack-container" class="page-toc-link">6. 进阶:潜入容器改网页</a></li>
-            <li><a href="#lifecycle" class="page-toc-link">7. 容器生命周期管理</a></li>
-            <li><a href="#final-challenge" class="page-toc-link">8. 完整实战:发布你的第一个网页</a></li>
-        </ul>
-    </nav>
+<!-- ============================================
+     侧边栏导航 - 课程目录
+     ============================================ -->
+<nav class="sidebar">
+    <div class="sidebar-nav">
+        <h3>课程导航</h3>
+        <a class="sidebar-link" href="#intro">👋 课程概览</a>
+        
+        <!-- Part 1: 基础命令 -->
+        <h3>Part 1: 基础准备</h3>
+        <a class="sidebar-link sub-link" href="#docker-commands">一、命令速查手册</a>
+        <a class="sidebar-link sub-link" href="#warmup">二、课前热身</a>
+        
+        <!-- Part 2: Web服务 -->
+        <h3>Part 2: Web服务部署</h3>
+        <a class="sidebar-link sub-link" href="#concept-web">三、什么是Web服务</a>
+        <a class="sidebar-link sub-link" href="#nginx-run">四、启动Nginx</a>
+        <a class="sidebar-link sub-link" href="#port-mapping">五、端口映射</a>
+        
+        <!-- Part 3: 进阶操作 -->
+        <h3>Part 3: 进阶技巧</h3>
+        <a class="sidebar-link sub-link" href="#hack-container">六、潜入容器改网页</a>
+        <a class="sidebar-link sub-link" href="#lifecycle">七、生命周期管理</a>
+        <a class="sidebar-link sub-link" href="#final-challenge">八、完整实战</a>
+        
+        <!-- 总结 -->
+        <h3>总结</h3>
+        <a class="sidebar-link sub-link" href="#summary">📝 课程小结</a>
+    </div>
+</nav>
 
-    <!-- Header -->
-    <header style="background-color: var(--color-text); color: white; padding: 2rem 0; border-bottom: 1px solid var(--color-border);">
-        <div class="container">
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                <i class="fab fa-docker" style="font-size: 2rem; color: var(--color-accent);"></i>
-                <div>
-                    <h1 style="color: white; font-size: 1.25rem; margin: 0;">Docker 容器技术竞赛培训</h1>
-                    <p style="color: #e5e7eb; font-size: 0.875rem; margin: 0.25rem 0 0 0;">第二讲：玩转容器网络与修改网页</p>
-                </div>
-            </div>
+
+<!-- ============================================
+     主内容区域
+     ============================================ -->
+<main class="content">
+
+    <!-- ============================================
+         课程头部 - 概览区域
+         ============================================ -->
+    <header id="intro">
+        <h1>第2讲：玩转容器网络与修改网页</h1>
+        <p class="intro">学习 Docker 常用命令、容器网络通信原理、端口映射技术，掌握如何进入容器修改网页内容。通过实战演练，完成从启动容器到发布网页的完整流程。</p>
+        
+        <!-- 知识点标签列表 -->
+        <div class="pill-list">
+            <span class="pill">Docker命令</span>
+            <span class="pill">端口映射</span>
+            <span class="pill">容器网络</span>
+            <span class="pill">Nginx</span>
+            <span class="pill">生命周期管理</span>
+            <span class="pill">实战演练</span>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container" style="padding: 2rem 0 3rem 0;">
+    <!-- ============================================
+         第一部分：基础准备
+         ============================================ -->
+    
+    <section id="docker-commands">
+        <h2>一、Docker 常用命令速查手册</h2>
 
-        <!-- Section 1: 命令速查 -->
-        <section id="docker-commands" class="section-card">
-            <h2>
-                <i class="fas fa-terminal" style="color: var(--color-accent); margin-right: 0.75rem;"></i>
-                1. Docker 常用命令速查手册
-            </h2>
+        <p>这是专门为练习准备的命令参考手册。掌握这些核心命令，你就能在竞赛中游刃有余。每个命令都附带详细说明和预期输出，方便对照练习。</p>
 
-            <p style="margin-bottom: 1.5rem;">这是专门为练习准备的命令参考手册。掌握这些核心命令，你就能在竞赛中游刃有余。每个命令都附带详细说明和预期输出，方便对照练习。</p>
+        <h3>1.1 基础信息命令</h3>
+        <p>查看 Docker 版本和系统信息</p>
 
-            <!-- 基础信息命令 -->
-            <div class="module-concept">
-                <div class="module-header">
-                    <i class="fas fa-info-circle"></i>
-                    <h4>基础信息命令</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 1rem;">查看 Docker 版本和系统信息</p>
-
-                    <div style="margin-bottom: 1.5rem;">
-                        <h5 style="margin-bottom: 0.5rem;"><code>docker version</code></h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">查看 Docker 客户端和服务端的版本信息</p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker version# 预期输出
+        <h4>docker version</h4>
+        <p>查看 Docker 客户端和服务端的版本信息</p>
+        <pre class="bash"><code>$ docker version
+# 预期输出
 Client: Docker Engine - Community
   Version: 24.0.6
   API version: 1.43
@@ -73,222 +92,142 @@ Client: Docker Engine - Community
 Server: Docker Engine - Community
   Version: 24.0.6
   API version: 1.43</code></pre>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div>
-                        <h5 style="margin-bottom: 0.5rem;"><code>docker info</code></h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">查看 Docker 系统详细信息，包括容器、镜像、网络等统计</p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker info# 预期输出（部分）
+        <h4>docker info</h4>
+        <p>查看 Docker 系统详细信息，包括容器、镜像、网络等统计</p>
+        <pre class="bash"><code>$ docker info
+# 预期输出（部分）
 Containers: 2
   Running: 1
   Paused: 0
   Stopped: 1
 Images: 15
 Server Version: 24.0.6</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 镜像管理命令 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-compact-disc"></i>
-                    <h4>镜像管理命令</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 1rem;">下载、查看、删除镜像</p>
+        <h3>1.2 镜像管理命令</h3>
+        <p>下载、查看、删除镜像</p>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <h5 style="margin-bottom: 0.5rem;"><code>docker pull [镜像名:标签]</code></h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">从 Docker Hub 下载镜像</p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker pull ubuntu:20.0420.04: Pulling from library/ubuntu
+        <h4>docker pull [镜像名:标签]</h4>
+        <p>从 Docker Hub 下载镜像</p>
+        <pre class="bash"><code>$ docker pull ubuntu:20.04
+20.04: Pulling from library/ubuntu
 Status: Downloaded newer image for ubuntu:20.04</code></pre>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <h5 style="margin-bottom: 0.5rem;"><code>docker images</code></h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">列出本地所有镜像</p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker imagesREPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+        <h4>docker images</h4>
+        <p>列出本地所有镜像</p>
+        <pre class="bash"><code>$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
 ubuntu        20.04     1234567890ab   2 weeks ago    72.8MB
 nginx         latest    fedcba654321   1 week ago     133MB</code></pre>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div>
-                        <h5 style="margin-bottom: 0.5rem;"><code>docker rmi [镜像ID或名称]</code></h5>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">删除本地镜像</p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker rmi hello-worldUntagged: hello-world:latest
+        <h4>docker rmi [镜像ID或名称]</h4>
+        <p>删除本地镜像</p>
+        <pre class="bash"><code>$ docker rmi hello-world
+Untagged: hello-world:latest
 Deleted: sha256:abcdef1234567890...</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- docker run 详解 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-rocket"></i>
-                    <h4>docker run - 最核心的命令</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 1rem;"><strong>功能：</strong>从指定镜像创建一个新容器并启动它。这是 Docker 最常用、最核心的命令。</p>
+        <h3>1.3 docker run - 最核心的命令</h3>
+        <p><strong>功能：</strong>从指定镜像创建一个新容器并启动它。这是 Docker 最常用、最核心的命令。</p>
 
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.75rem;">常用参数详解：</h5>
+        <h4>常用参数详解</h4>
 
-                    <div class="grid-auto" style="margin-top: 1rem;">
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <h6 style="margin-bottom: 0.5rem;"><code>-d</code> 或 <code>--detach</code></h6>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">后台运行容器，并返回容器ID</p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>适用场景：</strong>需要容器长期运行，不占用终端窗口</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d nginx
+        <div class="tip-box">
+            <span class="tip-title">-d 或 --detach</span>
+            <p>后台运行容器，并返回容器ID。</p>
+            <p><strong>适用场景：</strong>需要容器长期运行，不占用终端窗口。</p>
+            <pre class="bash"><code>$ docker run -d nginx
 a1b2c3d4e5f6... (容器ID)</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        </div>
 
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <h6 style="margin-bottom: 0.5rem;"><code>-it</code> (交互模式)</h6>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">-i：保持标准输入打开；-t：分配伪终端</p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>适用场景：</strong>需要进入容器命令行进行交互</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -it ubuntu:20.04 bash
+        <div class="tip-box">
+            <span class="tip-title">-it (交互模式)</span>
+            <p>-i：保持标准输入打开；-t：分配伪终端。</p>
+            <p><strong>适用场景：</strong>需要进入容器命令行进行交互。</p>
+            <pre class="bash"><code>$ docker run -it ubuntu:20.04 bash
 root@abcdef123456:/#</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        </div>
 
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <h6 style="margin-bottom: 0.5rem;"><code>-p</code> 或 <code>--publish</code></h6>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">端口映射：[宿主机端口]:[容器端口]</p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>适用场景：</strong>从外部访问容器内的服务</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d -p 8080:80 nginx
+        <div class="tip-box">
+            <span class="tip-title">-p 或 --publish</span>
+            <p>端口映射：[宿主机端口]:[容器端口]</p>
+            <p><strong>适用场景：</strong>从外部访问容器内的服务。</p>
+            <pre class="bash"><code>$ docker run -d -p 8080:80 nginx
 # 访问 http://localhost:8080</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        </div>
 
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <h6 style="margin-bottom: 0.5rem;"><code>-v</code> 或 <code>--volume</code></h6>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">挂载目录：[宿主机路径]:[容器路径]</p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>适用场景：</strong>持久化数据或共享文件</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d -v /host/html:/usr/share/nginx/html nginx</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="tip-box">
+            <span class="tip-title">-v 或 --volume</span>
+            <p>挂载目录：[宿主机路径]:[容器路径]</p>
+            <p><strong>适用场景：</strong>持久化数据或共享文件。</p>
+            <pre class="bash"><code>$ docker run -d -v /host/html:/usr/share/nginx/html nginx</code></pre>
+        </div>
 
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <h6 style="margin-bottom: 0.5rem;"><code>--name</code></h6>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">为容器指定自定义名称</p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>适用场景：</strong>便于识别和管理容器</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --name my-nginx nginx</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="tip-box">
+            <span class="tip-title">--name</span>
+            <p>为容器指定自定义名称。</p>
+            <p><strong>适用场景：</strong>便于识别和管理容器。</p>
+            <pre class="bash"><code>$ docker run -d --name my-nginx nginx</code></pre>
+        </div>
 
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <h6 style="margin-bottom: 0.5rem;"><code>--rm</code></h6>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">容器停止后自动删除</p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>适用场景：</strong>临时测试，避免产生无用容器</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run --rm ubuntu echo "Hello"
+        <div class="tip-box">
+            <span class="tip-title">--rm</span>
+            <p>容器停止后自动删除。</p>
+            <p><strong>适用场景：</strong>临时测试，避免产生无用容器。</p>
+            <pre class="bash"><code>$ docker run --rm ubuntu echo "Hello"
 Hello</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        </div>
 
-                    <div class="module-warning" style="margin-top: 1rem;">
-                        <div class="module-content">
-                            <p><strong>注意事项：</strong></p>
-                            <ul style="margin-top: 0.5rem; font-size: 0.875rem;">
-                                <li>参数顺序重要：选项 → 镜像名 → 命令</li>
-                                <li>多个短参数可合并：<code>-d -it</code> = <code>-dit</code></li>
-                                <li>端口映射时宿主机端口不能被占用</li>
-                                <li>使用 <code>--rm</code> 后容器无法恢复</li>
-                            </ul>
-                        </div>
-                    </div>
+        <div class="warning-box">
+            <strong>注意事项：</strong>
+            <ul class="checklist">
+                <li>参数顺序重要：选项 → 镜像名 → 命令</li>
+                <li>多个短参数可合并：<code>-d -it</code> = <code>-dit</code></li>
+                <li>端口映射时宿主机端口不能被占用</li>
+                <li>使用 <code>--rm</code> 后容器无法恢复</li>
+            </ul>
+        </div>
 
-                    <div class="module-tip" style="margin-top: 1rem;">
-                        <div class="module-content">
-                            <h6 style="margin-bottom: 0.75rem;">更多高级参数：</h6>
-                            <div style="display: grid; gap: 1rem; margin-top: 0.75rem;">
-                                <div style="padding: 0.75rem; background-color: #f8f9fa; border-radius: 6px;">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>-e</code> 或 <code>--env</code></p>
-                                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">设置环境变量</p>
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d -e MYSQL_ROOT_PASSWORD=123456 mysql</code></pre>
-                                </div>
-                                <div style="padding: 0.75rem; background-color: #f8f9fa; border-radius: 6px;">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>--restart</code></p>
-                                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">设置重启策略（no/always/on-failure/unless-stopped）</p>
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --restart always nginx</code></pre>
-                                </div>
-                                <div style="padding: 0.75rem; background-color: #f8f9fa; border-radius: 6px;">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>--network</code></p>
-                                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">指定容器网络</p>
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --network my-net nginx</code></pre>
-                                </div>
-                                <div style="padding: 0.75rem; background-color: #f8f9fa; border-radius: 6px;">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>--link</code></p>
-                                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">连接到另一个容器（已过时，推荐用自定义网络）</p>
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --link db:database web-app</code></pre>
-                                </div>
-                                <div style="padding: 0.75rem; background-color: #f8f9fa; border-radius: 6px;">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>--memory</code> / <code>-m</code></p>
-                                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">限制内存使用</p>
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d -m 512m nginx</code></pre>
-                                </div>
-                                <div style="padding: 0.75rem; background-color: #f8f9fa; border-radius: 6px;">
-                                    <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>--cpus</code></p>
-                                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">限制CPU使用量</p>
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --cpus=0.5 nginx</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <h4>更多高级参数</h4>
+        <table class="prop-table">
+            <thead>
+                <tr>
+                    <th>参数</th>
+                    <th>说明</th>
+                    <th>示例</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>-e</code></td>
+                    <td>设置环境变量</td>
+                    <td><code>-e MYSQL_ROOT_PASSWORD=123</code></td>
+                </tr>
+                <tr>
+                    <td><code>--restart</code></td>
+                    <td>重启策略</td>
+                    <td><code>--restart always</code></td>
+                </tr>
+                <tr>
+                    <td><code>--network</code></td>
+                    <td>指定容器网络</td>
+                    <td><code>--network my-net</code></td>
+                </tr>
+                <tr>
+                    <td><code>--memory</code></td>
+                    <td>限制内存使用</td>
+                    <td><code>-m 512m</code></td>
+                </tr>
+                <tr>
+                    <td><code>--cpus</code></td>
+                    <td>限制CPU使用量</td>
+                    <td><code>--cpus=0.5</code></td>
+                </tr>
+            </tbody>
+        </table>
 
-                    <div class="module-tip" style="margin-top: 1rem; background-color: #e0f2fe; border-left: 3px solid #0284c7;">
-                        <div class="module-content">
-                            <h6 style="margin-bottom: 0.75rem;">💼 综合使用示例：</h6>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 0;"><code># 后台运行 Nginx，指定名称、端口映射、挂载目录
+        <div class="concept-box">
+            <span class="concept-title">💼 综合使用示例</span>
+            <pre class="bash"><code># 后台运行 Nginx，指定名称、端口映射、挂载目录
 $ docker run -d --name my-web -p 8080:80 -v /host/html:/usr/share/nginx/html nginx
 
 # 生产环境完整示例：添加重启策略、资源限制、环境变量
@@ -301,253 +240,205 @@ $ docker run -d \
   --cpus=1 \
   -e TZ=Asia/Shanghai \
   nginx:alpine</code></pre>
-                        </div>
-                    </div>
+        </div>
 
-                    <div class="module-concept" style="margin-top: 1rem; background-color: #fff3cd; border-left: 3px solid #ffc107;">
-                        <div class="module-content">
-                            <p style="font-weight: 600; margin-bottom: 0.5rem;">💡 参数组合的最佳实践</p>
-                            <ul style="font-size: 0.875rem;">
-                                <li><strong>开发环境：</strong><code>-d -p --name --rm</code>（方便测试，用完即删）</li>
-                                <li><strong>生产环境：</strong><code>-d -p -v --name --restart --memory --cpus</code>（稳定可靠）</li>
-                                <li><strong>调试排错：</strong><code>-it --rm</code>（交互式，不留痕迹）</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="tip-box">
+            <span class="tip-title">💡 参数组合的最佳实践</span>
+            <ul class="checklist">
+                <li><strong>开发环境：</strong><code>-d -p --name --rm</code>（方便测试，用完即删）</li>
+                <li><strong>生产环境：</strong><code>-d -p -v --name --restart --memory --cpus</code>（稳定可靠）</li>
+                <li><strong>调试排错：</strong><code>-it --rm</code>（交互式，不留痕迹）</li>
+            </ul>
+        </div>
 
             <!-- 其他容器命令 -->
-            <div class="module-command" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-box-open"></i>
-                    <h4>容器管理命令速查表</h4>
-                </div>
-                <div class="module-content">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--color-border);">
-                                <th style="text-align: left; padding: 0.75rem;">命令</th>
-                                <th style="text-align: left; padding: 0.75rem;">说明</th>
-                                <th style="text-align: left; padding: 0.75rem;">示例</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker ps</code></td>
-                                <td style="padding: 0.75rem;">查看运行中的容器</td>
-                                <td style="padding: 0.75rem;"><code>docker ps</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker ps -a</code></td>
-                                <td style="padding: 0.75rem;">查看所有容器（包括已停止）</td>
-                                <td style="padding: 0.75rem;"><code>docker ps -a</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker stop</code></td>
-                                <td style="padding: 0.75rem;">停止容器</td>
-                                <td style="padding: 0.75rem;"><code>docker stop [容器名/ID]</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker start</code></td>
-                                <td style="padding: 0.75rem;">启动已停止的容器</td>
-                                <td style="padding: 0.75rem;"><code>docker start [容器名/ID]</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker restart</code></td>
-                                <td style="padding: 0.75rem;">重启容器</td>
-                                <td style="padding: 0.75rem;"><code>docker restart [容器名/ID]</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker rm</code></td>
-                                <td style="padding: 0.75rem;">删除已停止的容器</td>
-                                <td style="padding: 0.75rem;"><code>docker rm [容器名/ID]</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker rm -f</code></td>
-                                <td style="padding: 0.75rem;">强制删除运行中的容器</td>
-                                <td style="padding: 0.75rem;"><code>docker rm -f [容器名/ID]</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker logs</code></td>
-                                <td style="padding: 0.75rem;">查看容器日志</td>
-                                <td style="padding: 0.75rem;"><code>docker logs [容器名/ID]</code></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--color-border);">
-                                <td style="padding: 0.75rem;"><code>docker exec</code></td>
-                                <td style="padding: 0.75rem;">在运行的容器中执行命令</td>
-                                <td style="padding: 0.75rem;"><code>docker exec -it [容器] bash</code></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.75rem;"><code>docker cp</code></td>
-                                <td style="padding: 0.75rem;">容器与主机间复制文件</td>
-                                <td style="padding: 0.75rem;"><code>docker cp file.txt [容器]:/path</code></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <h3>1.4 容器管理命令速查表</h3>
+            <table class="prop-table">
+                <thead>
+                    <tr>
+                        <th>命令</th>
+                        <th>说明</th>
+                        <th>示例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>docker ps</code></td>
+                        <td>查看运行中的容器</td>
+                        <td><code>docker ps</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker ps -a</code></td>
+                        <td>查看所有容器（包括已停止）</td>
+                        <td><code>docker ps -a</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker stop</code></td>
+                        <td>停止容器</td>
+                        <td><code>docker stop [容器名/ID]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker start</code></td>
+                        <td>启动已停止的容器</td>
+                        <td><code>docker start [容器名/ID]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker restart</code></td>
+                        <td>重启容器</td>
+                        <td><code>docker restart [容器名/ID]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker rm</code></td>
+                        <td>删除已停止的容器</td>
+                        <td><code>docker rm [容器名/ID]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker rm -f</code></td>
+                        <td>强制删除运行中的容器</td>
+                        <td><code>docker rm -f [容器名/ID]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker logs</code></td>
+                        <td>查看容器日志</td>
+                        <td><code>docker logs [容器名/ID]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker exec</code></td>
+                        <td>在运行的容器中执行命令</td>
+                        <td><code>docker exec -it [容器] bash</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>docker cp</code></td>
+                        <td>容器与主机间复制文件</td>
+                        <td><code>docker cp file.txt [容器]:/path</code></td>
+                    </tr>
+                </tbody>
+            </table>
 
             <!-- docker ps 详解 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-list"></i>
-                    <h4>docker ps - 查看容器状态详解</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>功能：</strong>列出容器及其状态信息，是最常用的监控命令。</p>
-                    
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">常用选项：</h5>
-                    <div style="display: grid; gap: 1rem; margin-top: 0.75rem;">
-                        <div style="padding: 1rem; background-color: #f8f9fa; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>docker ps</code></p>
-                            <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">只显示运行中的容器</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS
+            <h3>1.5 docker ps - 查看容器状态详解</h3>
+            <p><strong>功能：</strong>列出容器及其状态信息，是最常用的监控命令。</p>
+            
+            <h4>常用选项</h4>
+            
+            <div class="tip-box">
+                <span class="tip-title">docker ps</span>
+                <p>只显示运行中的容器。</p>
+                <pre class="bash"><code>CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS
 a1b2c3d4e5f6   nginx     "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes</code></pre>
-                        </div>
-                        </div>
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <p><strong><code>docker ps -a</code></strong></p>
-                                <p style="font-size: 0.875rem; margin: 0.25rem 0;">显示所有容器（包括已停止的）</p>
-                            </div>
-                        </div>
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <p><strong><code>docker ps -q</code></strong></p>
-                                <p style="font-size: 0.875rem; margin: 0.25rem 0;">只显示容器ID（配合批量操作）</p>
-                                <div class="module-command" style="margin-top: 0.5rem;">
-                                    <div class="module-content">
-                                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 停止所有运行中的容器
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">docker ps -a</span>
+                <p>显示所有容器（包括已停止的）。</p>
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">docker ps -q</span>
+                <p>只显示容器ID（配合批量操作）。</p>
+                <pre class="bash"><code># 停止所有运行中的容器
 $ docker stop $(docker ps -q)</code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="module-tip">
-                            <div class="module-content">
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;"><code>docker ps --filter</code></p>
-                                <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">按条件筛选容器</p>
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看nginx镜像的容器
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">docker ps --filter</span>
+                <p>按条件筛选容器。</p>
+                <pre class="bash"><code># 查看nginx镜像的容器
 $ docker ps --filter ancestor=nginx
 
 # 查看处于退出状态的容器
 $ docker ps -a --filter status=exited</code></pre>
-                            </div>
-                        </div>
-                    </div>
+            </div>
 
-                    <div class="module-tip" style="margin-top: 1rem;">
-                        <div class="module-content">
-                            <h6 style="margin-bottom: 0.5rem;">输出字段解释：</h6>
-                            <ul style="font-size: 0.875rem;">
-                                <li><strong>CONTAINER ID：</strong>容器的唯一标识符（前12位）</li>
-                                <li><strong>IMAGE：</strong>容器使用的镜像名称</li>
-                                <li><strong>COMMAND：</strong>容器启动时执行的命令</li>
-                                <li><strong>CREATED：</strong>容器创建的时间</li>
-                                <li><strong>STATUS：</strong>容器状态（Up=运行中，Exited=已停止）</li>
-                                <li><strong>PORTS：</strong>端口映射信息</li>
-                                <li><strong>NAMES：</strong>容器名称（自动生成或用户指定）</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="concept-box">
+                <span class="concept-title">输出字段解释</span>
+                <ul class="checklist">
+                    <li><strong>CONTAINER ID：</strong>容器的唯一标识符（前12位）</li>
+                    <li><strong>IMAGE：</strong>容器使用的镜像名称</li>
+                    <li><strong>COMMAND：</strong>容器启动时执行的命令</li>
+                    <li><strong>CREATED：</strong>容器创建的时间</li>
+                    <li><strong>STATUS：</strong>容器状态（Up=运行中，Exited=已停止）</li>
+                    <li><strong>PORTS：</strong>端口映射信息</li>
+                    <li><strong>NAMES：</strong>容器名称（自动生成或用户指定）</li>
+                </ul>
             </div>
 
             <!-- docker exec 详解 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-terminal"></i>
-                    <h4>docker exec - 进入容器执行命令</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>功能：</strong>在运行中的容器内执行命令，是调试和运维的核心工具。</p>
-                    
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.75rem;">常用场景：</h5>
-                    <div style="display: grid; gap: 1rem;">
-                        <div style="padding: 1rem; background-color: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.75rem;">场景1：进入容器Shell</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 进入bash（Ubuntu/Debian容器）
+            <h3>1.6 docker exec - 进入容器执行命令</h3>
+            <p><strong>功能：</strong>在运行中的容器内执行命令，是调试和运维的核心工具。</p>
+            
+            <h4>常用场景</h4>
+            
+            <div class="tip-box">
+                <span class="tip-title">场景1：进入容器Shell</span>
+                <pre class="bash"><code># 进入bash（Ubuntu/Debian容器）
 $ docker exec -it my-nginx bash
 
 # 进入sh（Alpine容器）
 $ docker exec -it my-nginx sh</code></pre>
-                        </div>
-                        <div style="padding: 1rem; background-color: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.75rem;">场景2：执行单条命令</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看容器内某个文件
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">场景2：执行单条命令</span>
+                <pre class="bash"><code># 查看容器内某个文件
 $ docker exec my-nginx cat /etc/nginx/nginx.conf
 
 # 查看进程列表
 $ docker exec my-nginx ps aux</code></pre>
-                        </div>
-                        <div style="padding: 1rem; background-color: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.75rem;">场景3：修改配置文件</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 安装编辑器（Alpine）
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">场景3：修改配置文件</span>
+                <pre class="bash"><code># 安装编辑器（Alpine）
 $ docker exec my-nginx apk add nano
 
 # 编辑文件
 $ docker exec -it my-nginx nano /usr/share/nginx/html/index.html</code></pre>
-                        </div>
-                        <div style="padding: 1rem; background-color: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.75rem;">场景4：调试网络问题</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 测试网络连通性
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">场景4：调试网络问题</span>
+                <pre class="bash"><code># 测试网络连通性
 $ docker exec my-nginx ping -c 3 google.com
 
 # 查看端口监听
 $ docker exec my-nginx netstat -tuln</code></pre>
-                        </div>
-                    </div>
+            </div>
 
-                    <div class="module-warning" style="margin-top: 1rem;">
-                        <div class="module-content">
-                            <p><strong>注意事项：</strong></p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
-                                <li><code>exec</code> 只能在运行中的容器使用</li>
-                                <li>退出 exec 会话不会停止容器（与 <code>docker attach</code> 不同）</li>
-                                <li>Alpine 镜像默认没有 bash，使用 <code>sh</code></li>
-                                <li>容器内的修改是临时的，重启后会丢失</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="warning-box">
+                <strong>注意事项：</strong>
+                <ul class="checklist">
+                    <li><code>exec</code> 只能在运行中的容器使用</li>
+                    <li>退出 exec 会话不会停止容器（与 <code>docker attach</code> 不同）</li>
+                    <li>Alpine 镜像默认没有 bash，使用 <code>sh</code></li>
+                    <li>容器内的修改是临时的，重启后会丢失</li>
+                </ul>
             </div>
 
             <!-- docker logs 详解 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-file-alt"></i>
-                    <h4>docker logs - 查看容器日志</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>功能：</strong>查看容器的标准输出和标准错误，排查问题的第一步。</p>
-                    
-                    <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">常用选项：</h5>
-                    <div class="module-command">
-                        <div class="module-content">
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 查看所有日志
-$ docker logs my-nginx
+            <h3>1.7 docker logs - 查看容器日志</h3>
+            <p><strong>功能：</strong>获取容器的日志输出（stdout/stderr），用于排错。</p>
+            
+            <h4>常用选项</h4>
+            
+            <div class="tip-box">
+                <span class="tip-title">docker logs [容器]</span>
+                <p>查看所有日志。</p>
+            </div>
 
-# 实时跟踪日志（类似 tail -f）
-$ docker logs -f my-nginx
+            <div class="tip-box">
+                <span class="tip-title">docker logs -f [容器]</span>
+                <p>实时跟踪日志输出（类似 <code>tail -f</code>）。</p>
+            </div>
 
-# 只看最近20行
-$ docker logs --tail 20 my-nginx
+            <div class="tip-box">
+                <span class="tip-title">docker logs --tail 100 [容器]</span>
+                <p>只查看最后100行日志。</p>
+            </div>
 
-# 查看最近5分钟的日志
-$ docker logs --since 5m my-nginx
-
-# 显示时间戳
-$ docker logs -t my-nginx
-
-# 组合使用：实时查看最近10行并显示时间
-$ docker logs -f --tail 10 -t my-nginx</code></pre>
-                        </div>
-                    </div>
-
-                    <div style="padding: 1rem; background-color: #fef3c7; border-left: 3px solid #f59e0b; border-radius: 6px; margin-top: 1rem;">
-                        <h6 style="margin-bottom: 0.75rem;">💡 实战案例：排查Nginx启动失败</h6>
-                        <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 容器启动后立即退出
+            <div class="concept-box">
+                <span class="concept-title">💡 实战案例：排查Nginx启动失败</span>
+                <pre class="bash"><code># 容器启动后立即退出
 $ docker ps -a
 CONTAINER ID   STATUS                      NAMES
 abc123         Exited (1) 5 seconds ago    my-nginx
@@ -557,50 +448,38 @@ $ docker logs abc123
 nginx: [emerg] bind() to 0.0.0.0:80 failed (98: Address already in use)
 
 # 原因：80端口被占用</code></pre>
-                    </div>
-                </div>
             </div>
 
             <!-- docker cp 详解 -->
-            <div class="module-concept" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-copy"></i>
-                    <h4>docker cp - 文件拷贝</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;"><strong>功能：</strong>在容器和主机之间复制文件或目录。</p>
-                    
-                    <div style="display: grid; gap: 1rem; margin-top: 0.75rem;">
-                        <div style="padding: 1rem; background-color: #eff6ff; border-left: 3px solid #3b82f6; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.75rem;">从主机复制到容器：</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 复制单个文件
+            <h3>1.8 docker cp - 文件拷贝</h3>
+            <p><strong>功能：</strong>在容器和主机之间复制文件或目录。</p>
+            
+            <div class="tip-box">
+                <span class="tip-title">从主机复制到容器</span>
+                <pre class="bash"><code># 复制单个文件
 $ docker cp index.html my-nginx:/usr/share/nginx/html/
 
 # 复制整个目录
 $ docker cp ./html my-nginx:/usr/share/nginx/</code></pre>
-                        </div>
-                        <div style="padding: 1rem; background-color: #eff6ff; border-left: 3px solid #3b82f6; border-radius: 6px;">
-                            <p style="font-weight: 600; margin-bottom: 0.75rem;">从容器复制到主机：</p>
-                            <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 导出容器内的文件
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-title">从容器复制到主机</span>
+                <pre class="bash"><code># 导出容器内的文件
 $ docker cp my-nginx:/etc/nginx/nginx.conf ./nginx.conf
 
 # 备份容器数据
 $ docker cp my-nginx:/var/log/nginx ./nginx-logs</code></pre>
-                        </div>
-                    </div>
+            </div>
 
-                    <div class="module-warning" style="margin-top: 1rem;">
-                        <div class="module-content">
-                            <p><strong>注意：</strong></p>
-                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
-                                <li>容器可以是运行或停止状态</li>
-                                <li>路径中的 <code>:</code> 分隔容器名和路径</li>
-                                <li>目标目录必须存在，否则会报错</li>
-                                <li>大文件传输较慢，建议用数据卷</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="warning-box">
+                <strong>注意：</strong>
+                <ul class="checklist">
+                    <li>容器可以是运行或停止状态</li>
+                    <li>路径中的 <code>:</code> 分隔容器名和路径</li>
+                    <li>目标目录必须存在，否则会报错</li>
+                    <li>大文件传输较慢，建议用数据卷</li>
+                </ul>
             </div>
         </section>
 
@@ -611,151 +490,60 @@ $ docker cp my-nginx:/var/log/nginx ./nginx-logs</code></pre>
                 2. 课前热身：找回手感
             </h2>
 
-            <p style="margin-bottom: 1.5rem;">在进入正式内容前，让我们通过几个简单操作回顾上节课的内容，为后续学习打好基础。</p>
+            <p>在进入正式内容前，让我们通过几个简单操作回顾上节课的内容，为后续学习打好基础。</p>
 
-            <div class="module-steps">
-                <div class="module-header">
-                    <i class="fas fa-list-ol"></i>
-                    <h4>5步快速练习</h4>
-                </div>
-                <div class="module-content">
-                    
-                    <div class="step-item">
-                        <span class="step-number" style="background-color: var(--color-accent);">1</span>
-                        <div class="step-content">
-                            <h5>拉取 nginx 镜像</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker pull nginx</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>Using default tag: latest
+            <h3>5步快速练习</h3>
+
+            <h4>1. 拉取 nginx 镜像</h4>
+            <pre class="bash"><code>$ docker pull nginx
+Using default tag: latest
 latest: Pulling from library/nginx
 a2abf6c4d29d: Pull complete
 a9edb18cadd1: Pull complete
 Status: Downloaded newer image for nginx:latest
 docker.io/library/nginx:latest</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem; color: var(--color-text-light);"><strong>说明：</strong>如果已经下载过，会显示 "Image is up to date"</p>
-                        </div>
-                    </div>
+            <p><strong>说明：</strong>如果已经下载过，会显示 "Image is up to date"</p>
 
-                    <div class="step-item">
-                        <span class="step-number">2</span>
-                        <div class="step-content">
-                            <h5>运行一个测试容器</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d --name test-nginx nginx</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem; color: var(--color-text-light);"><strong>输出：</strong>这是容器的完整ID（64位），后续可用前几位代替</p>
-                        </div>
-                    </div>
+            <h4>2. 运行一个测试容器</h4>
+            <pre class="bash"><code>$ docker run -d --name test-nginx nginx
+a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456</code></pre>
+            <p><strong>输出：</strong>这是容器的完整ID（64位），后续可用前几位代替</p>
 
-                    <div class="step-item">
-                        <span class="step-number">3</span>
-                        <div class="step-content">
-                            <h5>查看容器状态</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker ps</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>CONTAINER ID   IMAGE   COMMAND                  CREATED          STATUS          PORTS     NAMES
+            <h4>3. 查看容器状态</h4>
+            <pre class="bash"><code>$ docker ps
+CONTAINER ID   IMAGE   COMMAND                  CREATED          STATUS          PORTS     NAMES
 a1b2c3d4e5f6   nginx   "/docker-entrypoint.…"   10 seconds ago   Up 9 seconds    80/tcp    test-nginx</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>关键信息：</strong></p>
-                            <ul style="font-size: 0.875rem;">
-                                <li><code>STATUS: Up 9 seconds</code> - 容器正在运行</li>
-                                <li><code>PORTS: 80/tcp</code> - 容器内部监听80端口，但<strong>未映射</strong>到主机</li>
-                            </ul>
-                        </div>
-                    </div>
+            <p><strong>关键信息：</strong></p>
+            <ul class="checklist">
+                <li><code>STATUS: Up 9 seconds</code> - 容器正在运行</li>
+                <li><code>PORTS: 80/tcp</code> - 容器内部监听80端口，但<strong>未映射</strong>到主机</li>
+            </ul>
 
-                    <div class="step-item">
-                        <span class="step-number">4</span>
-                        <div class="step-content">
-                            <h5>停止容器</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker stop test-nginx</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>test-nginx</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>验证停止：</strong></p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker ps -a | grep test-nginx
+            <h4>4. 停止容器</h4>
+            <pre class="bash"><code>$ docker stop test-nginx
+test-nginx</code></pre>
+            <p><strong>验证停止：</strong></p>
+            <pre class="bash"><code>$ docker ps -a | grep test-nginx
 a1b2c3d4e5f6   nginx   ...   Exited (0) 5 seconds ago   test-nginx</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="step-item">
-                        <span class="step-number">5</span>
-                        <div class="step-content">
-                            <h5>删除容器</h5>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker rm test-nginx</code></pre>
-                                </div>
-                            </div>
-                            <div class="module-output" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>test-nginx</code></pre>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>验证删除：</strong></p>
-                            <div class="module-command">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker ps -a | grep test-nginx
+            <h4>5. 删除容器</h4>
+            <pre class="bash"><code>$ docker rm test-nginx
+test-nginx</code></pre>
+            <p><strong>验证删除：</strong></p>
+            <pre class="bash"><code>$ docker ps -a | grep test-nginx
 # 无输出，说明容器已被删除</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="module-tip" style="margin-top: 1.5rem;">
-                <div class="module-header">
-                    <i class="fas fa-lightbulb"></i>
-                    <h4>小测试</h4>
-                </div>
-                <div class="module-content">
-                    <p style="margin-bottom: 0.75rem;">如果上面5步操作都顺利完成，恭喜你已经掌握了容器的基本生命周期！</p>
-                    <div class="practice-task">
-                        <h5>挑战：一行命令完成</h5>
-                        <p style="margin-bottom: 0.5rem;">尝试用一行命令启动容器并在浏览器中看到效果（提示：需要端口映射）</p>
-                        <details style="margin-top: 0.5rem;">
-                            <summary style="cursor: pointer; color: var(--color-accent); font-weight: 600;">点击查看答案</summary>
-                            <div class="module-command" style="margin-top: 0.5rem;">
-                                <div class="module-content">
-                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>$ docker run -d -p 8080:80 --name quick-test nginx
+            <div class="tip-box">
+                <span class="tip-title">小测试</span>
+                <p>如果上面5步操作都顺利完成，恭喜你已经掌握了容器的基本生命周期！</p>
+                <p><strong>挑战：一行命令完成</strong></p>
+                <p>尝试用一行命令启动容器并在浏览器中看到效果（提示：需要端口映射）</p>
+                <details>
+                    <summary>点击查看答案</summary>
+                    <pre class="bash"><code>$ docker run -d -p 8080:80 --name quick-test nginx
 
 # 然后访问 http://localhost:8080</code></pre>
-                                </div>
-                            </div>
-                        </details>
-                    </div>
-                </div>
+                </details>
             </div>
         </section>
 
@@ -1650,7 +1438,7 @@ nano index.html</code></pre>
                             <div class="module-warning" style="margin-top: 0.75rem;">
                                 <div class="module-content">
                                     <p style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ 中文编码注意事项：</p>
-                                    <ul style="font-size: 0.875rem;">
+                                    <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
                                         <li><strong>必须添加：</strong><code>&lt;meta charset="UTF-8"&gt;</code> 标签</li>
                                         <li><strong>方法A：</strong>简单的 <code>echo</code> 命令可能导致中文乱码</li>
                                         <li><strong>推荐方法：</strong>使用 <code>cat &gt; file &lt;&lt;EOF</code> 写入多行内容（方法B）</li>
@@ -1938,16 +1726,483 @@ COPY index.html /usr/share/nginx/html/</code></pre>
                     </div>
 
                     <div class="practice-task" style="margin-top: 1rem;">
-                        <h5>操作步骤：</h5>
-                        <div class="module-command">
+                        <h5>about.html (关于页面)</h5>
+                        <div class="module-code-file">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 将上面代码保存为 mypage.html
-# 2. 拷贝到容器
-docker cp mypage.html web:/usr/share/nginx/html/index.html
-# 3. 访问 http://localhost:8080 查看效果</code></pre>
+                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;关于我 - 我的个人主页&lt;/title&gt;
+    &lt;link rel="stylesheet" href="css/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar"&gt;
+        &lt;div class="container"&gt;
+            &lt;h2 class="logo"&gt;我的网站&lt;/h2&gt;
+            &lt;ul class="nav-links"&gt;
+                &lt;li&gt;&lt;a href="index.html"&gt;首页&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="about.html" class="active"&gt;关于&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="contact.html"&gt;联系&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+
+    &lt;section class="content" style="padding-top: 6rem;"&gt;
+        &lt;div class="container"&gt;
+            &lt;h1&gt;关于我&lt;/h1&gt;
+            &lt;p&gt;我是一名热爱编程的开发者，专注于容器化技术和Web开发。这个网站使用Docker + Nginx部署，展示了现代化的DevOps实践。&lt;/p&gt;
+            
+            &lt;h2 style="margin-top: 2rem;"&gt;教育背景&lt;/h2&gt;
+            &lt;p&gt;🎓 XX大学 - 计算机科学与技术专业 (2020-2024)&lt;/p&gt;
+            
+            &lt;h2 style="margin-top: 2rem;"&gt;项目经验&lt;/h2&gt;
+            &lt;ul style="list-style: none; padding: 0;"&gt;
+                &lt;li style="margin-bottom: 1rem;"&gt;
+                    &lt;strong&gt;🚀 微服务平台&lt;/strong&gt;&lt;br&gt;
+                    使用Docker Compose编排多个微服务，实现高可用架构
+                &lt;/li&gt;
+                &lt;li&gt;
+                    &lt;strong&gt;📱 移动端应用&lt;/strong&gt;&lt;br&gt;
+                    React Native开发跨平台应用，部署到iOS和Android
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;footer class="footer"&gt;
+        &lt;div class="container"&gt;
+            &lt;p&gt;&copy; 2024 张三的个人网站 | Powered by Docker + Nginx&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
                             </div>
                         </div>
                     </div>
+
+                    <div class="practice-task" style="margin-top: 1rem;">
+                        <h5>contact.html (联系页面)</h5>
+                        <div class="module-code-file">
+                            <div class="module-content">
+                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;联系我 - 我的个人主页&lt;/title&gt;
+    &lt;link rel="stylesheet" href="css/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar"&gt;
+        &lt;div class="container"&gt;
+            &lt;h2 class="logo"&gt;我的网站&lt;/h2&gt;
+            &lt;ul class="nav-links"&gt;
+                &lt;li&gt;&lt;a href="index.html"&gt;首页&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="about.html"&gt;关于&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="contact.html" class="active"&gt;联系&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+
+    &lt;section class="content" style="padding-top: 6rem;"&gt;
+        &lt;div class="container"&gt;
+            &lt;h1&gt;联系我&lt;/h1&gt;
+            &lt;p&gt;如果你有任何问题或合作意向，欢迎通过以下方式联系我：&lt;/p&gt;
+            
+            &lt;div class="contact-info"&gt;
+                &lt;div class="contact-card"&gt;
+                    &lt;h3&gt;📧 Email&lt;/h3&gt;
+                    &lt;p&gt;zhangsan@example.com&lt;/p&gt;
+                &lt;/div&gt;
+                &lt;div class="contact-card"&gt;
+                    &lt;h3&gt;🐙 GitHub&lt;/h3&gt;
+                    &lt;p&gt;github.com/zhangsan&lt;/p&gt;
+                &lt;/div&gt;
+                &lt;div class="contact-card"&gt;
+                    &lt;h3&gt;💼 LinkedIn&lt;/h3&gt;
+                    &lt;p&gt;linkedin.com/in/zhangsan&lt;/p&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;footer class="footer"&gt;
+        &lt;div class="container"&gt;
+            &lt;p&gt;&copy; 2024 张三的个人网站 | Powered by Docker + Nginx&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤3：创建CSS -->
+            <div class="module-practice" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-palette"></i>
+                    <h4>步骤3：创建样式文件</h4>
+                </div>
+                <div class="module-content">
+                    <div class="practice-task">
+                        <h5>css/style.css</h5>
+                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">创建 <code>css/style.css</code> 文件：</p>
+                        <div class="module-code-file">
+                            <div class="module-content">
+                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code>/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* 导航栏 */
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s;
+    font-weight: 500;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* 英雄区域 */
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8rem 0 4rem;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.hero-badges {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+}
+
+/* 内容区域 */
+.content {
+    padding: 4rem 0;
+}
+
+.content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #667eea;
+}
+
+.content h2 {
+    font-size: 2rem;
+    margin: 2rem 0 1rem;
+    color: #764ba2;
+}
+
+.content p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+/* 技能卡片 */
+.skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.skill-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+}
+
+.skill-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #667eea;
+}
+
+/* 联系卡片 */
+.contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contact-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.contact-card:hover {
+    transform: scale(1.05);
+}
+
+.contact-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 页脚 */
+.footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 4rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .skills {
+        grid-template-columns: 1fr;
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤4：部署到Docker -->
+            <div class="module-practice" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-docker"></i>
+                    <h4>步骤4：使用Docker部署网站</h4>
+                </div>
+                <div class="module-content">
+                    <div class="practice-task">
+                        <h5>方法1：使用数据卷挂载(推荐)</h5>
+                        <div class="module-command">
+                            <div class="module-content">
+                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell (假设你在 D:\my-website 目录)
+docker run -d `
+  -p 8080:80 `
+  -v D:/my-website:/usr/share/nginx/html `
+  --name my-website `
+  --restart=unless-stopped `
+  nginx
+
+# Linux/Mac
+docker run -d \
+  -p 8080:80 \
+  -v $(pwd):/usr/share/nginx/html \
+  --name my-website \
+  --restart=unless-stopped \
+  nginx</code></pre>
+                            </div>
+                        </div>
+                        <div class="module-tip" style="margin-top: 0.75rem;">
+                            <div class="module-content">
+                                <p><strong>优点：</strong>修改主机文件后，刷新浏览器即可看到更新(无需重启容器)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="practice-task" style="margin-top: 1rem;">
+                        <h5>方法2：使用docker cp(一次性部署)</h5>
+                        <div class="module-command">
+                            <div class="module-content">
+                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 启动容器
+docker run -d -p 8080:80 --name my-website nginx
+
+# 2. 停止Nginx(避免文件占用)
+docker exec my-website nginx -s stop
+
+# 3. 拷贝整个目录
+docker cp . my-website:/usr/share/nginx/html/
+
+# 4. 重启容器
+docker restart my-website</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="practice-task" style="margin-top: 1rem;">
+                        <h5>验证部署</h5>
+                        <div class="module-command">
+                            <div class="module-content">
+                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 1. 检查容器状态
+docker ps | grep my-website
+
+# 2. 查看容器日志
+docker logs my-website
+
+# 3. 访问网站
+# 打开浏览器访问 http://localhost:8080</code></pre>
+                            </div>
+                        </div>
+                        <div style="background-color: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success); margin-top: 0.75rem;">
+                            <p style="color: var(--color-success); font-weight: 600; margin-bottom: 0.5rem;">✅ 成功标志：</p>
+                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
+                                <li>看到导航栏(紫色渐变背景)</li>
+                                <li>可以点击"首页""关于""联系"切换页面</li>
+                                <li>页面响应式(手机浏览也正常)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 故障排查 -->
+            <div class="module-warning" style="margin-top: 1.5rem;">
+                <div class="module-header">
+                    <i class="fas fa-wrench"></i>
+                    <h4>常见问题排查</h4>
+                </div>
+                <div class="module-content">
+                    <div class="grid-auto">
+                        <div>
+                            <p style="font-weight: 600; color: var(--color-error);">❌ 样式不生效</p>
+                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：CSS文件路径错误</p>
+                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
+                            <div class="module-command" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 进入容器检查文件结构
+docker exec my-website ls -R /usr/share/nginx/html
+
+# 确保css目录存在
+docker exec my-website ls /usr/share/nginx/html/css</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p style="font-weight: 600; color: var(--color-error);">❌ Windows路径问题</p>
+                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：反斜杠 \ 需要改为正斜杠 /</p>
+                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>解决：</strong></p>
+                            <div class="module-command" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 错误
+-v C:\Users\...\my-website:/usr/share/nginx/html
+
+# 正确
+-v C:/Users/.../my-website:/usr/share/nginx/html</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p style="font-weight: 600; color: var(--color-error);">❌ 403 Forbidden错误</p>
+                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：没有index.html或权限问题</p>
+                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
+                            <div class="module-command" style="margin-top: 0.5rem;">
+                                <div class="module-content">
+                                    <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 检查文件权限
+docker exec my-website ls -l /usr/share/nginx/html/
+
+# 修复权限
+docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 进阶挑战 -->
+            <div class="module-tip" style="margin-top: 1.5rem; background-color: #fef3c7; border-left: 3px solid var(--color-warning);">
+                <div class="module-content">
+                    <h5 style="margin-bottom: 0.75rem;">🚀 进阶挑战：让网站更专业</h5>
+                    <ul style="font-size: 0.875rem;">
+                        <li><strong>添加图片：</strong>在images目录放入头像图片，修改HTML引用</li>
+                        <li><strong>添加JavaScript：</strong>实现导航栏滚动效果、打字机动画</li>
+                        <li><strong>添加表单：</strong>在contact.html添加联系表单(纯前端验证)</li>
+                        <li><strong>自定义域名：</strong>修改 /etc/hosts 添加本地域名解析</li>
+                        <li><strong>HTTPS支持：</strong>学习使用自签名证书配置HTTPS(下一讲)</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -2264,6 +2519,12 @@ abc123def456   web    0.01%   3.5MiB / 7.78GiB    0.04%   1.2kB / 0B    0B / 0B<
                         </div>
                     </div>
 
+                    <div class="module-warning" style="margin-top: 1rem;">
+                        <div class="module-content">
+                            <p><strong>注意：</strong>docker stats 显示的是实时数据，可能会影响容器性能，建议在开发环境使用</p>
+                        </div>
+                    </div>
+
                     <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">日志管理：</h5>
                     <div class="module-command">
                         <div class="module-content">
@@ -2442,7 +2703,7 @@ docker system df</code></pre>
                         <h5>在主机上创建目录</h5>
                         <div class="module-command">
                             <div class="module-content">
-                                <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell
+                                                               <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># Windows PowerShell
 mkdir my-website
 cd my-website
 mkdir css, js, images
@@ -2575,7 +2836,7 @@ cd my-website</code></pre>
     &lt;section class="content" style="padding-top: 6rem;"&gt;
         &lt;div class="container"&gt;
             &lt;h1&gt;关于我&lt;/h1&gt;
-            &lt;p&gt;我是张三，一名充满热情的全栈开发工程师，专注于使用现代技术栈构建高质量的Web应用。&lt;/p&gt;
+            &lt;p&gt;我是一名热爱编程的开发者，专注于容器化技术和Web开发。这个网站使用Docker + Nginx部署，展示了现代化的DevOps实践。&lt;/p&gt;
             
             &lt;h2 style="margin-top: 2rem;"&gt;教育背景&lt;/h2&gt;
             &lt;p&gt;🎓 XX大学 - 计算机科学与技术专业 (2020-2024)&lt;/p&gt;
@@ -2684,7 +2945,7 @@ cd my-website</code></pre>
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     line-height: 1.6;
     color: #333;
 }
@@ -2949,7 +3210,7 @@ docker logs my-website
                         </div>
                         <div style="background-color: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 3px solid var(--color-success); margin-top: 0.75rem;">
                             <p style="color: var(--color-success); font-weight: 600; margin-bottom: 0.5rem;">✅ 成功标志：</p>
-                            <ul style="font-size: 0.875rem;">
+                            <ul style="font-size: 0.875rem; margin-top: 0.5rem;">
                                 <li>看到导航栏(紫色渐变背景)</li>
                                 <li>可以点击"首页""关于""联系"切换页面</li>
                                 <li>页面响应式(手机浏览也正常)</li>
@@ -2969,7 +3230,7 @@ docker logs my-website
                     <div class="grid-auto">
                         <div>
                             <p style="font-weight: 600; color: var(--color-error);">❌ 样式不生效</p>
-                            <p style="font-size: 0.875rem;"><strong>原因：</strong>CSS文件路径错误</p>
+                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：CSS文件路径错误</p>
                             <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
                             <div class="module-command" style="margin-top: 0.5rem;">
                                 <div class="module-content">
@@ -2984,8 +3245,8 @@ docker exec my-website ls /usr/share/nginx/html/css</code></pre>
 
                         <div>
                             <p style="font-weight: 600; color: var(--color-error);">❌ Windows路径问题</p>
-                            <p style="font-size: 0.875rem;"><strong>原因：</strong>反斜杠 \ 需要改为正斜杠 /</p>
-                            <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
+                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：反斜杠 \ 需要改为正斜杠 /</p>
+                            <p style="font-size: 0.875rem; margin-bottom: 0.5rem;"><strong>解决：</strong></p>
                             <div class="module-command" style="margin-top: 0.5rem;">
                                 <div class="module-content">
                                     <pre style="background-color: #1e293b; color: #e2e8f0; padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0;"><code># 错误
@@ -2999,7 +3260,7 @@ docker exec my-website ls /usr/share/nginx/html/css</code></pre>
 
                         <div>
                             <p style="font-weight: 600; color: var(--color-error);">❌ 403 Forbidden错误</p>
-                            <p style="font-size: 0.875rem;"><strong>原因：</strong>没有index.html或权限问题</p>
+                            <p style="font-size: 0.875rem; margin: 0.25rem 0;">原因：没有index.html或权限问题</p>
                             <p style="font-size: 0.875rem;"><strong>解决：</strong></p>
                             <div class="module-command" style="margin-top: 0.5rem;">
                                 <div class="module-content">
