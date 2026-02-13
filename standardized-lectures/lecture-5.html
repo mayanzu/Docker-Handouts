@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第5课时 - Docker镜像仓库</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第5课时</h1>
+          <h2 class="sub-title">Docker镜像仓库</h2>
+          <p class="tagline">私有仓库搭建与镜像管理</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">📚</div>
+              <div class="goal-content">
+                <h3>理解镜像仓库分类</h3>
+                <p>公有仓库与私有仓库</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔧</div>
+              <div class="goal-content">
+                <h3>掌握私有仓库搭建</h3>
+                <p>Docker Registry部署</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">☁️</div>
+              <div class="goal-content">
+                <h3>使用阿里云镜像服务</h3>
+                <p>企业级镜像托管</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔒</div>
+              <div class="goal-content">
+                <h3>镜像安全最佳实践</h3>
+                <p>漏洞扫描与签名</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">30分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">仓库分类、Registry原理</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc">私有仓库搭建、阿里云配置</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">20分钟</div>
+              <div class="schedule-type">练习与总结</div>
+              <div class="schedule-desc">推送镜像、安全检查</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">镜像仓库概述</h1>
+          <p class="section-desc">理解镜像的存储与分发机制</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是镜像仓库？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">镜像仓库（Registry）</div>
+            <div class="definition-content">
+              镜像仓库是存储和分发Docker镜像的服务。类似于代码仓库（如Git），但存储的是构建好的镜像文件。
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 名词解释：Registry vs Repository</div>
+            <p><strong>Registry</strong>：仓库服务器，如Docker Hub、阿里云镜像服务</p>
+            <p><strong>Repository</strong>：具体的镜像仓库，如nginx、mysql</p>
+            <p><strong>Tag</strong>：镜像标签，如latest、1.0、alpine</p>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">镜像仓库分类</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #93c5fd;">
+              <div class="pain-icon">🌍</div>
+              <h3>公有仓库</h3>
+              <p>Docker Hub、Quay.io</p>
+              <p>免费使用、公开可见</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">🏢</div>
+              <h3>私有仓库</h3>
+              <p>自建Registry、Harbor</p>
+              <p>安全可控、内网访问</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fcd34d;">
+              <div class="pain-icon">☁️</div>
+              <h3>云服务商</h3>
+              <p>阿里云、腾讯云、AWS ECR</p>
+              <p>稳定可靠、CDN加速</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">Docker Hub介绍</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box info">
+            <div class="highlight-title">🌐 Docker Hub</div>
+            <div class="highlight-content">
+              <p>Docker官方提供的公有镜像仓库，是全球最大的容器镜像社区。</p>
+            </div>
+          </div>
+          <div class="feature-list">
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>官方镜像：nginx、mysql、redis、python等</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>免费账户：1个私有仓库，无限公有仓库</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>自动构建：关联GitHub自动构建镜像</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Webhooks：镜像更新时触发通知</span>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">登录Docker Hub</span>
+            </div>
+            <pre><code>docker login
+# 输入用户名和密码
+# 登录成功后可推送镜像</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">私有仓库搭建</h1>
+          <p class="section-desc">Docker Registry部署与配置</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">为什么需要私有仓库？</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">🔒</div>
+              <h3>安全性</h3>
+              <p>敏感代码不暴露到公网</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">⚡</div>
+              <h3>速度</h3>
+              <p>内网传输更快</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">💰</div>
+              <h3>成本</h3>
+              <p>节省带宽费用</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">📋</div>
+              <h3>合规</h3>
+              <p>满足数据安全要求</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">Docker Registry部署</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker Registry</div>
+            <div class="definition-content">
+              Docker官方提供的开源镜像仓库服务，轻量级、易部署，适合小型团队使用。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动Registry容器</span>
+            </div>
+            <pre><code>docker run -d \
+  --name registry \
+  -p 5000:5000 \
+  -v /data/registry:/var/lib/registry \
+  --restart=always \
+  registry:2</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name">-p 5000:5000</span>
+              <span class="param-desc">映射端口</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">-v /data/registry</span>
+              <span class="param-desc">数据持久化目录</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">--restart=always</span>
+              <span class="param-desc">自动重启</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">推送镜像到私有仓库</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>标记镜像</h4>
+              <div class="code-block">
+                <pre><code># 格式：docker tag 原镜像 仓库地址/镜像名:标签
+docker tag nginx:latest localhost:5000/mynginx:v1</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>推送镜像</h4>
+              <div class="code-block">
+                <pre><code>docker push localhost:5000/mynginx:v1</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>拉取镜像</h4>
+              <div class="code-block">
+                <pre><code>docker pull localhost:5000/mynginx:v1</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">查看仓库中的镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看镜像列表</span>
+            </div>
+            <pre><code># 查看所有镜像仓库
+curl http://localhost:5000/v2/_catalog
+
+# 查看某镜像的所有标签
+curl http://localhost:5000/v2/mynginx/tags/list</code></pre>
+          </div>
+          <div class="example-box">
+            <div class="example-title">返回示例</div>
+            <pre><code>{
+  "repositories": ["mynginx", "myapp", "mysql"]
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5</span>
+          <h1 class="page-title">配置HTTPS（生产环境）</h1>
+        </div>
+        <div class="page-body">
+          <div class="warning-box">
+            <div class="warning-title">⚠️ 安全警告</div>
+            <p>生产环境必须使用HTTPS，否则密码明文传输，存在安全风险。</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">生成自签名证书</span>
+            </div>
+            <pre><code>mkdir -p /data/registry/certs
+openssl req -newkey rsa:4096 -nodes \
+  -keyout /data/registry/certs/domain.key \
+  -x509 -days 365 \
+  -out /data/registry/certs/domain.crt</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动带HTTPS的Registry</span>
+            </div>
+            <pre><code>docker run -d \
+  --name registry \
+  -p 443:443 \
+  -v /data/registry:/var/lib/registry \
+  -v /data/registry/certs:/certs \
+  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+  registry:2</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">阿里云镜像服务</h1>
+          <p class="section-desc">企业级镜像托管方案</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">阿里云容器镜像服务</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box info">
+            <div class="highlight-title">☁️ 阿里云容器镜像服务ACR</div>
+            <div class="highlight-content">
+              <p>阿里云提供的企业级容器镜像托管服务，支持镜像安全扫描、镜像签名、镜像加速等功能。</p>
+            </div>
+          </div>
+          <div class="feature-list">
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>免费额度：个人版免费使用</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>国内加速：镜像加速器提升下载速度</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>安全扫描：自动检测镜像漏洞</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>跨区域同步：支持多地域镜像分发</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">配置镜像加速器</h1>
+        </div>
+        <div class="page-body">
+          <div class="tip-box">
+            <div class="tip-title">💡 为什么需要加速器？</div>
+            <p>Docker Hub服务器在国外，国内访问速度慢。阿里云提供镜像加速服务，大幅提升下载速度。</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">配置Docker加速器</span>
+            </div>
+            <pre><code># 编辑daemon.json
+sudo vim /etc/docker/daemon.json
+
+# 添加加速器配置
+{
+  "registry-mirrors": [
+    "https://xxxxxx.mirror.aliyuncs.com"
+  ]
+}
+
+# 重启Docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">登录阿里云镜像服务</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>获取登录凭证</h4>
+              <p class="paragraph">登录阿里云控制台 → 容器镜像服务 → 访问凭证</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>登录仓库</h4>
+              <div class="code-block">
+                <pre><code>docker login --username=your_username \
+  registry.cn-hangzhou.aliyuncs.com</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>推送镜像</h4>
+              <div class="code-block">
+                <pre><code>docker tag myapp:v1 \
+  registry.cn-hangzhou.aliyuncs.com/mynamespace/myapp:v1
+docker push registry.cn-hangzhou.aliyuncs.com/mynamespace/myapp:v1</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">镜像安全最佳实践</h1>
+          <p class="section-desc">保护镜像与仓库安全</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">镜像安全风险</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">🦠</div>
+              <h3>漏洞风险</h3>
+              <p>基础镜像可能包含已知漏洞</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">🔑</div>
+              <h3>密钥泄露</h3>
+              <p>镜像中可能包含敏感信息</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">🎭</div>
+              <h3>镜像篡改</h3>
+              <p>传输过程可能被中间人攻击</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">👤</div>
+              <h3>权限滥用</h3>
+              <p>容器以root权限运行</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">安全最佳实践</h1>
+        </div>
+        <div class="page-body">
+          <div class="best-practices">
+            <div class="practice-item">
+              <div class="practice-number">1</div>
+              <div class="practice-content">
+                <h4>使用官方基础镜像</h4>
+                <p>优先选择官方镜像，定期更新基础镜像版本</p>
+              </div>
+            </div>
+            <div class="practice-item">
+              <div class="practice-number">2</div>
+              <div class="practice-content">
+                <h4>最小化镜像体积</h4>
+                <p>使用alpine版本，减少攻击面</p>
+              </div>
+            </div>
+            <div class="practice-item">
+              <div class="practice-number">3</div>
+              <div class="practice-content">
+                <h4>不存储敏感信息</h4>
+                <p>密钥、密码通过环境变量或Secret注入</p>
+              </div>
+            </div>
+            <div class="practice-item">
+              <div class="practice-number">4</div>
+              <div class="practice-content">
+                <h4>镜像漏洞扫描</h4>
+                <p>使用Trivy、Clair等工具扫描镜像</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">镜像漏洞扫描</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Trivy</div>
+            <div class="definition-content">
+              一款开源的容器镜像漏洞扫描工具，可检测操作系统包和应用程序依赖中的已知漏洞。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">安装并使用Trivy</span>
+            </div>
+            <pre><code># 安装Trivy
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+
+# 扫描镜像
+trivy image nginx:latest
+
+# 扫描本地镜像
+trivy image --input myimage.tar</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">实操环节</h1>
+          <p class="section-desc">动手搭建私有仓库</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">实操：搭建本地私有仓库</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">完整操作流程</span>
+            </div>
+            <pre><code># 1. 启动Registry
+docker run -d -p 5000:5000 --name registry registry:2
+
+# 2. 标记镜像
+docker tag busybox localhost:5000/busybox:v1
+
+# 3. 推送镜像
+docker push localhost:5000/busybox:v1
+
+# 4. 验证
+curl http://localhost:5000/v2/_catalog
+
+# 5. 拉取镜像
+docker pull localhost:5000/busybox:v1</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">实操：配置镜像加速器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">配置阿里云加速器</span>
+            </div>
+            <pre><code># 1. 编辑配置文件
+sudo vim /etc/docker/daemon.json
+
+# 2. 添加配置
+{
+  "registry-mirrors": [
+    "https://你的加速器地址.mirror.aliyuncs.com"
+  ]
+}
+
+# 3. 重启Docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 4. 验证
+docker info | grep "Registry Mirrors" -A 1</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 6</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6</span>
+          <h1 class="page-title">练习任务（15分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>搭建私有仓库</h3>
+                <p>启动Registry容器，端口5000</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>推送镜像</h3>
+                <p>将本地镜像推送到私有仓库</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>验证仓库</h3>
+                <p>使用curl查看仓库中的镜像列表</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>配置加速器</h3>
+                <p>配置阿里云镜像加速器</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">镜像仓库分类：公有、私有、云服务</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">私有仓库搭建：Docker Registry部署</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">阿里云镜像服务：加速器与镜像托管</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">镜像安全：漏洞扫描与最佳实践</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第6课时：MySQL主从复制</h3>
+            <ul>
+              <li>MySQL主从复制原理</li>
+              <li>Docker部署MySQL主从</li>
+              <li>数据同步验证</li>
+              <li>故障切换演练</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">24</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>

@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第16课时 - K8s实战与课程总结</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">课程收官</div>
+          <h1 class="main-title">第16课时</h1>
+          <h2 class="sub-title">K8s实战与课程总结</h2>
+          <p class="tagline">从入门到精通的最后一公里</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程目标</h2>
+        <div class="objective-list">
+          <div class="objective-item">
+            <span class="objective-num">01</span>
+            <div class="objective-content">
+              <h3>掌握配置管理</h3>
+              <p>学会ConfigMap和Secret的使用，实现配置与镜像解耦</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">02</span>
+            <div class="objective-content">
+              <h3>理解持久化存储</h3>
+              <p>掌握PV/PVC机制，实现数据持久化与存储管理</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">03</span>
+            <div class="objective-content">
+              <h3>了解Helm工具</h3>
+              <p>学会使用Helm进行复杂应用的一键部署</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">04</span>
+            <div class="objective-content">
+              <h3>完成综合实战</h3>
+              <p>独立完成SpringBoot+MySQL全栈应用的K8s部署</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程安排</h2>
+        <div class="schedule-grid">
+          <div class="schedule-item theory">
+            <div class="schedule-icon">📚</div>
+            <div class="schedule-content">
+              <h3>理论讲解</h3>
+              <p>30分钟</p>
+              <span>配置管理 + 存储 + Helm</span>
+            </div>
+          </div>
+          <div class="schedule-item practice">
+            <div class="schedule-icon">💻</div>
+            <div class="schedule-content">
+              <h3>综合实战</h3>
+              <p>45分钟</p>
+              <span>SpringBoot+MySQL部署</span>
+            </div>
+          </div>
+          <div class="schedule-item exercise">
+            <div class="schedule-icon">✏️</div>
+            <div class="schedule-content">
+              <h3>随堂练习</h3>
+              <p>15分钟</p>
+              <span>Helm部署Prometheus</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 1</div>
+        <h2 class="section-title">配置管理</h2>
+        <p class="section-desc">ConfigMap与Secret</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">为什么需要配置管理？</h2>
+        <div class="pain-points-grid">
+          <div class="pain-point">
+            <div class="pain-icon">😰</div>
+            <h3>传统方式的痛点</h3>
+            <ul>
+              <li>配置文件打包在镜像中</li>
+              <li>修改配置需要重新构建镜像</li>
+              <li>敏感信息明文存储</li>
+              <li>不同环境配置难以管理</li>
+            </ul>
+          </div>
+          <div class="pain-point solution">
+            <div class="pain-icon">😊</div>
+            <h3>K8s配置管理方案</h3>
+            <ul>
+              <li>ConfigMap：存储配置文件</li>
+              <li>Secret：存储敏感信息</li>
+              <li>配置与镜像解耦</li>
+              <li>支持热更新（需应用配合）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">ConfigMap详解</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">ConfigMap</span>
+          </div>
+          <p class="term-def">ConfigMap是K8s中用于存储非敏感配置数据的API对象，可以将配置文件、命令行参数、环境变量等与容器镜像解耦。</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>configmap.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  application.yml: |
+    server:
+      port: 8080
+    database:
+      host: mysql-service
+      port: 3306
+  DEBUG: "false"</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">ConfigMap使用方式</h2>
+        <div class="usage-cards">
+          <div class="usage-card">
+            <div class="usage-num">01</div>
+            <h3>环境变量注入</h3>
+            <div class="code-block mini">
+              <pre class="code-content"><code>envFrom:
+- configMapRef:
+    name: app-config</code></pre>
+            </div>
+          </div>
+          <div class="usage-card">
+            <div class="usage-num">02</div>
+            <h3>挂载为文件</h3>
+            <div class="code-block mini">
+              <pre class="code-content"><code>volumes:
+- name: config
+  configMap:
+    name: app-config</code></pre>
+            </div>
+          </div>
+          <div class="usage-card">
+            <div class="usage-num">03</div>
+            <h3>命令行参数</h3>
+            <div class="code-block mini">
+              <pre class="code-content"><code>command: ["./app"]
+args: ["--config=/etc/config/app.yml"]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Secret详解</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">Secret</span>
+          </div>
+          <p class="term-def">Secret是K8s中用于存储敏感信息（如密码、令牌、密钥）的API对象，数据采用Base64编码存储。</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>secret.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+type: Opaque
+data:
+  username: cm9vdA==        # base64编码的 "root"
+  password: cGFzc3dvcmQxMjM=  # base64编码的 "password123"</code></pre>
+        </div>
+        <div class="highlight-box warning">
+          <h3>⚠️ 安全提示</h3>
+          <ul>
+            <li>Base64不是加密，只是编码</li>
+            <li>生产环境建议启用KMS加密</li>
+            <li>使用RBAC限制Secret访问权限</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 2</div>
+        <h2 class="section-title">持久化存储</h2>
+        <p class="section-desc">Volume与PersistentVolumeClaim</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">为什么需要持久化存储？</h2>
+        <div class="storage-problem">
+          <div class="problem-box">
+            <div class="problem-title">容器存储特性</div>
+            <div class="problem-flow">
+              <div class="flow-item">
+                <span class="flow-icon">📦</span>
+                <span>容器内数据</span>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-item danger">
+                <span class="flow-icon">💥</span>
+                <span>容器删除后丢失</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="highlight-box">
+          <h3>K8s存储解决方案</h3>
+          <ul>
+            <li><strong>Volume</strong>：Pod级别的存储卷</li>
+            <li><strong>PV</strong>：集群级别的持久化存储资源</li>
+            <li><strong>PVC</strong>：用户对存储资源的请求</li>
+            <li><strong>StorageClass</strong>：动态存储供应</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">PV与PVC关系</h2>
+        <div class="pv-pvc-diagram">
+          <div class="pv-layer">
+            <div class="pv-box">
+              <div class="pv-title">PersistentVolume (PV)</div>
+              <div class="pv-desc">存储资源抽象</div>
+              <div class="pv-types">
+                <span>NFS</span>
+                <span>Cloud Disk</span>
+                <span>Local</span>
+              </div>
+            </div>
+          </div>
+          <div class="binding-arrow">↓ 绑定</div>
+          <div class="pvc-layer">
+            <div class="pvc-box">
+              <div class="pvc-title">PersistentVolumeClaim (PVC)</div>
+              <div class="pvc-desc">存储资源请求</div>
+              <div class="pvc-spec">storage: 10Gi</div>
+            </div>
+          </div>
+          <div class="binding-arrow">↓ 挂载</div>
+          <div class="pod-layer">
+            <div class="pod-box">
+              <div class="pod-title">Pod</div>
+              <div class="pod-mount">/data</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">PVC使用示例</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>pvc.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>在Pod中使用PVC</span>
+          </div>
+          <pre class="code-content"><code>volumes:
+- name: mysql-data
+  persistentVolumeClaim:
+    claimName: mysql-pvc
+volumeMounts:
+- name: mysql-data
+  mountPath: /var/lib/mysql</code></pre>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 3</div>
+        <h2 class="section-title">Helm包管理</h2>
+        <p class="section-desc">快速部署复杂应用</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Helm简介</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">Helm</span>
+          </div>
+          <p class="term-def">Helm是K8s的包管理工具，类似于apt/yum。通过Chart（预定义模板）实现复杂应用的一键部署。</p>
+        </div>
+        <div class="helm-concepts">
+          <div class="concept-card">
+            <div class="concept-icon">📦</div>
+            <h3>Chart</h3>
+            <p>应用包模板，包含所有K8s资源定义</p>
+          </div>
+          <div class="concept-card">
+            <div class="concept-icon">🚀</div>
+            <h3>Release</h3>
+            <p>Chart的部署实例，可多次安装</p>
+          </div>
+          <div class="concept-card">
+            <div class="concept-icon">🏠</div>
+            <h3>Repository</h3>
+            <p>Chart仓库，存放各类应用模板</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Helm常用命令</h2>
+        <div class="cmd-table">
+          <div class="cmd-row header">
+            <div class="cmd-col">命令</div>
+            <div class="cmd-col">说明</div>
+          </div>
+          <div class="cmd-row">
+            <div class="cmd-col"><code>helm repo add</code></div>
+            <div class="cmd-col">添加Chart仓库</div>
+          </div>
+          <div class="cmd-row">
+            <div class="cmd-col"><code>helm search repo</code></div>
+            <div class="cmd-col">搜索可用的Chart</div>
+          </div>
+          <div class="cmd-row">
+            <div class="cmd-col"><code>helm install</code></div>
+            <div class="cmd-col">安装Chart</div>
+          </div>
+          <div class="cmd-row">
+            <div class="cmd-col"><code>helm upgrade</code></div>
+            <div class="cmd-col">升级Release</div>
+          </div>
+          <div class="cmd-row">
+            <div class="cmd-col"><code>helm rollback</code></div>
+            <div class="cmd-col">回滚Release</div>
+          </div>
+          <div class="cmd-row">
+            <div class="cmd-col"><code>helm uninstall</code></div>
+            <div class="cmd-col">卸载Release</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 4</div>
+        <h2 class="section-title">技术选型对比</h2>
+        <p class="section-desc">容器技术生态全景</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">容器技术选型对比</h2>
+        <div class="compare-table">
+          <div class="compare-header">
+            <div class="compare-cell">技术</div>
+            <div class="compare-cell">定位</div>
+            <div class="compare-cell">适用场景</div>
+            <div class="compare-cell">复杂度</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>Docker</strong></div>
+            <div class="compare-cell">容器运行时</div>
+            <div class="compare-cell">单机开发测试</div>
+            <div class="compare-cell">★☆☆☆☆</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>Compose</strong></div>
+            <div class="compare-cell">多容器编排</div>
+            <div class="compare-cell">单机多服务</div>
+            <div class="compare-cell">★★☆☆☆</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>Swarm</strong></div>
+            <div class="compare-cell">集群编排</div>
+            <div class="compare-cell">中小规模集群</div>
+            <div class="compare-cell">★★★☆☆</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>K8s</strong></div>
+            <div class="compare-cell">容器平台</div>
+            <div class="compare-cell">企业级生产</div>
+            <div class="compare-cell">★★★★☆</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">学习路径规划</h2>
+        <div class="learning-path">
+          <div class="path-stage">
+            <div class="stage-num">1</div>
+            <div class="stage-content">
+              <h3>入门阶段</h3>
+              <p>Docker基础 → 镜像构建 → 容器管理</p>
+            </div>
+          </div>
+          <div class="path-arrow">↓</div>
+          <div class="path-stage">
+            <div class="stage-num">2</div>
+            <div class="stage-content">
+              <h3>进阶阶段</h3>
+              <p>Docker网络 → Compose编排 → 私有仓库</p>
+            </div>
+          </div>
+          <div class="path-arrow">↓</div>
+          <div class="path-stage">
+            <div class="stage-num">3</div>
+            <div class="stage-content">
+              <h3>K8s入门</h3>
+              <p>Pod/Deployment → Service → Ingress</p>
+            </div>
+          </div>
+          <div class="path-arrow">↓</div>
+          <div class="path-stage">
+            <div class="stage-num">4</div>
+            <div class="stage-content">
+              <h3>K8s进阶</h3>
+              <p>存储/配置 → Helm → 监控告警</p>
+            </div>
+          </div>
+          <div class="path-arrow">↓</div>
+          <div class="path-stage">
+            <div class="stage-num">5</div>
+            <div class="stage-content">
+              <h3>精通阶段</h3>
+              <p>CKA认证 → 源码分析 → 云原生架构</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 5</div>
+        <h2 class="section-title">综合实战</h2>
+        <p class="section-desc">K8s部署SpringBoot+MySQL全栈应用</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实战架构</h2>
+        <div class="arch-diagram-full">
+          <div class="arch-ingress">
+            <div class="ingress-box">Ingress</div>
+            <div class="ingress-domain">app.example.com</div>
+          </div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-services">
+            <div class="service-box spring">
+              <div class="svc-name">SpringBoot Service</div>
+              <div class="svc-pods">
+                <span class="pod">Pod1</span>
+                <span class="pod">Pod2</span>
+              </div>
+            </div>
+          </div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-services">
+            <div class="service-box mysql">
+              <div class="svc-name">MySQL Service</div>
+              <div class="svc-pods">
+                <span class="pod">MySQL Pod</span>
+              </div>
+            </div>
+          </div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-storage">
+            <div class="storage-box">PVC → PV → 云存储/NFS</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">步骤1：创建ConfigMap和Secret</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>配置与密钥</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: springboot-config
+data:
+  application.yml: |
+    server.port: 8080
+    spring.datasource.url: jdbc:mysql://mysql-service:3306/appdb
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+type: Opaque
+stringData:
+  root-password: "MySecretPass123"
+  database: "appdb"
+EOF</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">步骤2：部署MySQL</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>mysql-deployment.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: root-password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: database
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-pvc</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">步骤3：部署SpringBoot应用</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>springboot-deployment.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    spec:
+      containers:
+      - name: springboot
+        image: myregistry/springboot-app:v1
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: springboot-config
+        env:
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: root-password</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">步骤4：创建Service和Ingress</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>service-ingress.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-service
+spec:
+  selector:
+    app: springboot
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  rules:
+  - host: app.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: springboot-service
+            port:
+              number: 80</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">步骤5：验证部署</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>验证命令</span>
+          </div>
+          <pre class="code-content"><code>kubectl get all
+NAME                                  READY   STATUS    AGE
+pod/mysql-xxx                         1/1     Running   2m
+pod/springboot-app-xxx-aaa            1/1     Running   2m
+pod/springboot-app-xxx-bbb            1/1     Running   2m
+
+curl http://app.example.com/api/health
+{"status":"UP"}
+
+kubectl exec -it mysql-xxx -- mysql -uroot -pMySecretPass123 -e "SHOW DATABASES;"
++--------------------+
+| Database           |
++--------------------+
+| appdb              |
++--------------------+</code></pre>
+        </div>
+        <div class="highlight-box success">
+          <h3>✅ 部署成功</h3>
+          <p>SpringBoot应用已成功连接MySQL，数据持久化到PVC！</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">故障排查模拟</h2>
+        <div class="troubleshoot-flow">
+          <div class="trouble-step">
+            <div class="step-title">1. 故障注入</div>
+            <div class="step-content">修改ConfigMap中的数据库连接地址为错误值</div>
+          </div>
+          <div class="trouble-step">
+            <div class="step-title">2. 观察现象</div>
+            <div class="step-content">应用日志显示数据库连接失败</div>
+          </div>
+          <div class="trouble-step">
+            <div class="step-title">3. 定位问题</div>
+            <div class="step-content">使用kubectl logs/describe查看错误信息</div>
+          </div>
+          <div class="trouble-step">
+            <div class="step-title">4. 修复问题</div>
+            <div class="step-content">修正ConfigMap，重启Pod恢复服务</div>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>排查命令</span>
+          </div>
+          <pre class="code-content"><code>kubectl logs springboot-app-xxx-aaa
+Error: Could not connect to mysql-service-wrong:3306
+
+kubectl describe pod springboot-app-xxx-aaa
+Events: Pulling image, Created container, Started container</code></pre>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 6</div>
+        <h2 class="section-title">随堂练习</h2>
+        <p class="section-desc">Helm部署Prometheus监控系统</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">练习任务</h2>
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <span class="exercise-badge">动手练习</span>
+            <span class="exercise-time">15分钟</span>
+          </div>
+          <div class="exercise-content">
+            <h3>任务要求</h3>
+            <ol class="exercise-steps">
+              <li>添加Prometheus Helm仓库</li>
+              <li>使用Helm一键部署Prometheus监控系统</li>
+              <li>查看Prometheus监控到的K8s集群节点、Pod指标</li>
+              <li>提交Helm部署命令和Prometheus监控面板截图</li>
+            </ol>
+          </div>
+        </div>
+        <div class="hint-box">
+          <span class="hint-icon">💡</span>
+          <div class="hint-content">
+            <h4>提示</h4>
+            <p>仓库：prometheus-community</p>
+            <p>Chart：kube-prometheus-stack</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">参考答案</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Helm部署Prometheus</span>
+          </div>
+          <pre class="code-content"><code>helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install prometheus prometheus-community/kube-prometheus-stack
+
+kubectl get pods
+NAME                                                     READY   STATUS
+prometheus-grafana-xxx                                   3/3     Running
+prometheus-kube-prometheus-operator-xxx                  1/1     Running
+prometheus-kube-state-metrics-xxx                        1/1     Running
+prometheus-prometheus-kube-prometheus-prometheus-0       2/2     Running
+
+kubectl port-forward svc/prometheus-grafana 3000:80
+# 访问 http://localhost:3000 查看Grafana监控面板</code></pre>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 7</div>
+        <h2 class="section-title">课程总结</h2>
+        <p class="section-desc">16讲知识点串讲</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Docker核心知识回顾</h2>
+        <div class="knowledge-grid">
+          <div class="knowledge-item">
+            <h3>镜像管理</h3>
+            <ul>
+              <li>Dockerfile构建</li>
+              <li>多阶段构建优化</li>
+              <li>私有仓库管理</li>
+            </ul>
+          </div>
+          <div class="knowledge-item">
+            <h3>容器操作</h3>
+            <ul>
+              <li>生命周期管理</li>
+              <li>数据卷挂载</li>
+              <li>资源限制</li>
+            </ul>
+          </div>
+          <div class="knowledge-item">
+            <h3>网络通信</h3>
+            <ul>
+              <li>Bridge/Host模式</li>
+              <li>自定义网络</li>
+              <li>容器互联</li>
+            </ul>
+          </div>
+          <div class="knowledge-item">
+            <h3>编排工具</h3>
+            <ul>
+              <li>Docker Compose</li>
+              <li>多服务编排</li>
+              <li>环境变量管理</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">K8s核心知识回顾</h2>
+        <div class="knowledge-grid">
+          <div class="knowledge-item">
+            <h3>工作负载</h3>
+            <ul>
+              <li>Pod最小调度单位</li>
+              <li>Deployment副本管理</li>
+              <li>滚动更新/回滚</li>
+            </ul>
+          </div>
+          <div class="knowledge-item">
+            <h3>服务发现</h3>
+            <ul>
+              <li>Service四种类型</li>
+              <li>Ingress七层路由</li>
+              <li>DNS服务发现</li>
+            </ul>
+          </div>
+          <div class="knowledge-item">
+            <h3>配置存储</h3>
+            <ul>
+              <li>ConfigMap配置</li>
+              <li>Secret密钥</li>
+              <li>PV/PVC存储</li>
+            </ul>
+          </div>
+          <div class="knowledge-item">
+            <h3>生态工具</h3>
+            <ul>
+              <li>Helm包管理</li>
+              <li>监控告警</li>
+              <li>CI/CD集成</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">知识体系全景图</h2>
+        <div class="full-map">
+          <div class="map-section docker">
+            <div class="section-title">Docker</div>
+            <div class="section-items">
+              <span>镜像</span>
+              <span>容器</span>
+              <span>网络</span>
+              <span>存储</span>
+              <span>Dockerfile</span>
+              <span>Compose</span>
+            </div>
+          </div>
+          <div class="map-arrow">→</div>
+          <div class="map-section k8s">
+            <div class="section-title">Kubernetes</div>
+            <div class="section-items">
+              <span>Pod</span>
+              <span>Deployment</span>
+              <span>Service</span>
+              <span>Ingress</span>
+              <span>ConfigMap</span>
+              <span>PV/PVC</span>
+            </div>
+          </div>
+          <div class="map-arrow">→</div>
+          <div class="map-section cloud">
+            <div class="section-title">云原生</div>
+            <div class="section-items">
+              <span>微服务</span>
+              <span>DevOps</span>
+              <span>服务网格</span>
+              <span>Serverless</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">后续学习建议</h2>
+        <div class="suggestions">
+          <div class="suggestion-item">
+            <div class="suggestion-icon">🏆</div>
+            <div class="suggestion-content">
+              <h3>考取认证</h3>
+              <p>CKA (Certified Kubernetes Administrator)</p>
+              <p>CKAD (Certified Kubernetes Application Developer)</p>
+            </div>
+          </div>
+          <div class="suggestion-item">
+            <div class="suggestion-icon">📖</div>
+            <div class="suggestion-content">
+              <h3>深入学习</h3>
+              <p>K8s源码分析、自定义控制器开发</p>
+              <p>服务网格（Istio）、Serverless（Knative）</p>
+            </div>
+          </div>
+          <div class="suggestion-item">
+            <div class="suggestion-icon">💼</div>
+            <div class="suggestion-content">
+              <h3>实践项目</h3>
+              <p>搭建完整的CI/CD流水线</p>
+              <p>部署真实的微服务架构应用</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程完结</h2>
+        <div class="final-message">
+          <div class="congrats">🎉 恭喜完成全部课程！</div>
+          <div class="summary-text">
+            <p>从Docker基础到K8s实战，您已经掌握了容器技术的核心知识。</p>
+            <p>技术的学习永无止境，希望您继续保持学习的热情！</p>
+          </div>
+          <div class="contact-info">
+            <p>如有问题，欢迎交流讨论！</p>
+          </div>
+        </div>
+        <div class="page-number">第16讲 / 共26页</div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">26</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>

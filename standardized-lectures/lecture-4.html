@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第4课时 - Docker镜像进阶</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第4课时</h1>
+          <h2 class="sub-title">Docker镜像进阶</h2>
+          <p class="tagline"><span class="highlight">自定义镜像</span>与Dockerfile</p>
+          <div class="meta-info">
+            <span>90分钟</span>
+            <span>理论+实操</span>
+            <span>进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解镜像分层原理</h3>
+                <p><span class="highlight">UnionFS</span>联合文件系统</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>掌握docker commit</h3>
+                <p><span class="key-point">手动制作镜像</span></p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>掌握Dockerfile核心指令</h3>
+                <p><span class="highlight">FROM/RUN/COPY/EXPOSE/CMD</span></p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>理解CMD与ENTRYPOINT</h3>
+                <p><span class="key-point">参数覆盖与传递</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">镜像分层、Dockerfile指令</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc"><span class="key-point">commit、Dockerfile构建镜像</span></div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">10分钟</div>
+              <div class="schedule-type">随堂练习</div>
+              <div class="schedule-desc">构建带ifconfig的Ubuntu镜像</div>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">本节核心</div>
+            <div class="kp-content">
+              Dockerfile是<span class="highlight">自动化构建镜像</span>的核心技能。掌握Dockerfile意味着你可以将任何应用打包成可移植的Docker镜像，实现"一次构建，处处运行"。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">镜像分层原理</h1>
+          <p class="section-desc">理解Docker镜像的存储机制</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">UnionFS联合文件系统</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term highlight">UnionFS</div>
+            <div class="definition-content">
+              联合文件系统（Union File System）是一种<span class="highlight">分层、轻量级</span>的高性能文件系统。它将多个目录挂载到同一个目录下，对外呈现一个统一的文件系统。
+            </div>
+          </div>
+          <div class="arch-diagram">
+            <div class="arch-layer app">应用层（可读写）</div>
+            <div class="arch-layer docker">依赖库层（只读）</div>
+            <div class="arch-layer os">基础系统层（只读）</div>
+            <div class="arch-layer host">引导层（只读）</div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">名词解释：分层存储</div>
+            <p>镜像由多个<span class="highlight">只读层</span>组成，每层代表Dockerfile中的一条指令。容器在镜像之上添加一个<span class="key-point">可写层</span>，所有修改都在这一层进行。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">Copy-on-Write机制</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box info">
+            <div class="highlight-title">写时复制原理</div>
+            <div class="highlight-content">
+              <p><span class="highlight">读取</span>：直接从镜像层读取文件</p>
+              <p><span class="highlight">修改</span>：先将文件复制到容器层，再修改</p>
+              <p><span class="highlight">删除</span>：在容器层标记文件已删除</p>
+            </div>
+          </div>
+          <div class="example-box">
+            <div class="example-title">示例：修改/etc/hosts</div>
+            <p class="paragraph">容器启动时，/etc/hosts来自镜像层。当容器修改hosts文件时，Docker会将文件<span class="key-point">复制到容器的可写层</span>，修改的是副本而非原文件。</p>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心概念</div>
+            <div class="conclusion-content">
+              <p>Copy-on-Write确保<span class="highlight">镜像层不被修改</span>，多个容器可以安全共享同一镜像。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">镜像分层的优势</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <h3>节省存储空间</h3>
+              <p>相同的基础层<span class="highlight">只存储一份</span></p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <h3>加速构建</h3>
+              <p>利用缓存，<span class="highlight">只重建变化的层</span></p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <h3>快速分发</h3>
+              <p><span class="key-point">只传输差异层</span></p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <h3>安全性</h3>
+              <p>基础层<span class="key-point">只读，不可篡改</span></p>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">实际应用</div>
+            <div class="kp-content">
+              <p>假设你有10个基于centos:7的镜像，基础层只需存储<span class="highlight">一份</span>（约200MB），而不是10份（2GB）。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">docker commit制作镜像</h1>
+          <p class="section-desc">手动方式创建自定义镜像</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">docker commit命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">基本语法</span>
+            </div>
+            <pre><code>docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+
+# 常用选项
+-a, --author    # 作者信息
+-m, --message   # 提交说明</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">示例</span>
+            </div>
+            <pre><code># 基于容器创建镜像
+docker commit -a "zhangsan" -m "add vim" mycentos mycentos:vim</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>docker commit是<span class="highlight">手动制作镜像</span>的方式，适合临时调试。</p>
+              <p>生产环境推荐使用<span class="key-point">Dockerfile</span>，便于版本控制和自动化。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">实操：制作带vim的CentOS镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>启动容器并安装vim</h4>
+              <div class="code-block">
+                <pre><code>docker run -it --name mycentos centos:7 /bin/bash
+yum install -y vim
+exit</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>提交为新镜像</h4>
+              <div class="code-block">
+                <pre><code>docker commit -m "add vim" -a "student" mycentos centos-vim:v1</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>验证新镜像</h4>
+              <div class="code-block">
+                <pre><code>docker run -it centos-vim:v1 vim --version</code></pre>
+              </div>
+              <div class="highlight-box success">
+                <div class="highlight-title">验证要点</div>
+                <div class="highlight-content">
+                  <p>显示 <span class="highlight">VIM 版本信息</span>表示vim安装成功</p>
+                  <p>无 "command not found" 错误</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">Dockerfile核心指令</h1>
+          <p class="section-desc">自动化构建镜像</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">Dockerfile是什么？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term highlight">Dockerfile</div>
+            <div class="definition-content">
+              Dockerfile是一个<span class="highlight">文本文件</span>，包含了一系列指令，用于自动化构建Docker镜像。每条指令都会创建一个新的镜像层。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">基本结构示例</span>
+            </div>
+            <pre><code>FROM centos:7
+RUN yum install -y vim
+COPY app.py /app/
+WORKDIR /app
+EXPOSE 8080
+CMD ["python", "app.py"]</code></pre>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">Dockerfile优势</div>
+            <div class="conclusion-content">
+              <p><span class="highlight">可版本控制</span>：Dockerfile可以纳入Git管理</p>
+              <p><span class="highlight">可重复构建</span>：相同Dockerfile构建相同镜像</p>
+              <p><span class="highlight">可自动化</span>：CI/CD流水线自动构建</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">FROM - 指定基础镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">FROM指令</span>
+            </div>
+            <pre><code># 指定基础镜像
+FROM centos:7
+
+# 使用最新版（不推荐）
+FROM ubuntu
+
+# 使用多阶段构建
+FROM node:18 AS builder
+FROM nginx:alpine</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">最佳实践</div>
+            <div class="highlight-content">
+              <p>始终使用<span class="highlight">明确的版本标签</span>，避免使用latest</p>
+              <p>确保构建的<span class="key-point">可重复性</span></p>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">基础镜像选择</div>
+            <div class="kp-content">
+              <p><span class="highlight">alpine</span>：最小化镜像（~5MB），适合生产</p>
+              <p><span class="key-point">slim</span>：精简版，比完整版小很多</p>
+              <p><span class="key-point">完整版</span>：包含完整工具链，适合开发</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">RUN - 执行命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">RUN指令两种形式</span>
+            </div>
+            <pre><code># shell形式
+RUN yum install -y vim
+
+# exec形式（推荐）
+RUN ["yum", "install", "-y", "vim"]
+
+# 合并多条命令减少层数
+RUN yum update && yum install -y \
+    vim \
+    net-tools \
+    && yum clean all</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>每个RUN指令都会<span class="highlight">创建一个新层</span></p>
+              <p>应尽量<span class="key-point">合并相关命令</span>以减少镜像层数</p>
+              <p>安装后清理缓存：<span class="key-point">yum clean all / rm -rf /var/lib/apt/lists/*</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.4</span>
+          <h1 class="page-title">COPY与ADD - 复制文件</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">复制文件</span>
+            </div>
+            <pre><code># COPY：复制文件或目录
+COPY app.py /app/
+COPY src/ /app/src/
+
+# ADD：支持URL和自动解压tar
+ADD https://example.com/file.tar.gz /tmp/
+ADD jdk-8u301-linux-x64.tar.gz /usr/local/</code></pre>
+          </div>
+          <div class="example-box">
+            <div class="example-title">COPY vs ADD 对比</div>
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>特性</th>
+                  <th>COPY</th>
+                  <th>ADD</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>复制本地文件</td>
+                  <td class="success"><span class="highlight">支持</span></td>
+                  <td class="success"><span class="highlight">支持</span></td>
+                </tr>
+                <tr>
+                  <td>支持URL</td>
+                  <td>不支持</td>
+                  <td class="success"><span class="key-point">支持</span></td>
+                </tr>
+                <tr>
+                  <td>自动解压tar</td>
+                  <td>不支持</td>
+                  <td class="success"><span class="key-point">支持</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">选择建议</div>
+            <div class="conclusion-content">
+              <p>优先使用<span class="highlight">COPY</span>，语义更清晰</p>
+              <p>需要解压tar时使用<span class="key-point">ADD</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.5</span>
+          <h1 class="page-title">其他常用指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WORKDIR/ENV/EXPOSE</span>
+            </div>
+            <pre><code># 设置工作目录
+WORKDIR /app
+
+# 设置环境变量
+ENV JAVA_HOME=/usr/local/jdk8
+ENV PATH=$PATH:$JAVA_HOME/bin
+
+# 声明暴露端口
+EXPOSE 8080
+EXPOSE 443</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name highlight">WORKDIR</span>
+              <span class="param-desc">设置工作目录，类似cd命令</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name highlight">ENV</span>
+              <span class="param-desc">设置环境变量，后续指令可用</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name highlight">EXPOSE</span>
+              <span class="param-desc">声明端口，不会实际发布端口</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">CMD与ENTRYPOINT</h1>
+          <p class="section-desc">理解容器启动命令的区别</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">CMD指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">CMD三种形式</span>
+            </div>
+            <pre><code># exec形式（推荐）
+CMD ["nginx", "-g", "daemon off;"]
+
+# shell形式
+CMD nginx -g "daemon off;"
+
+# 作为ENTRYPOINT的默认参数
+CMD ["--port", "8080"]</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">CMD特点</div>
+            <div class="highlight-content">
+              <p>Dockerfile中<span class="highlight">只能有一条CMD指令</span></p>
+              <p>docker run时指定的命令会<span class="highlight">覆盖CMD</span></p>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">使用场景</div>
+            <div class="kp-content">
+              CMD适合设置<span class="key-point">默认启动命令</span>，用户可以在docker run时覆盖。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">ENTRYPOINT指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">ENTRYPOINT</span>
+            </div>
+            <pre><code># exec形式
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# docker run时追加参数
+docker run myimage --server.port=8080
+# 实际执行：java -jar app.jar --server.port=8080</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">ENTRYPOINT特点</div>
+            <div class="highlight-content">
+              <p>docker run的参数会<span class="highlight">追加到ENTRYPOINT后</span></p>
+              <p>适合作为容器的<span class="key-point">固定主命令</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">CMD vs ENTRYPOINT对比</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>特性</th>
+                <th>CMD</th>
+                <th>ENTRYPOINT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>docker run参数</td>
+                <td>覆盖整个CMD</td>
+                <td class="success"><span class="highlight">追加到后面</span></td>
+              </tr>
+              <tr>
+                <td>用途</td>
+                <td>默认命令</td>
+                <td class="success"><span class="highlight">固定主命令</span></td>
+              </tr>
+              <tr>
+                <td>数量</td>
+                <td>只能一个</td>
+                <td class="success">只能一个</td>
+              </tr>
+              <tr>
+                <td>组合使用</td>
+                <td colspan="2" class="success">CMD作为ENTRYPOINT的<span class="highlight">默认参数</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">组合使用示例</span>
+            </div>
+            <pre><code>ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["--server.port=8080"]
+
+# docker run myimage --server.port=9090
+# 实际执行：java -jar app.jar --server.port=9090</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">实操环节</h1>
+          <p class="section-desc">动手构建自定义镜像</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">实操：构建自定义Nginx镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建Dockerfile</span>
+            </div>
+            <pre><code># Dockerfile
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">构建并运行</span>
+            </div>
+            <pre><code># 构建镜像
+docker build -t mynginx:v1 .
+
+# 运行容器
+docker run -d -p 8080:80 mynginx:v1</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">验证要点</div>
+            <div class="highlight-content">
+              <p>构建过程显示 <span class="highlight">FINISHED</span> 表示成功</p>
+              <p>浏览器访问 <span class="key-point">http://localhost:8080</span> 显示自定义页面</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">实操：构建带JDK8的镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Dockerfile</span>
+            </div>
+            <pre><code>FROM centos:7
+WORKDIR /usr/local
+ADD jdk-8u301-linux-x64.tar.gz /usr/local/
+ENV JAVA_HOME=/usr/local/jdk1.8.0_301
+ENV PATH=$PATH:$JAVA_HOME/bin
+CMD ["java", "-version"]</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">构建并验证</span>
+            </div>
+            <pre><code>docker build -t myjdk8:v1 .
+docker run myjdk8:v1</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">验证要点</div>
+            <div class="highlight-content">
+              <p>Java 版本输出显示 <span class="highlight">"1.8.0_xxx"</span></p>
+              <p>无 "java: command not found" 错误</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验1</span>
+          <h1 class="page-title">Dockerfile构建实验</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">自定义Nginx镜像构建</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Dockerfile编写和docker build命令的使用</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建项目目录和index.html文件</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">编写Dockerfile</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">构建镜像：docker build -t mynginx:v1 .</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">运行容器：docker run -d -p 8080:80 mynginx:v1</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">浏览器访问验证</span>
+              </div>
+            </div>
+            <div class="experiment-data">
+              <h4>数据记录</h4>
+              <table class="data-table">
+                <tr><th>项目</th><th>结果</th></tr>
+                <tr><td>构建时间</td><td>? 秒</td></tr>
+                <tr><td>镜像大小</td><td>? MB</td></tr>
+                <tr><td>访问结果</td><td>? </td></tr>
+              </table>
+            </div>
+            <div class="experiment-result">
+              <h4>预期结果</h4>
+              <p>成功构建镜像，<span class="highlight">浏览器显示自定义页面</span></p>
+            </div>
+            <div class="experiment-analysis">
+              <h4>结果分析</h4>
+              <p>如果构建失败，检查：<span class="key-point">Dockerfile语法</span>、<span class="key-point">文件路径</span>、<span class="key-point">网络连接</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验2</span>
+          <h1 class="page-title">CMD与ENTRYPOINT实验</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">CMD与ENTRYPOINT区别验证</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>通过实验理解CMD和ENTRYPOINT的行为差异</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建CMD版Dockerfile并构建测试</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">docker run时传递不同参数观察行为</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">创建ENTRYPOINT版Dockerfile并测试</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">对比两种方式的输出差异</span>
+              </div>
+            </div>
+            <div class="experiment-result">
+              <h4>预期结果</h4>
+              <p>CMD版本：参数<span class="highlight">覆盖</span>原命令</p>
+              <p>ENTRYPOINT版本：参数<span class="highlight">追加</span>到原命令后</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 6</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6</span>
+          <h1 class="page-title">练习任务（10分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>编写Dockerfile</h3>
+                <p>构建一个带<span class="highlight">ifconfig命令</span>的Ubuntu镜像</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>构建镜像</h3>
+                <p>命令：<code>docker build -t myubuntu:v1 .</code></p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>验证镜像</h3>
+                <p>运行容器并执行ifconfig命令</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>提交截图</h3>
+                <p>Dockerfile内容和ifconfig输出</p>
+              </div>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">提示</div>
+            <div class="kp-content">
+              <p>Ubuntu安装ifconfig：<span class="highlight">apt-get update && apt-get install -y net-tools</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">镜像分层原理：<span class="highlight">UnionFS、Copy-on-Write</span></div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">docker commit<span class="key-point">手动制作镜像</span></div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">Dockerfile核心指令：<span class="highlight">FROM/RUN/COPY/EXPOSE</span></div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text"><span class="highlight">CMD与ENTRYPOINT</span>区别与组合使用</div>
+            </div>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心要点</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">Dockerfile</span>是自动化构建镜像的标准方式</p>
+              <p>2. 每个RUN指令创建一个新层，应<span class="key-point">合并命令减少层数</span></p>
+              <p>3. CMD可被覆盖，ENTRYPOINT参数追加</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>第5课时：<span class="highlight">Docker镜像仓库</span></h3>
+            <ul>
+              <li>镜像仓库分类</li>
+              <li><span class="key-point">私有仓库搭建</span></li>
+              <li>阿里云镜像服务</li>
+              <li>镜像安全最佳实践</li>
+            </ul>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">预习建议</div>
+            <div class="kp-content">
+              <p>思考：如何搭建企业私有镜像仓库？</p>
+              <p>预习：<span class="highlight">Docker Registry</span> 和 <span class="highlight">Harbor</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">28</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>

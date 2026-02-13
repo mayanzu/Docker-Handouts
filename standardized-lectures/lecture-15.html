@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第15课时 - K8s核心资源（下）</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">Kubernetes 进阶</div>
+          <h1 class="main-title">第15课时</h1>
+          <h2 class="sub-title">K8s核心资源（下）</h2>
+          <p class="tagline">Service与Ingress</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程目标</h2>
+        <div class="objective-list">
+          <div class="objective-item">
+            <span class="objective-num">01</span>
+            <div class="objective-content">
+              <h3>理解Service核心价值</h3>
+              <p>掌握Service如何解决Pod IP动态变化的痛点</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">02</span>
+            <div class="objective-content">
+              <h3>掌握四种Service类型</h3>
+              <p>ClusterIP、NodePort、LoadBalancer、ExternalName的使用场景</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">03</span>
+            <div class="objective-content">
+              <h3>理解Ingress原理</h3>
+              <p>掌握HTTP七层路由转发与Ingress Controller部署</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">04</span>
+            <div class="objective-content">
+              <h3>完成实战操作</h3>
+              <p>独立完成Service创建与Ingress域名路由配置</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程安排</h2>
+        <div class="schedule-grid">
+          <div class="schedule-item theory">
+            <div class="schedule-icon">📚</div>
+            <div class="schedule-content">
+              <h3>理论讲解</h3>
+              <p>40分钟</p>
+              <span>Service类型 + Ingress原理</span>
+            </div>
+          </div>
+          <div class="schedule-item practice">
+            <div class="schedule-icon">💻</div>
+            <div class="schedule-content">
+              <h3>实操环节</h3>
+              <p>40分钟</p>
+              <span>Service + Ingress实战</span>
+            </div>
+          </div>
+          <div class="schedule-item exercise">
+            <div class="schedule-icon">✏️</div>
+            <div class="schedule-content">
+              <h3>随堂练习</h3>
+              <p>10分钟</p>
+              <span>Redis Service实战</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 1</div>
+        <h2 class="section-title">Service核心价值</h2>
+        <p class="section-desc">解决Pod IP动态变化的痛点</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Pod IP的问题</h2>
+        <div class="problem-diagram">
+          <div class="problem-scenario">
+            <div class="scenario-title">场景：Pod重建后IP变化</div>
+            <div class="scenario-flow">
+              <div class="flow-step">
+                <div class="step-box pod-old">
+                  <div class="pod-info">Pod-A</div>
+                  <div class="pod-ip">IP: 10.244.1.5</div>
+                </div>
+              </div>
+              <div class="flow-arrow">节点故障/重建</div>
+              <div class="flow-step">
+                <div class="step-box pod-new">
+                  <div class="pod-info">Pod-A'</div>
+                  <div class="pod-ip">IP: 10.244.2.8</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="highlight-box warning">
+          <h3>⚠️ 核心痛点</h3>
+          <ul>
+            <li>Pod IP是动态分配的，每次重建都会变化</li>
+            <li>客户端无法提前知道Pod的新IP地址</li>
+            <li>直接访问Pod IP在生产环境不可行</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Service解决方案</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">Service</span>
+          </div>
+          <p class="term-def">Service是Kubernetes中定义一组Pod访问策略的抽象，通过Label Selector自动发现后端Pod，提供稳定的访问入口。</p>
+        </div>
+        <div class="solution-diagram">
+          <div class="service-layer">
+            <div class="service-box">
+              <div class="service-name">Service</div>
+              <div class="service-ip">ClusterIP: 10.96.0.1</div>
+              <div class="service-dns">DNS: nginx-service.default.svc</div>
+            </div>
+          </div>
+          <div class="connection-line">↓ 负载均衡</div>
+          <div class="pods-layer">
+            <div class="pod-node">Pod-1<br/>10.244.1.5</div>
+            <div class="pod-node">Pod-2<br/>10.244.1.6</div>
+            <div class="pod-node">Pod-3<br/>10.244.2.3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Service核心特性</h2>
+        <div class="feature-cards">
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>稳定入口</h3>
+            <p>提供固定的ClusterIP和DNS名称，不随Pod变化</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚖️</div>
+            <h3>负载均衡</h3>
+            <p>自动将请求分发到后端所有健康Pod</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>服务发现</h3>
+            <p>通过Label Selector自动发现匹配的Pod</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🏥</div>
+            <h3>健康检查</h3>
+            <p>自动剔除不健康的Pod，保证服务可用</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 2</div>
+        <h2 class="section-title">Service类型详解</h2>
+        <p class="section-desc">四种Service类型及其使用场景</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Service类型概览</h2>
+        <div class="type-overview">
+          <div class="type-card clusterip">
+            <div class="type-header">
+              <span class="type-name">ClusterIP</span>
+              <span class="type-badge default">默认</span>
+            </div>
+            <p class="type-desc">仅集群内部可访问</p>
+            <div class="type-scenario">微服务内部调用</div>
+          </div>
+          <div class="type-card nodeport">
+            <div class="type-header">
+              <span class="type-name">NodePort</span>
+              <span class="type-badge test">测试</span>
+            </div>
+            <p class="type-desc">通过节点IP+端口暴露</p>
+            <div class="type-scenario">开发测试环境</div>
+          </div>
+          <div class="type-card loadbalancer">
+            <div class="type-header">
+              <span class="type-name">LoadBalancer</span>
+              <span class="type-badge prod">生产</span>
+            </div>
+            <p class="type-desc">对接云厂商负载均衡</p>
+            <div class="type-scenario">公网访问服务</div>
+          </div>
+          <div class="type-card externalname">
+            <div class="type-header">
+              <span class="type-name">ExternalName</span>
+              <span class="type-badge special">特殊</span>
+            </div>
+            <p class="type-desc">映射外部服务</p>
+            <div class="type-scenario">跨集群/外部调用</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">ClusterIP类型</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">ClusterIP</span>
+          </div>
+          <p class="term-def">ClusterIP是Service的默认类型，分配一个集群内部的虚拟IP，仅集群内的Pod可以访问。</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>clusterip-service.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80</code></pre>
+        </div>
+        <div class="highlight-box">
+          <h3>使用场景</h3>
+          <ul>
+            <li>微服务之间的内部调用</li>
+            <li>数据库、缓存等内部服务</li>
+            <li>不需要外部访问的后端服务</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">NodePort类型</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">NodePort</span>
+          </div>
+          <p class="term-def">NodePort在每个Node上开放一个固定端口（30000-32767），外部可以通过任意Node的IP+端口访问服务。</p>
+        </div>
+        <div class="nodeport-diagram">
+          <div class="external-access">
+            <div class="client">客户端</div>
+            <div class="access-arrow">访问 NodeIP:30080</div>
+          </div>
+          <div class="nodes-row">
+            <div class="node-box">
+              <div class="node-name">Node1</div>
+              <div class="node-port">:30080</div>
+            </div>
+            <div class="node-box">
+              <div class="node-name">Node2</div>
+              <div class="node-port">:30080</div>
+            </div>
+          </div>
+          <div class="service-box-mini">Service → Pods</div>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>NodePort端口范围默认为30000-32767，可通过API Server配置修改。</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">NodePort YAML示例</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>nodeport-service.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080</code></pre>
+        </div>
+        <div class="field-table">
+          <div class="field-row header">
+            <div class="field-col">字段</div>
+            <div class="field-col">说明</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>port</code></div>
+            <div class="field-col">Service暴露的端口</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>targetPort</code></div>
+            <div class="field-col">容器内端口</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>nodePort</code></div>
+            <div class="field-col">节点端口（可省略，自动分配）</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">LoadBalancer类型</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">LoadBalancer</span>
+          </div>
+          <p class="term-def">LoadBalancer类型会自动请求云厂商（如AWS、阿里云）创建负载均衡器，并将外部流量转发到Service。</p>
+        </div>
+        <div class="lb-diagram">
+          <div class="cloud-lb">
+            <div class="lb-icon">☁️</div>
+            <div class="lb-name">云负载均衡器</div>
+            <div class="lb-ip">External IP</div>
+          </div>
+          <div class="lb-arrow">↓</div>
+          <div class="service-row">
+            <div class="svc-box">Service (LoadBalancer)</div>
+          </div>
+          <div class="lb-arrow">↓</div>
+          <div class="pods-mini">
+            <span>Pod1</span>
+            <span>Pod2</span>
+            <span>Pod3</span>
+          </div>
+        </div>
+        <div class="highlight-box">
+          <h3>使用场景</h3>
+          <p>生产环境需要公网访问的Web服务、API服务等</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">ExternalName类型</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">ExternalName</span>
+          </div>
+          <p class="term-def">ExternalName将Service映射到外部DNS名称，不创建ClusterIP，用于访问集群外部服务。</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>external-service.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: external-mysql
+spec:
+  type: ExternalName
+  externalName: mysql.external.example.com</code></pre>
+        </div>
+        <div class="highlight-box">
+          <h3>使用场景</h3>
+          <ul>
+            <li>访问集群外部的数据库服务</li>
+            <li>跨集群服务调用</li>
+            <li>迁移期间的服务别名</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Service类型对比</h2>
+        <div class="compare-table">
+          <div class="compare-header">
+            <div class="compare-cell">类型</div>
+            <div class="compare-cell">访问范围</div>
+            <div class="compare-cell">典型场景</div>
+            <div class="compare-cell">依赖</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>ClusterIP</strong></div>
+            <div class="compare-cell">集群内部</div>
+            <div class="compare-cell">微服务内部调用</div>
+            <div class="compare-cell">无</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>NodePort</strong></div>
+            <div class="compare-cell">集群外部</div>
+            <div class="compare-cell">开发测试环境</div>
+            <div class="compare-cell">无</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>LoadBalancer</strong></div>
+            <div class="compare-cell">公网访问</div>
+            <div class="compare-cell">生产环境</div>
+            <div class="compare-cell">云厂商</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-cell"><strong>ExternalName</strong></div>
+            <div class="compare-cell">外部服务</div>
+            <div class="compare-cell">跨集群调用</div>
+            <div class="compare-cell">DNS</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 3</div>
+        <h2 class="section-title">Ingress原理</h2>
+        <p class="section-desc">HTTP七层路由转发</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">为什么需要Ingress？</h2>
+        <div class="pain-points-grid">
+          <div class="pain-point">
+            <div class="pain-icon">😰</div>
+            <h3>NodePort的痛点</h3>
+            <ul>
+              <li>每个服务占用一个端口</li>
+              <li>端口范围有限（30000-32767）</li>
+              <li>无法基于域名路由</li>
+              <li>不支持HTTPS终止</li>
+            </ul>
+          </div>
+          <div class="pain-point solution">
+            <div class="pain-icon">😊</div>
+            <h3>Ingress解决方案</h3>
+            <ul>
+              <li>单一入口点</li>
+              <li>基于域名/路径路由</li>
+              <li>支持HTTPS证书管理</li>
+              <li>七层负载均衡</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Ingress架构</h2>
+        <div class="ingress-arch">
+          <div class="client-layer">
+            <div class="client-box">客户端请求</div>
+          </div>
+          <div class="ingress-layer">
+            <div class="ingress-controller">
+              <div class="ic-name">Ingress Controller</div>
+              <div class="ic-type">(Nginx/Traefik)</div>
+            </div>
+            <div class="ingress-rules">
+              <div class="rule-item">nginx.example.com → nginx-svc</div>
+              <div class="rule-item">api.example.com → api-svc</div>
+            </div>
+          </div>
+          <div class="services-layer">
+            <div class="svc-item">nginx-svc</div>
+            <div class="svc-item">api-svc</div>
+          </div>
+        </div>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">Ingress</span>
+          </div>
+          <p class="term-def">Ingress是K8s中管理外部访问集群内服务的规则集合，支持HTTP/HTTPS路由、SSL终止、基于名称的虚拟主机等。</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Ingress Controller</h2>
+        <div class="ic-intro">
+          <p>Ingress本身只是规则定义，需要<strong>Ingress Controller</strong>来实现具体的流量转发。</p>
+        </div>
+        <div class="ic-options">
+          <div class="ic-card">
+            <div class="ic-logo">🌐</div>
+            <h3>Nginx Ingress</h3>
+            <p>最常用，社区支持好</p>
+            <span class="ic-badge recommended">推荐</span>
+          </div>
+          <div class="ic-card">
+            <div class="ic-logo">🚀</div>
+            <h3>Traefik</h3>
+            <p>自动服务发现，配置简单</p>
+          </div>
+          <div class="ic-card">
+            <div class="ic-logo">⚡</div>
+            <h3>Kong</h3>
+            <p>API网关功能丰富</p>
+          </div>
+          <div class="ic-card">
+            <div class="ic-logo">🔒</div>
+            <h3>HAProxy</h3>
+            <p>高性能TCP/HTTP代理</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Ingress YAML示例</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>nginx-ingress.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nginx.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80</code></pre>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 4</div>
+        <h2 class="section-title">实操环节</h2>
+        <p class="section-desc">Service与Ingress实战操作</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操1：创建ClusterIP Service</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>基于Nginx Deployment创建Service</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f nginx-deployment.yaml
+
+kubectl expose deployment nginx-deployment --port=80 --target-port=80 --name=nginx-service
+
+kubectl get svc
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+nginx-service   ClusterIP   10.96.158.120   &lt;none&gt;        80/TCP    10s
+
+kubectl describe svc nginx-service</code></pre>
+        </div>
+        <div class="highlight-box">
+          <h3>测试集群内部访问</h3>
+          <pre class="inline-code"><code>kubectl run test-pod --image=busybox --rm -it -- wget -qO- nginx-service</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操2：创建NodePort Service</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>创建NodePort类型Service</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+EOF
+
+kubectl get svc
+NAME             TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+nginx-nodeport   NodePort   10.96.200.50    &lt;none&gt;        80:30080/TCP   5s</code></pre>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>访问 <code>http://&lt;任意NodeIP&gt;:30080</code> 即可访问Nginx服务</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操3：kubectl expose快速创建</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>命令行快速创建Service</span>
+          </div>
+          <pre class="code-content"><code>kubectl expose deployment nginx-deployment \
+  --type=NodePort \
+  --port=80 \
+  --target-port=80 \
+  --name=nginx-quick
+
+kubectl get svc nginx-quick
+NAME          TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+nginx-quick   NodePort   10.96.50.100   &lt;none&gt;        80:31234/TCP   5s</code></pre>
+        </div>
+        <div class="highlight-box">
+          <h3>expose vs YAML</h3>
+          <ul>
+            <li><code>kubectl expose</code> - 快速创建，适合测试</li>
+            <li>YAML文件 - 可版本控制，适合生产</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操4：部署Ingress Controller</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>部署Nginx Ingress Controller</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+
+kubectl get pods -n ingress-nginx
+NAME                                        READY   STATUS    AGE
+ingress-nginx-controller-xxxxxx-yyyyy       1/1     Running   30s
+
+kubectl get svc -n ingress-nginx
+NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)
+ingress-nginx-controller             LoadBalancer   10.96.100.1     &lt;pending&gt;     80:30080/TCP</code></pre>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>本地环境EXTERNAL-IP会显示pending，可通过NodePort访问</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操5：创建Ingress规则</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>创建Ingress配置域名路由</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f - &lt;&lt;EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nginx.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+EOF
+
+kubectl get ingress
+NAME            CLASS   HOSTS               ADDRESS        PORTS   AGE
+nginx-ingress   nginx   nginx.example.com   192.168.1.100  80      10s</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操6：验证域名访问</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>修改本地hosts文件验证</span>
+          </div>
+          <pre class="code-content"><code># Windows: C:\Windows\System32\drivers\etc\hosts
+# Linux/Mac: /etc/hosts
+
+# 添加一行
+192.168.1.100  nginx.example.com
+
+# 测试访问
+curl http://nginx.example.com
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;Welcome to nginx!&lt;/head&gt;
+...</code></pre>
+        </div>
+        <div class="highlight-box success">
+          <h3>✅ 验证成功</h3>
+          <p>通过域名成功访问到Nginx服务，Ingress路由配置生效！</p>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 5</div>
+        <h2 class="section-title">随堂练习</h2>
+        <p class="section-desc">巩固所学知识</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">练习任务</h2>
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <span class="exercise-badge">动手练习</span>
+            <span class="exercise-time">10分钟</span>
+          </div>
+          <div class="exercise-content">
+            <h3>任务要求</h3>
+            <ol class="exercise-steps">
+              <li>为第14课时的Redis Deployment创建ClusterIP Service，端口映射为6379</li>
+              <li>启动一个测试Pod，通过Redis Service名称+端口连接Redis并设置key</li>
+              <li>提交Service YAML文件、测试Pod的连接命令及Redis返回结果</li>
+            </ol>
+          </div>
+        </div>
+        <div class="hint-box">
+          <span class="hint-icon">💡</span>
+          <div class="hint-content">
+            <h4>提示</h4>
+            <p>Service名称：redis-service</p>
+            <p>连接命令：<code>redis-cli -h redis-service -p 6379</code></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">参考答案框架</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>redis-service.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>测试连接命令</span>
+          </div>
+          <pre class="code-content"><code>kubectl run redis-cli --image=redis:7.0 --rm -it -- redis-cli -h redis-service SET test "hello"
+
+kubectl run redis-cli --image=redis:7.0 --rm -it -- redis-cli -h redis-service GET test
+"hello"</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程总结</h2>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <h3>Service核心要点</h3>
+            <ul>
+              <li>解决Pod IP动态变化问题</li>
+              <li>提供稳定的访问入口</li>
+              <li>支持负载均衡和服务发现</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h3>四种Service类型</h3>
+            <ul>
+              <li>ClusterIP：集群内部访问</li>
+              <li>NodePort：节点端口暴露</li>
+              <li>LoadBalancer：云负载均衡</li>
+              <li>ExternalName：外部服务映射</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h3>Ingress核心要点</h3>
+            <ul>
+              <li>HTTP七层路由转发</li>
+              <li>基于域名/路径路由</li>
+              <li>需要Ingress Controller</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">下节预告</h2>
+        <div class="preview-card">
+          <h3>第16讲：K8s实战与课程总结</h3>
+          <div class="preview-topics">
+            <div class="preview-topic">
+              <span class="topic-icon">⚙️</span>
+              <span>ConfigMap与Secret配置管理</span>
+            </div>
+            <div class="preview-topic">
+              <span class="topic-icon">💾</span>
+              <span>PersistentVolume持久化存储</span>
+            </div>
+            <div class="preview-topic">
+              <span class="topic-icon">📦</span>
+              <span>Helm包管理工具</span>
+            </div>
+            <div class="preview-topic">
+              <span class="topic-icon">🚀</span>
+              <span>综合实战：SpringBoot+MySQL全栈部署</span>
+            </div>
+          </div>
+        </div>
+        <div class="page-number">第15讲 / 共24页</div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">24</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>

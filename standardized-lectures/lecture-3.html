@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第3课时 - Docker核心命令（下）</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第3课时</h1>
+          <h2 class="sub-title">Docker核心命令（下）</h2>
+          <p class="tagline"><span class="highlight">数据持久化</span>与容器卷</p>
+          <div class="meta-info">
+            <span>90分钟</span>
+            <span>理论+实操</span>
+            <span>入门级</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解容器数据丢失问题</h3>
+                <p>容器删除后数据<span class="highlight">默认不保留</span></p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>掌握数据卷三种挂载方式</h3>
+                <p><span class="highlight">宿主机目录、匿名卷、命名卷</span></p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>理解读写权限控制</h3>
+                <p><span class="key-point">rw/ro</span>模式区别</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>掌握数据卷共享</h3>
+                <p>多个容器<span class="key-point">共享同一数据卷</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">35分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">数据卷概念、挂载方式、权限控制</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">45分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc"><span class="key-point">MySQL持久化</span>、数据卷共享</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">10分钟</div>
+              <div class="schedule-type">随堂练习</div>
+              <div class="schedule-desc">Redis持久化配置</div>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">本节核心</div>
+            <div class="kp-content">
+              数据持久化是<span class="highlight">生产环境部署的关键</span>。没有数据卷，容器重启或删除后所有数据都会丢失，这对于数据库等应用是致命的。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">容器数据丢失问题</h1>
+          <p class="section-desc">为什么需要数据持久化？</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">问题演示：容器数据丢失</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建文件后删除容器</span>
+            </div>
+            <pre><code># 1. 启动容器并创建文件
+docker run -it --name test centos:7 /bin/bash
+echo "hello" > /tmp/test.txt
+exit
+
+# 2. 重新启动容器查看文件
+docker start -i test
+cat /tmp/test.txt  # 文件存在
+
+# 3. 删除容器后重新创建
+docker rm -f test
+docker run -it --name test2 centos:7 /bin/bash
+cat /tmp/test.txt  # 文件不存在！</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">核心问题</div>
+            <div class="highlight-content">
+              <p>容器删除后，容器内的<span class="highlight">所有数据都会丢失</span>！</p>
+              <p>这对于数据库等需要持久化数据的应用是<span class="important">致命的</span>。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">解决方案：数据卷</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term highlight">数据卷 Volume</div>
+            <div class="definition-content">
+              数据卷是一个可供容器使用的<span class="highlight">特殊目录</span>，它绕过容器的文件系统，<span class="key-point">直接存在于宿主机上</span>。即使容器被删除，数据卷中的数据也不会丢失。
+            </div>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">数据卷的优势</div>
+            <div class="highlight-content">
+              <p><span class="highlight">数据持久化</span>：容器删除后数据不丢失</p>
+              <p><span class="highlight">数据共享</span>：多个容器可以共享同一数据卷</p>
+              <p><span class="highlight">数据备份</span>：可以直接在宿主机上备份数据</p>
+            </div>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心概念</div>
+            <div class="conclusion-content">
+              <p>容器的文件系统是<span class="highlight">临时的</span>，数据卷是<span class="highlight">持久的</span>。</p>
+              <p>数据卷将数据从容器中分离出来，存储在宿主机上。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">数据卷三种挂载方式</h1>
+          <p class="section-desc">掌握不同的数据挂载场景</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">三种挂载方式概览</h1>
+        </div>
+        <div class="page-body">
+          <div class="three-column">
+            <div class="concept-preview">
+              <div class="concept-num">01</div>
+              <h3>宿主机目录挂载</h3>
+              <p><span class="highlight">-v /host:/container</span></p>
+            </div>
+            <div class="concept-preview">
+              <div class="concept-num">02</div>
+              <h3>匿名卷</h3>
+              <p><span class="key-point">-v /container</span></p>
+            </div>
+            <div class="concept-preview">
+              <div class="concept-num">03</div>
+              <h3>命名卷</h3>
+              <p><span class="key-point">-v name:/container</span></p>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">挂载的本质</div>
+            <div class="kp-content">
+              挂载就是将宿主机的目录与容器内的目录<span class="highlight">建立映射关系</span>。容器内对该目录的读写操作，实际上是对宿主机目录的操作。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">方式一：宿主机目录挂载</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">挂载宿主机目录</span>
+            </div>
+            <pre><code># 将宿主机/opt/data挂载到容器/app/data
+docker run -it -v /opt/data:/app/data centos:7 /bin/bash
+
+# 在容器内创建文件
+echo "test" > /app/data/test.txt
+
+# 在宿主机查看
+cat /opt/data/test.txt  # 文件存在！</code></pre>
+          </div>
+          <div class="term-box">
+            <div class="term-title">语法说明</div>
+            <p><strong class="highlight">-v 宿主机路径:容器路径</strong>：将宿主机的指定目录挂载到容器内的指定路径。两边目录会<span class="key-point">实时同步</span>。</p>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">使用场景</div>
+            <div class="conclusion-content">
+              <p><span class="highlight">开发环境</span>：代码目录挂载，实时更新</p>
+              <p><span class="highlight">配置文件</span>：挂载配置文件，便于修改</p>
+              <p><span class="highlight">日志收集</span>：挂载日志目录，统一管理</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">方式二：匿名卷</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建匿名卷</span>
+            </div>
+            <pre><code># 创建匿名卷
+docker run -it -v /app/data centos:7 /bin/bash
+
+# 查看卷信息
+docker inspect 容器ID | grep -A 10 Mounts</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">匿名卷特点</div>
+            <div class="highlight-content">
+              <p>Docker<span class="highlight">自动在/var/lib/docker/volumes下创建目录</span></p>
+              <p>没有明确的名称，只有一串<span class="key-point">随机ID</span></p>
+              <p>适合<span class="key-point">临时数据存储</span></p>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">匿名卷的局限</div>
+            <div class="kp-content">
+              匿名卷由于没有名称，<span class="highlight">难以管理和复用</span>。当容器被删除时，匿名卷可能成为"孤儿卷"，占用磁盘空间。生产环境建议使用命名卷。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">方式三：命名卷</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建和使用命名卷</span>
+            </div>
+            <pre><code># 创建命名卷
+docker volume create mydata
+
+# 使用命名卷
+docker run -it -v mydata:/app/data centos:7 /bin/bash
+
+# 查看所有卷
+docker volume ls
+
+# 查看卷详情
+docker volume inspect mydata
+
+# 删除命名卷
+docker volume rm mydata</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">命名卷优势</div>
+            <div class="highlight-content">
+              <p><span class="highlight">有明确的名称</span>，便于管理</p>
+              <p><span class="highlight">可以在多个容器间共享</span></p>
+              <p><span class="highlight">易于备份和迁移</span></p>
+            </div>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">生产环境推荐</div>
+            <div class="conclusion-content">
+              命名卷是<span class="highlight">生产环境的首选</span>，它提供了最佳的可管理性和可维护性。数据库数据、应用日志等都应使用命名卷。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5</span>
+          <h1 class="page-title">三种挂载方式对比</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>方式</th>
+                <th>语法</th>
+                <th>特点</th>
+                <th>适用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>宿主机目录</td>
+                <td><span class="highlight">-v /host:/container</span></td>
+                <td class="success">灵活可控</td>
+                <td>开发环境、配置文件</td>
+              </tr>
+              <tr>
+                <td>匿名卷</td>
+                <td>-v /container</td>
+                <td>自动管理</td>
+                <td>临时数据</td>
+              </tr>
+              <tr>
+                <td>命名卷</td>
+                <td><span class="highlight">-v name:/container</span></td>
+                <td class="success">易于管理</td>
+                <td><span class="key-point">生产环境</span>、数据共享</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="knowledge-point">
+            <div class="kp-title">选择建议</div>
+            <div class="kp-content">
+              <p><span class="highlight">开发环境</span>：使用宿主机目录挂载，方便编辑代码</p>
+              <p><span class="highlight">生产环境</span>：使用命名卷，便于管理和备份</p>
+              <p><span class="highlight">临时数据</span>：使用匿名卷，让Docker自动管理</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">读写权限控制</h1>
+          <p class="section-desc">rw/ro模式区别</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">读写权限控制</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">权限设置</span>
+            </div>
+            <pre><code># 默认读写模式(rw)
+docker run -v /opt/data:/app centos:7
+
+# 只读模式(ro)
+docker run -v /opt/data:/app:ro centos:7
+
+# 容器内无法写入只读挂载的目录
+echo "test" > /app/test.txt  # 报错！</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name highlight">rw</span>
+              <span class="param-desc">读写模式（默认），容器可以读写挂载目录</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name highlight">ro</span>
+              <span class="param-desc">只读模式，容器只能读取，不能写入</span>
+            </div>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">ro模式使用场景</div>
+            <div class="conclusion-content">
+              <p><span class="highlight">配置文件</span>：防止容器意外修改配置</p>
+              <p><span class="highlight">共享数据</span>：多个容器读取同一数据，防止误写</p>
+              <p><span class="highlight">安全隔离</span>：限制容器对敏感数据的访问</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">实操环节</h1>
+          <p class="section-desc">MySQL数据持久化与数据卷共享</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">实操：MySQL数据持久化</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>启动MySQL并挂载数据卷</h4>
+              <div class="code-block">
+                <pre><code>docker run -d \
+  --name mysql \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=123456 \
+  -v /opt/mysql/data:/var/lib/mysql \
+  -v /opt/mysql/conf:/etc/mysql/conf.d \
+  mysql:5.7</code></pre>
+              </div>
+              <p class="step-desc">挂载<span class="highlight">数据目录</span>和<span class="highlight">配置目录</span></p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>创建测试数据</h4>
+              <div class="code-block">
+                <pre><code># 进入MySQL容器
+docker exec -it mysql mysql -uroot -p123456
+
+# 创建数据库和表
+CREATE DATABASE testdb;
+USE testdb;
+CREATE TABLE users (id INT, name VARCHAR(50));
+INSERT INTO users VALUES (1, 'docker');
+SELECT * FROM users;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">验证数据持久化</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">删除容器后验证数据</span>
+            </div>
+            <pre><code># 删除容器
+docker rm -f mysql
+
+# 重新启动MySQL
+docker run -d \
+  --name mysql2 \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=123456 \
+  -v /opt/mysql/data:/var/lib/mysql \
+  mysql:5.7
+
+# 验证数据
+docker exec -it mysql2 mysql -uroot -p123456
+USE testdb;
+SELECT * FROM users;  # 数据还在！</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">验证成功</div>
+            <div class="highlight-content">
+              <p>即使删除容器，数据仍然保存在<span class="highlight">宿主机的挂载目录</span>中。</p>
+              <p>重新启动容器后<span class="key-point">数据自动恢复</span>。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">实操：数据卷共享</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">两个容器共享同一数据卷</span>
+            </div>
+            <pre><code># 创建共享数据卷
+docker volume create shared-data
+
+# 启动容器1
+docker run -it --name c1 -v shared-data:/data centos:7
+
+# 在容器1中创建文件
+echo "from c1" > /data/share.txt
+
+# 启动容器2
+docker run -it --name c2 -v shared-data:/data centos:7
+
+# 在容器2中查看文件
+cat /data/share.txt  # 输出：from c1</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">使用场景</div>
+            <div class="highlight-content">
+              <p>多个容器需要访问<span class="highlight">同一份数据</span>：</p>
+              <p><span class="key-point">Web服务器集群</span>共享静态文件</p>
+              <p><span class="key-point">日志收集</span>：多个应用写入同一日志目录</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验1</span>
+          <h1 class="page-title">MySQL数据持久化实验</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">MySQL容器数据持久化</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>验证数据卷的持久化特性，掌握MySQL容器的数据备份与恢复</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">启动MySQL容器并挂载数据卷</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">创建数据库和测试数据</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">删除容器</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">重新启动容器并验证数据</span>
+              </div>
+            </div>
+            <div class="experiment-data">
+              <h4>数据记录</h4>
+              <table class="data-table">
+                <tr><th>操作</th><th>结果</th></tr>
+                <tr><td>创建数据</td><td>记录数: ?</td></tr>
+                <tr><td>删除容器</td><td>容器状态: ?</td></tr>
+                <tr><td>重启验证</td><td>数据是否保留: ?</td></tr>
+              </table>
+            </div>
+            <div class="experiment-result">
+              <h4>预期结果</h4>
+              <p>删除容器后重新启动，<span class="highlight">数据完整保留</span></p>
+            </div>
+            <div class="experiment-analysis">
+              <h4>结果分析</h4>
+              <p>数据卷将数据存储在<span class="key-point">宿主机</span>，与容器生命周期解耦，实现数据持久化。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验2</span>
+          <h1 class="page-title">数据卷共享实验</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">多容器数据卷共享</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>验证命名卷在多容器间的共享特性</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建命名卷：docker volume create shared</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">启动容器1并写入数据</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">启动容器2并读取数据</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">验证数据一致性</span>
+              </div>
+            </div>
+            <div class="experiment-result">
+              <h4>预期结果</h4>
+              <p>容器2可以<span class="highlight">读取容器1写入的数据</span>，实现数据共享</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5</span>
+          <h1 class="page-title">练习任务（10分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>创建Redis配置文件</h3>
+                <p>开启持久化、设置密码</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>启动Redis并挂载配置</h3>
+                <p>命令：<code>docker run -d -v /opt/redis/redis.conf:/etc/redis/redis.conf redis</code></p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>验证配置生效</h3>
+                <p>使用redis-cli验证密码和持久化</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>验证数据持久化</h3>
+                <p>删除容器后重启，验证数据不丢失</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">理解容器数据丢失问题：<span class="highlight">容器删除数据丢失</span></div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">掌握三种挂载方式：<span class="highlight">宿主机目录、匿名卷、命名卷</span></div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">理解权限控制：<span class="highlight">rw读写/ro只读</span></div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon highlight">✓</div>
+              <div class="summary-text">完成<span class="highlight">MySQL数据持久化</span>实战</div>
+            </div>
+          </div>
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心要点</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">数据卷</span>是实现数据持久化的关键</p>
+              <p>2. 生产环境推荐使用<span class="highlight">命名卷</span></p>
+              <p>3. 使用ro模式保护配置文件</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>第4课时：<span class="highlight">Docker镜像进阶</span></h3>
+            <ul>
+              <li>镜像分层原理</li>
+              <li><span class="key-point">docker commit</span>制作镜像</li>
+              <li>Dockerfile核心指令</li>
+              <li><span class="key-point">CMD与ENTRYPOINT</span>区别</li>
+            </ul>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">预习建议</div>
+            <div class="kp-content">
+              <p>思考：如何制作自己的Docker镜像？</p>
+              <p>预习命令：<span class="highlight">docker commit</span> 和 <span class="highlight">docker build</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">26</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>

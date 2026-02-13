@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第12课时 - 企业实战与面试题</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第12课时</h1>
+          <h2 class="sub-title">企业实战与面试题</h2>
+          <p class="tagline">CI/CD流水线与常见面试题解析</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">🏭</div>
+              <div class="goal-content">
+                <h3>企业级镜像构建</h3>
+                <p>最佳实践与优化</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔄</div>
+              <div class="goal-content">
+                <h3>CI/CD流水线</h3>
+                <p>自动化构建部署</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">❓</div>
+              <div class="goal-content">
+                <h3>面试题解析</h3>
+                <p>常见问题与答案</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">💡</div>
+              <div class="goal-content">
+                <h3>实战案例</h3>
+                <p>真实项目经验分享</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">30分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">企业实践、CI/CD</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">35分钟</div>
+              <div class="schedule-type">面试题解析</div>
+              <div class="schedule-desc">常见问题与答案</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">25分钟</div>
+              <div class="schedule-type">案例分享</div>
+              <div class="schedule-desc">实战经验总结</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">企业级镜像构建</h1>
+          <p class="section-desc">最佳实践与优化技巧</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">镜像构建最佳实践</h1>
+        </div>
+        <div class="page-body">
+          <div class="best-practices">
+            <div class="practice-item">
+              <div class="practice-number">1</div>
+              <div class="practice-content">
+                <h4>使用多阶段构建</h4>
+                <p>减小最终镜像体积</p>
+              </div>
+            </div>
+            <div class="practice-item">
+              <div class="practice-number">2</div>
+              <div class="practice-content">
+                <h4>合理利用缓存</h4>
+                <p>将不常变化的层放前面</p>
+              </div>
+            </div>
+            <div class="practice-item">
+              <div class="practice-number">3</div>
+              <div class="practice-content">
+                <h4>最小化基础镜像</h4>
+                <p>使用alpine版本</p>
+              </div>
+            </div>
+            <div class="practice-item">
+              <div class="practice-number">4</div>
+              <div class="practice-content">
+                <h4>不存储敏感信息</h4>
+                <p>使用环境变量或Secret</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">多阶段构建示例</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">多阶段Dockerfile</span>
+            </div>
+            <pre><code># 构建阶段
+FROM node:18 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# 运行阶段
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">✅ 优势</div>
+            <div class="highlight-content">
+              <p>最终镜像只包含运行时必需的文件，体积大幅减小</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">CI/CD流水线</h1>
+          <p class="section-desc">自动化构建与部署</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">CI/CD概述</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">CI/CD</div>
+            <div class="definition-content">
+              持续集成（CI）和持续部署（CD）的实践，实现代码提交后自动构建、测试、部署。
+            </div>
+          </div>
+          <div class="arch-diagram">
+            <div class="arch-layer ci">代码提交 → 自动构建 → 自动测试</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer cd">自动部署 → 生产环境</div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">GitLab CI示例</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">.gitlab-ci.yml</span>
+            </div>
+            <pre><code>stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: docker:latest
+  script:
+    - docker build -t myapp:$CI_COMMIT_SHA .
+    - docker push myapp:$CI_COMMIT_SHA
+
+deploy:
+  stage: deploy
+  script:
+    - docker pull myapp:$CI_COMMIT_SHA
+    - docker run -d -p 80:80 myapp:$CI_COMMIT_SHA
+  only:
+    - main</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">常见面试题</h1>
+          <p class="section-desc">Docker面试高频问题</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Q1</span>
+          <h1 class="page-title">Docker与虚拟机的区别？</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>特性</th>
+                <th>Docker</th>
+                <th>虚拟机</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>启动速度</td>
+                <td class="success">秒级</td>
+                <td>分钟级</td>
+              </tr>
+              <tr>
+                <td>资源占用</td>
+                <td class="success">MB级</td>
+                <td>GB级</td>
+              </tr>
+              <tr>
+                <td>隔离性</td>
+                <td>进程级</td>
+                <td class="success">操作系统级</td>
+              </tr>
+              <tr>
+                <td>性能</td>
+                <td class="success">接近原生</td>
+                <td>有损耗</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Q2</span>
+          <h1 class="page-title">CMD与ENTRYPOINT的区别？</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box info">
+            <div class="highlight-title">💡 答案</div>
+            <div class="highlight-content">
+              <p><strong>CMD</strong>：设置容器启动时默认执行的命令，可被docker run参数覆盖</p>
+              <p><strong>ENTRYPOINT</strong>：设置容器主命令，docker run参数会追加到后面</p>
+              <p><strong>组合使用</strong>：ENTRYPOINT定义主命令，CMD定义默认参数</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Q3</span>
+          <h1 class="page-title">如何优化Docker镜像体积？</h1>
+        </div>
+        <div class="page-body">
+          <div class="feature-list">
+            <div class="feature-item">
+              <span class="feature-icon">1</span>
+              <span>使用alpine基础镜像</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">2</span>
+              <span>多阶段构建</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">3</span>
+              <span>合并RUN指令，减少层数</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">4</span>
+              <span>清理缓存和临时文件</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">5</span>
+              <span>使用.dockerignore排除无用文件</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Q4</span>
+          <h1 class="page-title">Docker容器数据持久化方案？</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #93c5fd;">
+              <div class="pain-icon">📁</div>
+              <h3>数据卷</h3>
+              <p>docker volume create</p>
+              <p>Docker管理，推荐使用</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fcd34d;">
+              <div class="pain-icon">📂</div>
+              <h3>绑定挂载</h3>
+              <p>-v /host/path:/container/path</p>
+              <p>主机目录映射</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">💾</div>
+              <h3>数据卷容器</h3>
+              <p>--volumes-from</p>
+              <p>容器间共享数据</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Q5</span>
+          <h1 class="page-title">Docker网络模式有哪些？</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>模式</th>
+                <th>特点</th>
+                <th>适用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Bridge</strong></td>
+                <td>默认模式，独立IP</td>
+                <td>大多数应用</td>
+              </tr>
+              <tr>
+                <td><strong>Host</strong></td>
+                <td>共享主机网络</td>
+                <td>高性能场景</td>
+              </tr>
+              <tr>
+                <td><strong>None</strong></td>
+                <td>无网络</td>
+                <td>安全隔离</td>
+              </tr>
+              <tr>
+                <td><strong>Overlay</strong></td>
+                <td>跨主机通信</td>
+                <td>Swarm集群</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">实战案例分享</h1>
+          <p class="section-desc">真实项目经验</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Case 1</span>
+          <h1 class="page-title">案例：微服务部署架构</h1>
+        </div>
+        <div class="page-body">
+          <div class="arch-diagram vertical">
+            <div class="arch-box gateway-box">
+              <div class="box-title">Nginx网关</div>
+              <div class="box-content">
+                <div class="box-item">负载均衡</div>
+                <div class="box-item">SSL终止</div>
+              </div>
+            </div>
+            <div class="arch-flow">
+              <span class="flow-arrow">↓</span>
+            </div>
+            <div class="arch-box service-box">
+              <div class="box-title">微服务集群</div>
+              <div class="box-content">
+                <div class="box-item">用户服务</div>
+                <div class="box-item">订单服务</div>
+                <div class="box-item">商品服务</div>
+              </div>
+            </div>
+            <div class="arch-flow">
+              <span class="flow-arrow">↓</span>
+            </div>
+            <div class="arch-box db-box">
+              <div class="box-title">数据层</div>
+              <div class="box-content">
+                <div class="box-item">MySQL主从</div>
+                <div class="box-item">Redis集群</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">企业级镜像构建：多阶段构建、最佳实践</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">CI/CD流水线：自动化构建部署</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">面试题：Docker核心概念与实战问题</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">实战案例：微服务部署架构</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第13课时：Kubernetes核心概念</h3>
+            <ul>
+              <li>K8s架构与组件</li>
+              <li>Pod、Service、Deployment</li>
+              <li>kubectl命令</li>
+              <li>应用部署实战</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">18</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>

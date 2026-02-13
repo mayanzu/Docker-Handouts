@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第9课时 - Docker Compose入门</title>
+  <link rel="stylesheet" href="../lecture-assets/css/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+<div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第9课时</h1>
+          <h2 class="sub-title">Docker Compose入门</h2>
+          <p class="tagline">多容器应用编排利器</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">📚</div>
+              <div class="goal-content">
+                <h3>理解Compose概念</h3>
+                <p>多容器应用编排</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">📝</div>
+              <div class="goal-content">
+                <h3>掌握YAML语法</h3>
+                <p>docker-compose.yml编写</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔧</div>
+              <div class="goal-content">
+                <h3>掌握常用命令</h3>
+                <p>up/down/logs/ps</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🚀</div>
+              <div class="goal-content">
+                <h3>实战项目部署</h3>
+                <p>WordPress博客搭建</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">30分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">Compose概念、YAML语法</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">45分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc">多容器应用部署</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">15分钟</div>
+              <div class="schedule-type">练习与总结</div>
+              <div class="schedule-desc">独立完成项目部署</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">Docker Compose概述</h1>
+          <p class="section-desc">多容器应用编排工具</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是Docker Compose？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker Compose</div>
+            <div class="definition-content">
+              Docker官方提供的多容器应用编排工具，通过YAML文件定义和运行多容器Docker应用。
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 核心概念</div>
+            <p><strong>服务（Service）</strong>：一个应用的容器，如web、db</p>
+            <p><strong>项目（Project）</strong>：一组关联的服务，如WordPress项目</p>
+            <p><strong>编排（Orchestration）</strong>：定义服务间的依赖和启动顺序</p>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">为什么需要Compose？</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">😫</div>
+              <h3>手动管理</h3>
+              <p>每个容器单独启动</p>
+              <p>命令冗长易出错</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">✅</div>
+              <h3>Compose管理</h3>
+              <p>一条命令启动所有</p>
+              <p>配置文件版本控制</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">对比：手动 vs Compose</span>
+            </div>
+            <pre><code># 手动方式（繁琐）
+docker run -d --name db -e MYSQL_ROOT_PASSWORD=123 mysql
+docker run -d --name web -p 80:80 --link db wordpress
+
+# Compose方式（简洁）
+docker-compose up -d</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">安装Docker Compose</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box info">
+            <div class="highlight-title">💡 注意</div>
+            <div class="highlight-content">
+              <p>Docker Desktop已内置Compose，无需单独安装。Linux需要单独安装。</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Linux安装Compose</span>
+            </div>
+            <pre><code># 下载Compose
+curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 添加执行权限
+chmod +x /usr/local/bin/docker-compose
+
+# 验证安装
+docker-compose --version</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">docker-compose.yml语法</h1>
+          <p class="section-desc">编写编排配置文件</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">YAML文件基本结构</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker-compose.yml</span>
+            </div>
+            <pre><code>version: '3.8'          # Compose文件版本
+
+services:               # 定义服务
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+  
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+
+networks:               # 定义网络（可选）
+  app-net:
+
+volumes:                # 定义卷（可选）
+  db-data:</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">服务配置详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用服务配置项</span>
+            </div>
+            <pre><code>services:
+  web:
+    image: nginx:latest       # 使用镜像
+    build: ./                 # 或从Dockerfile构建
+    container_name: myweb     # 容器名称
+    ports:
+      - "8080:80"             # 端口映射
+    environment:              # 环境变量
+      - ENV=production
+    volumes:                  # 数据卷
+      - ./html:/usr/share/nginx/html
+    networks:                 # 网络
+      - app-net
+    depends_on:               # 依赖关系
+      - db
+    restart: always           # 重启策略</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">网络与卷配置</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">网络配置</span>
+            </div>
+            <pre><code>networks:
+  app-net:
+    driver: bridge            # 网络驱动
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">卷配置</span>
+            </div>
+            <pre><code>volumes:
+  db-data:
+    driver: local             # 卷驱动
+  # 或使用外部卷
+  # db-data:
+  #   external: true</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">Compose常用命令</h1>
+          <p class="section-desc">管理多容器应用</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">基本命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用命令</span>
+            </div>
+            <pre><code># 启动所有服务
+docker-compose up -d
+
+# 停止所有服务
+docker-compose down
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f
+
+# 重启服务
+docker-compose restart
+
+# 进入容器
+docker-compose exec web bash</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">更多命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">高级命令</span>
+            </div>
+            <pre><code># 构建镜像
+docker-compose build
+
+# 拉取镜像
+docker-compose pull
+
+# 查看配置
+docker-compose config
+
+# 停止但保留容器
+docker-compose stop
+
+# 启动已停止的服务
+docker-compose start
+
+# 删除停止的容器
+docker-compose rm
+
+# 查看资源使用
+docker-compose top</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">实战：WordPress部署</h1>
+          <p class="section-desc">多容器应用实战</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">WordPress项目结构</h1>
+        </div>
+        <div class="page-body">
+          <div class="arch-diagram vertical">
+            <div class="arch-box web-box">
+              <div class="box-title">WordPress容器</div>
+              <div class="box-content">
+                <div class="box-item">端口 80</div>
+                <div class="box-item">PHP应用</div>
+              </div>
+            </div>
+            <div class="arch-flow">
+              <span class="flow-arrow">↓</span>
+            </div>
+            <div class="arch-box db-box">
+              <div class="box-title">MySQL容器</div>
+              <div class="box-content">
+                <div class="box-item">端口 3306</div>
+                <div class="box-item">数据持久化</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">编写docker-compose.yml</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker-compose.yml</span>
+            </div>
+            <pre><code>version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - wordpress-data:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  wordpress-data:
+  db-data:</code></pre>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">启动WordPress项目</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动命令</span>
+            </div>
+            <pre><code># 启动项目
+docker-compose up -d
+
+# 查看状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f wordpress
+
+# 访问WordPress
+# http://localhost:8080</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">✅ 部署成功</div>
+            <div class="highlight-content">
+              <p>访问 http://localhost:8080 即可看到WordPress安装页面</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5</span>
+          <h1 class="page-title">练习任务（15分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>编写配置文件</h3>
+                <p>Nginx + Redis 两服务编排</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>启动服务</h3>
+                <p>使用docker-compose up -d</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>验证服务</h3>
+                <p>访问Nginx，连接Redis</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>提交截图</h3>
+                <p>docker-compose ps输出结果</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">Compose概念：多容器应用编排工具</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">YAML语法：version/services/networks/volumes</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">常用命令：up/down/ps/logs/exec</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">实战项目：WordPress多容器部署</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第10课时：微服务编排</h3>
+            <ul>
+              <li>微服务架构概述</li>
+              <li>服务注册与发现</li>
+              <li>配置中心</li>
+              <li>链路追踪</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">20</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../lecture-assets/js/lecture-template.js"></script>
+</body>
+</html>
