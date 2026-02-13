@@ -1,583 +1,983 @@
 <template>
-  <div class="lecture-content">
-    <header class="lecture-header">
-      <h1>第2讲：镜像与容器 — Docker的基本单位</h1>
-      <p class="intro">深入理解镜像和容器的关系，掌握 Docker Hub 的使用，学习镜像的拉取、运行和管理。</p>
+  <div class="lecture-page">
+    <div class="page-container" :style="{ transform: `translateX(-${(currentPage - 1) * 100}%)` }">
       
-      <div class="pill-list">
-        <span class="pill">镜像概念</span>
-        <span class="pill">Docker Hub</span>
-        <span class="pill">镜像管理</span>
-        <span class="pill">容器启动</span>
-      </div>
-    </header>
-
-    <LectureSidebar :sections="sections" />
-
-    <section id="intro">
-      <h2>👋 课程目标</h2>
-      <ul class="goal-list">
-        <li>理解镜像（Image）与容器（Container）的本质区别</li>
-        <li>掌握从 Docker Hub 搜索和下载镜像</li>
-        <li>学会管理本地镜像：查看、删除、打标签</li>
-        <li>理解镜像的分层结构和共享机制</li>
-      </ul>
-    </section>
-
-    <section id="chapter-1">
-      <h2>一、镜像与容器：类与实例的关系</h2>
-      
-      <h3>1.1 镜像是什么？</h3>
-      <p><strong>镜像（Image）</strong>可以理解为：</p>
-      <ul>
-        <li>📦 <strong>应用的安装包</strong>：包含运行应用所需的一切（代码、依赖、配置）</li>
-        <li>📸 <strong>文件系统快照</strong>：某个时间点的完整文件系统状态</li>
-        <li>📄 <strong>只读模板</strong>：不可修改，用于创建容器</li>
-      </ul>
-
-      <h3>1.2 容器是什么？</h3>
-      <p><strong>容器（Container）</strong>是镜像的运行实例：</p>
-      <ul>
-        <li>🏃 <strong>运行中的进程</strong>：基于镜像启动的隔离进程</li>
-        <li>📝 <strong>可写层</strong>：在镜像只读层之上添加可写层</li>
-        <li>💀 <strong>临时性</strong>：删除容器后，未持久化的数据会丢失</li>
-      </ul>
-
-      <div class="comparison-box">
-        <h4>类比理解</h4>
-        <table class="comparison-table">
-          <thead>
-            <tr>
-              <th>概念</th>
-              <th>镜像（Image）</th>
-              <th>容器（Container）</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>程序世界</td>
-              <td>类（Class）</td>
-              <td>实例（Object）</td>
-            </tr>
-            <tr>
-              <td>操作系统</td>
-              <td>安装程序（.exe / .dmg）</td>
-              <td>运行的进程</td>
-            </tr>
-            <tr>
-              <td>游戏世界</td>
-              <td>游戏光盘</td>
-              <td>游戏存档</td>
-            </tr>
-            <tr>
-              <td>状态</td>
-              <td>静态、只读</td>
-              <td>动态、可写</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- 封面页 -->
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第2课时</h1>
+          <h2 class="sub-title">Docker核心命令（上）</h2>
+          <p class="tagline">镜像与容器基础操作</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 入门级</span>
+          </div>
+        </div>
       </div>
 
-      <div class="example-box">
-        <h4>💡 形象比喻</h4>
-        <pre><code>镜像 = 菜谱（配方）
-容器 = 根据菜谱做出的菜
-
-- 一份菜谱可以做出无数份菜
-- 每份菜可以加不同的调料（配置）
-- 吃完菜（删除容器），菜谱还在（镜像保留）</code></pre>
+      <!-- 课程目标 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">🖼️</div>
+              <div class="goal-content">
+                <h3>掌握镜像管理命令</h3>
+                <p>images/pull/push/rmi/save/load</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">📦</div>
+              <div class="goal-content">
+                <h3>理解容器生命周期</h3>
+                <p>新建、启动、停止、删除</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔧</div>
+              <div class="goal-content">
+                <h3>掌握容器交互方式</h3>
+                <p>exec/attach区别与使用</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">⚙️</div>
+              <div class="goal-content">
+                <h3>理解关键参数</h3>
+                <p>-it/-d/--name/-p/-P</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="chapter-2">
-      <h2>二、Docker Hub —— 镜像的应用商店</h2>
-      
-      <h3>2.1 什么是 Docker Hub？</h3>
-      <p><strong>Docker Hub</strong> 是 Docker 官方的公共镜像仓库，类似于：</p>
-      <ul>
-        <li>📱 App Store / Google Play（应用商店）</li>
-        <li>📦 npm（JavaScript 包管理器）</li>
-        <li>🐍 PyPI（Python 包索引）</li>
-      </ul>
-      <p>网址：<code>https://hub.docker.com</code></p>
+      <!-- 课程安排 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">镜像管理、容器生命周期、关键参数</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc">镜像操作、容器操作、端口映射</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">10分钟</div>
+              <div class="schedule-type">随堂练习</div>
+              <div class="schedule-desc">Redis容器部署与验证</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <h3>2.2 搜索镜像</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 1：搜索 Redis 镜像</h4>
-        <pre><code># 命令行搜索
-docker search redis
+      <!-- Part 1 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">镜像管理命令</h1>
+          <p class="section-desc">掌握Docker镜像的基本操作</p>
+        </div>
+      </div>
+
+      <!-- 镜像管理概览 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">镜像管理命令概览</h1>
+        </div>
+        <div class="page-body">
+          <table class="command-table">
+            <thead>
+              <tr>
+                <th>命令</th>
+                <th>说明</th>
+                <th>示例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>docker images</code></td>
+                <td>列出本地镜像</td>
+                <td>docker images</td>
+              </tr>
+              <tr>
+                <td><code>docker pull</code></td>
+                <td>拉取镜像</td>
+                <td>docker pull nginx:latest</td>
+              </tr>
+              <tr>
+                <td><code>docker push</code></td>
+                <td>推送镜像</td>
+                <td>docker push myimage:v1</td>
+              </tr>
+              <tr>
+                <td><code>docker rmi</code></td>
+                <td>删除镜像</td>
+                <td>docker rmi nginx:latest</td>
+              </tr>
+              <tr>
+                <td><code>docker save</code></td>
+                <td>导出镜像</td>
+                <td>docker save -o nginx.tar nginx</td>
+              </tr>
+              <tr>
+                <td><code>docker load</code></td>
+                <td>导入镜像</td>
+                <td>docker load -i nginx.tar</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- docker images -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">docker images - 查看本地镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看本地镜像</span>
+            </div>
+            <pre><code>docker images
 
 # 输出示例
-NAME                DESCRIPTION                     STARS     OFFICIAL
-redis               Official Redis image            12000+    [OK]
-redis/redis-stack   Redis Stack Server              150+
-bitnami/redis       Bitnami Redis Docker Image      800+</code></pre>
-        <p><strong>关键字段：</strong></p>
-        <ul>
-          <li><code>OFFICIAL</code>：官方维护的镜像，更可靠</li>
-          <li><code>STARS</code>：用户评分，类似 GitHub stars</li>
-        </ul>
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+nginx         latest    605c77e624dd   2 weeks ago    141MB
+centos        7         eeb6ee3f44bd   3 months ago   204MB</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name">REPOSITORY</span>
+              <span class="param-desc">镜像名称（来源仓库）</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">TAG</span>
+              <span class="param-desc">镜像标签（版本号）</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">IMAGE ID</span>
+              <span class="param-desc">镜像唯一ID</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">SIZE</span>
+              <span class="param-desc">镜像大小</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <h3>2.3 镜像命名规范</h3>
-      <pre><code># 完整格式
-[仓库地址/]用户名/镜像名:标签
-
-# 示例
-docker.io/library/nginx:1.25-alpine
-│         │       │     │
-│         │       │     └─ 标签（版本号）
-│         │       └─────── 镜像名
-│         └───────────── 命名空间（官方镜像用 library）
-└─────────────────────── 仓库地址（默认 docker.io）
-
-# 简写形式
-nginx           # 等同于 docker.io/library/nginx:latest
-nginx:1.25      # 指定版本
-mysql:8.0       # MySQL 8.0 版本</code></pre>
-
-      <h3>2.4 常见标签（Tag）含义</h3>
-      <table class="comparison-table">
-        <thead>
-          <tr>
-            <th>标签</th>
-            <th>含义</th>
-            <th>示例</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>latest</code></td>
-            <td>最新版本（默认标签）</td>
-            <td><code>nginx:latest</code></td>
-          </tr>
-          <tr>
-            <td><code>版本号</code></td>
-            <td>具体版本</td>
-            <td><code>python:3.11</code></td>
-          </tr>
-          <tr>
-            <td><code>alpine</code></td>
-            <td>基于 Alpine Linux（体积小）</td>
-            <td><code>node:18-alpine</code></td>
-          </tr>
-          <tr>
-            <td><code>slim</code></td>
-            <td>精简版（去除非必需文件）</td>
-            <td><code>python:3.11-slim</code></td>
-          </tr>
-          <tr>
-            <td><code>buster/bullseye</code></td>
-            <td>基于 Debian 发行版</td>
-            <td><code>node:18-bullseye</code></td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section id="chapter-3">
-      <h2>三、镜像管理实战</h2>
-      
-      <h3>3.1 拉取镜像</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 2：下载不同版本的镜像</h4>
-        <pre><code># 下载最新版 Nginx
+      <!-- docker pull -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">docker pull - 拉取镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">拉取镜像</span>
+            </div>
+            <pre><code># 拉取最新版本
 docker pull nginx
-# 完整写法：docker pull docker.io/library/nginx:latest
 
-# 下载指定版本
-docker pull nginx:1.25-alpine
+# 拉取指定版本
+docker pull nginx:1.21
 
-# 下载 Python 3.11
-docker pull python:3.11
-
-# 下载轻量级 Node.js
-docker pull node:18-alpine
-
-# 查看下载进度
-docker pull mysql:8.0
-# 输出：
-# 8.0: Pulling from library/mysql
-# abc123def456: Pull complete  ← 分层下载
-# 789ghi012jkl: Pull complete
-# ...
-# Status: Downloaded newer image for mysql:8.0</code></pre>
+# 拉取指定仓库的镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/myimage:v1</code></pre>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 名词解释：镜像标签</div>
+            <p><strong>Tag</strong>是镜像的版本标识。如nginx:1.21表示nginx镜像的1.21版本。不指定tag时默认使用latest（最新版）。</p>
+          </div>
+        </div>
       </div>
 
-      <h3>3.2 查看本地镜像</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 3：管理本地镜像</h4>
-        <pre><code># 列出所有镜像
-docker images
+      <!-- docker rmi -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.4</span>
+          <h1 class="page-title">docker rmi - 删除镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">删除镜像</span>
+            </div>
+            <pre><code># 删除指定镜像
+docker rmi nginx:latest
 
-# 输出示例
-REPOSITORY   TAG          IMAGE ID       CREATED        SIZE
-nginx        latest       a1b2c3d4e5f6   2 days ago     187MB
-nginx        1.25-alpine  b2c3d4e5f6a7   3 days ago     42MB
-python       3.11         c3d4e5f6a7b8   1 week ago     1.02GB
-node         18-alpine    d4e5f6a7b8c9   2 weeks ago    177MB
-
-# 只显示镜像 ID
-docker images -q
-
-# 过滤显示
-docker images nginx          # 只显示 nginx 镜像
-docker images python:3.11    # 精确匹配</code></pre>
-      </div>
-
-      <h3>3.3 镜像详细信息</h3>
-      <pre><code># 查看镜像详细信息（JSON 格式）
-docker inspect nginx:latest
-
-# 查看镜像历史（构建层）
-docker history nginx:latest
-
-# 输出示例
-IMAGE          CREATED       CREATED BY                                      SIZE
-a1b2c3d4e5f6   2 days ago    CMD ["nginx" "-g" "daemon off;"]                0B
-&lt;missing&gt;      2 days ago    EXPOSE map[80/tcp:{}]                          0B
-&lt;missing&gt;      2 days ago    COPY file:abc123... /etc/nginx/nginx.conf      1.5kB
-...</code></pre>
-
-      <h3>3.4 删除镜像</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 4：清理无用镜像</h4>
-        <pre><code># 删除指定镜像
-docker rmi nginx:1.25-alpine
-
-# 删除多个镜像
-docker rmi nginx python:3.11
-
-# 通过 IMAGE ID 删除
-docker rmi a1b2c3d4e5f6
+# 通过IMAGE ID删除
+docker rmi 605c77e624dd
 
 # 强制删除（即使有容器在使用）
-docker rmi -f nginx
+docker rmi -f nginx:latest
 
 # 删除所有未使用的镜像
-docker image prune
-
-# 删除所有镜像（危险操作！）
-docker rmi $(docker images -q)</code></pre>
+docker image prune</code></pre>
+          </div>
+          <div class="warning-box">
+            <div class="warning-title">⚠️ 注意</div>
+            <p>删除镜像前，确保没有容器在使用该镜像，否则需要使用-f强制删除。</p>
+          </div>
+        </div>
       </div>
 
-      <div class="key-point">
-        <h4>⚠️ 注意事项</h4>
-        <ul>
-          <li>正在被容器使用的镜像无法删除（除非使用 <code>-f</code>）</li>
-          <li>删除镜像不会影响已运行的容器</li>
-          <li><code>docker image prune</code> 只删除 dangling 镜像（无标签的）</li>
-        </ul>
+      <!-- docker save/load -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.5</span>
+          <h1 class="page-title">docker save/load - 导出导入镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">导出镜像为tar文件</span>
+            </div>
+            <pre><code>docker save -o nginx.tar nginx:latest</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">从tar文件导入镜像</span>
+            </div>
+            <pre><code>docker load -i nginx.tar</code></pre>
+          </div>
+          <div class="tip-box">
+            <div class="tip-title">💡 使用场景</div>
+            <p>在内网环境中，无法访问Docker Hub时，可以通过tar文件离线传输镜像。</p>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="chapter-4">
-      <h2>四、镜像的分层结构</h2>
-      
-      <h3>4.1 Union FS（联合文件系统）</h3>
-      <p>Docker 镜像采用<strong>分层存储</strong>，每一层都是只读的：</p>
-      <pre><code>┌─────────────────────┐
-│   容器可写层        │ ← 容器运行时创建，可写
-├─────────────────────┤
-│   应用层           │ ← COPY app.py
-├─────────────────────┤
-│   依赖层           │ ← RUN pip install flask
-├─────────────────────┤
-│   Python 运行时    │ ← FROM python:3.11
-├─────────────────────┤
-│   基础镜像层       │ ← Ubuntu/Alpine
-└─────────────────────┘</code></pre>
-
-      <h3>4.2 分层的优势</h3>
-      <div class="example-box">
-        <h4>💡 示例：多个 Python 应用</h4>
-        <pre><code># 应用 A
-FROM python:3.11      ← 共享层（1GB）
-RUN pip install flask
-COPY app_a.py /app
-
-# 应用 B
-FROM python:3.11      ← 复用相同层，无需重复下载！
-RUN pip install django
-COPY app_b.py /app
-
-# 实际磁盘占用
-# 方案一（不分层）：1GB + 1GB = 2GB
-# 方案二（分层）：1GB（共享） + 50MB + 50MB = 1.1GB</code></pre>
-        <p><strong>好处：</strong></p>
-        <ul>
-          <li>✅ 节省磁盘空间</li>
-          <li>✅ 加速镜像下载（复用已有层）</li>
-          <li>✅ 加速镜像构建（缓存机制）</li>
-        </ul>
+      <!-- Part 2 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">容器生命周期管理</h1>
+          <p class="section-desc">掌握容器的创建、启动、停止、删除</p>
+        </div>
       </div>
-    </section>
 
-    <section id="chapter-5">
-      <h2>五、从镜像到容器</h2>
-      
-      <h3>5.1 基础运行方式</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 5：多种方式启动容器</h4>
-        <pre><code># 1. 最简单：前台运行
-docker run nginx
-# 问题：占用终端，Ctrl+C 会停止容器
+      <!-- 容器生命周期概览 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">容器生命周期概览</h1>
+        </div>
+        <div class="page-body">
+          <div class="flow-diagram">
+            <div class="flow-node">镜像</div>
+            <div class="flow-arrow">docker run →</div>
+            <div class="flow-node highlight">运行中</div>
+            <div class="flow-arrow">stop →</div>
+            <div class="flow-node">已停止</div>
+            <div class="flow-arrow">rm →</div>
+            <div class="flow-node">删除</div>
+          </div>
+          <table class="command-table">
+            <thead>
+              <tr>
+                <th>命令</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>docker run</code></td>
+                <td>创建并启动容器</td>
+              </tr>
+              <tr>
+                <td><code>docker start</code></td>
+                <td>启动已停止的容器</td>
+              </tr>
+              <tr>
+                <td><code>docker stop</code></td>
+                <td>停止运行中的容器</td>
+              </tr>
+              <tr>
+                <td><code>docker rm</code></td>
+                <td>删除容器</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-# 2. 后台运行
+      <!-- docker run -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">docker run - 创建并启动容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">基本语法</span>
+            </div>
+            <pre><code>docker run [OPTIONS] IMAGE [COMMAND]</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用示例</span>
+            </div>
+            <pre><code># 交互式启动
+docker run -it centos:7 /bin/bash
+
+# 后台启动
 docker run -d nginx
-# 输出：a1b2c3d4e5f6...（容器 ID）
 
-# 3. 命名容器
-docker run -d --name my-nginx nginx
-# 之后可以用名称操作：docker stop my-nginx
+# 指定容器名称
+docker run --name mynginx -d nginx
 
-# 4. 端口映射
-docker run -d -p 8080:80 nginx
-# 访问 http://localhost:8080
-
-# 5. 环境变量
-docker run -d -e MYSQL_ROOT_PASSWORD=secret mysql:8.0
-
-# 6. 组合参数
-docker run -d \
-  --name my-web \
-  -p 8080:80 \
-  -e ENV=production \
-  nginx</code></pre>
+# 端口映射
+docker run -d -p 8080:80 nginx</code></pre>
+          </div>
+        </div>
       </div>
 
-      <h3>5.2 容器与镜像的关系验证</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 6：一个镜像创建多个容器</h4>
-        <pre><code># 1. 拉取镜像
-docker pull nginx
+      <!-- 关键参数 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">docker run 关键参数</h1>
+        </div>
+        <div class="page-body">
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name">-i</span>
+              <span class="param-desc">保持STDIN打开，即使没有附加</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">-t</span>
+              <span class="param-desc">分配一个伪终端</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">-d</span>
+              <span class="param-desc">后台运行容器</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">--name</span>
+              <span class="param-desc">指定容器名称</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">-p</span>
+              <span class="param-desc">端口映射：主机端口:容器端口</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">-P</span>
+              <span class="param-desc">随机端口映射</span>
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">💡 -it 组合</div>
+            <p><strong>-it</strong>是-i和-t的组合，通常一起使用来进入容器的交互式终端。就像远程登录到容器内部一样。</p>
+          </div>
+        </div>
+      </div>
 
-# 2. 从同一镜像创建 3 个容器
-docker run -d -p 8081:80 --name web1 nginx
-docker run -d -p 8082:80 --name web2 nginx
-docker run -d -p 8083:80 --name web3 nginx
+      <!-- 端口映射详解 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">端口映射详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口映射示例</span>
+            </div>
+            <pre><code># 将主机8080端口映射到容器80端口
+docker run -d -p 8080:80 nginx
 
-# 3. 查看容器状态
+# 映射多个端口
+docker run -d -p 8080:80 -p 443:443 nginx
+
+# 指定IP地址
+docker run -d -p 127.0.0.1:8080:80 nginx
+
+# 随机端口映射
+docker run -d -P nginx</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">💡 端口映射原理</div>
+            <div class="highlight-content">
+              <p>容器内部运行的服务（如Nginx监听80端口）默认只能在容器内部访问。</p>
+              <p>通过端口映射，将主机的端口与容器端口绑定，外部才能访问容器内的服务。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- docker start/stop -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5</span>
+          <h1 class="page-title">docker start/stop - 启动与停止</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动容器</span>
+            </div>
+            <pre><code># 启动已停止的容器
+docker start mynginx
+
+# 启动并附加
+docker start -i mynginx</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">停止容器</span>
+            </div>
+            <pre><code># 优雅停止
+docker stop mynginx
+
+# 强制停止
+docker kill mynginx</code></pre>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 名词解释：优雅停止</div>
+            <p><strong>优雅停止</strong>会先发送SIGTERM信号，给容器时间清理资源，等待10秒后强制停止。<strong>强制停止</strong>直接发送SIGKILL信号立即终止。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- docker rm -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.6</span>
+          <h1 class="page-title">docker rm - 删除容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">删除容器</span>
+            </div>
+            <pre><code># 删除已停止的容器
+docker rm mynginx
+
+# 强制删除运行中的容器
+docker rm -f mynginx
+
+# 删除所有已停止的容器
+docker container prune
+
+# 删除所有容器
+docker rm -f $(docker ps -aq)</code></pre>
+          </div>
+          <div class="warning-box">
+            <div class="warning-title">⚠️ 注意</div>
+            <p>删除容器后，容器内的数据也会丢失。需要持久化的数据请使用数据卷。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">容器交互</h1>
+          <p class="section-desc">进入容器与查看容器状态</p>
+        </div>
+      </div>
+
+      <!-- docker ps -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">docker ps - 查看容器列表</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看容器</span>
+            </div>
+            <pre><code># 查看运行中的容器
 docker ps
 
-# 4. 验证：访问三个不同端口
-# http://localhost:8081
-# http://localhost:8082
-# http://localhost:8083
+# 查看所有容器（包括已停止）
+docker ps -a
 
-# 5. 删除所有容器
-docker rm -f web1 web2 web3
-
-# 6. 镜像依然存在
-docker images nginx</code></pre>
-        <p><strong>结论：</strong>镜像是模板，可以创建无数个容器实例！</p>
-      </div>
-    </section>
-
-    <section id="practice">
-      <h2>六、综合练习</h2>
-      
-      <div class="practice-box">
-        <h3>练习 1：镜像版本对比</h3>
-        <p><strong>任务：</strong>下载并对比不同 Node.js 版本的镜像大小</p>
-        <pre><code># 下载三个版本
-docker pull node:18
-docker pull node:18-alpine
-docker pull node:18-slim
-
-# 对比大小
-docker images node
-
-# 思考问题
-1. 为什么 alpine 版本最小？
-2. 在什么场景下选择 alpine？
-3. 什么时候不应该用 alpine？</code></pre>
-      </div>
-
-      <div class="practice-box">
-        <h3>练习 2：搭建 Redis 缓存服务</h3>
-        <pre><code># 1. 搜索 Redis 镜像
-docker search redis
-
-# 2. 拉取官方镜像
-docker pull redis:7-alpine
-
-# 3. 启动 Redis 容器
-docker run -d \
-  --name my-redis \
-  -p 6379:6379 \
-  redis:7-alpine
-
-# 4. 验证 Redis 是否运行
-docker ps | grep redis
-
-# 5. 连接 Redis（需要 redis-cli 或使用容器内命令）
-docker exec -it my-redis redis-cli
-# 在 Redis CLI 中执行
-SET greeting "Hello from Redis!"
-GET greeting
-EXIT
-
-# 6. 清理
-docker stop my-redis
-docker rm my-redis</code></pre>
+# 只显示容器ID
+docker ps -q</code></pre>
+          </div>
+          <table class="command-table">
+            <thead>
+              <tr>
+                <th>字段</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CONTAINER ID</td>
+                <td>容器ID</td>
+              </tr>
+              <tr>
+                <td>IMAGE</td>
+                <td>使用的镜像</td>
+              </tr>
+              <tr>
+                <td>COMMAND</td>
+                <td>启动命令</td>
+              </tr>
+              <tr>
+                <td>STATUS</td>
+                <td>状态（Up/Exited）</td>
+              </tr>
+              <tr>
+                <td>PORTS</td>
+                <td>端口映射</td>
+              </tr>
+              <tr>
+                <td>NAMES</td>
+                <td>容器名称</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="practice-box">
-        <h3>练习 3：镜像标签管理</h3>
-        <pre><code># 1. 拉取镜像
-docker pull nginx:1.25-alpine
+      <!-- docker exec -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">docker exec - 在容器中执行命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">进入容器终端</span>
+            </div>
+            <pre><code># 进入容器的bash终端
+docker exec -it mynginx /bin/bash
 
-# 2. 为镜像创建自定义标签
-docker tag nginx:1.25-alpine my-nginx:prod
-docker tag nginx:1.25-alpine my-nginx:v1.0
-
-# 3. 查看标签
-docker images my-nginx
-
-# 4. 删除标签（不删除镜像数据）
-docker rmi my-nginx:v1.0
-
-# 5. 验证：原始镜像仍在
-docker images nginx:1.25-alpine</code></pre>
+# 在容器中执行单条命令
+docker exec mynginx ls /etc/nginx</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">✅ 推荐使用</div>
+            <div class="highlight-content">
+              <strong>docker exec</strong>是最常用的进入容器的方式，不会影响容器的主进程，可以同时开启多个终端。
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="summary">
-      <h2>📝 课程小结</h2>
-      
-      <div class="summary-box">
-        <h3>核心知识点</h3>
-        <ul class="checklist">
-          <li>✅ 镜像 vs 容器：镜像是只读模板（类），容器是运行实例（对象）</li>
-          <li>✅ Docker Hub：官方镜像仓库，类似应用商店</li>
-          <li>✅ 镜像命名：<code>[仓库地址/]用户名/镜像名:标签</code></li>
-          <li>✅ 常用标签：<code>latest</code>、<code>alpine</code>、<code>slim</code>、版本号</li>
-          <li>✅ 分层存储：Union FS 实现层共享，节省空间</li>
-        </ul>
-
-        <h3>关键命令回顾</h3>
-        <pre><code># 镜像操作
-docker search &lt;镜像名&gt;        # 搜索镜像
-docker pull &lt;镜像名:标签&gt;     # 下载镜像
-docker images                 # 列出镜像
-docker rmi &lt;镜像名&gt;           # 删除镜像
-docker inspect &lt;镜像名&gt;       # 查看详情
-docker history &lt;镜像名&gt;       # 查看历史层
-
-# 从镜像到容器
-docker run -d --name &lt;名称&gt; -p &lt;主机端口&gt;:&lt;容器端口&gt; &lt;镜像名&gt;</code></pre>
-
-        <h3>🎯 下节预告</h3>
-        <p>第3讲将学习 <strong>容器生命周期管理</strong>：</p>
-        <ul>
-          <li>容器的启动、停止、重启</li>
-          <li>查看容器日志和状态</li>
-          <li>进入运行中的容器</li>
-          <li>容器资源限制</li>
-        </ul>
+      <!-- docker attach -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">docker attach - 附加到容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">附加到容器</span>
+            </div>
+            <pre><code>docker attach mynginx</code></pre>
+          </div>
+          <div class="warning-box">
+            <div class="warning-title">⚠️ 注意</div>
+            <p>attach直接连接到容器的主进程，退出时（Ctrl+C）会导致容器停止！</p>
+          </div>
+          <div class="example-box">
+            <div class="example-title">💡 exec vs attach 区别</div>
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>特性</th>
+                  <th>exec</th>
+                  <th>attach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>创建新进程</td>
+                  <td class="success">是</td>
+                  <td>否</td>
+                </tr>
+                <tr>
+                  <td>退出影响容器</td>
+                  <td class="success">不影响</td>
+                  <td>可能停止</td>
+                </tr>
+                <tr>
+                  <td>多终端</td>
+                  <td class="success">支持</td>
+                  <td>共享同一终端</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <div class="navigation-buttons">
-      <router-link to="/lecture-1" class="nav-btn prev">← 上一讲</router-link>
-      <router-link to="/lecture-3" class="nav-btn next">下一讲：容器生命周期 →</router-link>
+      <!-- docker logs -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.4</span>
+          <h1 class="page-title">docker logs - 查看容器日志</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看日志</span>
+            </div>
+            <pre><code># 查看所有日志
+docker logs mynginx
+
+# 实时跟踪日志
+docker logs -f mynginx
+
+# 查看最后100行
+docker logs --tail 100 mynginx
+
+# 查看指定时间后的日志
+docker logs --since 2024-01-01 mynginx</code></pre>
+          </div>
+          <div class="tip-box">
+            <div class="tip-title">💡 调试技巧</div>
+            <p>容器启动失败时，使用docker logs查看错误信息是最有效的排查方法。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- docker inspect/top -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.5</span>
+          <h1 class="page-title">docker inspect/top - 容器详情</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看容器详情</span>
+            </div>
+            <pre><code># 查看容器详细信息（JSON格式）
+docker inspect mynginx
+
+# 查看容器IP地址
+docker inspect --format='{{.NetworkSettings.IPAddress}}' mynginx</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看容器进程</span>
+            </div>
+            <pre><code># 查看容器内运行的进程
+docker top mynginx</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 4 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">实操环节</h1>
+          <p class="section-desc">动手实践镜像与容器操作</p>
+        </div>
+      </div>
+
+      <!-- 实操1 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">实操：镜像操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>拉取nginx和tomcat镜像</h4>
+              <div class="code-block">
+                <pre><code>docker pull nginx
+docker pull tomcat:9</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>查看镜像分层</h4>
+              <div class="code-block">
+                <pre><code>docker history nginx</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>导出/导入镜像</h4>
+              <div class="code-block">
+                <pre><code>docker save -o nginx.tar nginx
+docker rmi nginx
+docker load -i nginx.tar</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 实操2 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">实操：容器基础操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>交互式启动CentOS并安装vim</h4>
+              <div class="code-block">
+                <pre><code>docker run -it --name mycentos centos:7 /bin/bash
+# 进入容器后执行
+yum install -y vim
+exit</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>后台启动Nginx</h4>
+              <div class="code-block">
+                <pre><code>docker run -d --name mynginx -p 8080:80 nginx</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>浏览器验证</h4>
+              <p class="paragraph">访问 http://localhost:8080 查看Nginx欢迎页面</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 实操3 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">实操：容器管理操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看容器日志和进程</span>
+            </div>
+            <pre><code># 查看日志
+docker logs mynginx
+
+# 查看进程
+docker top mynginx
+
+# 查看详情
+docker inspect mynginx</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口映射练习</span>
+            </div>
+            <pre><code># 将容器80端口映射到主机8080
+docker run -d --name nginx2 -p 8080:80 nginx
+
+# 查看端口映射
+docker port nginx2</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 5 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      <!-- 练习任务 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5</span>
+          <h1 class="page-title">练习任务（10分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>拉取Redis镜像</h3>
+                <p>命令：<code>docker pull redis</code></p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>后台启动Redis容器</h3>
+                <p>命令：<code>docker run -d --name myredis -p 6379:6379 redis</code></p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>进入Redis执行命令</h3>
+                <p>命令：<code>docker exec -it myredis redis-cli</code></p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>设置key-value</h3>
+                <p>执行：<code>SET name docker</code> 和 <code>GET name</code></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程总结 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">镜像管理：images/pull/push/rmi/save/load</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">容器生命周期：run/start/stop/rm</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">容器交互：exec进入容器，logs查看日志</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">关键参数：-it交互/-d后台/-p端口映射</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下节预告 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第3课时：Docker核心命令（下）</h3>
+            <ul>
+              <li>容器数据丢失问题</li>
+              <li>数据卷三种挂载方式</li>
+              <li>MySQL容器数据持久化</li>
+              <li>数据卷共享</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 页面导航 -->
+    <div class="page-navigation">
+      <button class="nav-btn prev" @click="prevPage" :disabled="currentPage === 1">
+        ← 上一页
+      </button>
+      <div class="page-indicator">
+        <span class="current">{{ currentPage }}</span>
+        <span class="separator">/</span>
+        <span class="total">{{ totalPages }}</span>
+      </div>
+      <button class="nav-btn next" @click="nextPage" :disabled="currentPage === totalPages">
+        下一页 →
+      </button>
+    </div>
+
+    <!-- 页面缩略图导航 -->
+    <div class="page-thumbnails">
+      <div 
+        v-for="i in totalPages" 
+        :key="i" 
+        class="thumbnail" 
+        :class="{ active: currentPage === i }"
+        @click="goToPage(i)"
+      >
+        {{ i }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import LectureSidebar from '@/components/LectureSidebar.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const sections = ref([
-  { id: 'intro', title: '👋 课程目标' },
-  { id: 'chapter-1', title: '一、镜像与容器：类与实例的关系', level: 1 },
-  { id: 'chapter-2', title: '二、Docker Hub', level: 1 },
-  { id: 'chapter-3', title: '三、镜像管理实战', level: 1 },
-  { id: 'chapter-4', title: '四、镜像的分层结构', level: 1 },
-  { id: 'chapter-5', title: '五、从镜像到容器', level: 1 },
-  { id: 'practice', title: '六、综合练习', level: 1 },
-  { id: 'summary', title: '📝 课程小结', level: 1 }
-])
+const currentPage = ref(1)
+const totalPages = 28
+
+const nextPage = () => {
+  if (currentPage.value < totalPages) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    nextPage()
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    prevPage()
+  } else if (e.key === 'Home') {
+    currentPage.value = 1
+  } else if (e.key === 'End') {
+    currentPage.value = totalPages
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style lang="scss" scoped>
-.coming-soon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  padding: $spacing-xl;
-}
-
-.coming-soon-card {
-  @include card($spacing-xxl);
-  text-align: center;
-  max-width: 600px;
-  background: linear-gradient(135deg, $color-bg-subtle, rgba($color-primary, 0.05));
-
-  .coming-soon-icon {
-    font-size: 4rem;
-    margin-bottom: $spacing-lg;
-    @include float-animation;
-  }
-
-  h2 {
-    color: $color-heading;
-    margin-bottom: $spacing-md;
-    font-size: 1.75rem;
-  }
-
-  p {
-    color: $color-text-secondary;
-    margin-bottom: $spacing-xl;
-    font-size: 1.125rem;
-  }
-
-  .preview-topics {
-    text-align: left;
-    margin-bottom: $spacing-xl;
-
-    h3 {
-      color: $color-primary;
-      margin-bottom: $spacing-md;
-      font-size: 1.125rem;
-    }
-
-    .checklist {
-      margin-left: 0;
-      
-      li {
-        margin-bottom: $spacing-sm;
-        padding: $spacing-sm;
-        background: rgba($color-primary, 0.05);
-        border-left: 3px solid $color-primary;
-        border-radius: 0 $border-radius $border-radius 0;
-      }
-    }
-  }
-
-  .navigation {
-    display: flex;
-    gap: $spacing-md;
-    justify-content: center;
-
-    .nav-button {
-      @include button-secondary;
-      text-decoration: none;
-      padding: $spacing-md $spacing-lg;
-    }
-  }
-}
-
-.lecture-header {
-  text-align: center;
-  margin-bottom: $spacing-xxl;
-  
-  .pill-list {
-    justify-content: center;
-    margin-top: $spacing-lg;
-  }
-}
+@import './styles/lecture-common.scss';
 </style>

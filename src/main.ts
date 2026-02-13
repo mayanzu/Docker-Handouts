@@ -38,15 +38,15 @@ const routes = [
   { path: '/lecture-11', name: 'Lecture11', component: Lecture11, meta: { title: '第11讲：K8s第一课 — Pod与Deployment' } },
   { path: '/lecture-12', name: 'Lecture12', component: Lecture12, meta: { title: '第12讲：让应用可访问 — Service' } },
   { path: '/lecture-13', name: 'Lecture13', component: Lecture13, meta: { title: '第13讲：部署自己的应用到K8s' } },
-  { path: '/lecture-14', name: 'Lecture14', component: Lecture14, meta: { title: '第14讲：配置与环境管理' } },
-  { path: '/lecture-15', name: 'Lecture15', component: Lecture15, meta: { title: '第15讲：K8s调试与运维基础' } },
-  { path: '/lecture-16', name: 'Lecture16', component: Lecture16, meta: { title: '第16讲：综合实战与未来之路' } },
+  { path: '/lecture-14', name: 'Lecture14', component: Lecture14, meta: { title: '第14讲：K8s核心资源（上）- Pod与Deployment' } },
+  { path: '/lecture-15', name: 'Lecture15', component: Lecture15, meta: { title: '第15讲：K8s核心资源（下）- Service与Ingress' } },
+  { path: '/lecture-16', name: 'Lecture16', component: Lecture16, meta: { title: '第16讲：K8s实战与课程总结' } },
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     } else {
@@ -55,8 +55,7 @@ const router = createRouter({
   },
 })
 
-// 路由守卫，更新页面标题
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   document.title = to.meta?.title 
     ? `${to.meta.title} - Docker K8s 课程平台`
     : 'Docker K8s 课程平台'

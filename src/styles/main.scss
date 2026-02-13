@@ -4,6 +4,7 @@
 
 @import 'base';
 @import 'lecture';
+@import 'slide';
 
 // 动画增强
 .fade-in { @include fade-in; }

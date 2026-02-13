@@ -1,28 +1,30 @@
 <template>
-  <div id="app">
-    <!-- 阅读进度条 -->
-    <div id="progress-bar" :style="{ width: scrollProgress + '%' }"></div>
+  <div id="app" :class="{ 'slide-mode': isSlideMode }">
+    <div id="progress-bar" :style="{ width: scrollProgress + '%' }" v-if="!isSlideMode"></div>
     
-    <!-- Canvas 背景动画 -->
-    <canvas ref="bgCanvas" id="bgCanvas"></canvas>
+    <canvas ref="bgCanvas" id="bgCanvas" v-if="!isSlideMode"></canvas>
     
-    <!-- 主导航栏 -->
-    <NavigationBar />
+    <NavigationBar v-if="!isSlideMode" />
     
-    <!-- 页面内容区域 -->
-    <main class="main-content">
+    <main class="main-content" :class="{ 'slide-content': isSlideMode }">
       <router-view />
     </main>
 
-    <!-- 返回顶部按钮 -->
-    <BackToTop />
+    <BackToTop v-if="!isSlideMode" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import NavigationBar from './components/NavigationBar.vue'
 import BackToTop from './components/BackToTop.vue'
+
+const route = useRoute()
+
+const isSlideMode = computed(() => {
+  return route.path.startsWith('/lecture-')
+})
 
 // Canvas动画相关
 const bgCanvas = ref<HTMLCanvasElement | null>(null)
@@ -331,7 +333,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss">
-// 进度条样式
 #progress-bar {
   position: fixed;
   top: 0;
@@ -343,7 +344,6 @@ onUnmounted(() => {
   box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
 }
 
-// Canvas背景
 #bgCanvas {
   position: fixed;
   top: 0;
@@ -357,9 +357,17 @@ onUnmounted(() => {
 .main-content {
   min-height: calc(100vh - 70px);
   padding-top: 70px;
+  
+  &.slide-content {
+    min-height: 100vh;
+    padding-top: 0;
+  }
 }
 
-// 交互模式样式
+#app.slide-mode {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
 :global(body.mode-interaction) {
   cursor: crosshair !important;
   user-select: none;

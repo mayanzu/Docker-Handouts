@@ -1,549 +1,777 @@
-﻿<template>
-  <div class="lecture-content">
-    <header class="lecture-header">
-      <h1>第7讲：Docker Compose 多容器编排</h1>
-      <p class="intro">使用Docker Compose管理多容器应用，掌握YAML配置、服务依赖和实战部署。</p>
+<template>
+  <div class="lecture-page">
+    <div class="page-container" :style="{ transform: `translateX(-${(currentPage - 1) * 100}%)` }">
       
-      <div class="pill-list">
-        <span class="pill">Compose</span>
-        <span class="pill">YAML配置</span>
-        <span class="pill">服务编排</span>
-        <span class="pill">实战项目</span>
-      </div>
-    </header>
-
-    <LectureSidebar :sections="sections" />
-
-    <section id="intro">
-      <h2>👋 课程目标</h2>
-      <ul class="goal-list">
-        <li>理解Docker Compose的作用</li>
-        <li>掌握docker-compose.yml语法</li>
-        <li>学会编排多容器应用</li>
-        <li>完成实战项目部署</li>
-      </ul>
-    </section>
-
-    <section id="chapter-1">
-      <h2>一、Docker Compose 简介</h2>
-      
-      <h3>1.1 为什么需要 Compose？</h3>
-      <div class="concept-box">
-        <h4>💡 问题场景</h4>
-        <p>部署一个完整的应用需要多个容器：</p>
-        <pre><code># 启动数据库
-docker run -d --name db --network mynet -e POSTGRES_PASSWORD=secret postgres
-
-# 启动 Redis
-docker run -d --name redis --network mynet redis
-
-# 启动后端
-docker run -d --name api --network mynet -e DB_HOST=db myapi
-
-# 启动前端
-docker run -d --name web --network mynet -p 80:80 myweb
-
-# 问题：
-# ❌ 命令太多，容易出错
-# ❌ 启动顺序难控制
-# ❌ 环境变量分散
-# ❌ 难以版本管理</code></pre>
-
-        <h4>✅ Compose 的解决方案</h4>
-        <p>一个 <code>docker-compose.yml</code> 文件定义所有服务，一条命令启动全部！</p>
-        <pre><code># 启动所有服务
-docker compose up -d
-
-# 停止所有服务
-docker compose down</code></pre>
+      <!-- 封面页 -->
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第7课时</h1>
+          <h2 class="sub-title">Redis集群搭建</h2>
+          <p class="tagline">主从复制、哨兵模式与Cluster集群</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
       </div>
 
-      <h3>1.2 安装 Compose</h3>
-      <pre><code># Docker Desktop 自带 Compose（Windows/macOS）
-docker compose version
-# Docker Compose version v2.24.0
+      <!-- 课程目标 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">📚</div>
+              <div class="goal-content">
+                <h3>理解Redis主从复制</h3>
+                <p>数据同步机制</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🛡️</div>
+              <div class="goal-content">
+                <h3>掌握哨兵模式</h3>
+                <p>高可用自动切换</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔗</div>
+              <div class="goal-content">
+                <h3>部署Cluster集群</h3>
+                <p>分布式存储方案</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">⚡</div>
+              <div class="goal-content">
+                <h3>缓存应用实践</h3>
+                <p>缓存穿透与雪崩</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-# Linux 安装
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose</code></pre>
-    </section>
+      <!-- 课程安排 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">30分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">Redis架构模式对比</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">45分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc">主从、哨兵、Cluster部署</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">15分钟</div>
+              <div class="schedule-type">练习与总结</div>
+              <div class="schedule-desc">缓存应用实践</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <section id="chapter-2">
-      <h2>二、docker-compose.yml 语法</h2>
-      
-      <h3>2.1 基本结构</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 1：第一个 Compose 文件</h4>
-        <pre><code># 创建项目目录
-mkdir myapp && cd myapp
+      <!-- Part 1 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">Redis架构模式</h1>
+          <p class="section-desc">三种部署模式对比</p>
+        </div>
+      </div>
 
-# 创建 docker-compose.yml
-cat > docker-compose.yml << 'EOF'
-version: '3.8'
+      <!-- Redis简介 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">Redis简介</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Redis</div>
+            <div class="definition-content">
+              Redis是一个开源的内存数据结构存储系统，可用作数据库、缓存和消息中间件。支持多种数据结构：字符串、哈希、列表、集合、有序集合等。
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 名词解释：内存数据库</div>
+            <p>数据存储在内存中，读写速度极快（微秒级）。通过持久化机制（RDB/AOF）将内存数据保存到磁盘，防止数据丢失。</p>
+          </div>
+        </div>
+      </div>
 
-services:
-  web:
-    image: nginx:alpine
-    ports:
-      - "8080:80"
-    volumes:
-      - ./html:/usr/share/nginx/html
+      <!-- 三种架构模式 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">三种架构模式对比</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>模式</th>
+                <th>特点</th>
+                <th>适用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>主从复制</strong></td>
+                <td>一主多从，读写分离</td>
+                <td>读多写少，数据备份</td>
+              </tr>
+              <tr>
+                <td><strong>哨兵模式</strong></td>
+                <td>自动故障转移</td>
+                <td>高可用要求</td>
+              </tr>
+              <tr>
+                <td><strong>Cluster集群</strong></td>
+                <td>分布式存储，数据分片</td>
+                <td>大数据量，高并发</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Part 2 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">Redis主从复制</h1>
+          <p class="section-desc">一主多从架构搭建</p>
+        </div>
+      </div>
+
+      <!-- 主从复制原理 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">主从复制原理</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>建立连接</h4>
+              <p class="paragraph">从库连接主库，发送SYNC命令</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>RDB快照</h4>
+              <p class="paragraph">主库执行bgsave，生成RDB文件</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>传输数据</h4>
+              <p class="paragraph">主库将RDB文件发送给从库</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 4</div>
+            <div class="step-content">
+              <h4>增量同步</h4>
+              <p class="paragraph">主库将新写命令发送给从库</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 部署主从 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">Docker部署主从</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动主库</span>
+            </div>
+            <pre><code>docker run -d --name redis-master \
+  -p 6379:6379 \
+  redis:7-alpine</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动从库</span>
+            </div>
+            <pre><code>docker run -d --name redis-slave \
+  -p 6380:6379 \
+  redis:7-alpine \
+  redis-server --slaveof redis-master 6379</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 验证主从 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">验证主从复制</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看复制状态</span>
+            </div>
+            <pre><code># 连接主库
+docker exec -it redis-master redis-cli
+
+# 查看主库信息
+127.0.0.1:6379> INFO replication
+role:master
+connected_slaves:1
+
+# 连接从库
+docker exec -it redis-slave redis-cli
+
+# 查看从库信息
+127.0.0.1:6379> INFO replication
+role:slave
+master_host:redis-master</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">哨兵模式</h1>
+          <p class="section-desc">自动故障转移</p>
+        </div>
+      </div>
+
+      <!-- 哨兵模式介绍 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">什么是哨兵模式？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">哨兵（Sentinel）</div>
+            <div class="definition-content">
+              Redis Sentinel是Redis官方提供的高可用解决方案，用于监控主从节点、自动故障转移和配置提供者。
+            </div>
+          </div>
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">👁️</div>
+              <h3>监控</h3>
+              <p>检查主从节点是否正常</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">🔄</div>
+              <h3>故障转移</h3>
+              <p>主库故障时自动切换</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">📢</div>
+              <h3>通知</h3>
+              <p>通知客户端新的主库地址</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 哨兵配置 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">哨兵配置文件</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">sentinel.conf</span>
+            </div>
+            <pre><code># 监控主节点
+sentinel monitor mymaster 192.168.1.100 6379 2
+
+# 主节点多久无响应认为下线
+sentinel down-after-milliseconds mymaster 30000
+
+# 故障转移超时时间
+sentinel failover-timeout mymaster 180000
+
+# 同时可以有多少从节点对新主节点同步
+sentinel parallel-syncs mymaster 1</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name">mymaster</span>
+              <span class="param-desc">主节点名称</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">2</span>
+              <span class="param-desc">需要2个哨兵同意才能故障转移</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 部署哨兵 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">Docker部署哨兵</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动哨兵容器</span>
+            </div>
+            <pre><code># 创建配置目录
+mkdir -p /data/redis-sentinel
+
+# 创建配置文件
+cat > /data/redis-sentinel/sentinel.conf << EOF
+sentinel monitor mymaster redis-master 6379 2
+sentinel down-after-milliseconds mymaster 30000
+sentinel parallel-syncs mymaster 1
+sentinel failover-timeout mymaster 180000
 EOF
 
-# 创建HTML文件
-mkdir html
-echo "<h1>Hello Compose!</h1>" > html/index.html
-
-# 启动服务
-docker compose up -d
-
-# 查看服务
-docker compose ps
-
-# 访问 http://localhost:8080
-
-# 查看日志
-docker compose logs web
-
-# 停止并删除
-docker compose down</code></pre>
+# 启动哨兵
+docker run -d --name redis-sentinel \
+  --network redis-net \
+  -v /data/redis-sentinel:/data \
+  redis:7-alpine \
+  redis-sentinel /data/sentinel.conf</code></pre>
+          </div>
+        </div>
       </div>
 
-      <h3>2.2 核心配置项</h3>
-      <div class="concept-box">
-        <h4>📊 常用配置详解</h4>
-        <pre><code>version: '3.8'
-
-services:
-  app:
-    # === 镜像相关 ===
-    image: nginx:alpine              # 使用镜像
-    build:                           # 或构建镜像
-      context: .
-      dockerfile: Dockerfile
-    
-    # === 容器名称 ===
-    container_name: my-web           # 自定义容器名
-    
-    # === 端口映射 ===
-    ports:
-      - "8080:80"                    # 主机:容器
-      - "443:443"
-    
-    # === 环境变量 ===
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=db
-    
-    # === 数据卷 ===
-    volumes:
-      - ./data:/data                 # 绑定挂载
-      - mydata:/var/lib/mysql        # 命名卷
-    
-    # === 网络 ===
-    networks:
-      - frontend
-      - backend
-    
-    # === 依赖 ===
-    depends_on:
-      - db
-      - redis
-    
-    # === 重启策略 ===
-    restart: unless-stopped
-    
-    # === 健康检查 ===
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-# === 命名卷 ===
-volumes:
-  mydata:
-
-# === 网络 ===
-networks:
-  frontend:
-  backend:</code></pre>
-      </div>
-    </section>
-
-    <section id="chapter-3">
-      <h2>三、实战案例</h2>
-      
-      <h3>3.1 WordPress 博客系统</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 2：WordPress + MySQL</h4>
-        <pre><code># 创建项目
-mkdir wordpress && cd wordpress
-
-# docker-compose.yml
-cat > docker-compose.yml << 'EOF'
-version: '3.8'
-
-services:
-  db:
-    image: mysql:8.0
-    volumes:
-      - db_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wpuser
-      MYSQL_PASSWORD: wppass
-    networks:
-      - backend
-    restart: unless-stopped
-
-  wordpress:
-    image: wordpress:latest
-    ports:
-      - "8080:80"
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: wpuser
-      WORDPRESS_DB_PASSWORD: wppass
-      WORDPRESS_DB_NAME: wordpress
-    volumes:
-      - wp_data:/var/www/html
-    networks:
-      - backend
-    depends_on:
-      - db
-    restart: unless-stopped
-
-volumes:
-  db_data:
-  wp_data:
-
-networks:
-  backend:
-EOF
-
-# 启动
-docker compose up -d
-
-# 查看状态
-docker compose ps
-# NAME        SERVICE     STATUS    PORTS
-# wordpress   wordpress   running   0.0.0.0:8080->80/tcp
-# db          db          running   3306/tcp
-
-# 访问 http://localhost:8080 安装 WordPress
-
-# 查看日志
-docker compose logs -f wordpress
-
-# 停止（保留数据）
-docker compose stop
-
-# 重新启动
-docker compose start
-
-# 完全清理（删除容器和数据卷）
-docker compose down -v</code></pre>
+      <!-- Part 4 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">Cluster集群</h1>
+          <p class="section-desc">分布式存储方案</p>
+        </div>
       </div>
 
-      <h3>3.2 前后端分离项目</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 3：React + Node.js + MongoDB</h4>
-        <pre><code># 项目结构
-# myapp/
-#   ├── docker-compose.yml
-#   ├── frontend/
-#   │   └── Dockerfile
-#   ├── backend/
-#   │   └── Dockerfile
-
-cat > docker-compose.yml << 'EOF'
-version: '3.8'
-
-services:
-  # MongoDB数据库
-  mongo:
-    image: mongo:7
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - backend
-    restart: unless-stopped
-
-  # Node.js后端API
-  backend:
-    build: ./backend
-    environment:
-      PORT: 8000
-      MONGO_URL: mongodb://admin:secret@mongo:27017
-    ports:
-      - "8000:8000"
-    networks:
-      - backend
-    depends_on:
-      - mongo
-    restart: unless-stopped
-
-  # React前端
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    environment:
-      REACT_APP_API_URL: http://localhost:8000
-    networks:
-      - backend
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-volumes:
-  mongo_data:
-
-networks:
-  backend:
-EOF
-
-# 构建并启动
-docker compose up -d --build
-
-# 查看日志
-docker compose logs -f backend
-
-# 扩展服务（运行多个副本）
-docker compose up -d --scale backend=3</code></pre>
+      <!-- Cluster介绍 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">Redis Cluster简介</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Redis Cluster</div>
+            <div class="definition-content">
+              Redis官方提供的分布式解决方案，支持数据自动分片、自动故障转移，可线性扩展到1000个节点。
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 名词解释：数据分片</div>
+            <p>将数据分散存储在多个节点上。Redis Cluster使用哈希槽（Slot）实现，共16384个槽位，每个节点负责一部分槽位。</p>
+          </div>
+        </div>
       </div>
 
-      <h3>3.3 LNMP 技术栈</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 4：Nginx + PHP + MySQL</h4>
-        <pre><code>cat > docker-compose.yml << 'EOF'
-version: '3.8'
-
-services:
-  # Nginx Web服务器
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./www:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - lnmp
-    depends_on:
-      - php
-    restart: unless-stopped
-
-  # PHP-FPM
-  php:
-    image: php:8.2-fpm-alpine
-    volumes:
-      - ./www:/usr/share/nginx/html
-    networks:
-      - lnmp
-    restart: unless-stopped
-
-  # MySQL数据库
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: mydb
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - lnmp
-    restart: unless-stopped
-
-volumes:
-  mysql_data:
-
-networks:
-  lnmp:
-EOF
-
-# 创建测试PHP文件
-mkdir www
-cat > www/index.php << 'PHPEOF'
-&lt;?php
-phpinfo();
-?&gt;
-PHPEOF
-
-# 启动
-docker compose up -d
-
-# 访问 http://localhost</code></pre>
+      <!-- Cluster架构 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">Cluster架构特点</h1>
+        </div>
+        <div class="page-body">
+          <div class="feature-list">
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>最少6个节点：3主3从</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>数据分片：16384个哈希槽</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>去中心化：无代理节点</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>自动故障转移</span>
+            </div>
+          </div>
+          <div class="arch-diagram">
+            <div class="arch-layer cluster">Master1 (0-5460槽)</div>
+            <div class="arch-layer cluster">Master2 (5461-10922槽)</div>
+            <div class="arch-layer cluster">Master3 (10923-16383槽)</div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="chapter-4">
-      <h2>四、Compose 高级特性</h2>
-      
-      <h3>4.1 环境变量文件</h3>
-      <pre><code># .env 文件（与 docker-compose.yml 同目录）
-DB_PASSWORD=mysecret
-API_PORT=8000
-APP_ENV=production
-
-# docker-compose.yml
-version: '3.8'
-
-services:
-  api:
-    build: .
-    ports:
-      - "${API_PORT}:8000"
-    environment:
-      DB_PASSWORD: ${DB_PASSWORD}
-      APP_ENV: ${APP_ENV}
-
-# 启动时自动读取 .env 文件
-docker compose up -d</code></pre>
-
-      <h3>4.2 多环境配置</h3>
-      <pre><code># docker-compose.yml（基础配置）
-version: '3.8'
-services:
-  app:
-    image: myapp:latest
-    networks:
-      - mynet
-
-# docker-compose.override.yml（开发环境，自动合并）
-version: '3.8'
-services:
-  app:
-    build: .                    # 覆盖：使用本地构建
-    volumes:
-      - .:/app                  # 添加：挂载代码
-    command: npm run dev        # 覆盖：开发模式
-
-# docker-compose.prod.yml（生产环境）
-version: '3.8'
-services:
-  app:
-    restart: always
-    environment:
-      NODE_ENV: production
-
-# 使用生产配置
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d</code></pre>
-
-      <h3>4.3 健康检查与依赖</h3>
-      <pre><code>version: '3.8'
-
-services:
-  db:
-    image: postgres:16
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  app:
-    image: myapp:latest
-    depends_on:
-      db:
-        condition: service_healthy    # 等待 db 健康后再启动
-    restart: on-failure</code></pre>
-    </section>
-
-    <section id="practice">
-      <h2>五、综合练习</h2>
-      
-      <div class="practice-box">
-        <h3>练习 1：微服务架构</h3>
-        <pre><code># 部署以下服务：
-# - Frontend (React): 端口 3000
-# - Backend API (Node.js): 端口 8000
-# - Auth Service (Node.js): 端口 8001
-# - Redis: 端口 6379
-# - PostgreSQL: 端口 5432
-#
-# 要求：
-# 1. 使用 docker-compose.yml
-# 2. 只有 Frontend 暴露端口
-# 3. 配置健康检查
-# 4. 使用环境变量</code></pre>
+      <!-- 部署Cluster -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">Docker部署Cluster</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建网络</span>
+            </div>
+            <pre><code>docker network create redis-cluster</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动6个Redis节点</span>
+            </div>
+            <pre><code>for i in $(seq 1 6); do
+  docker run -d --name redis-$i \
+    --network redis-cluster \
+    -p 700$i:6379 \
+    redis:7-alpine \
+    redis-server --cluster-enabled yes
+done</code></pre>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="summary">
-      <h2>📝 课程小结</h2>
-      
-      <div class="summary-box">
-        <h3>核心知识点</h3>
-        <ul class="checklist">
-          <li>✅ docker-compose.yml：YAML 格式配置</li>
-          <li>✅ services：定义容器服务</li>
-          <li>✅ volumes：数据持久化</li>
-          <li>✅ networks：服务间通信</li>
-          <li>✅ depends_on：服务依赖</li>
-          <li>✅ environment：环境变量</li>
-          <li>✅ .env 文件：环境配置</li>
-        </ul>
+      <!-- 创建集群 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.4</span>
+          <h1 class="page-title">创建集群</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">初始化集群</span>
+            </div>
+            <pre><code># 进入任意节点
+docker exec -it redis-1 redis-cli --cluster create \
+  redis-1:6379 redis-2:6379 redis-3:6379 \
+  redis-4:6379 redis-5:6379 redis-6:6379 \
+  --cluster-replicas 1
 
-        <h3>常用命令</h3>
-        <pre><code># 启动服务
-docker compose up -d
-
-# 查看状态
-docker compose ps
-
-# 查看日志
-docker compose logs -f [服务名]
-
-# 停止服务
-docker compose stop
-
-# 停止并删除
-docker compose down
-
-# 删除包括数据卷
-docker compose down -v
-
-# 重新构建
-docker compose up -d --build
-
-# 扩展服务
-docker compose up -d --scale web=3</code></pre>
-
-        <h3>🎯 下节预告</h3>
-        <p>第8讲将学习 <strong>Docker 实战进阶</strong>：</p>
-        <ul>
-          <li>CI/CD 集成</li>
-          <li>容器监控</li>
-          <li>日志管理</li>
-          <li>性能优化</li>
-        </ul>
+# 输入yes确认
+# 集群创建成功</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">✅ 集群创建成功</div>
+            <div class="highlight-content">
+              <p>3主3从架构，每个主节点有一个从节点</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <div class="navigation-buttons">
-      <router-link to="/lecture-6" class="nav-btn prev">← 上一讲</router-link>
-      <router-link to="/lecture-8" class="nav-btn next">下一讲：实战进阶 →</router-link>
+      <!-- 验证集群 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.5</span>
+          <h1 class="page-title">验证集群状态</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看集群信息</span>
+            </div>
+            <pre><code># 连接集群
+docker exec -it redis-1 redis-cli -c
+
+# 查看集群状态
+127.0.0.1:6379> CLUSTER INFO
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_known_nodes:6
+
+# 查看节点信息
+127.0.0.1:6379> CLUSTER NODES</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 5 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">缓存应用实践</h1>
+          <p class="section-desc">常见问题与解决方案</p>
+        </div>
+      </div>
+
+      <!-- 缓存穿透 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">缓存穿透</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">缓存穿透</div>
+            <div class="definition-content">
+              查询不存在的数据，缓存和数据库都没有，每次请求都穿透到数据库。
+            </div>
+          </div>
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">💥</div>
+              <h3>问题</h3>
+              <p>恶意请求大量不存在的key</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">✅</div>
+              <h3>解决方案</h3>
+              <p>布隆过滤器、缓存空值</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 缓存雪崩 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">缓存雪崩</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">缓存雪崩</div>
+            <div class="definition-content">
+              大量缓存同时过期，所有请求都打到数据库，导致数据库压力过大甚至崩溃。
+            </div>
+          </div>
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">💥</div>
+              <h3>问题</h3>
+              <p>缓存集中过期</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">✅</div>
+              <h3>解决方案</h3>
+              <p>随机过期时间、多级缓存</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 缓存击穿 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3</span>
+          <h1 class="page-title">缓存击穿</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">缓存击穿</div>
+            <div class="definition-content">
+              热点key过期，大量请求同时访问这个key，全部打到数据库。
+            </div>
+          </div>
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">💥</div>
+              <h3>问题</h3>
+              <p>热点key过期瞬间</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">✅</div>
+              <h3>解决方案</h3>
+              <p>互斥锁、永不过期</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 6 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 6</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      <!-- 练习任务 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6</span>
+          <h1 class="page-title">练习任务（15分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>部署主从复制</h3>
+                <p>一主一从架构</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>验证数据同步</h3>
+                <p>主库写入，从库读取</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>部署Cluster集群</h3>
+                <p>3主3从架构</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>提交截图</h3>
+                <p>CLUSTER INFO输出结果</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程总结 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">主从复制：一主多从，读写分离</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">哨兵模式：自动监控与故障转移</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">Cluster集群：分布式存储，数据分片</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">缓存问题：穿透、雪崩、击穿</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下节预告 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第8课时：Docker网络原理</h3>
+            <ul>
+              <li>Docker网络类型</li>
+              <li>Bridge网络原理</li>
+              <li>Overlay网络</li>
+              <li>容器间通信</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 页面导航 -->
+    <div class="page-navigation">
+      <button class="nav-btn prev" @click="prevPage" :disabled="currentPage === 1">
+        ← 上一页
+      </button>
+      <div class="page-indicator">
+        <span class="current">{{ currentPage }}</span>
+        <span class="separator">/</span>
+        <span class="total">{{ totalPages }}</span>
+      </div>
+      <button class="nav-btn next" @click="nextPage" :disabled="currentPage === totalPages">
+        下一页 →
+      </button>
+    </div>
+
+    <!-- 页面缩略图导航 -->
+    <div class="page-thumbnails">
+      <div 
+        v-for="i in totalPages" 
+        :key="i" 
+        class="thumbnail" 
+        :class="{ active: currentPage === i }"
+        @click="goToPage(i)"
+      >
+        {{ i }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import LectureSidebar from '@/components/LectureSidebar.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const sections = ref([
-  { id: 'intro', title: '👋 课程目标' },
-  { id: 'chapter-1', title: '一、Docker Compose 简介', level: 1 },
-  { id: 'chapter-2', title: '二、docker-compose.yml 语法', level: 1 },
-  { id: 'chapter-3', title: '三、实战案例', level: 1 },
-  { id: 'chapter-4', title: '四、Compose 高级特性', level: 1 },
-  { id: 'practice', title: '五、综合练习', level: 1 },
-  { id: 'summary', title: '📝 课程小结', level: 1 }
-])
+const currentPage = ref(1)
+const totalPages = 22
+
+const nextPage = () => {
+  if (currentPage.value < totalPages) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    nextPage()
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    prevPage()
+  } else if (e.key === 'Home') {
+    currentPage.value = 1
+  } else if (e.key === 'End') {
+    currentPage.value = totalPages
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
+
+<style lang="scss" scoped>
+@import './styles/lecture-common.scss';
+</style>

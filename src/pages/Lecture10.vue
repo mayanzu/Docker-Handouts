@@ -1,15 +1,584 @@
-﻿<template>
-  <div class="lecture-content">
-    <header class="lecture-header">
-      <h1>第</h1>
-      <p class="intro">课程内容开发中...</p>
-    </header>
+<template>
+  <div class="lecture-page">
+    <div class="page-container" :style="{ transform: `translateX(-${(currentPage - 1) * 100}%)` }">
+      
+      <!-- 封面页 -->
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第10课时</h1>
+          <h2 class="sub-title">微服务编排</h2>
+          <p class="tagline">服务注册、配置中心与链路追踪</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程目标 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">📚</div>
+              <div class="goal-content">
+                <h3>理解微服务架构</h3>
+                <p>服务拆分与通信</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔍</div>
+              <div class="goal-content">
+                <h3>服务注册与发现</h3>
+                <p>Consul/Nacos</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">⚙️</div>
+              <div class="goal-content">
+                <h3>配置中心</h3>
+                <p>集中配置管理</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔗</div>
+              <div class="goal-content">
+                <h3>链路追踪</h3>
+                <p>Jaeger/Zipkin</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程安排 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">30分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">微服务架构、组件介绍</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">45分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc">Consul、配置中心部署</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">15分钟</div>
+              <div class="schedule-type">练习与总结</div>
+              <div class="schedule-desc">微服务部署实践</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 1 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">微服务架构概述</h1>
+          <p class="section-desc">理解微服务设计理念</p>
+        </div>
+      </div>
+
+      <!-- 什么是微服务 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是微服务？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">微服务架构</div>
+            <div class="definition-content">
+              将单一应用拆分为多个小型服务，每个服务独立部署、独立运行，服务间通过API通信。
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 微服务特点</div>
+            <p><strong>单一职责</strong>：每个服务只做一件事</p>
+            <p><strong>独立部署</strong>：服务可独立更新部署</p>
+            <p><strong>松耦合</strong>：服务间依赖最小化</p>
+            <p><strong>技术异构</strong>：不同服务可用不同技术栈</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 微服务 vs 单体 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">微服务 vs 单体架构</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>特性</th>
+                <th>单体架构</th>
+                <th>微服务架构</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>部署</td>
+                <td>整体部署</td>
+                <td class="success">独立部署</td>
+              </tr>
+              <tr>
+                <td>扩展</td>
+                <td>整体扩展</td>
+                <td class="success">按需扩展</td>
+              </tr>
+              <tr>
+                <td>技术栈</td>
+                <td>统一技术</td>
+                <td class="success">技术异构</td>
+              </tr>
+              <tr>
+                <td>复杂度</td>
+                <td class="success">简单</td>
+                <td>运维复杂</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 微服务组件 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">微服务核心组件</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #93c5fd;">
+              <div class="pain-icon">🔍</div>
+              <h3>服务注册发现</h3>
+              <p>Consul、Nacos</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fcd34d;">
+              <div class="pain-icon">⚙️</div>
+              <h3>配置中心</h3>
+              <p>集中配置管理</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">🚪</div>
+              <h3>API网关</h3>
+              <p>统一入口、路由</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">🔗</div>
+              <h3>链路追踪</h3>
+              <p>Jaeger、Zipkin</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">服务注册与发现</h1>
+          <p class="section-desc">Consul部署与实践</p>
+        </div>
+      </div>
+
+      <!-- 服务注册原理 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">服务注册发现原理</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>服务注册</h4>
+              <p class="paragraph">服务启动时向注册中心注册自己的地址</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>服务发现</h4>
+              <p class="paragraph">调用方从注册中心获取服务地址列表</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>健康检查</h4>
+              <p class="paragraph">注册中心定期检查服务健康状态</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consul部署 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">Docker部署Consul</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动Consul</span>
+            </div>
+            <pre><code>docker run -d --name consul \
+  -p 8500:8500 \
+  -p 8600:8600/udp \
+  consul:latest
+
+# 访问Web UI
+# http://localhost:8500</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name">8500端口</span>
+              <span class="param-desc">Web UI和HTTP API</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">8600端口</span>
+              <span class="param-desc">DNS服务</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 服务注册 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">注册服务到Consul</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">通过API注册服务</span>
+            </div>
+            <pre><code>curl -X PUT http://localhost:8500/v1/agent/service/register -d '{
+  "Name": "web",
+  "Address": "192.168.1.100",
+  "Port": 8080,
+  "Check": {
+    "HTTP": "http://192.168.1.100:8080/health",
+    "Interval": "10s"
+  }
+}'
+
+# 查询服务
+curl http://localhost:8500/v1/catalog/service/web</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">配置中心</h1>
+          <p class="section-desc">集中配置管理</p>
+        </div>
+      </div>
+
+      <!-- 配置中心介绍 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">为什么需要配置中心？</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #fca5a5;">
+              <div class="pain-icon">😫</div>
+              <h3>传统方式问题</h3>
+              <p>配置分散在各服务</p>
+              <p>修改需要重启服务</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">✅</div>
+              <h3>配置中心优势</h3>
+              <p>集中管理所有配置</p>
+              <p>动态更新无需重启</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consul KV配置 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">Consul KV存储</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">使用Consul KV</span>
+            </div>
+            <pre><code># 存储配置
+curl -X PUT http://localhost:8500/v1/kv/config/app/db_url \
+  -d "mysql://localhost:3306/mydb"
+
+# 读取配置
+curl http://localhost:8500/v1/kv/config/app/db_url
+
+# 通过Web UI管理
+# http://localhost:8500/ui/dc1/kv</code></pre>
+          </div>
+          <div class="tip-box">
+            <div class="tip-title">💡 配置热更新</div>
+            <p>应用监听KV变化，配置更新时自动加载新值，无需重启。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 4 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">链路追踪</h1>
+          <p class="section-desc">分布式调用链分析</p>
+        </div>
+      </div>
+
+      <!-- 链路追踪介绍 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">什么是链路追踪？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">链路追踪（Distributed Tracing）</div>
+            <div class="definition-content">
+              追踪请求在微服务间的调用链路，帮助定位性能瓶颈和故障点。
+            </div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 核心概念</div>
+            <p><strong>Trace</strong>：一次完整请求的调用链</p>
+            <p><strong>Span</strong>：单个服务的处理过程</p>
+            <p><strong>TraceID</strong>：唯一标识一次请求</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jaeger部署 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">Docker部署Jaeger</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动Jaeger</span>
+            </div>
+            <pre><code>docker run -d --name jaeger \
+  -p 5775:5775/udp \
+  -p 16686:16686 \
+  jaegertracing/all-in-one:latest
+
+# 访问Web UI
+# http://localhost:16686</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">💡 Jaeger功能</div>
+            <div class="highlight-content">
+              <p>查看调用链路、分析延迟、定位错误</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 5 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      <!-- 练习任务 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5</span>
+          <h1 class="page-title">练习任务（15分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>部署Consul</h3>
+                <p>使用Docker启动Consul</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>注册服务</h3>
+                <p>通过API注册一个服务</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>配置KV</h3>
+                <p>存储和读取配置</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>提交截图</h3>
+                <p>Consul Web UI界面</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程总结 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">微服务架构：服务拆分与独立部署</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">服务注册发现：Consul部署与服务注册</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">配置中心：Consul KV集中配置管理</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">链路追踪：Jaeger调用链分析</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下节预告 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第11课时：Docker可视化与监控</h3>
+            <ul>
+              <li>Portainer可视化管理</li>
+              <li>Prometheus监控</li>
+              <li>Grafana可视化</li>
+              <li>告警配置</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 页面导航 -->
+    <div class="page-navigation">
+      <button class="nav-btn prev" @click="prevPage" :disabled="currentPage === 1">
+        ← 上一页
+      </button>
+      <div class="page-indicator">
+        <span class="current">{{ currentPage }}</span>
+        <span class="separator">/</span>
+        <span class="total">{{ totalPages }}</span>
+      </div>
+      <button class="nav-btn next" @click="nextPage" :disabled="currentPage === totalPages">
+        下一页 →
+      </button>
+    </div>
+
+    <!-- 页面缩略图导航 -->
+    <div class="page-thumbnails">
+      <div 
+        v-for="i in totalPages" 
+        :key="i" 
+        class="thumbnail" 
+        :class="{ active: currentPage === i }"
+        @click="goToPage(i)"
+      >
+        {{ i }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// TODO: 添加课程内容
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const currentPage = ref(1)
+const totalPages = 20
+
+const nextPage = () => {
+  if (currentPage.value < totalPages) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    nextPage()
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    prevPage()
+  } else if (e.key === 'Home') {
+    currentPage.value = 1
+  } else if (e.key === 'End') {
+    currentPage.value = totalPages
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style lang="scss" scoped>
+@import './styles/lecture-common.scss';
 </style>

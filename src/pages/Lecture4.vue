@@ -1,845 +1,792 @@
 <template>
-  <div class="lecture-content">
-    <header class="lecture-header">
-      <h1>第4讲：数据持久化 — 数据卷</h1>
-      <p class="intro">理解容器数据为什么会丢失，掌握Volume和Bind Mount的使用，学会数据库容器化的正确姿势。</p>
+  <div class="lecture-page">
+    <div class="page-container" :style="{ transform: `translateX(-${(currentPage - 1) * 100}%)` }">
       
-      <div class="pill-list">
-        <span class="pill">数据卷</span>
-        <span class="pill">绑定挂载</span>
-        <span class="pill">数据持久化</span>
-        <span class="pill">备份恢复</span>
-      </div>
-    </header>
-
-    <LectureSidebar :sections="sections" />
-
-    <section id="intro">
-      <h2>👋 课程目标</h2>
-      <ul class="goal-list">
-        <li>理解容器数据存储的本质</li>
-        <li>掌握 Volume 和 Bind Mount 的使用</li>
-        <li>学会数据库容器化的最佳实践</li>
-        <li>掌握数据备份与恢复技巧</li>
-      </ul>
-    </section>
-
-    <section id="chapter-1">
-      <h2>一、为什么需要数据持久化？</h2>
-      
-      <h3>1.1 容器的临时性特征</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 1：容器数据会丢失</h4>
-        <pre><code># 启动一个容器并写入数据
-docker run -it --name temp-test ubuntu bash
-
-# 在容器内操作
-echo "重要数据" > /data.txt
-cat /data.txt
-exit
-
-# 重新启动容器（数据还在）
-docker start -ai temp-test
-cat /data.txt            # 输出：重要数据
-
-# 删除容器
-docker rm temp-test
-
-# 创建新容器（数据丢失！）
-docker run -it --name temp-test2 ubuntu bash
-ls /                     # 没有 data.txt
-cat /data.txt            # No such file or directory</code></pre>
-
-        <div class="key-point">
-          <h4>💡 核心问题</h4>
-          <p>容器是<strong>临时的、一次性的</strong>。删除容器后，所有容器内的修改都会丢失，包括：</p>
-          <ul>
-            <li>应用上传的文件</li>
-            <li>数据库的数据</li>
-            <li>日志文件</li>
-            <li>配置文件修改</li>
-          </ul>
+      <!-- 封面页 -->
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">🐳 Docker & Kubernetes 实战课程</div>
+          <h1 class="main-title">第4课时</h1>
+          <h2 class="sub-title">Docker镜像进阶</h2>
+          <p class="tagline">自定义镜像与Dockerfile</p>
+          <div class="meta-info">
+            <span>📚 90分钟</span>
+            <span>🎯 理论+实操</span>
+            <span>📊 进阶级</span>
+          </div>
         </div>
       </div>
 
-      <h3>1.2 联合文件系统回顾</h3>
-      <div class="concept-box">
-        <h4>📊 容器层与镜像层</h4>
-        <p>回顾第1讲的知识：Docker 使用<strong>分层存储</strong></p>
-        <ul>
-          <li><strong>镜像层</strong>（只读）：共享的基础文件系统</li>
-          <li><strong>容器层</strong>（可写）：容器的改动都在这一层</li>
-          <li>删除容器 = 删除容器层 = 数据丢失</li>
-        </ul>
-
-        <pre><code># 查看容器的层级结构
-docker inspect nginx | grep -A 10 "GraphDriver"
-
-# 输出示例：
-# "GraphDriver": {
-#     "Data": {
-#         "LowerDir": "/var/lib/docker/overlay2/abc123/diff",  ← 镜像层（只读）
-#         "UpperDir": "/var/lib/docker/overlay2/def456/diff",  ← 容器层（可写）
-#         "WorkDir": "/var/lib/docker/overlay2/def456/work"
-#     }
-# }</code></pre>
-      </div>
-    </section>
-
-    <section id="chapter-2">
-      <h2>二、Docker 数据持久化方案</h2>
-      
-      <h3>2.1 三种数据挂载方式</h3>
-      <div class="comparison-box">
-        <div class="compare-item">
-          <h4>🏗️ Volume（数据卷）</h4>
-          <ul>
-            <li>✅ Docker 官方推荐</li>
-            <li>✅ Docker 管理存储位置</li>
-            <li>✅ 支持驱动和插件</li>
-            <li>✅ 便于备份和迁移</li>
-          </ul>
-          <pre><code>docker run -v mydata:/data nginx</code></pre>
+      <!-- 课程目标 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
         </div>
-
-        <div class="compare-item">
-          <h4>📁 Bind Mount（绑定挂载）</h4>
-          <ul>
-            <li>✅ 使用主机的绝对路径</li>
-            <li>✅ 性能最好</li>
-            <li>✅ 开发环境常用</li>
-            <li>⚠️ 依赖主机目录结构</li>
-          </ul>
-          <pre><code>docker run -v /host/path:/container/path nginx</code></pre>
-        </div>
-
-        <div class="compare-item">
-          <h4>🧠 Tmpfs Mount（内存挂载）</h4>
-          <ul>
-            <li>💾 存储在内存中</li>
-            <li>⚡ 非常快</li>
-            <li>⚠️ 容器停止即清空</li>
-            <li>🎯 适合临时数据</li>
-          </ul>
-          <pre><code>docker run --tmpfs /temp nginx</code></pre>
+        <div class="page-body">
+          <div class="goal-list">
+            <div class="goal-item">
+              <div class="goal-icon">📚</div>
+              <div class="goal-content">
+                <h3>理解镜像分层原理</h3>
+                <p>UnionFS联合文件系统</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">🔧</div>
+              <div class="goal-content">
+                <h3>掌握docker commit</h3>
+                <p>手动制作镜像</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">📝</div>
+              <div class="goal-content">
+                <h3>掌握Dockerfile核心指令</h3>
+                <p>FROM/RUN/COPY/EXPOSE/CMD</p>
+              </div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-icon">⚙️</div>
+              <div class="goal-content">
+                <h3>理解CMD与ENTRYPOINT</h3>
+                <p>参数覆盖与传递</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <h3>2.2 Volume vs Bind Mount 对比</h3>
-      <table class="comparison-table">
-        <thead>
-          <tr>
-            <th>特性</th>
-            <th>Volume</th>
-            <th>Bind Mount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>路径</td>
-            <td>卷名（Docker 管理）</td>
-            <td>主机绝对路径</td>
-          </tr>
-          <tr>
-            <td>存储位置</td>
-            <td><code>/var/lib/docker/volumes/</code></td>
-            <td>主机任意位置</td>
-          </tr>
-          <tr>
-            <td>创建方式</td>
-            <td>自动创建</td>
-            <td>主机目录必须存在</td>
-          </tr>
-          <tr>
-            <td>管理命令</td>
-            <td><code>docker volume</code></td>
-            <td>主机文件系统命令</td>
-          </tr>
-          <tr>
-            <td>备份</td>
-            <td>容易</td>
-            <td>需要自己处理</td>
-          </tr>
-          <tr>
-            <td>跨平台</td>
-            <td>好</td>
-            <td>差（路径不同）</td>
-          </tr>
-          <tr>
-            <td>适用场景</td>
-            <td>生产环境</td>
-            <td>开发环境</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section id="chapter-3">
-      <h2>三、Volume 数据卷详解</h2>
-      
-      <h3>3.1 Volume 基础操作</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 2：Volume 完整生命周期</h4>
-        <pre><code># === 创建数据卷 ===
-docker volume create my-data
-# 输出：my-data
-
-# === 查看所有数据卷 ===
-docker volume ls
-# DRIVER    VOLUME NAME
-# local     my-data
-
-# === 查看数据卷详情 ===
-docker volume inspect my-data
-# 输出（JSON 格式）：
-# [
-#     {
-#         "CreatedAt": "2025-12-26T10:30:00Z",
-#         "Driver": "local",
-#         "Mountpoint": "/var/lib/docker/volumes/my-data/_data",
-#         "Name": "my-data",
-#         "Scope": "local"
-#     }
-# ]
-
-# === 使用数据卷 ===
-docker run -d \
-  --name web \
-  -v my-data:/usr/share/nginx/html \
-  nginx
-
-# === 验证数据持久化 ===
-# 写入数据
-docker exec web bash -c "echo 'Hello Volume' > /usr/share/nginx/html/test.txt"
-
-# 删除容器
-docker rm -f web
-
-# 创建新容器使用同一数据卷
-docker run -d --name web2 -v my-data:/usr/share/nginx/html nginx
-
-# 数据还在！
-docker exec web2 cat /usr/share/nginx/html/test.txt
-# 输出：Hello Volume
-
-# === 删除数据卷 ===
-docker rm -f web2
-docker volume rm my-data        # 删除单个
-# docker volume prune           # 删除所有未使用的卷</code></pre>
-      </div>
-
-      <h3>3.2 匿名卷 vs 命名卷</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 3：两种卷的区别</h4>
-        <pre><code># === 匿名卷（不推荐）===
-docker run -d --name anon -v /data nginx
-# Docker 自动生成卷名：如 a1b2c3d4e5f6...
-
-docker volume ls
-# DRIVER    VOLUME NAME
-# local     a1b2c3d4e5f6...           ← 难以识别
-
-# === 命名卷（推荐）===
-docker run -d --name named -v mydata:/data nginx
-
-docker volume ls
-# DRIVER    VOLUME NAME
-# local     mydata                    ← 语义清晰
-
-# 清理
-docker rm -f anon named
-docker volume prune -f            # 删除匿名卷</code></pre>
-
-        <div class="key-point">
-          <h4>🎯 最佳实践</h4>
-          <ul>
-            <li>✅ 生产环境：使用<strong>命名卷</strong>（便于管理）</li>
-            <li>⚠️ 匿名卷：仅用于临时测试</li>
-            <li>✅ 卷命名建议：<code>项目名-用途</code>（如 <code>blog-db-data</code>）</li>
-          </ul>
+      <!-- 课程安排 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">02</span>
+          <h1 class="page-title">课程安排</h1>
+        </div>
+        <div class="page-body">
+          <div class="schedule-grid">
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">理论讲解</div>
+              <div class="schedule-desc">镜像分层、Dockerfile指令</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">40分钟</div>
+              <div class="schedule-type">实操演示</div>
+              <div class="schedule-desc">commit、Dockerfile构建镜像</div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-time">10分钟</div>
+              <div class="schedule-type">随堂练习</div>
+              <div class="schedule-desc">构建带ifconfig的Ubuntu镜像</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <h3>3.3 Volume 的高级用法</h3>
-      <pre><code># 只读挂载
-docker run -d -v my-config:/etc/nginx:ro nginx
-# :ro = read-only，容器内只能读取，不能修改
-
-# 多个容器共享一个卷
-docker run -d --name app1 -v shared-data:/data nginx
-docker run -d --name app2 -v shared-data:/data nginx
-# 两个容器可以互相访问对方写入的数据
-
-# 卷的驱动（高级）
-docker volume create --driver local --opt type=nfs my-nfs-volume
-# 支持 NFS、CIFS 等网络存储</code></pre>
-    </section>
-
-    <section id="chapter-4">
-      <h2>四、Bind Mount 绑定挂载</h2>
-      
-      <h3>4.1 基本用法</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 4：Bind Mount 实战</h4>
-        <pre><code># 创建测试目录
-mkdir -p /tmp/docker-test
-echo "Host File" > /tmp/docker-test/host.txt
-
-# === 绑定挂载（Windows 路径）===
-docker run -it --name bind-test \
-  -v C:\tmp\docker-test:/data \
-  ubuntu bash
-
-# 在容器内查看
-ls /data                    # 看到 host.txt
-cat /data/host.txt          # 输出：Host File
-
-# 容器内创建文件
-echo "Container File" > /data/container.txt
-exit
-
-# 主机上查看（数据同步了！）
-ls C:\tmp\docker-test
-# host.txt  container.txt
-cat C:\tmp\docker-test\container.txt
-# 输出：Container File</code></pre>
-
-        <div class="key-point">
-          <h4>⚠️ 关键特性</h4>
-          <ul>
-            <li>主机和容器<strong>实时同步</strong></li>
-            <li>修改主机文件 → 容器内立即生效</li>
-            <li>修改容器文件 → 主机上立即生效</li>
-            <li>适合<strong>开发环境</strong>（修改代码即时生效）</li>
-          </ul>
+      <!-- Part 1 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">镜像分层原理</h1>
+          <p class="section-desc">理解Docker镜像的存储机制</p>
         </div>
       </div>
 
-      <h3>4.2 开发环境典型用例</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 5：前端开发环境</h4>
-        <pre><code># 假设你有一个前端项目
-# 目录结构：
-# C:\projects\my-website\
-#   ├── index.html
-#   ├── style.css
-#   └── script.js
-
-# 挂载整个项目目录
-docker run -d \
-  --name dev-server \
-  -p 8080:80 \
-  -v C:\projects\my-website:/usr/share/nginx/html \
-  nginx
-
-# 访问 http://localhost:8080
-
-# 修改 index.html（在主机上用 VS Code 编辑）
-# 刷新浏览器 → 立即看到效果！
-
-# 这就是 Bind Mount 的威力：
-# ✅ 无需重新构建镜像
-# ✅ 无需重启容器
-# ✅ 改代码 → F5 刷新 → 看效果</code></pre>
+      <!-- UnionFS -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">UnionFS联合文件系统</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">UnionFS</div>
+            <div class="definition-content">
+              联合文件系统（Union File System）是一种分层、轻量级的高性能文件系统。它将多个目录挂载到同一个目录下，对外呈现一个统一的文件系统。
+            </div>
+          </div>
+          <div class="arch-diagram">
+            <div class="arch-layer app">应用层（可读写）</div>
+            <div class="arch-layer docker">依赖库层（只读）</div>
+            <div class="arch-layer os">基础系统层（只读）</div>
+            <div class="arch-layer host">引导层（只读）</div>
+          </div>
+          <div class="term-box">
+            <div class="term-title">📚 名词解释：分层存储</div>
+            <p>镜像由多个只读层组成，每层代表Dockerfile中的一条指令。容器在镜像之上添加一个可写层，所有修改都在这一层进行。</p>
+          </div>
+        </div>
       </div>
 
-      <h3>4.3 Bind Mount 的注意事项</h3>
-      <div class="example-box">
-        <h4>⚠️ 常见陷阱</h4>
-        <pre><code># 陷阱1：目录覆盖
-docker run -d -v C:\empty:/etc/nginx nginx
-# 主机的空目录会覆盖容器内的 /etc/nginx
-# 导致 Nginx 配置丢失，启动失败！
-
-# 解决方案：只挂载单个文件
-docker run -d \
-  -v C:\myconfig\nginx.conf:/etc/nginx/nginx.conf:ro \
-  nginx
-
-# 陷阱2：权限问题（Linux）
-docker run -v /data:/data ubuntu touch /data/test.txt
-# 文件属主可能是 root，主机普通用户无法删除
-
-# 解决方案：指定用户
-docker run --user $(id -u):$(id -g) ...
-
-# 陷阱3：性能问题（Windows/macOS）
-# Docker Desktop 的文件同步有性能损耗
-# 解决方案：数据库等 I/O 密集的用 Volume，不用 Bind Mount</code></pre>
-      </div>
-    </section>
-
-    <section id="chapter-5">
-      <h2>五、数据库容器化实战</h2>
-      
-      <h3>5.1 MySQL 数据持久化</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 6：MySQL 数据持久化</h4>
-        <pre><code># === 错误做法（数据会丢失）===
-docker run -d --name mysql-wrong \
-  -e MYSQL_ROOT_PASSWORD=123456 \
-  mysql:8.0
-# 删除容器后，数据库数据全部丢失！
-
-# === 正确做法（使用 Volume）===
-docker run -d \
-  --name mysql-persistent \
-  -e MYSQL_ROOT_PASSWORD=123456 \
-  -v mysql-data:/var/lib/mysql \
-  -p 3306:3306 \
-  mysql:8.0
-
-# 连接数据库并创建数据
-docker exec -it mysql-persistent mysql -uroot -p123456
-# 在 MySQL 命令行执行：
-CREATE DATABASE testdb;
-USE testdb;
-CREATE TABLE users (id INT, name VARCHAR(50));
-INSERT INTO users VALUES (1, 'Alice'), (2, 'Bob');
-SELECT * FROM users;
-EXIT;
-
-# === 验证数据持久化 ===
-# 删除容器
-docker rm -f mysql-persistent
-
-# 创建新容器，使用同一数据卷
-docker run -d \
-  --name mysql-new \
-  -e MYSQL_ROOT_PASSWORD=123456 \
-  -v mysql-data:/var/lib/mysql \
-  -p 3306:3306 \
-  mysql:8.0
-
-# 连接数据库查看
-docker exec -it mysql-new mysql -uroot -p123456 -e "SELECT * FROM testdb.users;"
-# +------+-------+
-# | id   | name  |
-# +------+-------+
-# |    1 | Alice |
-# |    2 | Bob   |
-# +------+-------+
-# 数据还在！</code></pre>
+      <!-- Copy-on-Write -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">Copy-on-Write机制</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box info">
+            <div class="highlight-title">💡 写时复制原理</div>
+            <div class="highlight-content">
+              <p><strong>读取</strong>：直接从镜像层读取文件</p>
+              <p><strong>修改</strong>：先将文件复制到容器层，再修改</p>
+              <p><strong>删除</strong>：在容器层标记文件已删除</p>
+            </div>
+          </div>
+          <div class="example-box">
+            <div class="example-title">示例：修改/etc/hosts</div>
+            <p class="paragraph">容器启动时，/etc/hosts来自镜像层。当容器修改hosts文件时，Docker会将文件复制到容器的可写层，修改的是副本而非原文件。</p>
+          </div>
+        </div>
       </div>
 
-      <h3>5.2 PostgreSQL 数据持久化</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 7：PostgreSQL 完整示例</h4>
-        <pre><code># 创建数据卷
-docker volume create pgdata
-
-# 运行 PostgreSQL
-docker run -d \
-  --name postgres \
-  -e POSTGRES_PASSWORD=mysecretpassword \
-  -v pgdata:/var/lib/postgresql/data \
-  -p 5432:5432 \
-  postgres:16
-
-# 创建测试数据
-docker exec -it postgres psql -U postgres
-# 在 psql 命令行执行：
-CREATE DATABASE myapp;
-\c myapp
-CREATE TABLE products (id SERIAL, name TEXT);
-INSERT INTO products (name) VALUES ('Laptop'), ('Phone');
-SELECT * FROM products;
-\q
-
-# 查看数据卷使用情况
-docker volume inspect pgdata
-
-# 停止容器
-docker stop postgres
-
-# 一周后重启（数据不丢失）
-docker start postgres
-
-# 验证数据
-docker exec -it postgres psql -U postgres -d myapp -c "SELECT * FROM products;"
-#  id |  name  
-# ----+--------
-#   1 | Laptop
-#   2 | Phone</code></pre>
+      <!-- 镜像分层优势 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">镜像分层的优势</h1>
+        </div>
+        <div class="page-body">
+          <div class="pain-points-grid">
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">💾</div>
+              <h3>节省存储空间</h3>
+              <p>相同的基础层只存储一份</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">🚀</div>
+              <h3>加速构建</h3>
+              <p>利用缓存，只重建变化的层</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">📦</div>
+              <h3>快速分发</h3>
+              <p>只传输差异层</p>
+            </div>
+            <div class="pain-point-card" style="border-color: #bbf7d0;">
+              <div class="pain-icon">🔒</div>
+              <h3>安全性</h3>
+              <p>基础层只读，不可篡改</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <h3>5.3 MongoDB 数据持久化</h3>
-      <pre><code># MongoDB 示例
-docker run -d \
-  --name mongodb \
-  -e MONGO_INITDB_ROOT_USERNAME=admin \
-  -e MONGO_INITDB_ROOT_PASSWORD=password \
-  -v mongo-data:/data/db \
-  -p 27017:27017 \
-  mongo:7
+      <!-- Part 2 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">docker commit制作镜像</h1>
+          <p class="section-desc">手动方式创建自定义镜像</p>
+        </div>
+      </div>
 
-# 连接并创建数据
-docker exec -it mongodb mongosh -u admin -p password
-# 在 mongosh 中执行：
-use mydb;
-db.users.insertMany([
-  { name: "Alice", age: 25 },
-  { name: "Bob", age: 30 }
-]);
-db.users.find();
+      <!-- docker commit -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">docker commit命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">基本语法</span>
+            </div>
+            <pre><code>docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+
+# 常用选项
+-a, --author    # 作者信息
+-m, --message   # 提交说明</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">示例</span>
+            </div>
+            <pre><code># 基于容器创建镜像
+docker commit -a "zhangsan" -m "add vim" mycentos mycentos:vim</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- commit实操 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">实操：制作带vim的CentOS镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="install-step">
+            <div class="step-number">Step 1</div>
+            <div class="step-content">
+              <h4>启动容器并安装vim</h4>
+              <div class="code-block">
+                <pre><code>docker run -it --name mycentos centos:7 /bin/bash
+yum install -y vim
 exit</code></pre>
-    </section>
-
-    <section id="chapter-6">
-      <h2>六、数据备份与恢复</h2>
-      
-      <h3>6.1 Volume 备份</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 8：数据卷备份与恢复</h4>
-        <pre><code># === 方法一：使用临时容器备份 ===
-# 假设有个数据卷叫 mysql-data
-docker run --rm \
-  -v mysql-data:/source \
-  -v C:\backups:/backup \
-  ubuntu \
-  tar czf /backup/mysql-backup-$(date +%Y%m%d).tar.gz -C /source .
-
-# 解释：
-# --rm: 容器退出后自动删除
-# -v mysql-data:/source: 挂载要备份的卷
-# -v C:\backups:/backup: 挂载备份存储位置
-# tar czf: 创建压缩包
-
-# === 方法二：直接复制数据卷目录（Linux）===
-sudo cp -a /var/lib/docker/volumes/mysql-data \
-  /backup/mysql-data-backup
-
-# === 恢复备份 ===
-# 创建新数据卷
-docker volume create mysql-data-restored
-
-# 解压备份到新卷
-docker run --rm \
-  -v mysql-data-restored:/target \
-  -v C:\backups:/backup \
-  ubuntu \
-  tar xzf /backup/mysql-backup-20251226.tar.gz -C /target
-
-# 使用恢复的数据卷
-docker run -d \
-  --name mysql-restored \
-  -e MYSQL_ROOT_PASSWORD=123456 \
-  -v mysql-data-restored:/var/lib/mysql \
-  mysql:8.0</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 2</div>
+            <div class="step-content">
+              <h4>提交为新镜像</h4>
+              <div class="code-block">
+                <pre><code>docker commit -m "add vim" -a "student" mycentos centos-vim:v1</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-number">Step 3</div>
+            <div class="step-content">
+              <h4>验证新镜像</h4>
+              <div class="code-block">
+                <pre><code>docker run -it centos-vim:v1 vim --version</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <h3>6.2 数据库备份最佳实践</h3>
-      <div class="experiment-box">
-        <h4>🧪 实验 9：MySQL 逻辑备份</h4>
-        <pre><code># === 使用 mysqldump 备份（推荐）===
-docker exec mysql-persistent \
-  mysqldump -uroot -p123456 --all-databases \
-  > C:\backups\mysql-all-$(date +%Y%m%d).sql
-
-# 单个数据库备份
-docker exec mysql-persistent \
-  mysqldump -uroot -p123456 testdb \
-  > C:\backups\testdb-$(date +%Y%m%d).sql
-
-# === 恢复备份 ===
-docker exec -i mysql-persistent \
-  mysql -uroot -p123456 \
-  < C:\backups\testdb-20251226.sql
-
-# === 定时备份脚本（Windows PowerShell）===
-$date = Get-Date -Format "yyyyMMdd-HHmmss"
-docker exec mysql-persistent `
-  mysqldump -uroot -p123456 --all-databases `
-  > "C:\backups\mysql-$date.sql"
-# 配合 Windows 任务计划程序实现自动备份</code></pre>
+      <!-- Part 3 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">Dockerfile核心指令</h1>
+          <p class="section-desc">自动化构建镜像</p>
+        </div>
       </div>
 
-      <h3>6.3 Volume 迁移</h3>
-      <pre><code># === 场景：迁移到另一台服务器 ===
-# 服务器 A（源）
-docker run --rm \
-  -v mysql-data:/source \
-  ubuntu \
-  tar czf - -C /source . \
-  > mysql-data.tar.gz
-
-# 传输文件到服务器 B
-scp mysql-data.tar.gz user@server-b:/tmp/
-
-# 服务器 B（目标）
-docker volume create mysql-data
-docker run --rm \
-  -v mysql-data:/target \
-  -v /tmp:/backup \
-  ubuntu \
-  tar xzf /backup/mysql-data.tar.gz -C /target</code></pre>
-    </section>
-
-    <section id="practice">
-      <h2>七、综合练习</h2>
-      
-      <div class="practice-box">
-        <h3>练习 1：搭建 WordPress + MySQL</h3>
-        <pre><code># 1. 创建网络
-docker network create wordpress-net
-
-# 2. 启动 MySQL（带持久化）
-docker run -d \
-  --name wordpress-db \
-  --network wordpress-net \
-  -e MYSQL_ROOT_PASSWORD=rootpass \
-  -e MYSQL_DATABASE=wordpress \
-  -e MYSQL_USER=wpuser \
-  -e MYSQL_PASSWORD=wppass \
-  -v wordpress-db-data:/var/lib/mysql \
-  mysql:8.0
-
-# 3. 启动 WordPress（带持久化）
-docker run -d \
-  --name wordpress \
-  --network wordpress-net \
-  -p 8080:80 \
-  -e WORDPRESS_DB_HOST=wordpress-db \
-  -e WORDPRESS_DB_USER=wpuser \
-  -e WORDPRESS_DB_PASSWORD=wppass \
-  -e WORDPRESS_DB_NAME=wordpress \
-  -v wordpress-data:/var/www/html \
-  wordpress:latest
-
-# 4. 访问 http://localhost:8080 完成安装
-
-# 5. 验证持久化
-docker restart wordpress-db wordpress
-# 重启后访问网站，数据不丢失</code></pre>
+      <!-- Dockerfile概览 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">Dockerfile是什么？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Dockerfile</div>
+            <div class="definition-content">
+              Dockerfile是一个文本文件，包含了一系列指令，用于自动化构建Docker镜像。每条指令都会创建一个新的镜像层。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">基本结构示例</span>
+            </div>
+            <pre><code>FROM centos:7
+RUN yum install -y vim
+COPY app.py /app/
+WORKDIR /app
+EXPOSE 8080
+CMD ["python", "app.py"]</code></pre>
+          </div>
+        </div>
       </div>
 
-      <div class="practice-box">
-        <h3>练习 2：配置文件管理</h3>
-        <pre><code># 场景：自定义 Nginx 配置
-# 1. 提取默认配置
-docker run --name temp-nginx -d nginx
-docker cp temp-nginx:/etc/nginx/nginx.conf C:\nginx-config\
-docker rm -f temp-nginx
+      <!-- FROM指令 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">FROM - 指定基础镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">FROM指令</span>
+            </div>
+            <pre><code># 指定基础镜像
+FROM centos:7
 
-# 2. 修改配置文件（自定义）
-# 编辑 C:\nginx-config\nginx.conf
+# 使用最新版
+FROM ubuntu
 
-# 3. 使用自定义配置启动
-docker run -d \
-  --name my-nginx \
-  -v C:\nginx-config\nginx.conf:/etc/nginx/nginx.conf:ro \
-  -v nginx-html:/usr/share/nginx/html \
-  -p 8080:80 \
-  nginx
-
-# 4. 测试配置修改
-# 修改主机上的 nginx.conf
-# 重新加载配置（不停止容器）
-docker exec my-nginx nginx -s reload</code></pre>
+# 使用多阶段构建
+FROM node:18 AS builder
+FROM nginx:alpine</code></pre>
+          </div>
+          <div class="tip-box">
+            <div class="tip-title">💡 最佳实践</div>
+            <p>始终使用明确的版本标签，避免使用latest，确保构建的可重复性。</p>
+          </div>
+        </div>
       </div>
 
-      <div class="practice-box">
-        <h3>练习 3：数据卷清理</h3>
-        <pre><code># 查看所有数据卷
-docker volume ls
+      <!-- RUN指令 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">RUN - 执行命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">RUN指令两种形式</span>
+            </div>
+            <pre><code># shell形式
+RUN yum install -y vim
 
-# 查看未使用的数据卷
-docker volume ls -f dangling=true
+# exec形式（推荐）
+RUN ["yum", "install", "-y", "vim"]
 
-# 清理未使用的数据卷
-docker volume prune
-
-# 查看数据卷占用的磁盘空间
-docker system df -v
-
-# 思考题：
-# 1. 如何找出哪些容器在使用某个数据卷？
-# 2. 删除数据卷前如何确保数据已备份？</code></pre>
+# 合并多条命令减少层数
+RUN yum update && yum install -y \
+    vim \
+    net-tools \
+    && yum clean all</code></pre>
+          </div>
+          <div class="warning-box">
+            <div class="warning-title">⚠️ 注意</div>
+            <p>每个RUN指令都会创建一个新层，应尽量合并相关命令以减少镜像层数。</p>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <section id="summary">
-      <h2>📝 课程小结</h2>
-      
-      <div class="summary-box">
-        <h3>核心知识点</h3>
-        <ul class="checklist">
-          <li>✅ 容器数据是<strong>临时的</strong>，删除容器会丢失数据</li>
-          <li>✅ <strong>Volume</strong>（数据卷）：Docker 管理，生产环境推荐</li>
-          <li>✅ <strong>Bind Mount</strong>（绑定挂载）：使用主机路径，开发环境常用</li>
-          <li>✅ 数据库容器化：必须挂载数据目录（MySQL: <code>/var/lib/mysql</code>，PostgreSQL: <code>/var/lib/postgresql/data</code>）</li>
-          <li>✅ 数据备份：Volume 备份 + 数据库逻辑备份（mysqldump）</li>
-          <li>✅ 只读挂载：<code>:ro</code> 防止容器修改主机文件</li>
-        </ul>
+      <!-- COPY/ADD指令 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.4</span>
+          <h1 class="page-title">COPY与ADD - 复制文件</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">复制文件</span>
+            </div>
+            <pre><code># COPY：复制文件或目录
+COPY app.py /app/
+COPY src/ /app/src/
 
-        <h3>关键命令回顾</h3>
-        <pre><code># 数据卷管理
-docker volume create/ls/inspect/rm/prune
-
-# 使用数据卷
-docker run -v volume-name:/container/path
-
-# 使用绑定挂载
-docker run -v /host/path:/container/path
-
-# 只读挂载
-docker run -v /path:/path:ro
-
-# 数据卷备份
-docker run --rm -v my-vol:/source -v /backup:/backup ubuntu tar czf /backup/backup.tar.gz -C /source .
-
-# 数据库备份
-docker exec mysql mysqldump -uroot -p database > backup.sql</code></pre>
-
-        <h3>最佳实践</h3>
-        <table class="comparison-table">
-          <thead>
-            <tr>
-              <th>场景</th>
-              <th>推荐方案</th>
-              <th>原因</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>数据库数据</td>
-              <td>Volume</td>
-              <td>性能好、易备份</td>
-            </tr>
-            <tr>
-              <td>应用配置文件</td>
-              <td>Bind Mount（只读）</td>
-              <td>便于修改和版本控制</td>
-            </tr>
-            <tr>
-              <td>开发环境源代码</td>
-              <td>Bind Mount</td>
-              <td>实时同步，无需重启</td>
-            </tr>
-            <tr>
-              <td>日志文件</td>
-              <td>Volume 或 Bind Mount</td>
-              <td>根据日志收集方案选择</td>
-            </tr>
-            <tr>
-              <td>临时数据</td>
-              <td>Tmpfs</td>
-              <td>快速且自动清理</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h3>🎯 下节预告</h3>
-        <p>第5讲将学习 <strong>Dockerfile 编写</strong>：</p>
-        <ul>
-          <li>Dockerfile 指令详解</li>
-          <li>构建自己的镜像</li>
-          <li>多阶段构建</li>
-          <li>镜像优化技巧</li>
-        </ul>
+# ADD：支持URL和自动解压tar
+ADD https://example.com/file.tar.gz /tmp/
+ADD jdk-8u301-linux-x64.tar.gz /usr/local/</code></pre>
+          </div>
+          <div class="example-box">
+            <div class="example-title">💡 COPY vs ADD</div>
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>特性</th>
+                  <th>COPY</th>
+                  <th>ADD</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>复制本地文件</td>
+                  <td class="success">✓</td>
+                  <td class="success">✓</td>
+                </tr>
+                <tr>
+                  <td>支持URL</td>
+                  <td>✗</td>
+                  <td class="success">✓</td>
+                </tr>
+                <tr>
+                  <td>自动解压tar</td>
+                  <td>✗</td>
+                  <td class="success">✓</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <div class="navigation-buttons">
-      <router-link to="/lecture-3" class="nav-btn prev">← 上一讲</router-link>
-      <router-link to="/lecture-5" class="nav-btn next">下一讲：Dockerfile →</router-link>
+      <!-- WORKDIR/ENV/EXPOSE -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.5</span>
+          <h1 class="page-title">其他常用指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WORKDIR/ENV/EXPOSE</span>
+            </div>
+            <pre><code># 设置工作目录
+WORKDIR /app
+
+# 设置环境变量
+ENV JAVA_HOME=/usr/local/jdk8
+ENV PATH=$PATH:$JAVA_HOME/bin
+
+# 声明暴露端口
+EXPOSE 8080
+EXPOSE 443</code></pre>
+          </div>
+          <div class="param-list">
+            <div class="param-item">
+              <span class="param-name">WORKDIR</span>
+              <span class="param-desc">设置工作目录，类似cd命令</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">ENV</span>
+              <span class="param-desc">设置环境变量，后续指令可用</span>
+            </div>
+            <div class="param-item">
+              <span class="param-name">EXPOSE</span>
+              <span class="param-desc">声明端口，不会实际发布端口</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 4 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">CMD与ENTRYPOINT</h1>
+          <p class="section-desc">理解容器启动命令的区别</p>
+        </div>
+      </div>
+
+      <!-- CMD指令 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">CMD指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">CMD三种形式</span>
+            </div>
+            <pre><code># exec形式（推荐）
+CMD ["nginx", "-g", "daemon off;"]
+
+# shell形式
+CMD nginx -g "daemon off;"
+
+# 作为ENTRYPOINT的默认参数
+CMD ["--port", "8080"]</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">⚠️ CMD特点</div>
+            <div class="highlight-content">
+              <p>• Dockerfile中只能有一条CMD指令</p>
+              <p>• docker run时指定的命令会覆盖CMD</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENTRYPOINT指令 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">ENTRYPOINT指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">ENTRYPOINT</span>
+            </div>
+            <pre><code># exec形式
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# docker run时追加参数
+docker run myimage --server.port=8080
+# 实际执行：java -jar app.jar --server.port=8080</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">💡 ENTRYPOINT特点</div>
+            <div class="highlight-content">
+              <p>• docker run的参数会追加到ENTRYPOINT后</p>
+              <p>• 适合作为容器的主命令</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMD vs ENTRYPOINT -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">CMD vs ENTRYPOINT对比</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table full-width">
+            <thead>
+              <tr>
+                <th>特性</th>
+                <th>CMD</th>
+                <th>ENTRYPOINT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>docker run参数</td>
+                <td>覆盖整个CMD</td>
+                <td class="success">追加到后面</td>
+              </tr>
+              <tr>
+                <td>用途</td>
+                <td>默认命令</td>
+                <td class="success">固定主命令</td>
+              </tr>
+              <tr>
+                <td>数量</td>
+                <td>只能一个</td>
+                <td class="success">只能一个</td>
+              </tr>
+              <tr>
+                <td>组合使用</td>
+                <td colspan="2" class="success">CMD作为ENTRYPOINT的默认参数</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">组合使用示例</span>
+            </div>
+            <pre><code>ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["--server.port=8080"]
+
+# docker run myimage --server.port=9090
+# 实际执行：java -jar app.jar --server.port=9090</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 5 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">实操环节</h1>
+          <p class="section-desc">动手构建自定义镜像</p>
+        </div>
+      </div>
+
+      <!-- 实操1 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">实操：构建自定义Nginx镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建Dockerfile</span>
+            </div>
+            <pre><code># Dockerfile
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">构建并运行</span>
+            </div>
+            <pre><code># 构建镜像
+docker build -t mynginx:v1 .
+
+# 运行容器
+docker run -d -p 8080:80 mynginx:v1</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 实操2 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">实操：构建带JDK8的镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Dockerfile</span>
+            </div>
+            <pre><code>FROM centos:7
+WORKDIR /usr/local
+ADD jdk-8u301-linux-x64.tar.gz /usr/local/
+ENV JAVA_HOME=/usr/local/jdk1.8.0_301
+ENV PATH=$PATH:$JAVA_HOME/bin
+CMD ["java", "-version"]</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">构建并验证</span>
+            </div>
+            <pre><code>docker build -t myjdk8:v1 .
+docker run myjdk8:v1</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 6 标题 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 6</span>
+          <h1 class="section-title">随堂练习</h1>
+          <p class="section-desc">巩固所学知识</p>
+        </div>
+      </div>
+
+      <!-- 练习任务 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6</span>
+          <h1 class="page-title">练习任务（10分钟）</h1>
+        </div>
+        <div class="page-body">
+          <div class="exercise-tasks">
+            <div class="exercise-task">
+              <div class="task-number">1</div>
+              <div class="task-content">
+                <h3>编写Dockerfile</h3>
+                <p>构建一个带ifconfig命令的Ubuntu镜像</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">2</div>
+              <div class="task-content">
+                <h3>构建镜像</h3>
+                <p>命令：<code>docker build -t myubuntu:v1 .</code></p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">3</div>
+              <div class="task-content">
+                <h3>验证镜像</h3>
+                <p>运行容器并执行ifconfig命令</p>
+              </div>
+            </div>
+            <div class="exercise-task">
+              <div class="task-number">4</div>
+              <div class="task-content">
+                <h3>提交截图</h3>
+                <p>Dockerfile内容和ifconfig输出</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程总结 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本课时小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">镜像分层原理：UnionFS、Copy-on-Write</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">docker commit手动制作镜像</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">Dockerfile核心指令：FROM/RUN/COPY/EXPOSE</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-text">CMD与ENTRYPOINT区别与组合使用</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下节预告 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下节预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>📚 第5课时：Docker镜像仓库</h3>
+            <ul>
+              <li>镜像仓库分类</li>
+              <li>私有仓库搭建</li>
+              <li>阿里云镜像服务</li>
+              <li>镜像安全最佳实践</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 页面导航 -->
+    <div class="page-navigation">
+      <button class="nav-btn prev" @click="prevPage" :disabled="currentPage === 1">
+        ← 上一页
+      </button>
+      <div class="page-indicator">
+        <span class="current">{{ currentPage }}</span>
+        <span class="separator">/</span>
+        <span class="total">{{ totalPages }}</span>
+      </div>
+      <button class="nav-btn next" @click="nextPage" :disabled="currentPage === totalPages">
+        下一页 →
+      </button>
+    </div>
+
+    <!-- 页面缩略图导航 -->
+    <div class="page-thumbnails">
+      <div 
+        v-for="i in totalPages" 
+        :key="i" 
+        class="thumbnail" 
+        :class="{ active: currentPage === i }"
+        @click="goToPage(i)"
+      >
+        {{ i }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import LectureSidebar from '@/components/LectureSidebar.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const sections = ref([
-  { id: 'intro', title: '👋 课程目标' },
-  { id: 'chapter-1', title: '一、为什么需要数据持久化？', level: 1 },
-  { id: 'chapter-2', title: '二、Docker 数据持久化方案', level: 1 },
-  { id: 'chapter-3', title: '三、Volume 数据卷详解', level: 1 },
-  { id: 'chapter-4', title: '四、Bind Mount 绑定挂载', level: 1 },
-  { id: 'chapter-5', title: '五、数据库容器化实战', level: 1 },
-  { id: 'chapter-6', title: '六、数据备份与恢复', level: 1 },
-  { id: 'practice', title: '七、综合练习', level: 1 },
-  { id: 'summary', title: '📝 课程小结', level: 1 }
-])
+const currentPage = ref(1)
+const totalPages = 26
+
+const nextPage = () => {
+  if (currentPage.value < totalPages) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    nextPage()
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    prevPage()
+  } else if (e.key === 'Home') {
+    currentPage.value = 1
+  } else if (e.key === 'End') {
+    currentPage.value = totalPages
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style lang="scss" scoped>
-.coming-soon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  padding: $spacing-xl;
-}
-
-.coming-soon-card {
-  @include card($spacing-xxl);
-  text-align: center;
-  max-width: 600px;
-  background: linear-gradient(135deg, $color-bg-subtle, rgba($color-primary, 0.05));
-
-  .coming-soon-icon {
-    font-size: 4rem;
-    margin-bottom: $spacing-lg;
-    @include float-animation;
-  }
-
-  h2 {
-    color: $color-heading;
-    margin-bottom: $spacing-md;
-    font-size: 1.75rem;
-  }
-
-  p {
-    color: $color-text-secondary;
-    margin-bottom: $spacing-xl;
-    font-size: 1.125rem;
-  }
-
-  .preview-topics {
-    text-align: left;
-    margin-bottom: $spacing-xl;
-
-    h3 {
-      color: $color-primary;
-      margin-bottom: $spacing-md;
-      font-size: 1.125rem;
-    }
-
-    .checklist {
-      margin-left: 0;
-      
-      li {
-        margin-bottom: $spacing-sm;
-        padding: $spacing-sm;
-        background: rgba($color-primary, 0.05);
-        border-left: 3px solid $color-primary;
-        border-radius: 0 $border-radius $border-radius 0;
-      }
-    }
-  }
-
-  .navigation {
-    display: flex;
-    gap: $spacing-md;
-    justify-content: center;
-
-    .nav-button {
-      @include button-secondary;
-      text-decoration: none;
-      padding: $spacing-md $spacing-lg;
-    }
-  }
-}
-
-.lecture-header {
-  text-align: center;
-  margin-bottom: $spacing-xxl;
-  
-  .pill-list {
-    justify-content: center;
-    margin-top: $spacing-lg;
-  }
-}
+@import './styles/lecture-common.scss';
 </style>

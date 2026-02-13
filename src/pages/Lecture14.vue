@@ -1,15 +1,767 @@
-﻿<template>
-  <div class="lecture-content">
-    <header class="lecture-header">
-      <h1>第</h1>
-      <p class="intro">课程内容开发中...</p>
-    </header>
+<template>
+  <div class="lecture-page">
+    <div class="page-container" :style="{ transform: `translateX(-${(currentPage - 1) * 100}%)` }">
+      
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">Kubernetes 进阶</div>
+          <h1 class="cover-title">第14讲：K8s核心资源（上）</h1>
+          <h2 class="cover-subtitle">Pod与Deployment</h2>
+          <div class="cover-meta">
+            <span class="meta-item">课程时长：90分钟</span>
+            <span class="meta-item">难度等级：★★★☆☆</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程目标</h2>
+        <div class="objective-list">
+          <div class="objective-item">
+            <span class="objective-num">01</span>
+            <div class="objective-content">
+              <h3>理解Pod核心概念</h3>
+              <p>掌握K8s最小调度单位，理解容器共享网络与存储机制</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">02</span>
+            <div class="objective-content">
+              <h3>掌握Deployment编排</h3>
+              <p>学会无状态应用编排、Pod副本管理与滚动更新策略</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">03</span>
+            <div class="objective-content">
+              <h3>理解控制器原理</h3>
+              <p>深入理解Deployment如何保证Pod副本数的声明式管理</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <span class="objective-num">04</span>
+            <div class="objective-content">
+              <h3>完成实战操作</h3>
+              <p>独立完成Pod创建、Deployment部署与版本回滚操作</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程安排</h2>
+        <div class="schedule-grid">
+          <div class="schedule-item theory">
+            <div class="schedule-icon">📚</div>
+            <div class="schedule-content">
+              <h3>理论讲解</h3>
+              <p>35分钟</p>
+              <span>Pod核心概念 + Deployment原理</span>
+            </div>
+          </div>
+          <div class="schedule-item practice">
+            <div class="schedule-icon">💻</div>
+            <div class="schedule-content">
+              <h3>实操环节</h3>
+              <p>45分钟</p>
+              <span>Pod创建 + Deployment管理</span>
+            </div>
+          </div>
+          <div class="schedule-item exercise">
+            <div class="schedule-icon">✏️</div>
+            <div class="schedule-content">
+              <h3>随堂练习</h3>
+              <p>10分钟</p>
+              <span>Redis Deployment实战</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 1</div>
+        <h2 class="section-title">Pod核心概念</h2>
+        <p class="section-desc">Kubernetes最小调度单位</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">什么是Pod？</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">Pod</span>
+          </div>
+          <p class="term-def">Pod是Kubernetes中最小的可部署单元，包含一个或多个紧密关联的容器，这些容器共享网络命名空间和存储卷。</p>
+        </div>
+        <div class="highlight-box">
+          <h3>核心特性</h3>
+          <ul class="feature-list">
+            <li><strong>最小调度单位</strong>：K8s不直接调度容器，而是调度Pod</li>
+            <li><strong>共享网络</strong>：同一Pod内的容器共享IP地址和端口空间</li>
+            <li><strong>共享存储</strong>：可通过Volume在容器间共享数据</li>
+            <li><strong>生命周期</strong>：Pod是短暂的，随时可能被销毁重建</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Pod内部架构</h2>
+        <div class="arch-diagram">
+          <div class="pod-container">
+            <div class="pod-header">
+              <span class="pod-label">Pod</span>
+              <span class="pod-ip">IP: 10.244.1.5</span>
+            </div>
+            <div class="containers-row">
+              <div class="container-box main">
+                <div class="container-name">主容器</div>
+                <div class="container-detail">Nginx:1.21</div>
+                <div class="container-port">Port: 80</div>
+              </div>
+              <div class="container-box side">
+                <div class="container-name">边车容器</div>
+                <div class="container-detail">Log Agent</div>
+                <div class="container-port">收集日志</div>
+              </div>
+            </div>
+            <div class="shared-resources">
+              <div class="shared-item">📦 共享存储 (Volume)</div>
+              <div class="shared-item">🌐 共享网络 (localhost)</div>
+            </div>
+          </div>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>同一Pod内的容器可通过 <code>localhost</code> 直接通信，非常适合紧密协作的容器组合。</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Pod的生命周期</h2>
+        <div class="lifecycle-flow">
+          <div class="lifecycle-phase">
+            <div class="phase-icon">📝</div>
+            <div class="phase-name">Pending</div>
+            <div class="phase-desc">Pod已创建，等待调度</div>
+          </div>
+          <div class="lifecycle-arrow">→</div>
+          <div class="lifecycle-phase">
+            <div class="phase-icon">🔄</div>
+            <div class="phase-name">Running</div>
+            <div class="phase-desc">Pod已调度，容器运行中</div>
+          </div>
+          <div class="lifecycle-arrow">→</div>
+          <div class="lifecycle-phase">
+            <div class="phase-icon">✅</div>
+            <div class="phase-name">Succeeded</div>
+            <div class="phase-desc">所有容器成功终止</div>
+          </div>
+          <div class="lifecycle-arrow">→</div>
+          <div class="lifecycle-phase">
+            <div class="phase-icon">❌</div>
+            <div class="phase-name">Failed</div>
+            <div class="phase-desc">容器异常退出</div>
+          </div>
+        </div>
+        <div class="highlight-box warning">
+          <h3>⚠️ 重要提示</h3>
+          <p>Pod是脆弱的！节点故障、资源不足、健康检查失败都会导致Pod被删除重建，新Pod会获得新的IP地址。</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Pod YAML结构解析</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>nginx-pod.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.21
+    ports:
+    - containerPort: 80
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Pod关键字段说明</h2>
+        <div class="field-table">
+          <div class="field-row header">
+            <div class="field-col">字段</div>
+            <div class="field-col">说明</div>
+            <div class="field-col">示例</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>apiVersion</code></div>
+            <div class="field-col">API版本</div>
+            <div class="field-col">v1</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>kind</code></div>
+            <div class="field-col">资源类型</div>
+            <div class="field-col">Pod</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>metadata.name</code></div>
+            <div class="field-col">Pod名称</div>
+            <div class="field-col">nginx-pod</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>metadata.labels</code></div>
+            <div class="field-col">标签（用于选择器）</div>
+            <div class="field-col">app: nginx</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>spec.containers</code></div>
+            <div class="field-col">容器列表</div>
+            <div class="field-col">-</div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><code>resources</code></div>
+            <div class="field-col">资源限制</div>
+            <div class="field-col">requests/limits</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 2</div>
+        <h2 class="section-title">Deployment控制器</h2>
+        <p class="section-desc">无状态应用编排的核心</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">为什么需要Deployment？</h2>
+        <div class="pain-points-grid">
+          <div class="pain-point">
+            <div class="pain-icon">😰</div>
+            <h3>Pod的痛点</h3>
+            <ul>
+              <li>Pod IP会变化</li>
+              <li>Pod无法自动恢复</li>
+              <li>无法轻松扩缩容</li>
+              <li>更新需要手动操作</li>
+            </ul>
+          </div>
+          <div class="pain-point solution">
+            <div class="pain-icon">😊</div>
+            <h3>Deployment解决方案</h3>
+            <ul>
+              <li>自动维护Pod副本数</li>
+              <li>支持滚动更新</li>
+              <li>支持版本回滚</li>
+              <li>声明式管理</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Deployment核心概念</h2>
+        <div class="term-box">
+          <div class="term-header">
+            <span class="term-icon">📖</span>
+            <span class="term-name">Deployment</span>
+          </div>
+          <p class="term-def">Deployment是Kubernetes中管理无状态应用的工作负载控制器，通过ReplicaSet实现Pod副本管理和滚动更新。</p>
+        </div>
+        <div class="hierarchy-diagram">
+          <div class="hierarchy-level">
+            <div class="hierarchy-box deployment">Deployment</div>
+            <div class="hierarchy-desc">定义期望状态</div>
+          </div>
+          <div class="hierarchy-arrow">↓ 管理</div>
+          <div class="hierarchy-level">
+            <div class="hierarchy-box replicaset">ReplicaSet</div>
+            <div class="hierarchy-desc">维护副本数</div>
+          </div>
+          <div class="hierarchy-arrow">↓ 创建</div>
+          <div class="hierarchy-level">
+            <div class="hierarchy-box pod">Pod × N</div>
+            <div class="hierarchy-desc">运行容器</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">控制器原理</h2>
+        <div class="control-loop-diagram">
+          <div class="loop-center">
+            <div class="loop-title">控制循环</div>
+            <div class="loop-subtitle">Control Loop</div>
+          </div>
+          <div class="loop-steps">
+            <div class="loop-step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>获取期望状态</h4>
+                <p>从YAML读取replicas: 3</p>
+              </div>
+            </div>
+            <div class="loop-step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>观察当前状态</h4>
+                <p>查询当前运行的Pod数量</p>
+              </div>
+            </div>
+            <div class="loop-step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>计算差异</h4>
+                <p>期望3个，实际2个，差1个</p>
+              </div>
+            </div>
+            <div class="loop-step">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <h4>执行调谐</h4>
+                <p>创建1个新Pod达到期望</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>这种"声明式"管理方式是K8s的核心设计理念——你只需要描述期望状态，K8s负责实现它。</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">滚动更新机制</h2>
+        <div class="rolling-update-visual">
+          <div class="update-phase">
+            <div class="phase-label">更新前</div>
+            <div class="pods-row">
+              <div class="pod-box old">v1</div>
+              <div class="pod-box old">v1</div>
+              <div class="pod-box old">v1</div>
+            </div>
+          </div>
+          <div class="update-arrow">↓ 滚动更新</div>
+          <div class="update-phase">
+            <div class="phase-label">更新中</div>
+            <div class="pods-row">
+              <div class="pod-box old">v1</div>
+              <div class="pod-box old">v1</div>
+              <div class="pod-box new">v2</div>
+            </div>
+          </div>
+          <div class="update-arrow">↓ 继续更新</div>
+          <div class="update-phase">
+            <div class="phase-label">更新完成</div>
+            <div class="pods-row">
+              <div class="pod-box new">v2</div>
+              <div class="pod-box new">v2</div>
+              <div class="pod-box new">v2</div>
+            </div>
+          </div>
+        </div>
+        <div class="highlight-box">
+          <h3>滚动更新策略</h3>
+          <p><code>maxSurge: 1</code> - 最多可以多创建1个Pod</p>
+          <p><code>maxUnavailable: 1</code> - 最多可以有1个Pod不可用</p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">Deployment YAML示例</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>nginx-deployment.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80</code></pre>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 3</div>
+        <h2 class="section-title">实操环节</h2>
+        <p class="section-desc">Pod与Deployment实战操作</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操1：创建Nginx Pod</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>创建Pod</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f nginx-pod.yaml
+
+kubectl get pods -o wide
+NAME        READY   STATUS    RESTARTS   AGE   IP           NODE
+nginx-pod   1/1     Running   0          10s   10.244.1.5   node1
+
+kubectl describe pod nginx-pod</code></pre>
+        </div>
+        <div class="highlight-box">
+          <h3>常用命令</h3>
+          <ul class="cmd-list">
+            <li><code>kubectl get pods</code> - 查看Pod列表</li>
+            <li><code>kubectl describe pod &lt;name&gt;</code> - 查看Pod详情</li>
+            <li><code>kubectl logs &lt;pod&gt;</code> - 查看容器日志</li>
+            <li><code>kubectl exec -it &lt;pod&gt; -- bash</code> - 进入容器</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操2：端口转发访问Pod</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>本地端口转发</span>
+          </div>
+          <pre class="code-content"><code>kubectl port-forward nginx-pod 8080:80
+
+# 输出：
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80</code></pre>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>打开浏览器访问 <code>http://localhost:8080</code> 即可看到Nginx欢迎页面。</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>进入Pod容器</span>
+          </div>
+          <pre class="code-content"><code>kubectl exec -it nginx-pod -- bash
+
+root@nginx-pod:/# curl localhost
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;Welcome to nginx!&lt;/head&gt;
+...</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操3：创建Deployment</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>创建3副本Deployment</span>
+          </div>
+          <pre class="code-content"><code>kubectl apply -f nginx-deployment.yaml
+
+kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3/3     3            3           30s
+
+kubectl get pods
+NAME                                READY   STATUS    AGE
+nginx-deployment-6b7f675859-2x4kl   1/1     Running   30s
+nginx-deployment-6b7f675859-7m8np   1/1     Running   30s
+nginx-deployment-6b7f675859-xk9pl   1/1     Running   30s</code></pre>
+        </div>
+        <div class="highlight-box">
+          <h3>观察要点</h3>
+          <p>Pod名称格式：<code>&lt;deployment-name&gt;-&lt;replicaset-hash&gt;-&lt;pod-hash&gt;</code></p>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操4：滚动更新</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>更新镜像版本</span>
+          </div>
+          <pre class="code-content"><code>kubectl set image deployment/nginx-deployment nginx=nginx:1.22
+
+# 或者修改YAML后重新apply
+kubectl apply -f nginx-deployment.yaml
+
+# 查看滚动更新状态
+kubectl rollout status deployment/nginx-deployment
+Waiting for deployment "nginx-deployment" rollout to finish: 1 out of 3 new replicas...
+deployment "nginx-deployment" successfully rolled out</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span>查看更新历史</span>
+          </div>
+          <pre class="code-content"><code>kubectl rollout history deployment/nginx-deployment
+REVISION  CHANGE-CAUSE
+1         &lt;none&gt;
+2         &lt;none&gt;</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操5：版本回滚</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>回滚到上一版本</span>
+          </div>
+          <pre class="code-content"><code>kubectl rollout undo deployment/nginx-deployment
+
+# 回滚到指定版本
+kubectl rollout undo deployment/nginx-deployment --to-revision=1
+
+# 查看回滚状态
+kubectl rollout status deployment/nginx-deployment</code></pre>
+        </div>
+        <div class="highlight-box warning">
+          <h3>⚠️ 注意事项</h3>
+          <ul>
+            <li>默认保留10个历史版本</li>
+            <li>回滚是即时生效的</li>
+            <li>生产环境建议先在测试环境验证</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">实操6：扩缩容</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>手动扩缩容</span>
+          </div>
+          <pre class="code-content"><code>kubectl scale deployment/nginx-deployment --replicas=5
+
+kubectl get pods
+NAME                                READY   STATUS    AGE
+nginx-deployment-6b7f675859-2x4kl   1/1     Running   5m
+nginx-deployment-6b7f675859-7m8np   1/1     Running   5m
+nginx-deployment-6b7f675859-xk9pl   1/1     Running   5m
+nginx-deployment-6b7f675859-a1b2c   1/1     Running   10s
+nginx-deployment-6b7f675859-d4e5f   1/1     Running   10s
+
+kubectl scale deployment/nginx-deployment --replicas=2</code></pre>
+        </div>
+        <div class="note-box">
+          <span class="note-icon">💡</span>
+          <p>扩缩容操作会立即生效，K8s控制器会自动调整Pod数量。</p>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-number">Part 4</div>
+        <h2 class="section-title">随堂练习</h2>
+        <p class="section-desc">巩固所学知识</p>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">练习任务</h2>
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <span class="exercise-badge">动手练习</span>
+            <span class="exercise-time">10分钟</span>
+          </div>
+          <div class="exercise-content">
+            <h3>任务要求</h3>
+            <ol class="exercise-steps">
+              <li>创建一个Deployment部署Redis，副本数为2</li>
+              <li>执行滚动更新，将Redis版本从6.0.8更新到7.0.0</li>
+              <li>提交Deployment YAML文件和更新前后的Pod列表</li>
+            </ol>
+          </div>
+        </div>
+        <div class="hint-box">
+          <span class="hint-icon">💡</span>
+          <div class="hint-content">
+            <h4>提示</h4>
+            <p>Redis默认端口：6379</p>
+            <p>镜像：redis:6.0.8 → redis:7.0.0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">参考答案框架</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span>redis-deployment.yaml</span>
+          </div>
+          <pre class="code-content"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6.0.8
+        ports:
+        - containerPort: 6379</code></pre>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">课程总结</h2>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <h3>Pod核心要点</h3>
+            <ul>
+              <li>K8s最小调度单位</li>
+              <li>容器共享网络和存储</li>
+              <li>生命周期短暂，IP会变化</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h3>Deployment核心要点</h3>
+            <ul>
+              <li>管理无状态应用</li>
+              <li>自动维护Pod副本数</li>
+              <li>支持滚动更新和回滚</li>
+            </ul>
+          </div>
+          <div class="summary-item">
+            <h3>核心命令</h3>
+            <ul>
+              <li>kubectl apply -f</li>
+              <li>kubectl get pods/deployments</li>
+              <li>kubectl rollout undo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page">
+        <h2 class="page-title">下节预告</h2>
+        <div class="preview-card">
+          <h3>第15讲：K8s核心资源（下）- Service与Ingress</h3>
+          <div class="preview-topics">
+            <div class="preview-topic">
+              <span class="topic-icon">🔗</span>
+              <span>Service：解决Pod IP动态变化问题</span>
+            </div>
+            <div class="preview-topic">
+              <span class="topic-icon">🌐</span>
+              <span>Service类型：ClusterIP/NodePort/LoadBalancer</span>
+            </div>
+            <div class="preview-topic">
+              <span class="topic-icon">🚀</span>
+              <span>Ingress：HTTP七层路由转发</span>
+            </div>
+            <div class="preview-topic">
+              <span class="topic-icon">💻</span>
+              <span>实操：部署Nginx Ingress Controller</span>
+            </div>
+          </div>
+        </div>
+        <div class="page-number">第14讲 / 共22页</div>
+      </div>
+
+    </div>
+
+    <div class="page-nav">
+      <button class="nav-btn prev" @click="prevPage" :disabled="currentPage === 1">◀ 上一页</button>
+      <span class="page-indicator">{{ currentPage }} / {{ totalPages }}</span>
+      <button class="nav-btn next" @click="nextPage" :disabled="currentPage === totalPages">下一页 ▶</button>
+    </div>
+
+    <div class="thumbnail-nav" :class="{ expanded: thumbnailsExpanded }">
+      <button class="thumbnail-toggle" @click="thumbnailsExpanded = !thumbnailsExpanded">
+        📑 {{ thumbnailsExpanded ? '收起' : '展开' }}导航
+      </button>
+      <div class="thumbnail-list" v-show="thumbnailsExpanded">
+        <div 
+          v-for="i in totalPages" 
+          :key="i" 
+          class="thumbnail-item"
+          :class="{ active: currentPage === i }"
+          @click="goToPage(i)"
+        >
+          <span class="thumbnail-num">{{ i }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// TODO: 添加课程内容
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const currentPage = ref(1)
+const totalPages = 22
+const thumbnailsExpanded = ref(false)
+
+const nextPage = () => {
+  if (currentPage.value < totalPages) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault()
+    nextPage()
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    prevPage()
+  } else if (e.key === 'Home') {
+    e.preventDefault()
+    currentPage.value = 1
+  } else if (e.key === 'End') {
+    e.preventDefault()
+    currentPage.value = totalPages
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style lang="scss" scoped>
+@import './styles/lecture-common.scss';
 </style>
