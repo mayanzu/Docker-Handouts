@@ -243,6 +243,27 @@ exit</code></pre>
               <div class="code-block">
                 <pre><code>docker run -it centos-vim:v1 vim --version</code></pre>
               </div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-title">预期输出结果</span>
+                </div>
+                <pre><code>VIM - Vi IMproved 8.0 (2016 Sep 12, compiled ...)
+Included patches: 1-... 
+Compiled by ...
+Huge version without GUI.
+...
+</code></pre>
+              </div>
+              <div class="highlight-box success">
+                <div class="highlight-title">✅ 验证要点</div>
+                <div class="highlight-content">
+                  <ul>
+                    <li>显示 VIM 版本信息表示 vim 安装成功</li>
+                    <li>版本号应为 8.0 或更高</li>
+                    <li>无 "command not found" 错误</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -585,6 +606,44 @@ docker build -t mynginx:v1 .
 # 运行容器
 docker run -d -p 8080:80 mynginx:v1</code></pre>
           </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">预期输出结果 - 构建过程</span>
+            </div>
+            <pre><code>[+] Building 3.2s (7/7) FINISHED
+ => [internal] load build definition from Dockerfile
+ => => transferring dockerfile: 142B
+ => [internal] load .dockerignore
+ => => transferring context: 2B
+ => [internal] load metadata for docker.io/library/nginx:alpine
+ => [1/2] FROM docker.io/library/nginx:alpine
+ => [2/2] COPY index.html /usr/share/nginx/html/
+ => exporting to image
+ => => exporting layers
+ => => writing image sha256:abc123...
+ => => naming to docker.io/library/mynginx:v1</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">预期输出结果 - 运行验证</span>
+            </div>
+            <pre><code># 查看运行中的容器
+$ docker ps
+
+CONTAINER ID   IMAGE        COMMAND                  CREATED         STATUS         PORTS                  NAMES
+a1b2c3d4e5f6   mynginx:v1   "/docker-entrypoint.…"   5 seconds ago   Up 4 seconds   0.0.0.0:8080->80/tcp   nostalgic_einstein</code></pre>
+          </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">🔍 验证要点</div>
+            <div class="highlight-content">
+              <ul>
+                <li>构建过程显示 <code>FINISHED</code> 表示成功</li>
+                <li><code>docker ps</code> 显示容器 STATUS 为 "Up"</li>
+                <li>PORTS 列显示 <code>0.0.0.0:8080->80/tcp</code> 映射正确</li>
+                <li>浏览器访问 <code>http://localhost:8080</code> 显示自定义页面</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -612,6 +671,37 @@ CMD ["java", "-version"]</code></pre>
             </div>
             <pre><code>docker build -t myjdk8:v1 .
 docker run myjdk8:v1</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">预期输出结果</span>
+            </div>
+            <pre><code># 构建过程
+[+] Building 15.2s (8/8) FINISHED
+ => [1/4] FROM docker.io/library/centos:7
+ => [2/4] WORKDIR /usr/local
+ => [3/4] ADD jdk-8u301-linux-x64.tar.gz /usr/local/
+ => [4/4] ENV JAVA_HOME=/usr/local/jdk1.8.0_301
+ => exporting to image
+ => => naming to docker.io/library/myjdk8:v1
+
+# 运行验证 - Java版本输出
+$ docker run myjdk8:v1
+
+java version "1.8.0_301"
+Java(TM) SE Runtime Environment (build 1.8.0_301-b09)
+Java HotSpot(TM) 64-Bit Server VM (build 25.301-b09, mixed mode)</code></pre>
+          </div>
+          <div class="highlight-box success">
+            <div class="highlight-title">✅ 验证要点</div>
+            <div class="highlight-content">
+              <ul>
+                <li>构建完成显示 <code>FINISHED</code> 且无明显错误</li>
+                <li>Java 版本输出显示 "1.8.0_xxx"</li>
+                <li>包含 Runtime Environment 和 VM 信息</li>
+                <li>无 "java: command not found" 错误</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
