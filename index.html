@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Docker & Kubernetes 实战课程</title>
+  <title>虚拟化容器技术 | 课程培训</title>
   <style>
     * {
       margin: 0;
@@ -11,474 +11,641 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --primary: #dc2626;
+      --primary-dark: #991b1b;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #ffffff;
+      --bg-alt: #f9fafb;
+      --border: #e5e7eb;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      color: #333;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 0 24px;
     }
 
     /* Header */
-    .header {
-      text-align: center;
-      padding: 60px 20px;
-      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-      color: white;
-      border-radius: 20px;
-      margin-bottom: 40px;
-      box-shadow: 0 10px 40px rgba(220, 38, 38, 0.3);
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 32px 0;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .header h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .header .subtitle {
-      font-size: 1.5rem;
-      opacity: 0.9;
-      margin-bottom: 30px;
-    }
-
-    .header .meta {
+    .header-inner {
       display: flex;
-      justify-content: center;
-      gap: 30px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .header .meta span {
-      background: rgba(255,255,255,0.2);
-      padding: 10px 25px;
-      border-radius: 30px;
-      font-size: 1rem;
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
     }
 
-    /* Course Intro */
-    .intro-section {
-      background: white;
-      padding: 40px;
-      border-radius: 15px;
-      margin-bottom: 40px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    .logo span {
+      color: var(--primary);
     }
 
-    .intro-section h2 {
-      color: #dc2626;
-      font-size: 2rem;
+    .header-meta {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
       margin-bottom: 20px;
-      border-left: 5px solid #dc2626;
-      padding-left: 20px;
+      max-width: 700px;
     }
 
-    .intro-section p {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #555;
-      margin-bottom: 15px;
+    .hero h1 span {
+      color: var(--primary);
     }
 
-    .intro-section .highlight {
-      color: #dc2626;
-      font-weight: bold;
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-light);
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* About Section */
+    .section {
+      padding: 60px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-light);
+      margin-bottom: 24px;
+    }
+
+    .about-text {
+      font-size: 16px;
+      color: var(--text);
+      max-width: 800px;
+    }
+
+    .about-text p {
+      margin-bottom: 16px;
+    }
+
+    .about-text strong {
+      color: var(--primary);
     }
 
     /* Course Grid */
+    .course-section {
+      padding: 60px 0;
+    }
+
     .course-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 25px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
     }
 
     .course-card {
-      background: white;
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
+      background: var(--bg);
+      padding: 28px;
       text-decoration: none;
       color: inherit;
       display: block;
+      transition: background 0.2s;
     }
 
     .course-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      background: var(--bg-alt);
     }
 
-    .course-card .number {
-      display: inline-block;
-      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-      color: white;
-      width: 50px;
-      height: 50px;
-      line-height: 50px;
-      text-align: center;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 15px;
+    .course-card .num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
     }
 
     .course-card h3 {
-      font-size: 1.3rem;
-      color: #333;
-      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
     }
 
     .course-card p {
-      color: #666;
-      font-size: 0.95rem;
-      line-height: 1.6;
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.5;
     }
 
     .course-card .tags {
-      margin-top: 15px;
+      margin-top: 12px;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .course-card .tag {
+      font-size: 11px;
+      color: var(--primary);
       background: #fef2f2;
-      color: #dc2626;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
-    /* Tools Section */
+    /* Tools */
     .tools-section {
-      background: white;
-      padding: 40px;
-      border-radius: 15px;
-      margin-bottom: 40px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
-
-    .tools-section h2 {
-      color: #dc2626;
-      font-size: 2rem;
-      margin-bottom: 30px;
-      border-left: 5px solid #dc2626;
-      padding-left: 20px;
+      padding: 60px 0;
+      background: var(--bg-alt);
     }
 
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
     }
 
     .tool-card {
-      background: #f8f9fa;
-      padding: 25px;
-      border-radius: 10px;
-      border-left: 4px solid #dc2626;
-      transition: background 0.3s, transform 0.3s;
+      background: var(--bg);
+      padding: 24px;
       text-decoration: none;
-      display: block;
       color: inherit;
+      display: block;
+      transition: background 0.2s;
     }
 
     .tool-card:hover {
-      background: #fef2f2;
-      transform: translateX(5px);
+      background: #ffffff;
     }
 
     .tool-card h4 {
-      color: #dc2626;
-      font-size: 1.1rem;
-      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
     }
 
     .tool-card p {
-      color: #666;
-      font-size: 0.9rem;
+      font-size: 12px;
+      color: var(--text-light);
       line-height: 1.5;
     }
 
+    /* Download Box */
+    .download-section {
+      padding: 60px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .download-box {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .download-info h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .download-info p {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .download-btn {
+      background: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .download-btn:hover {
+      background: var(--primary-dark);
+    }
+
     /* Footer */
-    .footer {
-      text-align: center;
-      padding: 30px;
-      color: #666;
-      font-size: 0.9rem;
+    footer {
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .footer-right {
+      font-size: 13px;
+      color: var(--text-light);
     }
 
     /* Responsive */
-    @media (max-width: 768px) {
-      .header h1 {
-        font-size: 2rem;
-      }
-      
-      .header .subtitle {
-        font-size: 1.1rem;
-      }
-      
+    @media (max-width: 900px) {
       .course-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
       }
       
       .tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .hero h1 {
+        font-size: 36px;
+      }
+      
+      .hero-stats {
+        gap: 32px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .course-grid, .tools-grid {
         grid-template-columns: 1fr;
+      }
+      
+      .hero h1 {
+        font-size: 28px;
+      }
+      
+      .hero-desc {
+        font-size: 16px;
+      }
+      
+      .hero-stats {
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+      
+      .download-box {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      
+      .footer-inner {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1>🐳 Docker & Kubernetes 实战课程</h1>
-      <p class="subtitle">从入门到精通，掌握容器化技术</p>
-      <div class="meta">
-        <span>📚 16 课时</span>
-        <span>⏱️ 24+ 小时</span>
-        <span>🎯 理论+实操</span>
-        <span>📖 永久有效</span>
+  <!-- Header -->
+  <header>
+    <div class="container header-inner">
+      <div class="logo">虚拟化容器技术</div>
+      <div class="header-meta">数据科学与大数据技术 · 40学时 / 2.5学分 · 考查</div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>掌握虚拟化容器技术<br><span>构建现代化应用</span></h1>
+      <p class="hero-desc">
+        系统学习 Docker 与 Kubernetes 虚拟化容器技术，从基础概念到企业级实战，
+        涵盖镜像管理、容器编排、服务部署等核心技能。
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-value">40</span>
+          <span class="stat-label">学时</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">2.5</span>
+          <span class="stat-label">学分</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">16</span>
+          <span class="stat-label">章节</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">考查</span>
+          <span class="stat-label">考核</span>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Course Intro -->
-    <div class="intro-section">
-      <h2>课程介绍</h2>
+  <!-- About -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">课程概述</h2>
+      <div class="about-text">
       <p>
-        本课程系统讲解 <span class="highlight">Docker</span> 和 <span class="highlight">Kubernetes</span> 容器化技术，
-        从基础概念到企业级实战，帮助你掌握现代云原生应用开发的核心技能。
+        本课程是面向 <strong>数据科学与大数据技术</strong> 专业的核心课程，
+        系统讲授 Docker 与 Kubernetes 虚拟化容器技术，包含容器基础、镜像构建、网络配置、数据持久化、服务编排等核心内容。
       </p>
       <p>
-        课程内容涵盖 Docker 镜像管理、容器编排、网络配置、数据持久化、
-        镜像仓库搭建、Docker Compose、Kubernetes 核心概念、Pod、Deployment、Service、Ingress 等。
-      </p>
-      <p>
-        通过大量动手实验和企业实战案例，让你真正掌握容器化技术，
-        为云原生开发和 DevOps 实践打下坚实基础。
+        课程采用理论与实践相结合的教学模式，通过大量动手实验帮助学生掌握容器化技术，
+        培养云原生开发能力，为将来从事大数据平台运维、云服务开发等工作奠定基础。
       </p>
     </div>
-
-    <!-- Course List -->
-    <div class="course-grid">
-      <a href="standardized-lectures/lecture-1.html" class="course-card">
-        <span class="number">01</span>
-        <h3>容器技术概述与Docker基础入门</h3>
-        <p>理解容器技术背景，掌握Docker核心概念，完成环境搭建</p>
-        <div class="tags">
-          <span class="tag">容器概述</span>
-          <span class="tag">Docker安装</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-2.html" class="course-card">
-        <span class="number">02</span>
-        <h3>Docker核心命令（上）</h3>
-        <p>镜像管理命令，容器生命周期，关键参数详解</p>
-        <div class="tags">
-          <span class="tag">镜像管理</span>
-          <span class="tag">容器操作</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-3.html" class="course-card">
-        <span class="number">03</span>
-        <h3>Docker核心命令（下）</h3>
-        <p>数据持久化，容器卷挂载，数据管理实践</p>
-        <div class="tags">
-          <span class="tag">数据卷</span>
-          <span class="tag">持久化</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-4.html" class="course-card">
-        <span class="number">04</span>
-        <h3>Docker镜像进阶</h3>
-        <p>镜像分层原理，Dockerfile，自定义镜像制作</p>
-        <div class="tags">
-          <span class="tag">Dockerfile</span>
-          <span class="tag">镜像构建</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-5.html" class="course-card">
-        <span class="number">05</span>
-        <h3>Docker镜像仓库</h3>
-        <p>私有仓库搭建，阿里云镜像服务，镜像安全</p>
-        <div class="tags">
-          <span class="tag">Registry</span>
-          <span class="tag">镜像仓库</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-6.html" class="course-card">
-        <span class="number">06</span>
-        <h3>MySQL主从复制</h3>
-        <p>Docker部署数据库高可用架构，主从复制配置</p>
-        <div class="tags">
-          <span class="tag">MySQL</span>
-          <span class="tag">主从复制</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-7.html" class="course-card">
-        <span class="number">07</span>
-        <h3>Redis集群搭建</h3>
-        <p>主从复制、哨兵模式与Cluster集群部署</p>
-        <div class="tags">
-          <span class="tag">Redis</span>
-          <span class="tag">集群</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-8.html" class="course-card">
-        <span class="number">08</span>
-        <h3>Docker网络原理</h3>
-        <p>容器网络模型，网络类型，容器间通信</p>
-        <div class="tags">
-          <span class="tag">网络</span>
-          <span class="tag">通信</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-9.html" class="course-card">
-        <span class="number">09</span>
-        <h3>Docker Compose入门</h3>
-        <p>多容器应用编排，docker-compose.yml编写</p>
-        <div class="tags">
-          <span class="tag">Compose</span>
-          <span class="tag">编排</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-10.html" class="course-card">
-        <span class="number">10</span>
-        <h3>微服务编排</h3>
-        <p>服务注册、配置中心与链路追踪</p>
-        <div class="tags">
-          <span class="tag">微服务</span>
-          <span class="tag">服务发现</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-11.html" class="course-card">
-        <span class="number">11</span>
-        <h3>Docker可视化与监控</h3>
-        <p>Portainer、Prometheus与Grafana部署</p>
-        <div class="tags">
-          <span class="tag">可视化</span>
-          <span class="tag">监控</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-12.html" class="course-card">
-        <span class="number">12</span>
-        <h3>企业实战与面试题</h3>
-        <p>CI/CD流水线，常见面试题解析</p>
-        <div class="tags">
-          <span class="tag">CI/CD</span>
-          <span class="tag">面试</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-13.html" class="course-card">
-        <span class="number">13</span>
-        <h3>Kubernetes核心概念</h3>
-        <p>K8s架构，核心组件，kubectl命令</p>
-        <div class="tags">
-          <span class="tag">Kubernetes</span>
-          <span class="tag">K8s基础</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-14.html" class="course-card">
-        <span class="number">14</span>
-        <h3>K8s核心资源（上）</h3>
-        <p>Pod与Deployment，应用部署实战</p>
-        <div class="tags">
-          <span class="tag">Pod</span>
-          <span class="tag">Deployment</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-15.html" class="course-card">
-        <span class="number">15</span>
-        <h3>K8s核心资源（下）</h3>
-        <p>Service与Ingress，服务暴露与路由</p>
-        <div class="tags">
-          <span class="tag">Service</span>
-          <span class="tag">Ingress</span>
-        </div>
-      </a>
-
-      <a href="standardized-lectures/lecture-16.html" class="course-card">
-        <span class="number">16</span>
-        <h3>K8s实战与课程总结</h3>
-        <p>配置管理，持久化存储，综合实战</p>
-        <div class="tags">
-          <span class="tag">ConfigMap</span>
-          <span class="tag">Helm</span>
-        </div>
-      </a>
     </div>
+  </section>
 
-    <!-- Tools Section -->
-    <div class="tools-section">
-      <h2>🛠️ 常用工具与资源</h2>
+  <!-- Course List -->
+  <section class="course-section">
+    <div class="container">
+      <h2 class="section-title">课程大纲</h2>
+    </div>
+    <div class="container">
+      <div class="course-grid">
+        <a href="standardized-lectures/lecture-1.html" class="course-card">
+          <div class="num">01</div>
+          <h3>容器技术概述与Docker基础入门</h3>
+          <p>理解容器技术背景，掌握Docker核心概念，完成环境搭建</p>
+          <div class="tags">
+            <span class="tag">容器概述</span>
+            <span class="tag">Docker安装</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-2.html" class="course-card">
+          <div class="num">02</div>
+          <h3>Docker核心命令（上）</h3>
+          <p>镜像管理命令，容器生命周期，关键参数详解</p>
+          <div class="tags">
+            <span class="tag">镜像管理</span>
+            <span class="tag">容器操作</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-3.html" class="course-card">
+          <div class="num">03</div>
+          <h3>Docker核心命令（下）</h3>
+          <p>数据持久化，容器卷挂载，数据管理实践</p>
+          <div class="tags">
+            <span class="tag">数据卷</span>
+            <span class="tag">持久化</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-4.html" class="course-card">
+          <div class="num">04</div>
+          <h3>Docker镜像进阶</h3>
+          <p>镜像分层原理，Dockerfile，自定义镜像制作</p>
+          <div class="tags">
+            <span class="tag">Dockerfile</span>
+            <span class="tag">镜像构建</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-5.html" class="course-card">
+          <div class="num">05</div>
+          <h3>Docker镜像仓库</h3>
+          <p>私有仓库搭建，阿里云镜像服务，镜像安全</p>
+          <div class="tags">
+            <span class="tag">Registry</span>
+            <span class="tag">镜像仓库</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-6.html" class="course-card">
+          <div class="num">06</div>
+          <h3>MySQL主从复制</h3>
+          <p>Docker部署数据库高可用架构，主从复制配置</p>
+          <div class="tags">
+            <span class="tag">MySQL</span>
+            <span class="tag">主从复制</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-7.html" class="course-card">
+          <div class="num">07</div>
+          <h3>Redis集群搭建</h3>
+          <p>主从复制、哨兵模式与Cluster集群部署</p>
+          <div class="tags">
+            <span class="tag">Redis</span>
+            <span class="tag">集群</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-8.html" class="course-card">
+          <div class="num">08</div>
+          <h3>Docker网络原理</h3>
+          <p>容器网络模型，网络类型，容器间通信</p>
+          <div class="tags">
+            <span class="tag">网络</span>
+            <span class="tag">通信</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-9.html" class="course-card">
+          <div class="num">09</div>
+          <h3>Docker Compose入门</h3>
+          <p>多容器应用编排，docker-compose.yml编写</p>
+          <div class="tags">
+            <span class="tag">Compose</span>
+            <span class="tag">编排</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-10.html" class="course-card">
+          <div class="num">10</div>
+          <h3>微服务编排</h3>
+          <p>服务注册、配置中心与链路追踪</p>
+          <div class="tags">
+            <span class="tag">微服务</span>
+            <span class="tag">服务发现</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-11.html" class="course-card">
+          <div class="num">11</div>
+          <h3>Docker可视化与监控</h3>
+          <p>Portainer、Prometheus与Grafana部署</p>
+          <div class="tags">
+            <span class="tag">可视化</span>
+            <span class="tag">监控</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-12.html" class="course-card">
+          <div class="num">12</div>
+          <h3>企业实战与面试题</h3>
+          <p>CI/CD流水线，常见面试题解析</p>
+          <div class="tags">
+            <span class="tag">CI/CD</span>
+            <span class="tag">面试</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-13.html" class="course-card">
+          <div class="num">13</div>
+          <h3>Kubernetes核心概念</h3>
+          <p>K8s架构，核心组件，kubectl命令</p>
+          <div class="tags">
+            <span class="tag">Kubernetes</span>
+            <span class="tag">K8s基础</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-14.html" class="course-card">
+          <div class="num">14</div>
+          <h3>K8s核心资源（上）</h3>
+          <p>Pod与Deployment，应用部署实战</p>
+          <div class="tags">
+            <span class="tag">Pod</span>
+            <span class="tag">Deployment</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-15.html" class="course-card">
+          <div class="num">15</div>
+          <h3>K8s核心资源（下）</h3>
+          <p>Service与Ingress，服务暴露与路由</p>
+          <div class="tags">
+            <span class="tag">Service</span>
+            <span class="tag">Ingress</span>
+          </div>
+        </a>
+
+        <a href="standardized-lectures/lecture-16.html" class="course-card">
+          <div class="num">16</div>
+          <h3>K8s实战与课程总结</h3>
+          <p>配置管理，持久化存储，综合实战</p>
+          <div class="tags">
+            <span class="tag">ConfigMap</span>
+            <span class="tag">Helm</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="tools-section">
+    <div class="container">
+      <h2 class="section-title">常用工具</h2>
+    </div>
+    <div class="container">
       <div class="tools-grid">
         <a href="https://hub.docker.com" target="_blank" class="tool-card">
-          <h4>🔗 Docker Hub</h4>
-          <p>Docker 官方镜像仓库，查找和下载各种应用镜像</p>
+          <h4>Docker Hub</h4>
+          <p>官方镜像仓库</p>
         </a>
         <a href="https://www.docker.com/products/docker-desktop" target="_blank" class="tool-card">
-          <h4>💻 Docker Desktop</h4>
-          <p>本地 Docker 开发环境，支持 Windows 和 Mac</p>
+          <h4>Docker Desktop</h4>
+          <p>本地开发环境</p>
         </a>
         <a href="https://www.portainer.io" target="_blank" class="tool-card">
-          <h4>🎛️ Portainer</h4>
-          <p>Docker 可视化管理工具，图形化界面管理容器</p>
+          <h4>Portainer</h4>
+          <p>可视化容器管理</p>
         </a>
         <a href="https://minikube.sigs.k8s.io" target="_blank" class="tool-card">
-          <h4>☸️ Minikube</h4>
-          <p>本地 Kubernetes 单节点集群，用于学习和开发</p>
+          <h4>Minikube</h4>
+          <p>本地 K8s 集群</p>
         </a>
         <a href="https://kubernetes.io/docs/tasks/tools/" target="_blank" class="tool-card">
-          <h4>⚡ kubectl</h4>
-          <p>Kubernetes 命令行工具，管理 K8s 集群</p>
+          <h4>kubectl</h4>
+          <p>K8s 命令行工具</p>
         </a>
         <a href="https://helm.sh" target="_blank" class="tool-card">
-          <h4>⛵ Helm</h4>
-          <p>Kubernetes 包管理工具，简化应用部署</p>
+          <h4>Helm</h4>
+          <p>K8s 包管理器</p>
         </a>
         <a href="https://prometheus.io" target="_blank" class="tool-card">
-          <h4>📊 Prometheus</h4>
-          <p>开源监控告警系统，监控容器和集群</p>
+          <h4>Prometheus</h4>
+          <p>监控系统</p>
         </a>
         <a href="https://grafana.com" target="_blank" class="tool-card">
-          <h4>📈 Grafana</h4>
-          <p>数据可视化平台，展示监控指标和日志</p>
+          <h4>Grafana</h4>
+          <p>数据可视化</p>
         </a>
       </div>
-      
-      <div style="margin-top: 30px; padding: 20px; background: #fef2f2; border-radius: 10px; border-left: 4px solid #dc2626;">
-        <h4 style="color: #dc2626; margin-bottom: 10px;">📦 课程配套工具包</h4>
-        <p style="color: #555; margin-bottom: 15px;">已打包好的开发环境工具，包含 Docker Desktop、kubectl、Minikube 等常用工具</p>
-        <a href="tools/" style="display: inline-block; background: #dc2626; color: white; padding: 10px 25px; border-radius: 5px; text-decoration: none; font-weight: bold;">下载工具包</a>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section class="download-section">
+    <div class="container">
+      <div class="download-box">
+        <div class="download-info">
+          <h3>课程配套工具包</h3>
+          <p>已整理好的开发环境工具，包含安装说明文档</p>
+        </div>
+        <a href="tools/" class="download-btn">查看下载</a>
       </div>
     </div>
+  </section>
 
-    <!-- Footer -->
-    <div class="footer">
-      <p>Docker & Kubernetes 实战课程 | 从入门到精通</p>
-      <p>© 2024 课程讲义</p>
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">虚拟化容器技术 · 数据科学与大数据技术</div>
+      <div class="footer-right">40学时 / 2.5学分 · 考查</div>
     </div>
-  </div>
+  </footer>
 </body>
 </html>
