@@ -246,45 +246,56 @@
       line-height: 1.5;
     }
 
-    /* Download Box */
-    .download-section {
-      padding: 60px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .download-box {
+    /* Assessment Box */
+    .assessment-box {
       background: var(--bg-alt);
       border: 1px solid var(--border);
       padding: 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    .download-info h3 {
-      font-size: 18px;
+    .assessment-item {
+      margin-bottom: 24px;
+    }
+
+    .assessment-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .assessment-item h4 {
+      font-size: 15px;
       font-weight: 600;
+      color: var(--primary);
       margin-bottom: 8px;
     }
 
-    .download-info p {
+    .assessment-item p {
       font-size: 14px;
-      color: var(--text-light);
+      color: var(--text);
+      line-height: 1.6;
     }
 
-    .download-btn {
-      background: var(--primary);
-      color: white;
-      padding: 14px 28px;
-      text-decoration: none;
+    .assessment-item ul {
+      list-style: none;
       font-size: 14px;
-      font-weight: 500;
-      border-radius: 6px;
-      transition: background 0.2s;
+      color: var(--text);
+      line-height: 1.8;
     }
 
-    .download-btn:hover {
-      background: var(--primary-dark);
+    .assessment-item li {
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .assessment-item li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+    }
+
+    .assessment-item strong {
+      color: var(--primary);
+      font-weight: 600;
     }
 
     /* Footer */
@@ -345,10 +356,8 @@
         gap: 24px;
       }
       
-      .download-box {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
+      .assessment-box {
+        padding: 24px;
       }
       
       .footer-inner {
@@ -386,7 +395,7 @@
           <span class="stat-label">学分</span>
         </div>
         <div class="stat">
-          <span class="stat-value">16</span>
+          <span class="stat-value">15</span>
           <span class="stat-label">章节</span>
         </div>
         <div class="stat">
@@ -414,6 +423,32 @@
     </div>
   </section>
 
+  <!-- Assessment -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">课程考核要求</h2>
+      <div class="assessment-box">
+        <div class="assessment-item">
+          <h4>成绩构成</h4>
+          <p>课程总成绩以随堂作业为主要评定依据。</p>
+        </div>
+        <div class="assessment-item">
+          <h4>作业要求</h4>
+          <p>作业须在学习通平台提交，内容应包含完整的操作步骤、相关代码及必要的文字说明，仅提交截图者视为无效。</p>
+        </div>
+        <div class="assessment-item">
+          <h4>提交时限与评分标准</h4>
+          <ul>
+            <li>授课当日提交：满分 <strong>10</strong> 分</li>
+            <li>三日内提交：满分 <strong>8</strong> 分</li>
+            <li>一周内提交：满分 <strong>6</strong> 分</li>
+            <li>逾期未提交：计零分，不予补交</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Course List -->
   <section class="course-section">
     <div class="container">
@@ -421,160 +456,150 @@
     </div>
     <div class="container">
       <div class="course-grid">
-        <a href="standardized-lectures/lecture-1.html" class="course-card">
+        <a href="lectures/lecture-1.html" class="course-card">
           <div class="num">01</div>
-          <h3>容器技术概述与Docker基础入门</h3>
-          <p>理解容器技术背景，掌握Docker核心概念，完成环境搭建</p>
+          <h3>Linux基础</h3>
+          <p>Linux系统概述，常用命令，文件系统，权限管理</p>
           <div class="tags">
-            <span class="tag">容器概述</span>
+            <span class="tag">Linux</span>
+            <span class="tag">命令行</span>
+          </div>
+        </a>
+
+        <a href="lectures/lecture-2.html" class="course-card">
+          <div class="num">02</div>
+          <h3>虚拟化技术基础</h3>
+          <p>虚拟化概念，虚拟机原理，VMware/VirtualBox使用</p>
+          <div class="tags">
+            <span class="tag">虚拟机</span>
+            <span class="tag">虚拟化</span>
+          </div>
+        </a>
+
+        <a href="lectures/lecture-3.html" class="course-card">
+          <div class="num">03</div>
+          <h3>容器技术概述与Docker基础</h3>
+          <p>容器技术原理，Docker架构，Docker安装配置</p>
+          <div class="tags">
+            <span class="tag">容器</span>
             <span class="tag">Docker安装</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-2.html" class="course-card">
-          <div class="num">02</div>
-          <h3>Docker核心命令（上）</h3>
-          <p>镜像管理命令，容器生命周期，关键参数详解</p>
+        <a href="lectures/lecture-4.html" class="course-card">
+          <div class="num">04</div>
+          <h3>Docker镜像管理</h3>
+          <p>镜像概念，镜像获取，镜像操作命令，镜像导出导入</p>
           <div class="tags">
-            <span class="tag">镜像管理</span>
-            <span class="tag">容器操作</span>
+            <span class="tag">镜像</span>
+            <span class="tag">镜像命令</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-3.html" class="course-card">
-          <div class="num">03</div>
-          <h3>Docker核心命令（下）</h3>
-          <p>数据持久化，容器卷挂载，数据管理实践</p>
+        <a href="lectures/lecture-5.html" class="course-card">
+          <div class="num">05</div>
+          <h3>Docker容器操作</h3>
+          <p>容器生命周期管理，运行参数，资源限制，日志与监控</p>
+          <div class="tags">
+            <span class="tag">容器</span>
+            <span class="tag">资源限制</span>
+          </div>
+        </a>
+
+        <a href="lectures/lecture-6.html" class="course-card">
+          <div class="num">06</div>
+          <h3>Docker数据管理</h3>
+          <p>数据卷概念，数据卷操作，数据持久化方案</p>
           <div class="tags">
             <span class="tag">数据卷</span>
             <span class="tag">持久化</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-4.html" class="course-card">
-          <div class="num">04</div>
-          <h3>Docker镜像进阶</h3>
-          <p>镜像分层原理，Dockerfile，自定义镜像制作</p>
+        <a href="lectures/lecture-7.html" class="course-card">
+          <div class="num">07</div>
+          <h3>Dockerfile与镜像构建</h3>
+          <p>Dockerfile语法，镜像构建流程，镜像优化</p>
           <div class="tags">
             <span class="tag">Dockerfile</span>
             <span class="tag">镜像构建</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-5.html" class="course-card">
-          <div class="num">05</div>
+        <a href="lectures/lecture-8.html" class="course-card">
+          <div class="num">08</div>
           <h3>Docker镜像仓库</h3>
-          <p>私有仓库搭建，阿里云镜像服务，镜像安全</p>
+          <p>Docker Hub使用，私有仓库搭建，镜像分发</p>
           <div class="tags">
             <span class="tag">Registry</span>
-            <span class="tag">镜像仓库</span>
+            <span class="tag">私有仓库</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-6.html" class="course-card">
-          <div class="num">06</div>
-          <h3>MySQL主从复制</h3>
-          <p>Docker部署数据库高可用架构，主从复制配置</p>
-          <div class="tags">
-            <span class="tag">MySQL</span>
-            <span class="tag">主从复制</span>
-          </div>
-        </a>
-
-        <a href="standardized-lectures/lecture-7.html" class="course-card">
-          <div class="num">07</div>
-          <h3>Redis集群搭建</h3>
-          <p>主从复制、哨兵模式与Cluster集群部署</p>
-          <div class="tags">
-            <span class="tag">Redis</span>
-            <span class="tag">集群</span>
-          </div>
-        </a>
-
-        <a href="standardized-lectures/lecture-8.html" class="course-card">
-          <div class="num">08</div>
-          <h3>Docker网络原理</h3>
-          <p>容器网络模型，网络类型，容器间通信</p>
+        <a href="lectures/lecture-9.html" class="course-card">
+          <div class="num">09</div>
+          <h3>Docker网络</h3>
+          <p>网络模型，网络类型，容器间通信，网络配置</p>
           <div class="tags">
             <span class="tag">网络</span>
             <span class="tag">通信</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-9.html" class="course-card">
-          <div class="num">09</div>
-          <h3>Docker Compose入门</h3>
-          <p>多容器应用编排，docker-compose.yml编写</p>
+        <a href="lectures/lecture-10.html" class="course-card">
+          <div class="num">10</div>
+          <h3>Docker Compose</h3>
+          <p>Compose文件语法，多容器编排，服务依赖管理</p>
           <div class="tags">
             <span class="tag">Compose</span>
             <span class="tag">编排</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-10.html" class="course-card">
-          <div class="num">10</div>
-          <h3>微服务编排</h3>
-          <p>服务注册、配置中心与链路追踪</p>
-          <div class="tags">
-            <span class="tag">微服务</span>
-            <span class="tag">服务发现</span>
-          </div>
-        </a>
-
-        <a href="standardized-lectures/lecture-11.html" class="course-card">
+        <a href="lectures/lecture-11.html" class="course-card">
           <div class="num">11</div>
           <h3>Docker可视化与监控</h3>
-          <p>Portainer、Prometheus与Grafana部署</p>
+          <p>Portainer部署，Prometheus监控，Grafana可视化</p>
           <div class="tags">
             <span class="tag">可视化</span>
             <span class="tag">监控</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-12.html" class="course-card">
+        <a href="lectures/lecture-12.html" class="course-card">
           <div class="num">12</div>
-          <h3>企业实战与面试题</h3>
-          <p>CI/CD流水线，常见面试题解析</p>
-          <div class="tags">
-            <span class="tag">CI/CD</span>
-            <span class="tag">面试</span>
-          </div>
-        </a>
-
-        <a href="standardized-lectures/lecture-13.html" class="course-card">
-          <div class="num">13</div>
           <h3>Kubernetes核心概念</h3>
-          <p>K8s架构，核心组件，kubectl命令</p>
+          <p>Kubernetes架构，核心组件，kubectl命令</p>
           <div class="tags">
             <span class="tag">Kubernetes</span>
-            <span class="tag">K8s基础</span>
+            <span class="tag">架构</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-14.html" class="course-card">
-          <div class="num">14</div>
-          <h3>K8s核心资源（上）</h3>
-          <p>Pod与Deployment，应用部署实战</p>
+        <a href="lectures/lecture-13.html" class="course-card">
+          <div class="num">13</div>
+          <h3>Pod与Deployment</h3>
+          <p>Pod概念与生命周期，Deployment控制器，应用部署</p>
           <div class="tags">
             <span class="tag">Pod</span>
             <span class="tag">Deployment</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-15.html" class="course-card">
-          <div class="num">15</div>
-          <h3>K8s核心资源（下）</h3>
-          <p>Service与Ingress，服务暴露与路由</p>
+        <a href="lectures/lecture-14.html" class="course-card">
+          <div class="num">14</div>
+          <h3>Service与存储管理</h3>
+          <p>Service类型，服务发现，Ingress路由，PV/PVC存储</p>
           <div class="tags">
             <span class="tag">Service</span>
-            <span class="tag">Ingress</span>
+            <span class="tag">存储</span>
           </div>
         </a>
 
-        <a href="standardized-lectures/lecture-16.html" class="course-card">
-          <div class="num">16</div>
-          <h3>K8s实战与课程总结</h3>
-          <p>配置管理，持久化存储，综合实战</p>
+        <a href="lectures/lecture-15.html" class="course-card">
+          <div class="num">15</div>
+          <h3>配置管理与综合应用</h3>
+          <p>ConfigMap，Secret，Helm包管理，集群运维</p>
           <div class="tags">
             <span class="tag">ConfigMap</span>
             <span class="tag">Helm</span>
@@ -623,19 +648,6 @@
           <h4>Grafana</h4>
           <p>数据可视化</p>
         </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Download -->
-  <section class="download-section">
-    <div class="container">
-      <div class="download-box">
-        <div class="download-info">
-          <h3>课程配套工具包</h3>
-          <p>已整理好的开发环境工具，包含安装说明文档</p>
-        </div>
-        <a href="tools/" class="download-btn">查看下载</a>
       </div>
     </div>
   </section>

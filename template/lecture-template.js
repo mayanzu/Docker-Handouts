@@ -49,128 +49,13 @@ function updatePageDisplay() {
  * 根据内容量自动调整，内容少则增大，内容多则减小
  */
 function adjustFontSizeForCurrentPage() {
-  // 获取当前页面元素
   const currentPageElement = document.querySelector(`.page:nth-child(${currentPage})`);
   if (!currentPageElement) return;
   
-  // 计算内容量
   const contentAmount = calculateContentAmount(currentPageElement);
-  
-  // 根据内容量计算合适的字体大小
   const fontSize = calculateFontSize(contentAmount);
   
-  // 应用字体大小
   document.documentElement.style.setProperty('--base-font-size', `${fontSize}rem`);
-  
-  // 检查内容是否溢出，需要分页
-  setTimeout(() => {
-    checkContentOverflow();
-  }, 300); // 延迟检查，确保字体大小已应用
-}
-
-/**
- * 检查内容是否溢出，需要自动分页
- */
-function checkContentOverflow() {
-  const pages = document.querySelectorAll('.page');
-  pages.forEach((page, index) => {
-    if (checkPageOverflow(page)) {
-      splitPageContent(page, index + 1);
-    }
-  });
-  
-  // 更新总页数
-  updateTotalPages();
-}
-
-/**
- * 检查页面是否溢出
- * @param {HTMLElement} pageElement - 页面元素
- * @returns {boolean} 是否溢出
- */
-function checkPageOverflow(pageElement) {
-  const pageHeight = pageElement.clientHeight;
-  const contentHeight = pageElement.scrollHeight;
-  const windowHeight = window.innerHeight;
-  
-  // 考虑padding和边距
-  const overflowThreshold = windowHeight * 0.95;
-  
-  return contentHeight > overflowThreshold;
-}
-
-/**
- * 分割页面内容
- * @param {HTMLElement} pageElement - 要分割的页面
- * @param {number} pageIndex - 页面索引
- */
-function splitPageContent(pageElement, pageIndex) {
-  const pageBody = pageElement.querySelector('.page-body');
-  if (!pageBody) return;
-  
-  // 获取所有子元素
-  const children = Array.from(pageBody.children);
-  if (children.length === 0) return;
-  
-  // 找到合适的分割点
-  let splitIndex = findSplitPoint(children, pageElement);
-  if (splitIndex <= 0) return;
-  
-  // 创建新页面
-  const newPage = createNewPage();
-  
-  // 移动元素到新页面
-  const elementsToMove = children.slice(splitIndex);
-  const newPageBody = newPage.querySelector('.page-body');
-  elementsToMove.forEach(element => {
-    newPageBody.appendChild(element);
-  });
-  
-  // 插入新页面
-  pageElement.parentNode.insertBefore(newPage, pageElement.nextSibling);
-  
-  // 更新页码显示
-  updatePageNumbers();
-}
-
-/**
- * 找到合适的分割点
- * @param {HTMLElement[]} elements - 子元素数组
- * @param {HTMLElement} pageElement - 页面元素
- * @returns {number} 分割点索引
- */
-function findSplitPoint(elements, pageElement) {
-  const pageHeight = pageElement.clientHeight * 0.8; // 80%高度作为分割点
-  let currentHeight = 0;
-  
-  for (let i = 0; i < elements.length; i++) {
-    currentHeight += elements[i].offsetHeight;
-    if (currentHeight > pageHeight) {
-      return i;
-    }
-  }
-  
-  return elements.length - 1;
-}
-
-/**
- * 创建新页面
- * @returns {HTMLElement} 新页面元素
- */
-function createNewPage() {
-  const newPage = document.createElement('div');
-  newPage.className = 'page content-page';
-  
-  newPage.innerHTML = `
-    <div class="page-header">
-      <span class="page-number">继续</span>
-      <h1 class="page-title">内容续页</h1>
-    </div>
-    <div class="page-body">
-    </div>
-  `;
-  
-  return newPage;
 }
 
 /**
@@ -181,32 +66,8 @@ function updateTotalPages() {
   if (totalPagesElement) {
     const actualTotalPages = document.querySelectorAll('.page').length;
     totalPagesElement.textContent = actualTotalPages;
-    totalPages = actualTotalPages; // 更新全局变量
+    totalPages = actualTotalPages;
   }
-}
-
-/**
- * 更新页面编号
- */
-function updatePageNumbers() {
-  const pages = document.querySelectorAll('.page');
-  pages.forEach((page, index) => {
-    const pageNumberElement = page.querySelector('.page-number');
-    if (pageNumberElement) {
-      // 保留封面和目录的特殊编号
-      if (index === 0) {
-        // 封面
-      } else if (index === 1) {
-        // 目录
-      } else {
-        // 保留原始的章节序号格式，不进行覆盖
-        // 仅对新创建的页面设置编号
-        if (pageNumberElement.textContent === '继续') {
-          pageNumberElement.textContent = `${index}`;
-        }
-      }
-    }
-  });
 }
 
 /**

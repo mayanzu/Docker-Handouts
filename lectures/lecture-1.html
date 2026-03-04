@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第一讲 Linux基础 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+      
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第一讲</h1>
+          <h2 class="sub-title">Linux基础</h2>
+          <p class="tagline">掌握Linux系统核心技能，为容器技术打下坚实基础</p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li>
+                <span class="toc-num">01</span>
+                <span class="toc-text">第一部分：Linux系统概述</span>
+              </li>
+              <li>
+                <span class="toc-num">02</span>
+                <span class="toc-text">第二部分：常用命令</span>
+              </li>
+              <li>
+                <span class="toc-num">03</span>
+                <span class="toc-text">第三部分：文件系统</span>
+              </li>
+              <li>
+                <span class="toc-num">04</span>
+                <span class="toc-text">第四部分：权限管理</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>Linux是容器技术的基石，本讲内容是后续课程的重要基础。建议学员<span class="highlight">边学边练</span>，每个命令都要亲自执行验证。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解Linux系统</h3>
+                <p>了解Linux的<span class="key-point">发展历史</span>、特点和应用场景</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>掌握常用命令</h3>
+                <p>熟练使用<span class="highlight">文件操作</span>、<span class="highlight">目录管理</span>等基础命令</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>理解文件系统</h3>
+                <p>掌握Linux<span class="key-point">目录结构</span>和文件路径概念</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>掌握权限管理</h3>
+                <p>理解<span class="highlight">用户权限</span>机制，能够进行权限设置</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">Linux系统概述</h1>
+          <p class="section-desc">了解Linux的前世今生</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是Linux？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">核心定义</div>
+            <div class="definition-content">
+              Linux是一种<span class="highlight">自由和开放源码</span>的类UNIX操作系统内核，由林纳斯·托瓦兹于1991年首次发布。它是一个<span class="highlight">多用户、多任务</span>的操作系统。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            Linux操作系统广泛应用于服务器、超级计算机、嵌入式设备等领域。在容器技术领域，Linux更是<span class="highlight">不可或缺的基础平台</span>，Docker等容器技术正是基于Linux内核特性实现的。
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">Linux特点</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">开源免费</span>：源代码公开，可自由使用和修改</p>
+              <p>2. <span class="key-point">稳定可靠</span>：可连续运行数年无需重启</p>
+              <p>3. <span class="key-point">安全高效</span>：权限机制完善，资源占用低</p>
+              <p>4. <span class="key-point">可定制性强</span>：可根据需求定制系统功能</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">Linux发行版</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Linux发行版是基于Linux内核的完整操作系统，包含内核、系统库、工具软件等。常见的发行版如下：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>发行版</th>
+                <th>特点</th>
+                <th>适用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">Ubuntu</span></td>
+                <td>用户友好，社区活跃</td>
+                <td>桌面、开发、服务器</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">CentOS</span></td>
+                <td>稳定，企业级支持</td>
+                <td>服务器、生产环境</td>
+              </tr>
+              <tr>
+                <td>Debian</td>
+                <td>稳定，软件包丰富</td>
+                <td>服务器、开发</td>
+              </tr>
+              <tr>
+                <td>Fedora</td>
+                <td>新技术前沿</td>
+                <td>开发、测试</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="tip-box">
+            <div class="tip-title">提示</div>
+            <p>本课程推荐使用 <span class="highlight">Ubuntu 20.04/22.04</span> 或 <span class="highlight">CentOS 7/8</span> 作为学习环境，这也是Docker官方推荐的基础镜像。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">常用命令</h1>
+          <p class="section-desc">掌握Linux操作的核心技能</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">目录操作命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">目录操作示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 显示当前目录
+pwd
+
+# 列出目录内容
+ls
+ls -l    # 详细信息
+ls -a    # 显示隐藏文件
+ls -lh   # 人性化显示文件大小
+
+# 切换目录
+cd /home         # 切换到/home目录
+cd ~             # 切换到用户主目录
+cd ..            # 切换到上级目录
+cd -             # 切换到上一个目录
+
+# 创建目录
+mkdir dir1              # 创建单个目录
+mkdir -p dir1/dir2      # 递归创建多级目录
+
+# 删除空目录
+rmdir dir1</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">命令说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">pwd</span>：Print Working Directory，显示当前工作目录</p>
+              <p>- <span class="key-point">ls</span>：List，列出目录内容</p>
+              <p>- <span class="key-point">cd</span>：Change Directory，切换目录</p>
+              <p>- <span class="key-point">mkdir</span>：Make Directory，创建目录</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">文件操作命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">文件操作示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建空文件
+touch file.txt
+
+# 复制文件
+cp file1.txt file2.txt       # 复制文件
+cp -r dir1 dir2              # 递归复制目录
+
+# 移动/重命名文件
+mv file1.txt file2.txt       # 重命名
+mv file.txt /tmp/            # 移动文件
+
+# 删除文件
+rm file.txt                  # 删除文件
+rm -r dir1                   # 递归删除目录
+rm -rf dir1                  # 强制递归删除（谨慎使用）
+
+# 查看文件内容
+cat file.txt                 # 显示全部内容
+head -n 10 file.txt          # 显示前10行
+tail -n 10 file.txt          # 显示后10行
+tail -f log.txt              # 实时追踪文件末尾</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">警告</div>
+            <div class="highlight-content">
+              <p><span class="highlight">rm -rf</span> 命令非常危险，会强制删除指定目录及其所有内容，且无法恢复。执行前务必确认路径正确！</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">文件查找与内容搜索</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查找与搜索示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查找文件
+find /home -name "*.txt"     # 按名称查找
+find /home -type f           # 查找所有文件
+find /home -type d           # 查找所有目录
+find /home -size +100M       # 查找大于100M的文件
+
+# 搜索文件内容
+grep "error" log.txt         # 在文件中搜索关键词
+grep -r "error" /var/log/    # 递归搜索目录
+grep -i "error" log.txt      # 忽略大小写
+grep -n "error" log.txt      # 显示行号
+
+# 组合使用
+find . -name "*.log" | xargs grep "error"</code></pre>
+          </div>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>find命令</h3>
+              <p>用于<span class="highlight">查找文件</span>，支持按名称、类型、大小、时间等条件搜索</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>grep命令</h3>
+              <p>用于<span class="highlight">搜索文本</span>内容，支持正则表达式，是日志分析的利器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">文件系统</h1>
+          <p class="section-desc">理解Linux目录结构</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">Linux目录结构</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Linux采用<span class="highlight">树形目录结构</span>，所有文件和目录都从根目录 / 开始。了解标准目录结构对于系统管理至关重要。
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>目录</th>
+                <th>说明</th>
+                <th>重要程度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">/</span></td>
+                <td>根目录，所有文件的起点</td>
+                <td><span class="highlight">核心</span></td>
+              </tr>
+              <tr>
+                <td><span class="highlight">/home</span></td>
+                <td>用户主目录</td>
+                <td><span class="highlight">核心</span></td>
+              </tr>
+              <tr>
+                <td><span class="highlight">/etc</span></td>
+                <td>系统配置文件</td>
+                <td><span class="highlight">核心</span></td>
+              </tr>
+              <tr>
+                <td>/var</td>
+                <td>可变数据（日志、缓存等）</td>
+                <td>重要</td>
+              </tr>
+              <tr>
+                <td>/usr</td>
+                <td>用户程序和数据</td>
+                <td>重要</td>
+              </tr>
+              <tr>
+                <td>/tmp</td>
+                <td>临时文件</td>
+                <td>一般</td>
+              </tr>
+              <tr>
+                <td>/root</td>
+                <td>root用户主目录</td>
+                <td>重要</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">路径概念</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">绝对路径</div>
+            <div class="definition-content">
+              从根目录 / 开始的完整路径，例如：<span class="highlight">/home/user/documents/file.txt</span>
+            </div>
+          </div>
+          
+          <div class="definition-box">
+            <div class="definition-term">相对路径</div>
+            <div class="definition-content">
+              相对于当前工作目录的路径，例如：<span class="highlight">./documents/file.txt</span> 或 <span class="highlight">../config/app.conf</span>
+            </div>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">特殊符号</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">.</span> 表示当前目录</p>
+              <p>- <span class="key-point">..</span> 表示上级目录</p>
+              <p>- <span class="key-point">~</span> 表示当前用户的主目录</p>
+              <p>- <span class="key-point">-</span> 表示上一个工作目录</p>
+            </div>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">最佳实践</div>
+            <p>在脚本中使用<span class="highlight">绝对路径</span>可以避免因工作目录变化导致的错误。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">权限管理</h1>
+          <p class="section-desc">保障系统安全的核心机制</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">权限概念</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Linux采用<span class="highlight">多用户权限机制</span>，每个文件和目录都有明确的权限设置，控制不同用户对资源的访问。
+          </p>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>读权限 r</h3>
+              <p>可以查看文件内容，列出目录内容。数值为 <span class="highlight">4</span></p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>写权限 w</h3>
+              <p>可以修改文件内容，在目录中创建/删除文件。数值为 <span class="highlight">2</span></p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>执行权限 x</h3>
+              <p>可以执行文件（脚本、程序），进入目录。数值为 <span class="highlight">1</span></p>
+            </div>
+          </div>
+          
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">权限分组</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">所有者 Owner</span>：文件的创建者</p>
+              <p>- <span class="key-point">所属组 Group</span>：文件所属的用户组</p>
+              <p>- <span class="key-point">其他用户 Others</span>：其他所有用户</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">权限查看与修改</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">权限操作示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看权限
+ls -l file.txt
+# 输出示例：-rwxr-xr-- 1 user group 1024 Jan 1 10:00 file.txt
+# 解释：-文件类型 rwx所有者权限 r-x组权限 r--其他用户权限
+
+# 数字方式修改权限
+chmod 755 script.sh    # rwxr-xr-x
+chmod 644 file.txt     # rw-r--r--
+chmod 700 private/     # rwx------
+
+# 符号方式修改权限
+chmod u+x script.sh    # 给所有者添加执行权限
+chmod g-w file.txt     # 移除组的写权限
+chmod o=r file.txt     # 设置其他用户只读
+chmod a+x script.sh    # 所有人添加执行权限
+
+# 修改所有者
+chown user file.txt           # 修改所有者
+chown user:group file.txt     # 修改所有者和所属组
+chgrp group file.txt          # 仅修改所属组</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">权限计算方法</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            权限数值通过<span class="highlight">相加计算</span>：r=4, w=2, x=1，将需要的权限数值相加即可。
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>权限组合</th>
+                <th>计算方式</th>
+                <th>数值</th>
+                <th>含义</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>rwx</td>
+                <td>4+2+1</td>
+                <td><span class="highlight">7</span></td>
+                <td>读+写+执行</td>
+              </tr>
+              <tr>
+                <td>r-x</td>
+                <td>4+0+1</td>
+                <td><span class="highlight">5</span></td>
+                <td>读+执行</td>
+              </tr>
+              <tr>
+                <td>rw-</td>
+                <td>4+2+0</td>
+                <td><span class="highlight">6</span></td>
+                <td>读+写</td>
+              </tr>
+              <tr>
+                <td>r--</td>
+                <td>4+0+0</td>
+                <td><span class="highlight">4</span></td>
+                <td>只读</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">常用权限设置</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">755</span>：目录或可执行程序（所有者全权限，其他人可读可执行）</p>
+              <p>- <span class="highlight">644</span>：普通文件（所有者可读写，其他人只读）</p>
+              <p>- <span class="highlight">700</span>：私有目录（仅所有者可访问）</p>
+              <p>- <span class="highlight">600</span>：敏感文件（仅所有者可读写）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">动手实验：Linux基础操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">Linux命令练习</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>熟悉Linux基本命令，掌握文件和目录操作，理解权限管理</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">打开终端，使用 pwd 查看当前目录，使用 ls 查看目录内容</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">在主目录下创建 test 目录，进入该目录创建 file1.txt 和 file2.txt</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">使用 ls -l 查看文件权限，尝试用 chmod 修改权限</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">使用 cat、head、tail 命令查看 /etc/passwd 文件内容</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">使用 find 命令查找 /etc 目录下所有 .conf 文件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">参考命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1-2
+pwd
+ls
+mkdir ~/test
+cd ~/test
+touch file1.txt file2.txt
+
+# 步骤3
+ls -l
+chmod 644 file1.txt
+ls -l
+
+# 步骤4
+cat /etc/passwd
+head -n 5 /etc/passwd
+tail -n 5 /etc/passwd
+
+# 步骤5
+find /etc -name "*.conf" | head -n 10</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本讲小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">理解<span class="highlight">Linux系统</span>：了解了Linux的发展、特点和发行版</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">掌握<span class="highlight">常用命令</span>：学会了目录操作、文件操作、查找搜索命令</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">理解<span class="highlight">文件系统</span>：掌握了Linux目录结构和路径概念</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">掌握<span class="highlight">权限管理</span>：理解权限机制，能够进行权限设置</span>
+            </div>
+          </div>
+          
+          <div class="key-conclusion" style="margin-top: 1.5rem;">
+            <div class="conclusion-title">核心要点回顾</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">命令行操作</span>是Linux的核心技能，需要大量练习</p>
+              <p>2. <span class="highlight">文件系统</span>结构是理解Linux的关键，要熟悉各目录用途</p>
+              <p>3. <span class="highlight">权限管理</span>是系统安全的基础，要谨慎操作</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下讲预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>第二讲：<span class="highlight">虚拟化技术基础</span></h3>
+            <ul>
+              <li>了解<span class="key-point">虚拟化概念</span>与发展历程</li>
+              <li>理解<span class="key-point">虚拟机原理</span>与架构</li>
+              <li>掌握<span class="key-point">VMware/VirtualBox</span>的使用</li>
+              <li>为<span class="key-point">容器技术</span>学习打下基础</li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">预习建议</div>
+            <div class="kp-content">
+              <p>1. 复习本讲的<span class="highlight">Linux命令</span>，确保熟练掌握</p>
+              <p>2. 了解<span class="highlight">虚拟化技术</span>的基本概念</p>
+              <p>3. 下载安装<span class="highlight">VirtualBox</span>虚拟机软件</p>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <span>虚拟化容器技术</span>
+          <span>感谢您的学习</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">18</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>
