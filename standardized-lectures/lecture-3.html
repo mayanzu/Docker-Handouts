@@ -181,23 +181,11 @@ cat /tmp/test.txt  # 文件不存在！</code></pre>
           <h1 class="page-title">三种挂载方式概览</h1>
         </div>
         <div class="page-body">
-          <div class="three-column">
-            <div class="concept-preview">
-              <div class="concept-num">01</div>
-              <h3>宿主机目录挂载</h3>
-              <p><span class="highlight">-v /host:/container</span></p>
-            </div>
-            <div class="concept-preview">
-              <div class="concept-num">02</div>
-              <h3>匿名卷</h3>
-              <p><span class="key-point">-v /container</span></p>
-            </div>
-            <div class="concept-preview">
-              <div class="concept-num">03</div>
-              <h3>命名卷</h3>
-              <p><span class="key-point">-v name:/container</span></p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>宿主机目录挂载</strong>：<span class="highlight">-v /host:/container</span></li>
+            <li><strong>匿名卷</strong>：<span class="key-point">-v /container</span></li>
+            <li><strong>命名卷</strong>：<span class="key-point">-v name:/container</span></li>
+          </ul>
           <div class="knowledge-point">
             <div class="kp-title">挂载的本质</div>
             <div class="kp-content">

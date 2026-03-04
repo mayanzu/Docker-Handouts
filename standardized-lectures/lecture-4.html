@@ -115,11 +115,16 @@
               联合文件系统（Union File System）是一种<span class="highlight">分层、轻量级</span>的高性能文件系统。它将多个目录挂载到同一个目录下，对外呈现一个统一的文件系统。
             </div>
           </div>
-          <div class="arch-diagram">
-            <div class="arch-layer app">应用层（可读写）</div>
-            <div class="arch-layer docker">依赖库层（只读）</div>
-            <div class="arch-layer os">基础系统层（只读）</div>
-            <div class="arch-layer host">引导层（只读）</div>
+          <div class="knowledge-point">
+            <div class="kp-title">镜像分层结构</div>
+            <div class="kp-content">
+              <ul>
+                <li>应用层（可读写）</li>
+                <li>依赖库层（只读）</li>
+                <li>基础系统层（只读）</li>
+                <li>引导层（只读）</li>
+              </ul>
+            </div>
           </div>
           <div class="term-box">
             <div class="term-title">名词解释：分层存储</div>
@@ -161,24 +166,12 @@
           <h1 class="page-title">镜像分层的优势</h1>
         </div>
         <div class="page-body">
-          <div class="pain-points-grid">
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <h3>节省存储空间</h3>
-              <p>相同的基础层<span class="highlight">只存储一份</span></p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <h3>加速构建</h3>
-              <p>利用缓存，<span class="highlight">只重建变化的层</span></p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <h3>快速分发</h3>
-              <p><span class="key-point">只传输差异层</span></p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <h3>安全性</h3>
-              <p>基础层<span class="key-point">只读，不可篡改</span></p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>节省存储空间</strong>：相同的基础层<span class="highlight">只存储一份</span></li>
+            <li><strong>加速构建</strong>：利用缓存，<span class="highlight">只重建变化的层</span></li>
+            <li><strong>快速分发</strong>：<span class="key-point">只传输差异层</span></li>
+            <li><strong>安全性</strong>：基础层<span class="key-point">只读，不可篡改</span></li>
+          </ul>
           <div class="knowledge-point">
             <div class="kp-title">实际应用</div>
             <div class="kp-content">

@@ -31,36 +31,12 @@
           <h1 class="page-title">课程目标</h1>
         </div>
         <div class="page-body">
-          <div class="goal-list">
-            <div class="goal-item">
-              <div class="goal-icon">📚</div>
-              <div class="goal-content">
-                <h3>理解镜像仓库分类</h3>
-                <p>公有仓库与私有仓库</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">🔧</div>
-              <div class="goal-content">
-                <h3>掌握私有仓库搭建</h3>
-                <p>Docker Registry部署</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">☁️</div>
-              <div class="goal-content">
-                <h3>使用阿里云镜像服务</h3>
-                <p>企业级镜像托管</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">🔒</div>
-              <div class="goal-content">
-                <h3>镜像安全最佳实践</h3>
-                <p>漏洞扫描与签名</p>
-              </div>
-            </div>
-          </div>
+          <ul>
+            <li><strong>理解镜像仓库分类</strong>：公有仓库与私有仓库</li>
+            <li><strong>掌握私有仓库搭建</strong>：Docker Registry部署</li>
+            <li><strong>使用阿里云镜像服务</strong>：企业级镜像托管</li>
+            <li><strong>镜像安全最佳实践</strong>：漏洞扫描与签名</li>
+          </ul>
         </div>
       </div>
 
@@ -129,26 +105,11 @@
           <h1 class="page-title">镜像仓库分类</h1>
         </div>
         <div class="page-body">
-          <div class="pain-points-grid">
-            <div class="pain-point-card" style="border-color: #93c5fd;">
-              <div class="pain-icon">🌍</div>
-              <h3>公有仓库</h3>
-              <p>Docker Hub、Quay.io</p>
-              <p>免费使用、公开可见</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #fca5a5;">
-              <div class="pain-icon">🏢</div>
-              <h3>私有仓库</h3>
-              <p>自建Registry、Harbor</p>
-              <p>安全可控、内网访问</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #fcd34d;">
-              <div class="pain-icon">☁️</div>
-              <h3>云服务商</h3>
-              <p>阿里云、腾讯云、AWS ECR</p>
-              <p>稳定可靠、CDN加速</p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>公有仓库</strong>：Docker Hub、Quay.io，免费使用、公开可见</li>
+            <li><strong>私有仓库</strong>：自建Registry、Harbor，安全可控、内网访问</li>
+            <li><strong>云服务商</strong>：阿里云、腾讯云、AWS ECR，稳定可靠、CDN加速</li>
+          </ul>
         </div>
       </div>
 
@@ -165,24 +126,12 @@
               <p>Docker官方提供的公有镜像仓库，是全球最大的容器镜像社区。</p>
             </div>
           </div>
-          <div class="feature-list">
-            <div class="feature-item">
-              <span class="feature-icon">✓</span>
-              <span>官方镜像：nginx、mysql、redis、python等</span>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">✓</span>
-              <span>免费账户：1个私有仓库，无限公有仓库</span>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">✓</span>
-              <span>自动构建：关联GitHub自动构建镜像</span>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">✓</span>
-              <span>Webhooks：镜像更新时触发通知</span>
-            </div>
-          </div>
+          <ul>
+            <li>官方镜像：nginx、mysql、redis、python等</li>
+            <li>免费账户：1个私有仓库，无限公有仓库</li>
+            <li>自动构建：关联GitHub自动构建镜像</li>
+            <li>Webhooks：镜像更新时触发通知</li>
+          </ul>
           <div class="code-block">
             <div class="code-header">
               <span class="code-title">登录Docker Hub</span>
@@ -210,28 +159,12 @@
           <h1 class="page-title">为什么需要私有仓库？</h1>
         </div>
         <div class="page-body">
-          <div class="pain-points-grid">
-            <div class="pain-point-card" style="border-color: #fca5a5;">
-              <div class="pain-icon">🔒</div>
-              <h3>安全性</h3>
-              <p>敏感代码不暴露到公网</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #fca5a5;">
-              <div class="pain-icon">⚡</div>
-              <h3>速度</h3>
-              <p>内网传输更快</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #fca5a5;">
-              <div class="pain-icon">💰</div>
-              <h3>成本</h3>
-              <p>节省带宽费用</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #fca5a5;">
-              <div class="pain-icon">📋</div>
-              <h3>合规</h3>
-              <p>满足数据安全要求</p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>安全性</strong>：敏感代码不暴露到公网</li>
+            <li><strong>速度</strong>：内网传输更快</li>
+            <li><strong>成本</strong>：节省带宽费用</li>
+            <li><strong>合规</strong>：满足数据安全要求</li>
+          </ul>
         </div>
       </div>
 

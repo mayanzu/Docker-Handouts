@@ -31,36 +31,12 @@
           <h1 class="page-title">课程目标</h1>
         </div>
         <div class="page-body">
-          <div class="goal-list">
-            <div class="goal-item">
-              <div class="goal-icon">📚</div>
-              <div class="goal-content">
-                <h3>理解主从复制原理</h3>
-                <p>Binlog日志与复制机制</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">🔧</div>
-              <div class="goal-content">
-                <h3>掌握Docker部署MySQL</h3>
-                <p>主从架构搭建</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">✅</div>
-              <div class="goal-content">
-                <h3>验证数据同步</h3>
-                <p>主从一致性测试</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">🔄</div>
-              <div class="goal-content">
-                <h3>故障切换演练</h3>
-                <p>主库故障处理</p>
-              </div>
-            </div>
-          </div>
+          <ul>
+            <li><strong>理解主从复制原理</strong>：Binlog日志与复制机制</li>
+            <li><strong>掌握Docker部署MySQL</strong>：主从架构搭建</li>
+            <li><strong>验证数据同步</strong>：主从一致性测试</li>
+            <li><strong>故障切换演练</strong>：主库故障处理</li>
+          </ul>
         </div>
       </div>
 
@@ -113,10 +89,15 @@
               将主数据库的数据实时同步到一个或多个从数据库，实现数据的冗余备份、读写分离和负载均衡。
             </div>
           </div>
-          <div class="arch-diagram">
-            <div class="arch-layer master">主库（Master）- 写操作</div>
-            <div class="arch-arrow">↓ Binlog同步</div>
-            <div class="arch-layer slave">从库（Slave）- 读操作</div>
+          <div class="knowledge-point">
+            <div class="kp-title">主从架构</div>
+            <div class="kp-content">
+              <ul>
+                <li>主库（Master）- 写操作</li>
+                <li>Binlog同步</li>
+                <li>从库（Slave）- 读操作</li>
+              </ul>
+            </div>
           </div>
           <div class="term-box">
             <div class="term-title">📚 名词解释：读写分离</div>
@@ -170,24 +151,14 @@
           <h1 class="page-title">复制架构示意</h1>
         </div>
         <div class="page-body">
-          <div class="arch-diagram vertical">
-            <div class="arch-box master-box">
-              <div class="box-title">Master 主库</div>
-              <div class="box-content">
-                <div class="box-item">Binlog日志</div>
-                <div class="box-item">写操作</div>
-              </div>
-            </div>
-            <div class="arch-flow">
-              <span class="flow-text">I/O线程读取</span>
-              <span class="flow-arrow">↓</span>
-            </div>
-            <div class="arch-box slave-box">
-              <div class="box-title">Slave 从库</div>
-              <div class="box-content">
-                <div class="box-item">Relay Log</div>
-                <div class="box-item">SQL线程重放</div>
-              </div>
+          <div class="knowledge-point">
+            <div class="kp-title">复制架构</div>
+            <div class="kp-content">
+              <ul>
+                <li>Master 主库：Binlog日志、写操作</li>
+                <li>I/O线程读取</li>
+                <li>Slave 从库：Relay Log、SQL线程重放</li>
+              </ul>
             </div>
           </div>
           <div class="highlight-box info">
@@ -206,32 +177,12 @@
           <h1 class="page-title">应用场景</h1>
         </div>
         <div class="page-body">
-          <div class="pain-points-grid">
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">📖</div>
-              <h3>读写分离</h3>
-              <p>主库写，从库读</p>
-              <p>提升读性能</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">💾</div>
-              <h3>数据备份</h3>
-              <p>实时数据冗余</p>
-              <p>防止数据丢失</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">🔄</div>
-              <h3>故障切换</h3>
-              <p>主库故障时</p>
-              <p>从库接管服务</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">📊</div>
-              <h3>数据分析</h3>
-              <p>从库执行报表</p>
-              <p>不影响主库</p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>读写分离</strong>：主库写，从库读，提升读性能</li>
+            <li><strong>数据备份</strong>：实时数据冗余，防止数据丢失</li>
+            <li><strong>故障切换</strong>：主库故障时，从库接管服务</li>
+            <li><strong>数据分析</strong>：从库执行报表，不影响主库</li>
+          </ul>
         </div>
       </div>
 

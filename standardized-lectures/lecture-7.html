@@ -31,36 +31,12 @@
           <h1 class="page-title">课程目标</h1>
         </div>
         <div class="page-body">
-          <div class="goal-list">
-            <div class="goal-item">
-              <div class="goal-icon">📚</div>
-              <div class="goal-content">
-                <h3>理解Redis主从复制</h3>
-                <p>数据同步机制</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">🛡️</div>
-              <div class="goal-content">
-                <h3>掌握哨兵模式</h3>
-                <p>高可用自动切换</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">🔗</div>
-              <div class="goal-content">
-                <h3>部署Cluster集群</h3>
-                <p>分布式存储方案</p>
-              </div>
-            </div>
-            <div class="goal-item">
-              <div class="goal-icon">⚡</div>
-              <div class="goal-content">
-                <h3>缓存应用实践</h3>
-                <p>缓存穿透与雪崩</p>
-              </div>
-            </div>
-          </div>
+          <ul>
+            <li><strong>理解Redis主从复制</strong>：数据同步机制</li>
+            <li><strong>掌握哨兵模式</strong>：高可用自动切换</li>
+            <li><strong>部署Cluster集群</strong>：分布式存储方案</li>
+            <li><strong>缓存应用实践</strong>：缓存穿透与雪崩</li>
+          </ul>
         </div>
       </div>
 
@@ -282,23 +258,11 @@ master_host:redis-master</code></pre>
               Redis Sentinel是Redis官方提供的高可用解决方案，用于监控主从节点、自动故障转移和配置提供者。
             </div>
           </div>
-          <div class="pain-points-grid">
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">👁️</div>
-              <h3>监控</h3>
-              <p>检查主从节点是否正常</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">🔄</div>
-              <h3>故障转移</h3>
-              <p>主库故障时自动切换</p>
-            </div>
-            <div class="pain-point-card" style="border-color: #bbf7d0;">
-              <div class="pain-icon">📢</div>
-              <h3>通知</h3>
-              <p>通知客户端新的主库地址</p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>监控</strong>：检查主从节点是否正常</li>
+            <li><strong>故障转移</strong>：主库故障时自动切换</li>
+            <li><strong>通知</strong>：通知客户端新的主库地址</li>
+          </ul>
         </div>
       </div>
 

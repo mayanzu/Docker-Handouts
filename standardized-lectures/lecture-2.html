@@ -388,14 +388,15 @@ Loaded image: nginx:latest</code></pre>
           <h1 class="page-title">容器生命周期概览</h1>
         </div>
         <div class="page-body">
-          <div class="flow-diagram">
-            <div class="flow-node">镜像</div>
-            <div class="flow-arrow">docker run →</div>
-            <div class="flow-node highlight"><span class="highlight">运行中</span></div>
-            <div class="flow-arrow">stop →</div>
-            <div class="flow-node">已停止</div>
-            <div class="flow-arrow">rm →</div>
-            <div class="flow-node">删除</div>
+          <div class="knowledge-point">
+            <div class="kp-title">容器状态流转</div>
+            <div class="kp-content">
+              <ul>
+                <li>镜像 → docker run → <span class="highlight">运行中</span></li>
+                <li>运行中 → stop → 已停止</li>
+                <li>已停止 → rm → 删除</li>
+              </ul>
+            </div>
           </div>
           <table class="command-table">
             <thead>

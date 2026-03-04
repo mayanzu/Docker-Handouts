@@ -190,28 +190,12 @@
           <h1 class="page-title">传统部署的痛点</h1>
         </div>
         <div class="page-body">
-          <div class="pain-points-grid">
-            <div class="pain-point-card">
-              <h3>环境不一致</h3>
-              <p>开发、测试、生产环境配置差异巨大</p>
-              <p class="highlight">影响：30%开发时间浪费</p>
-            </div>
-            <div class="pain-point-card">
-              <h3>依赖冲突</h3>
-              <p>不同项目需要不同版本的运行时</p>
-              <p class="highlight">影响：项目间相互干扰</p>
-            </div>
-            <div class="pain-point-card">
-              <h3>配置复杂</h3>
-              <p>新员工配置环境需要数天时间</p>
-              <p class="highlight">影响：入职效率低下</p>
-            </div>
-            <div class="pain-point-card">
-              <h3>迁移困难</h3>
-              <p>换服务器就要重新配置环境</p>
-              <p class="highlight">影响：扩展能力受限</p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>环境不一致</strong>：开发、测试、生产环境配置差异巨大，影响：30%开发时间浪费</li>
+            <li><strong>依赖冲突</strong>：不同项目需要不同版本的运行时，影响：项目间相互干扰</li>
+            <li><strong>配置复杂</strong>：新员工配置环境需要数天时间，影响：入职效率低下</li>
+            <li><strong>迁移困难</strong>：换服务器就要重新配置环境，影响：扩展能力受限</li>
+          </ul>
         </div>
       </div>
 
@@ -221,20 +205,11 @@
           <h1 class="page-title">传统部署的痛点</h1>
         </div>
         <div class="page-body">
-          <div class="impact-items">
-            <div class="impact-item">
-              <span class="impact-value highlight">30%</span>
-              <span class="impact-label">开发时间浪费在环境问题上</span>
-            </div>
-            <div class="impact-item">
-              <span class="impact-value highlight">50%</span>
-              <span class="impact-label">部署失败源于环境差异</span>
-            </div>
-            <div class="impact-item">
-              <span class="impact-value highlight">数天</span>
-              <span class="impact-label">新员工环境配置时间</span>
-            </div>
-          </div>
+          <ul>
+            <li><strong class="highlight">30%</strong> 开发时间浪费在环境问题上</li>
+            <li><strong class="highlight">50%</strong> 部署失败源于环境差异</li>
+            <li><strong class="highlight">数天</strong> 新员工环境配置时间</li>
+          </ul>
           <div class="term-box">
             <div class="term-title">名词解释：环境</div>
             <p><strong class="highlight">环境</strong>指软件运行所需的完整条件，包括操作系统、运行时（如Python、Java）、依赖库、配置文件等。就像植物生长需要土壤、阳光、水分一样，软件运行也需要特定的"环境"。</p>
@@ -242,10 +217,12 @@
           <div class="knowledge-point">
             <div class="kp-title">环境配置的复杂性来源</div>
             <div class="kp-content">
-              <p>1. <span class="key-point">操作系统差异</span>：不同OS有不同的文件系统、权限模型、网络配置</p>
-              <p>2. <span class="key-point">版本依赖</span>：项目A需要Python 3.8，项目B需要Python 3.11</p>
-              <p>3. <span class="key-point">库冲突</span>：不同项目依赖同一库的不同版本</p>
-              <p>4. <span class="key-point">配置差异</span>：开发/测试/生产环境的配置参数不同</p>
+              <ul>
+                <li><span class="key-point">操作系统差异</span>：不同OS有不同的文件系统、权限模型、网络配置</li>
+                <li><span class="key-point">版本依赖</span>：项目A需要Python 3.8，项目B需要Python 3.11</li>
+                <li><span class="key-point">库冲突</span>：不同项目依赖同一库的不同版本</li>
+                <li><span class="key-point">配置差异</span>：开发/测试/生产环境的配置参数不同</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -288,23 +265,31 @@
           <h1 class="page-title">传统方案一：详细文档</h1>
         </div>
         <div class="page-body">
-          <div class="solution-item">
-            <h3>方案描述</h3>
-            <p>将整个操作系统打包成虚拟机镜像，保证环境完全一致</p>
-            <div class="pros-cons">
-              <div class="pros">
-                <div class="label">优点</div>
-                <span class="pro">环境完全隔离</span>
-                <span class="pro">可以打包所有依赖</span>
-                <span class="pro">保证一致性</span>
-              </div>
-              <div class="cons">
-                <div class="label">缺点</div>
-                <span class="con"><span class="highlight">镜像体积巨大（5-20GB）</span></span>
-                <span class="con"><span class="highlight">启动慢（分钟级）</span></span>
-                <span class="con">资源消耗高</span>
-                <span class="con">难以大规模部署</span>
-              </div>
+          <div class="highlight-box info">
+            <div class="highlight-title">方案描述</div>
+            <div class="highlight-content">
+              <p>将整个操作系统打包成虚拟机镜像，保证环境完全一致</p>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">优点</div>
+            <div class="kp-content">
+              <ul>
+                <li>环境完全隔离</li>
+                <li>可以打包所有依赖</li>
+                <li>保证一致性</li>
+              </ul>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">缺点</div>
+            <div class="kp-content">
+              <ul>
+                <li><span class="highlight">镜像体积巨大（5-20GB）</span></li>
+                <li><span class="highlight">启动慢（分钟级）</span></li>
+                <li>资源消耗高</li>
+                <li>难以大规模部署</li>
+              </ul>
             </div>
           </div>
           <div class="term-box">
@@ -327,13 +312,13 @@
               <p><strong class="highlight">答案就是——容器技术！</strong></p>
             </div>
           </div>
-          <div class="comparison-visual">
-            <div class="compare-item bad">
-              <div class="compare-text">虚拟机：太重、太慢</div>
-            </div>
-            <div class="compare-arrow">→</div>
-            <div class="compare-item good">
-              <div class="compare-text">容器：<span class="highlight">轻量、快速</span></div>
+          <div class="knowledge-point">
+            <div class="kp-title">对比</div>
+            <div class="kp-content">
+              <ul>
+                <li>虚拟机：太重、太慢</li>
+                <li>容器：<span class="highlight">轻量、快速</span></li>
+              </ul>
             </div>
           </div>
           <div class="key-conclusion">
@@ -387,32 +372,26 @@
           <h1 class="page-title">Docker是什么？</h1>
         </div>
         <div class="page-body">
-          <div class="solution-visual">
-            <div class="before-after">
-              <div class="before">
-                <h4>没有Docker</h4>
-                <div class="flow">
-                  <div class="flow-step">开发环境配置</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step error"><span class="highlight">环境不一致</span></div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step error"><span class="highlight">反复调试</span></div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step error"><span class="highlight">部署失败</span></div>
-                </div>
-              </div>
-              <div class="after">
-                <h4>使用Docker</h4>
-                <div class="flow">
-                  <div class="flow-step">打包成镜像</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step success"><span class="highlight">环境完全一致</span></div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step success"><span class="highlight">一键部署</span></div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step success"><span class="highlight">运行成功</span></div>
-                </div>
-              </div>
+          <div class="knowledge-point">
+            <div class="kp-title">没有Docker</div>
+            <div class="kp-content">
+              <ul>
+                <li>开发环境配置</li>
+                <li><span class="highlight">环境不一致</span></li>
+                <li><span class="highlight">反复调试</span></li>
+                <li><span class="highlight">部署失败</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">使用Docker</div>
+            <div class="kp-content">
+              <ul>
+                <li>打包成镜像</li>
+                <li><span class="highlight">环境完全一致</span></li>
+                <li><span class="highlight">一键部署</span></li>
+                <li><span class="highlight">运行成功</span></li>
+              </ul>
             </div>
           </div>
         </div>
@@ -424,23 +403,25 @@
           <h1 class="page-title">Docker vs 虚拟机</h1>
         </div>
         <div class="page-body">
-          <div class="arch-comparison">
-            <div class="arch-item">
-              <h4>虚拟机架构</h4>
-              <div class="arch-diagram">
-                <div class="arch-layer app">应用 + 依赖库</div>
-                <div class="arch-layer os"><span class="highlight">完整操作系统 (1-2GB)</span></div>
-                <div class="arch-layer hypervisor">Hypervisor</div>
-                <div class="arch-layer host">宿主机操作系统</div>
-              </div>
+          <div class="knowledge-point">
+            <div class="kp-title">虚拟机架构</div>
+            <div class="kp-content">
+              <ul>
+                <li>应用 + 依赖库</li>
+                <li><span class="highlight">完整操作系统 (1-2GB)</span></li>
+                <li>Hypervisor</li>
+                <li>宿主机操作系统</li>
+              </ul>
             </div>
-            <div class="arch-item highlight">
-              <h4>容器架构</h4>
-              <div class="arch-diagram">
-                <div class="arch-layer app">应用 + 依赖库</div>
-                <div class="arch-layer docker"><span class="highlight">Docker Engine</span></div>
-                <div class="arch-layer host">宿主机操作系统</div>
-              </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">容器架构</div>
+            <div class="kp-content">
+              <ul>
+                <li>应用 + 依赖库</li>
+                <li><span class="highlight">Docker Engine</span></li>
+                <li>宿主机操作系统</li>
+              </ul>
             </div>
           </div>
           <div class="key-conclusion">
@@ -515,24 +496,26 @@
           <h1 class="page-title">Docker与DevOps的关系</h1>
         </div>
         <div class="page-body">
-          <div class="devops-flow">
-            <div class="flow-item traditional">
-              <h4>传统流程</h4>
-              <div class="flow-steps">
-                <div class="step">开发代码</div>
-                <div class="step">编写部署文档</div>
-                <div class="step error"><span class="highlight">环境不一致</span></div>
-                <div class="step error"><span class="highlight">反复调试</span></div>
-              </div>
+          <div class="knowledge-point">
+            <div class="kp-title">传统流程</div>
+            <div class="kp-content">
+              <ul>
+                <li>开发代码</li>
+                <li>编写部署文档</li>
+                <li><span class="highlight">环境不一致</span></li>
+                <li><span class="highlight">反复调试</span></li>
+              </ul>
             </div>
-            <div class="flow-item modern">
-              <h4>Docker化流程</h4>
-              <div class="flow-steps">
-                <div class="step">开发代码</div>
-                <div class="step">构建镜像</div>
-                <div class="step success"><span class="highlight">一键部署</span></div>
-                <div class="step success"><span class="highlight">环境一致</span></div>
-              </div>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">Docker化流程</div>
+            <div class="kp-content">
+              <ul>
+                <li>开发代码</li>
+                <li>构建镜像</li>
+                <li><span class="highlight">一键部署</span></li>
+                <li><span class="highlight">环境一致</span></li>
+              </ul>
             </div>
           </div>
           <div class="term-box">
@@ -548,23 +531,11 @@
           <h1 class="page-title">Docker三大核心组件</h1>
         </div>
         <div class="page-body">
-          <div class="core-concepts-overview">
-            <div class="concept-preview">
-              <div class="concept-num">01</div>
-              <h3>镜像 <span class="highlight">Image</span></h3>
-              <p>应用的"安装包"</p>
-            </div>
-            <div class="concept-preview">
-              <div class="concept-num">02</div>
-              <h3>容器 <span class="highlight">Container</span></h3>
-              <p>镜像的运行实例</p>
-            </div>
-            <div class="concept-preview">
-              <div class="concept-num">03</div>
-              <h3>仓库 <span class="highlight">Repository</span></h3>
-              <p>存储分发镜像</p>
-            </div>
-          </div>
+          <ul>
+            <li><strong>镜像 <span class="highlight">Image</span></strong>：应用的"安装包"</li>
+            <li><strong>容器 <span class="highlight">Container</span></strong>：镜像的运行实例</li>
+            <li><strong>仓库 <span class="highlight">Repository</span></strong>：存储分发镜像</li>
+          </ul>
           <div class="key-conclusion">
             <div class="conclusion-title">类比理解</div>
             <div class="conclusion-content">
@@ -662,21 +633,13 @@
           <h1 class="page-title">镜像、容器、仓库的关系</h1>
         </div>
         <div class="page-body">
-          <div class="relationship-diagram">
-            <h4>工作流程</h4>
-            <div class="diagram-flow">
-              <div class="flow-item">Dockerfile</div>
-              <div class="flow-arrow">build →</div>
-              <div class="flow-item highlight"><span class="highlight">镜像</span></div>
-              <div class="flow-arrow">run →</div>
-              <div class="flow-item">容器</div>
-            </div>
-            <div class="diagram-flow">
-              <div class="flow-item">镜像</div>
-              <div class="flow-arrow">push →</div>
-              <div class="flow-item highlight"><span class="highlight">仓库</span></div>
-              <div class="flow-arrow">pull →</div>
-              <div class="flow-item">镜像</div>
+          <div class="knowledge-point">
+            <div class="kp-title">工作流程</div>
+            <div class="kp-content">
+              <ul>
+                <li>Dockerfile → build → <span class="highlight">镜像</span> → run → 容器</li>
+                <li>镜像 → push → <span class="highlight">仓库</span> → pull → 镜像</li>
+              </ul>
             </div>
           </div>
           <div class="key-conclusion">
