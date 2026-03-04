@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第三讲 容器技术概述与Docker基础 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+      
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第三讲</h1>
+          <h2 class="sub-title">容器技术概述与Docker基础</h2>
+          <p class="tagline">走进容器世界，掌握Docker核心概念与基础操作</p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li>
+                <span class="toc-num">01</span>
+                <span class="toc-text">第一部分：容器技术概述</span>
+              </li>
+              <li>
+                <span class="toc-num">02</span>
+                <span class="toc-text">第二部分：Docker简介</span>
+              </li>
+              <li>
+                <span class="toc-num">03</span>
+                <span class="toc-text">第三部分：Docker架构</span>
+              </li>
+              <li>
+                <span class="toc-num">04</span>
+                <span class="toc-text">第四部分：Docker安装与配置</span>
+              </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：第一个Docker容器</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>本讲是<span class="highlight">Docker入门</span>的关键，建议边学边操作，在Linux环境或WSL中完成所有示例。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解容器技术</h3>
+                <p>掌握<span class="key-point">容器的定义</span>、原理和与虚拟机的区别</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>了解Docker历史</h3>
+                <p>了解<span class="highlight">Docker的发展历程</span>和生态系统</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>掌握Docker架构</h3>
+                <p>理解<span class="key-point">Docker核心组件</span>和工作流程</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>安装配置Docker</h3>
+                <p>能够在<span class="highlight">Linux/WSL</span>上安装和配置Docker</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">05</div>
+              <div class="objective-content">
+                <h3>运行第一个容器</h3>
+                <p>成功运行<span class="highlight">Hello World</span>容器</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">容器技术概述</h1>
+          <p class="section-desc">从轻量级虚拟化到云原生</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是容器？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">容器定义</div>
+            <div class="definition-content">
+              容器是一种<span class="highlight">操作系统级虚拟化</span>技术，它将应用程序及其依赖打包在一起，在隔离的环境中运行，共享宿主机的操作系统内核，但拥有独立的文件系统、进程空间和网络接口。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            可以把容器想象成一个<span class="highlight">标准化的集装箱</span>。就像集装箱统一了货物的包装标准，容器统一了应用程序的打包和运行标准。无论在开发环境还是生产环境，容器都能确保应用以相同的方式运行。
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">容器的核心特性</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">轻量级</span>：共享宿主机内核，启动速度快，资源占用少</p>
+              <p>2. <span class="key-point">可移植</span>：一次构建，到处运行，环境一致性保证</p>
+              <p>3. <span class="key-point">隔离性</span>：进程、文件系统、网络相互隔离</p>
+              <p>4. <span class="key-point">标准化</span>：统一的打包、分发、运行标准</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">容器 vs 虚拟机</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            容器和虚拟机都是虚拟化技术，但实现层次和设计理念不同：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>虚拟机（VM）</th>
+                <th>容器（Container）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>架构层次</td>
+                <td>硬件级虚拟化</td>
+                <td>操作系统级虚拟化</td>
+              </tr>
+              <tr>
+                <td>操作系统</td>
+                <td>每个VM独立内核</td>
+                <td>共享宿主机内核</td>
+              </tr>
+              <tr>
+                <td>启动时间</td>
+                <td>分钟级</td>
+                <td><span class="highlight">秒级/毫秒级</span></td>
+              </tr>
+              <tr>
+                <td>资源占用</td>
+                <td>GB级</td>
+                <td><span class="highlight">MB级</span></td>
+              </tr>
+              <tr>
+                <td>性能损耗</td>
+                <td>5-15%</td>
+                <td><span class="highlight">接近原生</span></td>
+              </tr>
+              <tr>
+                <td>隔离强度</td>
+                <td><span class="highlight">强隔离</span></td>
+                <td>进程级隔离</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="tip-box">
+            <div class="tip-title">选择建议</div>
+            <p>需要<strong>强隔离</strong>和<strong>运行不同操作系统</strong>时选择虚拟机；需要<strong>快速启动</strong>、<strong>高密度部署</strong>和<strong>微服务架构</strong>时选择容器。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">容器技术的发展历程</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>里程碑</th>
+                <th>意义</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">1979</span></td>
+                <td>Unix chroot</td>
+                <td>最早的容器雏形，隔离文件系统</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2000</span></td>
+                <td>FreeBSD Jails</td>
+                <td>实现进程和网络隔离</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2006</span></td>
+                <td>Google Process Containers</td>
+                <td>资源限制和隔离</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2008</span></td>
+                <td>LXC发布</td>
+                <td>Linux容器标准化</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2013</span></td>
+                <td>Docker发布</td>
+                <td><span class="highlight">容器技术大众化</span></td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2015</span></td>
+                <td>Kubernetes 1.0发布</td>
+                <td>容器编排时代开启</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2015</span></td>
+                <td>OCI成立</td>
+                <td>容器标准化组织</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">关键技术演进</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">chroot</span>：文件系统隔离的起点</p>
+              <p>- <span class="key-point">cgroups</span>：Google贡献的资源限制技术</p>
+              <p>- <span class="key-point">Namespace</span>：Linux内核提供的隔离机制</p>
+              <p>- <span class="key-point">UnionFS</span>：分层文件系统，镜像的基础</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">Docker简介</h1>
+          <p class="section-desc">容器技术的集大成者</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">什么是Docker？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker定义</div>
+            <div class="definition-content">
+              Docker是一个开源的<span class="highlight">容器化平台</span>，它使开发者能够将应用程序及其依赖打包到一个轻量级、可移植的容器中，然后在任何环境中一致地运行。Docker简化了容器的创建、部署和管理过程。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            Docker公司最初由Solomon Hykes于2013年创立，最初是dotCloud公司的内部项目。Docker开源后迅速成为<span class="highlight">容器技术的事实标准</span>，推动了整个容器生态系统的发展。
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">Docker的核心价值</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">Build Once, Run Anywhere</span>：一次构建，到处运行</p>
+              <p>2. <span class="key-point">环境一致性</span>：开发、测试、生产环境完全一致</p>
+              <p>3. <span class="key-point">快速交付</span>：加速应用开发和部署流程</p>
+              <p>4. <span class="key-point">资源高效</span>：一台服务器可运行数百个容器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">Docker生态系统</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker拥有丰富的生态系统，涵盖了容器生命周期的各个阶段：
+          </p>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>Docker Engine</h3>
+              <p>Docker的<span class="highlight">核心运行时</span>，负责容器的创建、运行和管理</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>Docker Hub</h3>
+              <p>官方的<span class="highlight">镜像仓库</span>，提供海量预构建镜像</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>Docker Compose</h3>
+              <p>多容器<span class="highlight">编排工具</span>，通过YAML定义应用栈</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>Dockerfile</h3>
+              <p><span class="highlight">镜像构建脚本</span>，定义镜像制作步骤</p>
+            </div>
+          </div>
+          
+          <div class="highlight-box" style="margin-top: 1.5rem;">
+            <div class="highlight-title">云原生生态</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">Kubernetes</span>：容器编排平台，大规模容器管理</p>
+              <p>- <span class="highlight">Prometheus</span>：容器监控和告警</p>
+              <p>- <span class="highlight">Jenkins/GitLab CI</span>：容器化CI/CD流水线</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">Docker架构</h1>
+          <p class="section-desc">理解Docker的工作原理</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">Docker核心组件</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>Docker Daemon</h3>
+              <p><span class="highlight">dockerd</span>，后台服务进程，监听Docker API请求，管理镜像、容器、网络和存储</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>Docker Client</h3>
+              <p><span class="highlight">docker</span>命令行工具，用户与Docker交互的接口，通过REST API与Daemon通信</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>Docker Registry</h3>
+              <p><span class="highlight">镜像仓库</span>，存储和分发Docker镜像，如Docker Hub、私有仓库</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>containerd</h3>
+              <p><span class="highlight">容器运行时</span>，管理容器生命周期，Docker 18.09+的核心组件</p>
+            </div>
+          </div>
+          
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">架构演进</div>
+            <div class="kp-content">
+              <p>Docker早期使用<span class="key-point">LXC</span>作为容器运行时，后来开发了自己的<span class="key-point">libcontainer</span>，再后来将运行时拆分为<span class="key-point">runc</span>和<span class="key-point">containerd</span>，遵循OCI标准。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">Docker工作流程</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker典型工作流程</span>
+              <span class="code-lang">流程说明</span>
+            </div>
+            <pre><code>1. 编写Dockerfile定义应用环境
+   FROM ubuntu:22.04
+   RUN apt-get update && apt-get install -y python3
+   COPY app.py /app/
+   CMD ["python3", "/app/app.py"]
+
+2. 构建镜像
+   docker build -t myapp:1.0 .
+
+3. 推送镜像到仓库（可选）
+   docker push myregistry/myapp:1.0
+
+4. 拉取并运行容器
+   docker pull myregistry/myapp:1.0
+   docker run -d -p 8080:80 myapp:1.0
+
+5. 管理容器生命周期
+   docker ps          # 查看运行中的容器
+   docker stop/start  # 停止/启动容器
+   docker rm          # 删除容器</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">理解要点</div>
+            <p>Docker采用<span class="highlight">客户端-服务器架构</span>，客户端发送命令，Daemon执行实际操作。镜像采用<span class="highlight">分层存储</span>，容器是镜像的运行实例。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">Docker底层技术</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker基于Linux内核的以下关键技术实现容器隔离：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>技术</th>
+                <th>功能</th>
+                <th>作用</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">Namespace</span></td>
+                <td>命名空间隔离</td>
+                <td>隔离进程、网络、文件系统等</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">cgroups</span></td>
+                <td>控制组</td>
+                <td>限制资源使用（CPU、内存、IO）</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">UnionFS</span></td>
+                <td>联合文件系统</td>
+                <td>镜像分层、写时复制</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">iptables</span></td>
+                <td>网络过滤</td>
+                <td>容器网络隔离和端口映射</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">Namespace类型</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">PID Namespace</span>：进程ID隔离</p>
+              <p>- <span class="key-point">Network Namespace</span>：网络隔离</p>
+              <p>- <span class="key-point">Mount Namespace</span>：文件系统挂载点隔离</p>
+              <p>- <span class="key-point">UTS Namespace</span>：主机名隔离</p>
+              <p>- <span class="key-point">IPC Namespace</span>：进程间通信隔离</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">Docker安装与配置</h1>
+          <p class="section-desc">搭建Docker运行环境</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">在Ubuntu上安装Docker</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker安装步骤（Ubuntu）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 更新包索引
+sudo apt-get update
+
+# 2. 安装必要的依赖包
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+# 3. 添加Docker官方GPG密钥
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# 4. 设置Docker稳定版仓库
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 5. 更新包索引并安装Docker
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# 6. 验证安装
+sudo docker --version
+sudo docker run hello-world</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">安装后配置</div>
+            <div class="highlight-content">
+              <p># 将当前用户加入docker组，免sudo使用docker</p>
+              <p>sudo usermod -aG docker $USER</p>
+              <p>newgrp docker  # 刷新组权限</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">在CentOS上安装Docker</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker安装步骤（CentOS）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 卸载旧版本（如有）
+sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+
+# 2. 安装yum工具
+sudo yum install -y yum-utils
+
+# 3. 添加Docker仓库
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+# 4. 安装Docker
+sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# 5. 启动Docker服务
+sudo systemctl start docker
+sudo systemctl enable docker  # 开机自启
+
+# 6. 验证安装
+sudo docker --version
+sudo docker run hello-world</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">国内镜像加速</div>
+            <p>由于网络原因，国内用户建议配置<span class="highlight">镜像加速器</span>，如阿里云、网易云、DaoCloud等提供的镜像服务。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">Docker配置镜像加速</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            配置镜像加速器可以显著提高镜像下载速度，以下是常用国内镜像源：
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">配置阿里云镜像加速</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 创建/编辑daemon配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://your-id.mirror.aliyuncs.com",
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://hub-mirror.c.163.com"
+  ]
+}
+EOF
+
+# 2. 重启Docker服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 3. 验证配置
+docker info | grep -A 5 "Registry Mirrors"</code></pre>
+          </div>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>镜像源</th>
+                <th>地址</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>阿里云</td>
+                <td>https://xxx.mirror.aliyuncs.com</td>
+                <td>需登录阿里云获取专属地址</td>
+              </tr>
+              <tr>
+                <td>中科大</td>
+                <td>https://docker.mirrors.ustc.edu.cn</td>
+                <td>公共镜像，无需注册</td>
+              </tr>
+              <tr>
+                <td>网易云</td>
+                <td>https://hub-mirror.c.163.com</td>
+                <td>公共镜像，无需注册</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">第一个Docker容器</h1>
+          <p class="section-desc">Hello World与基础操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">运行Hello World</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">第一个Docker容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 运行hello-world容器
+$ docker run hello-world
+
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+2db29710123e: Pull complete
+Digest: sha256:2498fce134fac7ea... 
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+...
+
+# 查看运行结果说明
+# 1. Docker在本地找不到hello-world镜像
+# 2. 从Docker Hub拉取镜像
+# 3. 创建并启动容器
+# 4. 容器输出欢迎信息并退出</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">发生了什么？</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">docker run</span>命令首先检查本地是否有hello-world镜像</p>
+              <p>2. 本地没有，从配置的<span class="key-point">镜像仓库</span>拉取</p>
+              <p>3. 基于镜像创建一个新的<span class="key-point">容器实例</span></p>
+              <p>4. 容器执行默认命令，输出信息后<span class="key-point">退出</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">Docker基础命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用Docker命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 镜像操作
+docker images              # 列出本地镜像
+docker pull nginx:latest   # 拉取镜像
+docker rmi hello-world     # 删除镜像
+
+# 容器操作
+docker ps                  # 列出运行中的容器
+docker ps -a               # 列出所有容器（包括停止的）
+docker run -d nginx        # 后台运行容器
+docker stop container_id   # 停止容器
+docker start container_id  # 启动容器
+docker rm container_id     # 删除容器
+
+# 交互操作
+docker exec -it container_id /bin/bash  # 进入容器内部
+docker logs container_id                # 查看容器日志
+docker inspect container_id             # 查看容器详情</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">run命令常用参数</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">-d</span>：后台运行（detached）</p>
+              <p>- <span class="highlight">-p</span>：端口映射（如 -p 8080:80）</p>
+              <p>- <span class="highlight">-v</span>：挂载卷（如 -v /host:/container）</p>
+              <p>- <span class="highlight">--name</span>：指定容器名称</p>
+              <p>- <span class="highlight">-e</span>：设置环境变量</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3</span>
+          <h1 class="page-title">运行Nginx容器示例</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">运行Nginx Web服务器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 拉取Nginx镜像
+docker pull nginx:latest
+
+# 2. 运行Nginx容器
+# -d: 后台运行
+# -p: 端口映射（主机8080 -> 容器80）
+# --name: 指定容器名
+docker run -d -p 8080:80 --name my-nginx nginx:latest
+
+# 3. 验证容器运行状态
+docker ps
+
+# 4. 测试访问
+# 在浏览器访问 http://localhost:8080
+# 或使用curl
+curl http://localhost:8080
+
+# 5. 停止并删除容器
+docker stop my-nginx
+docker rm my-nginx</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">访问测试</div>
+            <p>如果在WSL中运行，可以使用<span class="highlight">curl localhost:8080</span>测试；如果在虚拟机中运行，需要确保网络模式允许宿主机访问。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">动手实验：Docker入门实践</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">Docker基础操作</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>完成Docker安装，运行第一个容器，掌握基础命令操作</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">在Linux或WSL环境中安装Docker（参考Part 4）</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">配置镜像加速器，提高镜像下载速度</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">运行 hello-world 容器，验证安装成功</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">拉取并运行Nginx容器，映射到主机8080端口</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">使用 docker exec 进入Nginx容器，查看内部文件</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">查看容器日志，停止并删除容器</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] docker --version 显示版本信息</p>
+              <p>- [ ] hello-world 容器成功运行并输出信息</p>
+              <p>- [ ] 浏览器/curl能访问Nginx欢迎页面</p>
+              <p>- [ ] 能使用基础命令管理镜像和容器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本讲小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">理解<span class="highlight">容器技术</span>：掌握了容器的定义、特性和与虚拟机的区别</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">了解<span class="highlight">Docker</span>：理解了Docker的价值和生态系统</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">掌握<span class="highlight">Docker架构</span>：理解了Daemon、Client、Registry等核心组件</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">完成<span class="highlight">Docker安装</span>：能够在Linux/WSL上安装配置Docker</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">运行<span class="highlight">第一个容器</span>：成功运行Hello World和Nginx容器</span>
+            </div>
+          </div>
+          
+          <div class="key-conclusion" style="margin-top: 1.5rem;">
+            <div class="conclusion-title">核心要点回顾</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">容器</span>是轻量级的应用打包和运行技术</p>
+              <p>2. <span class="highlight">Docker</span>是容器技术的集大成者，提供完整的工具链</p>
+              <p>3. <span class="highlight">Docker架构</span>采用C/S模式，核心组件包括Daemon、Client、Registry</p>
+              <p>4. <span class="highlight">Docker安装</span>需要配置镜像加速器以提高国内访问速度</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下讲预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>第四讲：<span class="highlight">Docker镜像管理</span></h3>
+            <ul>
+              <li>深入理解<span class="key-point">镜像概念</span>和分层存储</li>
+              <li>掌握<span class="key-point">镜像操作命令</span>（搜索、拉取、删除等）</li>
+              <li>学习<span class="key-point">镜像导出导入</span>和备份</li>
+              <li>了解<span class="key-point">镜像仓库</span>的使用</li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">预习建议</div>
+            <div class="kp-content">
+              <p>1. 确保<span class="highlight">Docker环境</span>已正确安装并可正常使用</p>
+              <p>2. 熟悉本讲的基础命令，多练习镜像和容器操作</p>
+              <p>3. 注册<span class="highlight">Docker Hub</span>账号，为下讲做准备</p>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <span>虚拟化容器技术</span>
+          <span>感谢您的学习</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">24</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>

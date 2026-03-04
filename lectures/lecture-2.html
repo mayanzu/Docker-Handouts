@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第二讲 虚拟化技术基础 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+      
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第二讲</h1>
+          <h2 class="sub-title">虚拟化技术基础</h2>
+          <p class="tagline">理解虚拟化原理，掌握虚拟机技术，为容器学习奠定基础</p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li>
+                <span class="toc-num">01</span>
+                <span class="toc-text">第一部分：虚拟化概述</span>
+              </li>
+              <li>
+                <span class="toc-num">02</span>
+                <span class="toc-text">第二部分：虚拟化类型</span>
+              </li>
+              <li>
+                <span class="toc-num">03</span>
+                <span class="toc-text">第三部分：虚拟机技术</span>
+              </li>
+              <li>
+                <span class="toc-num">04</span>
+                <span class="toc-text">第四部分：虚拟化工具实践</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>虚拟化是容器技术的前置知识，理解<span class="highlight">虚拟化与容器的区别</span>对于后续学习至关重要。建议结合实践操作加深理解。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解虚拟化概念</h3>
+                <p>掌握<span class="key-point">虚拟化的定义</span>、发展历程和核心价值</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>了解虚拟化类型</h3>
+                <p>区分<span class="highlight">全虚拟化</span>、<span class="highlight">半虚拟化</span>和硬件辅助虚拟化</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>掌握虚拟机原理</h3>
+                <p>理解<span class="key-point">Hypervisor架构</span>和虚拟机运行机制</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>实践虚拟化工具</h3>
+                <p>能够使用<span class="highlight">VMware Workstation</span>创建和管理虚拟机</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">虚拟化概述</h1>
+          <p class="section-desc">从物理机到虚拟机的演进</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是虚拟化？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">核心定义</div>
+            <div class="definition-content">
+              虚拟化（Virtualization）是将<span class="highlight">物理计算资源</span>抽象成<span class="highlight">逻辑资源</span>的技术，使得多个操作系统和应用可以共享同一套物理硬件资源，实现资源的高效利用和灵活管理。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            虚拟化技术的核心思想是<span class="highlight">解耦</span>——将软件与硬件分离，打破"一台物理服务器只能运行一个操作系统"的传统限制。通过虚拟化，单台物理服务器可以同时运行多个相互隔离的虚拟机。
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">虚拟化的核心价值</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">资源利用率提升</span>：打破物理边界，提高硬件利用率</p>
+              <p>2. <span class="key-point">成本降低</span>：减少物理服务器数量，降低运维成本</p>
+              <p>3. <span class="key-point">灵活扩展</span>：快速创建、复制、迁移虚拟机</p>
+              <p>4. <span class="key-point">隔离安全</span>：虚拟机之间相互隔离，提高安全性</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">虚拟化发展历史</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            虚拟化技术的发展经历了多个重要阶段：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>时期</th>
+                <th>里程碑</th>
+                <th>意义</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">1960s</span></td>
+                <td>IBM推出CP/CMS系统</td>
+                <td>虚拟化技术的起源</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">1999</span></td>
+                <td>VMware Workstation发布</td>
+                <td>x86平台虚拟化开端</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2003</span></td>
+                <td>Xen开源项目启动</td>
+                <td>开源虚拟化的兴起</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2005-2006</span></td>
+                <td>Intel VT/AMD-V技术</td>
+                <td>硬件辅助虚拟化成熟</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">2013</span></td>
+                <td>Docker发布</td>
+                <td>容器技术革命</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="tip-box">
+            <div class="tip-title">提示</div>
+            <p>从2013年Docker发布开始，<span class="highlight">容器技术</span>逐渐成为虚拟化领域的新热点，与传统虚拟机形成互补关系。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">虚拟化类型</h1>
+          <p class="section-desc">不同层次的虚拟化技术</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">按实现层次分类</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>硬件虚拟化</h3>
+              <p>在<span class="highlight">硬件层面</span>实现虚拟化，如CPU虚拟化（Intel VT-x/AMD-V）、内存虚拟化、I/O虚拟化</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>系统虚拟化</h3>
+              <p>通过<span class="highlight">Hypervisor</span>实现完整操作系统虚拟化，如VMware、KVM、Xen</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>桌面虚拟化</h3>
+              <p>将桌面环境虚拟化，用户通过网络访问虚拟桌面，如Citrix、VMware Horizon</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>应用虚拟化</h3>
+              <p>将应用程序与底层系统隔离，如Java虚拟机、容器技术</p>
+            </div>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">本课程重点</div>
+            <div class="highlight-content">
+              本课程主要关注<span class="highlight">系统虚拟化</span>（虚拟机）和<span class="highlight">应用虚拟化</span>（容器）两大类型，理解它们的区别和适用场景。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">虚拟化技术对比</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>特性</th>
+                <th>全虚拟化</th>
+                <th>半虚拟化</th>
+                <th>硬件辅助虚拟化</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>实现方式</td>
+                <td>软件模拟所有硬件</td>
+                <td>修改客户机内核</td>
+                <td>CPU硬件支持</td>
+              </tr>
+              <tr>
+                <td>性能开销</td>
+                <td>较高（15-20%）</td>
+                <td>中等（5-10%）</td>
+                <td><span class="highlight">低（1-5%）</span></td>
+              </tr>
+              <tr>
+                <td>兼容性</td>
+                <td><span class="highlight">无需修改系统</span></td>
+                <td>需要修改内核</td>
+                <td>无需修改系统</td>
+              </tr>
+              <tr>
+                <td>代表产品</td>
+                <td>VMware ESX早期版本</td>
+                <td>Xen</td>
+                <td><span class="highlight">KVM、VMware vSphere</span></td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">技术说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">全虚拟化</span>：Hypervisor完全通过软件模拟硬件，客户机无感知</p>
+              <p>- <span class="key-point">半虚拟化</span>：客户机操作系统需要修改以配合Hypervisor</p>
+              <p>- <span class="key-point">硬件辅助虚拟化</span>：CPU提供虚拟化扩展指令，性能最优</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">虚拟机技术</h1>
+          <p class="section-desc">Hypervisor与虚拟机架构</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">Hypervisor架构</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Hypervisor定义</div>
+            <div class="definition-content">
+              Hypervisor（虚拟机监控器）是<span class="highlight">运行在物理硬件和虚拟机之间</span>的软件层，负责管理物理资源并为虚拟机提供虚拟硬件接口。
+            </div>
+          </div>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>Type 1 裸机型</h3>
+              <p>直接运行在物理硬件上，如<span class="highlight">VMware ESXi</span>、<span class="highlight">Microsoft Hyper-V</span>、<span class="highlight">Xen</span>，性能最优</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>Type 2 宿主型</h3>
+              <p>运行在宿主操作系统上，如<span class="highlight">VMware Workstation</span>、<span class="highlight">VirtualBox</span>，易于安装使用</p>
+            </div>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">架构对比</div>
+            <p>Type 1直接控制硬件，性能更好，适合生产环境；Type 2依赖宿主系统，安装简便，适合开发和测试。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">虚拟机核心组件</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            一个完整的虚拟机包含以下核心组件，Hypervisor负责将这些虚拟组件映射到物理资源：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>虚拟组件</th>
+                <th>功能说明</th>
+                <th>虚拟化方式</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">vCPU</span></td>
+                <td>虚拟中央处理器</td>
+                <td>时间片轮转调度</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">vRAM</span></td>
+                <td>虚拟内存</td>
+                <td>影子页表/EPT</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">vDisk</span></td>
+                <td>虚拟磁盘</td>
+                <td>镜像文件（VMDK/VHD）</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">vNIC</span></td>
+                <td>虚拟网卡</td>
+                <td>软件模拟/SR-IOV</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">关键概念</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">VMDK</span>：VMware虚拟磁盘格式</p>
+              <p>- <span class="key-point">VHD/VHDX</span>：微软虚拟磁盘格式</p>
+              <p>- <span class="key-point">QCOW2</span>：QEMU/KVM虚拟磁盘格式</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">虚拟机 vs 容器</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            理解虚拟机与容器的区别是本课程的重要基础。两者都是虚拟化技术，但实现层次和适用场景不同：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>虚拟机（VM）</th>
+                <th>容器（Container）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>虚拟化层次</td>
+                <td>硬件级虚拟化</td>
+                <td>操作系统级虚拟化</td>
+              </tr>
+              <tr>
+                <td>隔离级别</td>
+                <td><span class="highlight">强隔离</span>（独立内核）</td>
+                <td>进程级隔离（共享内核）</td>
+              </tr>
+              <tr>
+                <td>启动速度</td>
+                <td>分钟级</td>
+                <td><span class="highlight">秒级</span></td>
+              </tr>
+              <tr>
+                <td>资源占用</td>
+                <td>较高（GB级）</td>
+                <td><span class="highlight">低（MB级）</span></td>
+              </tr>
+              <tr>
+                <td>性能损耗</td>
+                <td>5-15%</td>
+                <td><span class="highlight">接近原生</span></td>
+              </tr>
+              <tr>
+                <td>适用场景</td>
+                <td>完整系统隔离</td>
+                <td>应用快速部署</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">虚拟化工具实践</h1>
+          <p class="section-desc">VMware Workstation虚拟机操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">VMware Workstation简介</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">VMware Workstation</div>
+            <div class="definition-content">
+              VMware Workstation是VMware公司推出的<span class="highlight">Type 2 Hypervisor</span>，是业界领先的桌面虚拟化软件。它支持在Windows和Linux宿主系统上同时运行多个操作系统，功能强大且性能优异。
+            </div>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">VMware Workstation特点</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">性能优异</span>：优化的虚拟化引擎，接近原生性能</p>
+              <p>2. <span class="key-point">功能强大</span>：支持3D加速、快照、克隆、虚拟网络编辑等</p>
+              <p>3. <span class="key-point">兼容性好</span>：支持数百种操作系统，包括最新的Windows和Linux发行版</p>
+              <p>4. <span class="key-point">企业级特性</span>：支持vSphere连接、团队开发等高级功能</p>
+            </div>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">版本说明</div>
+            <p><span class="highlight">VMware Workstation Pro</span>是商业版本，功能完整；<span class="highlight">VMware Workstation Player</span>是免费个人版，功能简化但足够学习使用。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">创建虚拟机</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建虚拟机步骤</span>
+              <span class="code-lang">操作指南</span>
+            </div>
+            <pre><code>1. 打开VMware Workstation，点击"文件"-"新建虚拟机"
+2. 选择配置类型
+   - 典型（推荐）：快速创建，使用默认设置
+   - 自定义：手动配置所有参数
+3. 选择安装来源
+   - 安装程序光盘映像文件（ISO）
+   - 稍后安装操作系统
+4. 选择客户机操作系统
+   - Linux - Ubuntu 64位
+5. 命名虚拟机并选择存储位置
+6. 指定磁盘容量（建议20GB以上）
+   - 将虚拟磁盘存储为单个文件
+   - 将虚拟磁盘拆分为多个文件</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">配置建议</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">内存</span>：建议分配2-4GB，不超过物理内存的50%</p>
+              <p>- <span class="highlight">处理器</span>：根据物理核心数分配（建议2核）</p>
+              <p>- <span class="highlight">磁盘</span>：单个文件性能更好，多个文件便于迁移</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">常用功能操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">VMware Workstation常用操作</span>
+              <span class="code-lang">操作指南</span>
+            </div>
+            <pre><code># 虚拟机电源操作
+启动虚拟机：点击"开启此虚拟机"
+挂起虚拟机：点击"挂起客户机"（保存状态）
+关闭虚拟机：点击"关机"或"关闭客户机"
+重启虚拟机：点击"重新启动客户机"
+
+# 快照管理
+创建快照：虚拟机 - 快照 - 拍摄快照
+恢复快照：虚拟机 - 快照 - 恢复到快照
+管理快照：虚拟机 - 快照 - 快照管理器
+
+# 克隆虚拟机
+虚拟机 - 管理 - 克隆
+- 链接克隆：依赖原虚拟机，节省空间
+- 完整克隆：独立副本，占用双倍空间
+
+# 虚拟机设置调整
+虚拟机 - 设置
+- 可调整内存、处理器、硬盘、网络适配器等</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">快照功能说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">快照</span>：保存虚拟机某一时刻的完整状态</p>
+              <p>- <span class="key-point">用途</span>：系统测试前备份、危险操作前保护</p>
+              <p>- <span class="key-point">注意</span>：快照过多会影响性能，建议定期清理</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.4</span>
+          <h1 class="page-title">虚拟机网络配置</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            VMware Workstation提供多种网络模式，通过虚拟网络编辑器可以灵活配置：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>网络模式</th>
+                <th>特点</th>
+                <th>适用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">桥接模式</span></td>
+                <td>虚拟机与宿主机同级，独立IP</td>
+                <td>服务器部署，需要外部访问</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">NAT模式</span></td>
+                <td>虚拟机可访问外网，通过NAT转换</td>
+                <td>默认模式，上网浏览</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">仅主机模式</span></td>
+                <td>仅宿主机与虚拟机通信，无外网</td>
+                <td>封闭测试环境</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">自定义/LAN区段</span></td>
+                <td>虚拟机之间组成独立网络</td>
+                <td>多机集群测试</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="tip-box">
+            <div class="tip-title">配置建议</div>
+            <p>学习Docker时建议使用<span class="highlight">桥接模式</span>或<span class="highlight">NAT模式+端口映射</span>，方便从宿主机访问容器服务。可通过"编辑"-"虚拟网络编辑器"进行高级配置。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">动手实验：VMware Workstation实践</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">创建Linux虚拟机</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握VMware Workstation的基本操作，创建并配置Linux虚拟机</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">下载并安装VMware Workstation Player（免费版）</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">下载Ubuntu Server或CentOS镜像（ISO文件）</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">创建新虚拟机，选择"典型"配置，加载ISO镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">配置2GB内存、2核处理器、20GB磁盘</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">完成安装后，配置网络为桥接模式，测试网络连通性</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">创建快照，测试快照恢复功能</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>安装前确保BIOS中已启用<span class="highlight">Intel VT-x</span>或<span class="highlight">AMD-V</span>虚拟化支持，否则虚拟机性能会大幅下降。安装VMware后可能需要重启计算机。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">WSL</h1>
+          <p class="section-desc">Windows Subsystem for Linux</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">什么是WSL？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">WSL定义</div>
+            <div class="definition-content">
+              WSL（Windows Subsystem for Linux）是Windows 10/11内置的<span class="highlight">Linux兼容层</span>，允许开发者在Windows上直接运行Linux命令行工具、应用程序和容器，无需传统虚拟机的开销。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            WSL是微软与Canonical合作开发的子系统技术，它通过<span class="highlight">系统调用转换</span>将Linux系统调用实时转换为Windows NT内核调用，实现了Linux环境在Windows上的原生运行。
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">WSL版本对比</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">WSL 1</span>：系统调用转换层，无真实Linux内核，文件IO性能受限</p>
+              <p>2. <span class="key-point">WSL 2</span>：基于轻量级VM，运行真实Linux内核，完整系统调用兼容性，性能大幅提升</p>
+            </div>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">推荐使用WSL 2</div>
+            <p>WSL 2是默认版本，提供更好的性能、完整的系统调用兼容性，且支持Docker Desktop集成。本课程所有操作均基于WSL 2。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">WSL的优势</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>轻量高效</h3>
+              <p>相比传统虚拟机，WSL 2启动<span class="highlight">仅需数秒</span>，内存占用极低，资源开销小</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>无缝集成</h3>
+              <p>与Windows文件系统<span class="highlight">无缝互通</span>，可在Windows和Linux间自由切换</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>Docker原生支持</h3>
+              <p>Docker Desktop可直接使用WSL 2后端，<span class="highlight">无需额外配置</span></p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>开发友好</h3>
+              <p>支持VS Code远程开发，<span class="highlight">Windows Terminal</span>集成，开发体验极佳</p>
+            </div>
+          </div>
+          
+          <table class="compare-table" style="margin-top: 1.5rem;">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>传统虚拟机</th>
+                <th>WSL 2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>启动时间</td>
+                <td>30秒-2分钟</td>
+                <td><span class="highlight">1-3秒</span></td>
+              </tr>
+              <tr>
+                <td>内存占用</td>
+                <td>2GB+</td>
+                <td><span class="highlight">动态分配</span></td>
+              </tr>
+              <tr>
+                <td>文件访问</td>
+                <td>共享文件夹/网络</td>
+                <td><span class="highlight">原生访问</span></td>
+              </tr>
+              <tr>
+                <td>GUI应用</td>
+                <td>完整支持</td>
+                <td><span class="highlight">WSLg支持</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3</span>
+          <h1 class="page-title">安装WSL</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WSL安装命令</span>
+              <span class="code-lang">PowerShell</span>
+            </div>
+            <pre><code># 以管理员身份打开PowerShell，执行以下命令
+
+# 自动安装WSL（推荐方式）
+wsl --install
+
+# 安装完成后重启计算机
+# 重启后会自动继续安装Ubuntu
+
+# 查看已安装的发行版
+wsl --list --verbose
+
+# 设置默认WSL版本为WSL 2
+wsl --set-default-version 2
+
+# 安装特定Linux发行版
+wsl --install -d Ubuntu-22.04
+
+# 查看可用的发行版列表
+wsl --list --online</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">系统要求</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">Windows 10</span>：版本2004及更高（内部版本19041+）</p>
+              <p>- <span class="highlight">Windows 11</span>：所有版本均支持</p>
+              <p>- 需要在BIOS中启用<span class="highlight">虚拟化支持</span>（Intel VT-x/AMD-V）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.4</span>
+          <h1 class="page-title">WSL常用操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WSL管理命令</span>
+              <span class="code-lang">PowerShell/CMD</span>
+            </div>
+            <pre><code># 启动默认的Linux发行版
+wsl
+
+# 启动指定的发行版
+wsl -d Ubuntu-22.04
+
+# 关闭所有WSL发行版
+wsl --shutdown
+
+# 终止指定的发行版
+wsl -t Ubuntu-22.04
+
+# 导出发行版为tar文件
+wsl --export Ubuntu-22.04 D:\backup\ubuntu.tar
+
+# 从tar文件导入发行版
+wsl --import CustomUbuntu D:\WSL D:\backup\ubuntu.tar
+
+# 设置默认发行版
+wsl --set-default Ubuntu-22.04
+
+# 卸载发行版
+wsl --unregister Ubuntu-22.04</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">文件系统访问</div>
+            <div class="kp-content">
+              <p>- 在WSL中访问Windows文件：<span class="key-point">/mnt/c/</span>（C盘）、<span class="key-point">/mnt/d/</span>（D盘）</p>
+              <p>- 在Windows中访问WSL文件：在资源管理器输入 <span class="key-point">\\wsl$\</span></p>
+              <p>- 建议将项目文件放在WSL文件系统中以获得最佳性能</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.5</span>
+          <h1 class="page-title">WSL与Docker</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            WSL 2与Docker Desktop深度集成，是Windows上运行Docker的最佳方案：
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">集成优势</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">原生Linux内核</span>：WSL 2运行真实Linux内核，Docker容器在Linux环境中原生运行</p>
+              <p>2. <span class="key-point">性能优化</span>：文件系统性能优于传统Hyper-V方案</p>
+              <p>3. <span class="key-point">资源高效</span>：Docker和WSL共享同一个轻量级VM</p>
+              <p>4. <span class="key-point">开发体验</span>：VS Code可直接连接到WSL中的Docker</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker Desktop WSL集成配置</span>
+              <span class="code-lang">操作步骤</span>
+            </div>
+            <pre><code>1. 安装WSL 2（已完成）
+2. 下载安装Docker Desktop for Windows
+3. 打开Docker Desktop设置
+4. 选择"Use the WSL 2 based engine"
+5. 在Resources - WSL Integration中
+   - 启用"Enable integration with my default WSL distro"
+   - 为需要的发行版开启集成
+6. 点击Apply & Restart
+
+# 验证Docker在WSL中可用
+wsl -d Ubuntu-22.04
+docker --version
+docker run hello-world</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">最佳实践</div>
+            <p>建议在WSL中直接安装Docker Engine（不依赖Docker Desktop），可获得更纯粹的Linux Docker体验，适合服务器环境模拟。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">动手实验：WSL配置与使用</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">WSL安装与配置</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>在Windows上安装配置WSL 2，安装Ubuntu系统，并验证Docker集成</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">以管理员身份打开PowerShell，执行 wsl --install 命令</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">重启计算机，完成Ubuntu的初始化配置（设置用户名密码）</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">执行 sudo apt update && sudo apt upgrade 更新系统</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">在Windows资源管理器中访问 \\wsl$\ 查看WSL文件系统</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">在WSL中创建测试文件，在Windows中编辑验证互通性</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">（可选）安装Docker Desktop并启用WSL集成</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">常见问题</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">WSL安装失败</span>：确保Windows版本符合要求，已启用虚拟化</p>
+              <p>- <span class="highlight">无法访问网络</span>：检查Windows防火墙设置，尝试 wsl --shutdown 后重启</p>
+              <p>- <span class="highlight">文件权限问题</span>：Windows文件在WSL中显示777权限是正常现象</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本讲小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">理解<span class="highlight">虚拟化概念</span>：掌握了虚拟化的定义、价值和历史发展</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">了解<span class="highlight">虚拟化类型</span>：区分了全虚拟化、半虚拟化和硬件辅助虚拟化</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">掌握<span class="highlight">Hypervisor架构</span>：理解了Type 1和Type 2的区别</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">对比<span class="highlight">VM与容器</span>：明确了两者的区别和适用场景</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">实践<span class="highlight">VMware Workstation</span>：能够创建和管理虚拟机</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">掌握<span class="highlight">WSL</span>：能够在Windows上运行Linux环境</span>
+            </div>
+          </div>
+          
+          <div class="key-conclusion" style="margin-top: 1.5rem;">
+            <div class="conclusion-title">核心要点回顾</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">虚拟化</span>是资源抽象技术，提高硬件利用率</p>
+              <p>2. <span class="highlight">Hypervisor</span>是虚拟化的核心，分Type 1和Type 2两种</p>
+              <p>3. <span class="highlight">虚拟机</span>提供强隔离，<span class="highlight">容器</span>更轻量高效</p>
+              <p>4. <span class="highlight">VMware Workstation</span>和<span class="highlight">WSL</span>是学习和测试虚拟化的理想工具</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下讲预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>第三讲：<span class="highlight">容器技术概述与Docker基础</span></h3>
+            <ul>
+              <li>了解<span class="key-point">容器技术原理</span>与发展历程</li>
+              <li>理解<span class="key-point">Docker架构</span>与核心组件</li>
+              <li>掌握<span class="key-point">Docker安装配置</span>方法</li>
+              <li>运行第一个<span class="key-point">Hello World</span>容器</li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">预习建议</div>
+            <div class="kp-content">
+              <p>1. 完成本讲的<span class="highlight">VMware实验</span>，准备好Linux环境</p>
+              <p>2. 了解<span class="highlight">Docker</span>的基本概念和用途</p>
+              <p>3. 在虚拟机中准备好Docker安装环境</p>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <span>虚拟化容器技术</span>
+          <span>感谢您的学习</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">27</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>
