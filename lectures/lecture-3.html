@@ -1657,6 +1657,62 @@ docker rm my-nginx</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">动手实验：Docker镜像管理</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">镜像操作与管理</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Docker镜像的基本操作，包括搜索、拉取、查看、删除和标记镜像</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">使用 docker search 命令搜索Ubuntu镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">拉取不同版本的Ubuntu镜像（如22.04和20.04）</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">使用 docker images 命令查看本地镜像列表</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">使用 docker tag 命令为Ubuntu 22.04镜像添加新标签</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">使用 docker rmi 命令删除不需要的镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">验证镜像操作结果，确保镜像管理正确</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 能成功搜索并拉取不同版本的Ubuntu镜像</p>
+              <p>- [ ] 能正确为镜像添加标签</p>
+              <p>- [ ] 能删除不需要的镜像，释放磁盘空间</p>
+              <p>- [ ] 能使用 docker images 查看本地镜像状态</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
           <span class="page-number">总结</span>
           <h1 class="page-title">本讲小结</h1>
         </div>

@@ -43,11 +43,19 @@
               </li>
               <li>
                 <span class="toc-num">03</span>
-                <span class="toc-text">第三部分：文件系统</span>
+                <span class="toc-text">实验一：Linux基础命令练习</span>
               </li>
               <li>
                 <span class="toc-num">04</span>
+                <span class="toc-text">第三部分：文件系统</span>
+              </li>
+              <li>
+                <span class="toc-num">05</span>
                 <span class="toc-text">第四部分：权限管理</span>
+              </li>
+              <li>
+                <span class="toc-num">06</span>
+                <span class="toc-text">实验二：文件系统与权限管理</span>
               </li>
             </ul>
           </div>
@@ -55,7 +63,7 @@
           <div class="knowledge-point">
             <div class="kp-title">学习建议</div>
             <div class="kp-content">
-              <p>Linux是容器技术的基石，本讲内容是后续课程的重要基础。建议学员<span class="highlight">边学边练</span>，每个命令都要亲自执行验证。</p>
+              <p>Linux是容器技术的基石，本讲内容是后续课程的重要基础。建议学员<span class="highlight">边学边练</span>，每个命令都要亲自执行验证。两个实验分别安排在常用命令和权限管理之后，便于及时巩固所学内容。</p>
             </div>
           </div>
         </div>
@@ -325,6 +333,123 @@ find . -name "*.log" | xargs grep "error"</code></pre>
 
       <div class="page section-page">
         <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：Linux基础命令</h1>
+          <p class="section-desc">巩固目录与文件操作命令</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">Linux基础命令练习</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">目录与文件操作实践</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>熟悉Linux基本命令，掌握目录操作、文件操作和内容查看方法</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">打开终端，使用 pwd 查看当前目录，使用 ls 查看目录内容</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">在主目录下创建 test 目录，进入该目录创建 file1.txt 和 file2.txt</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">使用 cat、head、tail 命令查看 /etc/passwd 文件内容</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">使用 find 命令查找 /etc 目录下所有 .conf 文件</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">清理实验环境，删除 test 目录</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验操作指南</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：查看当前目录和内容
+$ pwd
+/home/user
+
+$ ls
+Desktop  Documents  Downloads
+
+$ ls -la
+total 32
+drwxr-xr-x  5 user user 4096 Jan 15 10:00 .
+drwxr-xr-x  3 root root 4096 Jan 10 09:00 ..
+drwxr-xr-x  2 user user 4096 Jan 15 10:00 Desktop
+
+# 步骤2：创建目录和文件
+$ mkdir ~/test
+$ cd ~/test
+$ touch file1.txt file2.txt
+$ ls -l
+-rw-r--r-- 1 user user 0 Jan 15 10:05 file1.txt
+-rw-r--r-- 1 user user 0 Jan 15 10:05 file2.txt
+
+# 步骤3：查看文件内容
+$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+...
+
+$ head -n 5 /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+
+$ tail -n 5 /etc/passwd
+# 显示最后5行
+
+# 步骤4：查找配置文件
+$ find /etc -name "*.conf" 2>/dev/null | head -n 10
+/etc/adduser.conf
+/etc/apg.conf
+/etc/appstream.conf
+...
+
+# 步骤5：清理环境
+$ cd ~
+$ rm -rf test
+$ ls test
+ls: cannot access 'test': No such file or directory</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功使用 pwd 和 ls 命令查看目录</p>
+              <p>- [ ] 成功创建目录和文件</p>
+              <p>- [ ] 能够使用 cat、head、tail 查看文件内容</p>
+              <p>- [ ] 能够使用 find 查找文件</p>
+              <p>- [ ] 成功清理实验环境</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
           <span class="section-label">Part 3</span>
           <h1 class="section-title">文件系统</h1>
           <p class="section-desc">理解Linux目录结构</p>
@@ -565,70 +690,126 @@ chgrp group file.txt          # 仅修改所属组</code></pre>
         </div>
       </div>
 
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：文件系统与权限管理</h1>
+          <p class="section-desc">巩固文件系统操作和权限设置</p>
+        </div>
+      </div>
+
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验</span>
-          <h1 class="page-title">动手实验：Linux基础操作</h1>
+          <h1 class="page-title">文件系统与权限管理练习</h1>
         </div>
         <div class="page-body">
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">Linux命令练习</span>
+              <span class="experiment-title">文件系统与权限实践</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>熟悉Linux基本命令，掌握文件和目录操作，理解权限管理</p>
+              <p>掌握Linux文件系统操作和权限管理，理解目录结构和权限机制</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
               <div class="step-item">
                 <span class="step-num">1</span>
-                <span class="step-text">打开终端，使用 pwd 查看当前目录，使用 ls 查看目录内容</span>
+                <span class="step-text">创建多级目录结构，理解绝对路径和相对路径</span>
               </div>
               <div class="step-item">
                 <span class="step-num">2</span>
-                <span class="step-text">在主目录下创建 test 目录，进入该目录创建 file1.txt 和 file2.txt</span>
+                <span class="step-text">创建文件并设置不同权限</span>
               </div>
               <div class="step-item">
                 <span class="step-num">3</span>
-                <span class="step-text">使用 ls -l 查看文件权限，尝试用 chmod 修改权限</span>
+                <span class="step-text">测试权限效果，验证权限设置</span>
               </div>
               <div class="step-item">
                 <span class="step-num">4</span>
-                <span class="step-text">使用 cat、head、tail 命令查看 /etc/passwd 文件内容</span>
+                <span class="step-text">创建私有目录，设置特殊权限</span>
               </div>
               <div class="step-item">
                 <span class="step-num">5</span>
-                <span class="step-text">使用 find 命令查找 /etc 目录下所有 .conf 文件</span>
+                <span class="step-text">清理实验环境</span>
               </div>
             </div>
           </div>
           
-          <div class="code-block">
+          <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">参考命令</span>
+              <span class="code-title">实验操作指南</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 步骤1-2
-pwd
-ls
-mkdir ~/test
-cd ~/test
-touch file1.txt file2.txt
+            <pre><code># 步骤1：创建多级目录结构
+$ mkdir -p ~/linux-lab/project/src
+$ mkdir -p ~/linux-lab/project/docs
+$ cd ~/linux-lab/project
 
-# 步骤3
-ls -l
-chmod 644 file1.txt
-ls -l
+# 查看目录结构
+$ tree
+.
+├── docs
+└── src
 
-# 步骤4
-cat /etc/passwd
-head -n 5 /etc/passwd
-tail -n 5 /etc/passwd
+# 使用绝对路径和相对路径
+$ pwd
+/home/user/linux-lab/project
 
-# 步骤5
-find /etc -name "*.conf" | head -n 10</code></pre>
+$ ls src           # 相对路径
+$ ls /home/user/linux-lab/project/src  # 绝对路径
+
+# 步骤2：创建文件并设置不同权限
+$ touch src/main.sh docs/readme.txt
+$ ls -l src/
+-rw-r--r-- 1 user user 0 Jan 15 10:10 main.sh
+
+# 设置执行权限
+$ chmod 755 src/main.sh
+$ ls -l src/
+-rwxr-xr-x 1 user user 0 Jan 15 10:10 main.sh
+
+# 设置普通文件权限
+$ chmod 644 docs/readme.txt
+
+# 步骤3：测试权限效果
+# 尝试执行脚本
+$ ./src/main.sh
+# （脚本为空，但可以执行）
+
+# 查看权限详情
+$ stat src/main.sh
+  File: src/main.sh
+  Access: (0755/-rwxr-xr-x)
+
+# 步骤4：创建私有目录
+$ mkdir ~/linux-lab/private
+$ chmod 700 ~/linux-lab/private
+$ touch ~/linux-lab/private/secret.txt
+$ echo "敏感信息" > ~/linux-lab/private/secret.txt
+
+# 验证权限
+$ ls -la ~/linux-lab/
+drwx------  2 user user 4096 Jan 15 10:15 private
+
+# 步骤5：清理实验环境
+$ cd ~
+$ rm -rf linux-lab
+$ ls linux-lab
+ls: cannot access 'linux-lab': No such file or directory</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功创建多级目录结构</p>
+              <p>- [ ] 理解并使用绝对路径和相对路径</p>
+              <p>- [ ] 能够设置并查看文件权限（755、644、700）</p>
+              <p>- [ ] 成功测试权限效果</p>
+              <p>- [ ] 能够清理实验环境</p>
+            </div>
           </div>
         </div>
       </div>
@@ -707,7 +888,7 @@ find /etc -name "*.conf" | head -n 10</code></pre>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">18</span>
+        <span class="total" id="totalPages">20</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>

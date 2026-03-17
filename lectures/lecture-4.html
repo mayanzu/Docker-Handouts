@@ -1952,6 +1952,149 @@ $ docker images</code></pre>
 
       <div class="page section-page">
         <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：Dockerfile基础实践</h1>
+          <p class="section-desc">掌握Dockerfile的编写和镜像构建</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">Dockerfile构建自定义镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">Dockerfile基础操作</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Dockerfile的基本语法和指令，能够编写简单的Dockerfile并构建自定义镜像</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建Dockerfile文件</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">编写Dockerfile指令</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">构建自定义镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">运行构建的镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">验证镜像功能</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验操作指南</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建工作目录
+$ mkdir -p myapp
+$ cd myapp
+
+# 步骤2：创建Dockerfile文件
+$ cat > Dockerfile << 'EOF'
+FROM ubuntu:22.04
+
+LABEL maintainer="your-email@example.com"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y nginx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY index.html /var/www/html/
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+EOF
+
+# 步骤3：创建index.html文件
+$ cat > index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Docker App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello from Docker!</h1>
+    <p>This is a custom Nginx image built with Dockerfile.</p>
+</body>
+</html>
+EOF
+
+# 步骤4：构建镜像
+$ docker build -t my-nginx:1.0 .
+
+# 步骤5：查看构建的镜像
+$ docker images my-nginx
+
+# 步骤6：运行容器
+$ docker run --name my-nginx-app -d -p 8080:80 my-nginx:1.0
+
+# 步骤7：验证容器运行状态
+$ docker ps
+
+# 步骤8：访问应用
+$ curl http://localhost:8080
+
+# 步骤9：清理资源
+$ docker stop my-nginx-app
+$ docker rm my-nginx-app
+$ docker rmi my-nginx:1.0
+
+# 验证结果
+$ docker images
+$ docker ps -a</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功创建Dockerfile文件</p>
+              <p>- [ ] 成功构建自定义镜像</p>
+              <p>- [ ] 成功运行容器</p>
+              <p>- [ ] 能够访问应用</p>
+              <p>- [ ] 成功清理资源</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
           <span class="section-label">Part 3</span>
           <h1 class="section-title">Dockerfile基础</h1>
           <p class="section-desc">构建自定义镜像的脚本</p>

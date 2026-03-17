@@ -1,0 +1,2598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第五讲 Docker容器管理 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+      
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第五讲</h1>
+          <h2 class="sub-title">Docker容器管理</h2>
+          <p class="tagline">掌握容器生命周期管理，实现高效的应用部署与运行</p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li>
+                <span class="toc-num">01</span>
+                <span class="toc-text">第一部分：容器基础概念</span>
+              </li>
+              <li>
+                <span class="toc-num">02</span>
+                <span class="toc-text">第二部分：容器操作管理</span>
+              </li>
+              <li>
+                <span class="toc-num">03</span>
+                <span class="toc-text">第三部分：容器资源管理</span>
+              </li>
+              <li>
+                <span class="toc-num">04</span>
+                <span class="toc-text">第四部分：容器网络管理</span>
+              </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：容器数据管理</span>
+              </li>
+              <li>
+                <span class="toc-num">06</span>
+                <span class="toc-text">第六部分：容器监控与安全</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>本讲是<span class="highlight">Docker实践</span>的核心内容，建议在Linux环境或WSL中完成所有实验操作，加深对容器管理的理解。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解容器生命周期</h3>
+                <p>掌握容器的<span class="key-point">创建、启动、停止、删除</span>等生命周期管理</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>掌握容器操作命令</h3>
+                <p>熟练使用<span class="highlight">docker run、exec、logs</span>等核心命令</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>管理容器资源</h3>
+                <p>能够限制容器的<span class="key-point">CPU、内存、IO</span>等资源使用</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>配置容器网络</h3>
+                <p>理解Docker网络模式，掌握<span class="highlight">端口映射和自定义网络</span></p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">05</div>
+              <div class="objective-content">
+                <h3>管理容器数据</h3>
+                <p>掌握<span class="key-point">数据卷、绑定挂载</span>等数据持久化方案</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">容器基础概念</h1>
+          <p class="section-desc">理解容器的本质和特点</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">什么是Docker容器？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">容器定义</div>
+            <div class="definition-content">
+              Docker容器是<span class="highlight">镜像的运行实例</span>，是一个轻量级、独立、可执行的软件包，包含运行应用所需的所有内容：代码、运行时、系统工具、系统库和配置。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            容器与镜像的关系类似于<span class="highlight">对象与类</span>的关系。镜像是静态的模板，容器是镜像的动态实例。容器在镜像的基础上添加了一个可写层，所有运行时的修改都发生在这个可写层中。
+          </p>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>轻量级</h3>
+              <p>共享宿主机内核，启动时间秒级，资源占用少</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>隔离性</h3>
+              <p>通过Namespace和Cgroups实现进程、网络、文件系统等隔离</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>可移植性</h3>
+              <p>在任何Docker环境中行为一致，实现"一次构建，到处运行"</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>可控制</h3>
+              <p>可限制CPU、内存、IO等资源使用，确保系统稳定</p>
+            </div>
+          </div>
+          
+          <div class="highlight-box" style="margin-top: 1.5rem;">
+            <div class="highlight-title">容器 vs 虚拟机</div>
+            <div class="highlight-content">
+              <p><span class="highlight">容器</span>：轻量级，启动快，资源占用少，共享内核</p>
+              <p><span class="highlight">虚拟机</span>：重量级，启动慢，资源占用多，完整操作系统</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">容器的生命周期</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">容器生命周期状态</span>
+              <span class="code-lang">状态说明</span>
+            </div>
+            <pre><code>┌─────────────┐     docker create     ┌─────────────┐
+│             │ ────────────────────► │             │
+│  Created    │ &lt;─────────────────── │  Deleted    │
+│             │     docker rm         │             │
+└─────┬───────┘                       └─────────────┘
+      │
+      │ docker start
+      ▼
+┌─────────────┐     docker pause      ┌─────────────┐
+│             │ ────────────────────► │             │
+│  Running    │ &lt;─────────────────── │  Paused     │
+│             │     docker unpause    │             │
+└─────┬───────┘                       └─────────────┘
+      │
+      │ docker stop
+      ▼
+┌─────────────┐
+│             │
+│  Stopped    │
+│             │
+└─────────────┘</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">生命周期状态说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Created</span>：容器已创建但未启动</p>
+              <p>- <span class="key-point">Running</span>：容器正在运行</p>
+              <p>- <span class="key-point">Paused</span>：容器暂停，进程被冻结</p>
+              <p>- <span class="key-point">Stopped</span>：容器停止，进程已终止</p>
+              <p>- <span class="key-point">Deleted</span>：容器已删除</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">容器操作命令</h1>
+          <p class="section-desc">掌握容器的创建、启动、停止等操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">创建与启动容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker create - 创建容器（不启动）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker create [OPTIONS] IMAGE [COMMAND] [ARG...]
+# 作用：创建一个新容器但不启动它，返回容器ID
+#       适合需要先配置再启动的场景
+
+# 基础用法 - 创建Ubuntu容器
+$ docker create --name my-ubuntu ubuntu:22.04
+
+# 预期输出：
+# 容器ID（如：1a2b3c4d5e6f...）
+
+# 参数详解：
+# --name "容器名"      为容器指定名称，便于后续管理
+#                      不指定则自动生成随机名称
+# --env, -e "KEY=VAL"  设置环境变量，可多次使用
+#                      示例：-e TZ=Asia/Shanghai
+# --volume, -v "宿主路径:容器路径"  挂载数据卷
+#                      示例：-v /data/app:/app
+# --port, -p "宿主端口:容器端口"   端口映射
+#                      示例：-p 8080:80
+# --network "网络名"   将容器连接到指定网络
+#                      示例：--network my-network
+# --restart "策略"     容器退出后的重启策略
+#                      no：不重启（默认）
+#                      always：总是重启
+#                      on-failure：失败时重启
+#                      unless-stopped：除非手动停止否则重启
+
+# 示例：创建带完整配置的Ubuntu容器
+$ docker create \
+  --name ubuntu-app \
+  -e TZ=Asia/Shanghai \
+  -e LANG=C.UTF-8 \
+  -v /data/app:/app \
+  --restart unless-stopped \
+  ubuntu:22.04
+
+# 预期输出：
+# 容器ID
+
+# 创建后需要手动启动
+$ docker start ubuntu-app</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker run - 创建并启动容器（最常用）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+# 作用：创建容器并立即启动，相当于 create + start
+
+# 基础用法 - 启动Ubuntu容器（交互式）
+$ docker run -it --name my-ubuntu ubuntu:22.04 bash
+
+# 预期输出：
+# 进入Ubuntu容器的bash终端
+root@1a2b3c4d5e6f:/#
+
+# 参数详解：
+# --detach, -d         后台运行模式，容器在后台运行并返回容器ID
+#                      不加此参数则前台运行，占用当前终端
+# --interactive, -i    保持STDIN打开，即使没有附加
+#                      通常与-t配合使用（-it），用于交互式操作
+# --tty, -t            分配一个伪终端（pseudo-TTY）
+#                      与-i配合使用，提供完整的终端体验
+# --rm                 容器退出后自动删除
+#                      适合临时测试，不会留下停止的容器
+# --name "名称"        指定容器名称，便于后续管理
+# --env, -e "KEY=VAL"  设置环境变量
+# --volume, -v         挂载数据卷
+# --port, -p           端口映射（宿主端口:容器端口）
+# --network "网络名"   指定网络
+# --restart "策略"     重启策略（no/always/on-failure/unless-stopped）
+# --cpus "数量"        限制CPU核心数
+# --memory, -m "大小"  限制内存使用
+
+# 示例：交互式运行Ubuntu容器（临时测试）
+$ docker run -it --rm ubuntu:22.04 bash
+
+# 预期输出：
+# 进入Ubuntu容器的bash终端
+root@1a2b3c4d5e6f:/# cat /etc/os-release
+PRETTY_NAME="Ubuntu 22.04.3 LTS"
+...
+root@1a2b3c4d5e6f:/# exit
+# 退出后容器自动删除
+
+# 示例：后台运行Ubuntu容器
+$ docker run -d --name ubuntu-server \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  ubuntu:22.04 sleep infinity
+
+# 预期输出：
+# 容器ID
+
+# 示例：带资源限制运行
+$ docker run -d --name ubuntu-limited \
+  --cpus 0.5 \
+  --memory 512m \
+  --restart unless-stopped \
+  ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">运行模式</div>
+            <p><span class="highlight">前台运行</span>：容器在当前终端运行，按Ctrl+C停止</p>
+            <p><span class="highlight">后台运行</span>：使用-d参数，容器在后台运行</p>
+            <p><span class="highlight">交互式运行</span>：使用-it参数，进入容器终端</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">查看容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker ps - 列出容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker ps [OPTIONS]
+# 作用：列出容器信息，默认只显示运行中的容器
+
+# 基础用法 - 列出运行中的容器
+$ docker ps
+
+# 预期输出：
+CONTAINER ID   IMAGE          COMMAND           CREATED         STATUS         PORTS     NAMES
+1a2b3c4d5e6f   ubuntu:22.04   "sleep infinity"  5 minutes ago   Up 5 minutes             my-ubuntu
+
+# 参数详解：
+# --all, -a            显示所有容器，包括已停止的
+#                      默认只显示运行中的容器
+# --quiet, -q          只显示容器ID，适合脚本处理
+#                      常用于批量操作：docker rm $(docker ps -aq)
+# --filter, -f "条件"  根据条件过滤容器
+#                      示例：-f status=running（运行中）
+#                            -f name=ubuntu（名称包含ubuntu）
+#                            -f ancestor=ubuntu:22.04（基于ubuntu镜像）
+# --format "模板"      使用Go模板格式化输出
+#                      示例：--format "table {{.Names}}\t{{.Status}}"
+# --last, -n "数量"    显示最近创建的n个容器（包括停止的）
+# --no-trunc           不截断输出，显示完整信息
+# -s, --size           显示容器大小
+
+# 示例：显示所有容器
+$ docker ps -a
+
+# 预期输出：
+CONTAINER ID   IMAGE          COMMAND           CREATED          STATUS                      PORTS     NAMES
+1a2b3c4d5e6f   ubuntu:22.04   "sleep infinity"  5 minutes ago    Up 5 minutes                          my-ubuntu
+2b3c4d5e6f7g   ubuntu:22.04   "bash"            10 minutes ago   Exited (0) 8 minutes ago              my-ubuntu-2
+
+# 示例：只显示容器ID（常用于批量操作）
+$ docker ps -q
+
+# 预期输出：
+1a2b3c4d5e6f
+
+# 示例：显示最近创建的3个容器
+$ docker ps -n 3
+
+# 预期输出：
+# 最近3个容器的信息
+
+# 示例：过滤特定状态的容器
+$ docker ps -f status=exited
+
+# 示例：自定义格式输出
+$ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker inspect - 查看容器详情</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+# 查看Ubuntu容器详细信息
+$ docker inspect my-ubuntu
+
+# 预期输出（部分关键信息）：
+[
+    {
+        "Id": "1a2b3c4d5e6f...",
+        "Name": "/my-ubuntu",
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 12345,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2024-01-15T10:00:00Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Config": {
+            "Hostname": "1a2b3c4d5e6f",
+            "Image": "ubuntu:22.04",
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "TZ=Asia/Shanghai"
+            ],
+            "Cmd": [
+                "sleep",
+                "infinity"
+            ],
+            "WorkingDir": "",
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "bridge": {
+                    "IPAddress": "172.17.0.2",
+                    "Gateway": "172.17.0.1",
+                    "MacAddress": "02:42:ac:11:00:02"
+                }
+            }
+        }
+    }
+]
+
+# 示例：只查看容器IP地址
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' my-ubuntu
+
+# 预期输出：
+172.17.0.2
+
+# 示例：查看容器状态
+$ docker inspect --format '{{.State.Status}}' my-ubuntu
+
+# 预期输出：
+running
+
+# 示例：查看容器PID
+$ docker inspect --format '{{.State.Pid}}' my-ubuntu
+
+# 预期输出：
+12345</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">停止与删除容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker stop - 优雅停止容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker stop [OPTIONS] CONTAINER [CONTAINER...]
+# 作用：发送SIGTERM信号，等待容器优雅停止
+#       容器内的进程有时间清理资源、保存数据
+
+# 基础用法 - 停止Ubuntu容器
+$ docker stop my-ubuntu
+
+# 预期输出：
+my-ubuntu
+
+# 参数详解：
+# --time, -t "秒数"    停止前的等待时间，默认10秒
+#                      Docker先发送SIGTERM，等待指定时间
+#                      如果超时仍未停止，则发送SIGKILL强制停止
+#                      建议给重要应用更长的停止时间
+
+# 示例：停止多个容器
+$ docker stop ubuntu-app1 ubuntu-app2
+
+# 预期输出：
+ubuntu-app1
+ubuntu-app2
+
+# 示例：给容器更长的停止时间（30秒）
+$ docker stop -t 30 ubuntu-database
+
+# 预期输出：
+ubuntu-database
+
+# 停止流程说明：
+# 1. Docker发送SIGTERM信号给容器主进程
+# 2. 主进程收到信号，开始清理工作（如保存数据、关闭连接）
+# 3. 如果在-t时间内停止，容器正常退出
+# 4. 如果超时，Docker发送SIGKILL强制终止</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker start - 启动已停止的容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker start [OPTIONS] CONTAINER [CONTAINER...]
+# 作用：启动已停止的容器，恢复之前的运行状态
+
+# 基础用法 - 启动容器
+$ docker start my-ubuntu
+
+# 预期输出：
+my-ubuntu
+
+# 参数详解：
+# --attach, -a         附加到容器的标准输入/输出/错误
+#                      启动后立即看到容器输出
+# --interactive, -i    附加到容器的STDIN
+#                      与-a配合使用，可以与容器交互
+# --checkpoint "名称"  从检查点恢复（实验性功能）
+# --checkpoint-dir     检查点目录（实验性功能）
+
+# 示例：启动并附加到容器（查看输出）
+$ docker start -a my-ubuntu
+
+# 预期输出：
+# 显示容器启动日志
+
+# 示例：启动并进入交互模式
+$ docker start -a -i my-ubuntu
+
+# 预期输出：
+# 进入容器终端</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker rm - 删除容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker rm [OPTIONS] CONTAINER [CONTAINER...]
+# 作用：删除已停止的容器，释放资源
+
+# 基础用法 - 删除容器
+$ docker rm my-ubuntu
+
+# 预期输出：
+my-ubuntu
+
+# 参数详解：
+# --force, -f          强制删除，即使容器正在运行
+#                      会先停止容器再删除，慎用
+# --volumes, -v        删除容器关联的匿名卷
+#                      注意：不会删除命名卷
+# --link, -l           删除容器间的链接（已弃用）
+
+# 示例：强制删除正在运行的容器
+$ docker rm -f my-ubuntu
+
+# 预期输出：
+my-ubuntu
+
+# 示例：删除多个容器
+$ docker rm ubuntu-app1 ubuntu-app2
+
+# 预期输出：
+ubuntu-app1
+ubuntu-app2
+
+# 示例：删除所有停止的容器
+$ docker rm $(docker ps -a -q)
+
+# 预期输出：
+# 所有停止容器的ID</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>- 删除容器前需先停止容器（除非使用-f参数）</p>
+              <p>- 使用-f参数强制删除可能导致数据丢失</p>
+              <p>- 删除容器不会自动删除关联的数据卷，需使用-v参数</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">容器交互与执行命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker exec - 在容器中执行命令（推荐）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+# 作用：在运行中的容器内启动新进程执行命令
+#       不影响容器主进程，是进入容器的推荐方式
+
+# 基础用法 - 在Ubuntu容器中执行命令
+$ docker exec my-ubuntu ls -la /home
+
+# 预期输出：
+# 目录内容列表
+
+# 参数详解：
+# --interactive, -i    保持STDIN打开，即使没有附加
+#                      用于需要输入的命令
+# --tty, -t            分配伪终端（pseudo-TTY）
+#                      与-i配合使用（-it），提供完整终端体验
+# --user, -u "用户"    指定执行命令的用户（用户名或UID）
+#                      示例：-u root 或 -u 0
+# --workdir, -w "路径" 指定命令的工作目录
+#                      示例：-w /app
+# --env, -e "KEY=VAL"  设置环境变量
+# --privileged         给命令扩展权限
+# --detach, -d         后台运行命令
+
+# 示例：进入Ubuntu容器终端（最常用）
+$ docker exec -it my-ubuntu bash
+
+# 预期输出：
+root@1a2b3c4d5e6f:/#
+
+# 示例：以root用户身份执行命令
+$ docker exec -u root my-ubuntu apt-get update
+
+# 预期输出：
+# 更新包列表
+
+# 示例：在指定工作目录执行命令
+$ docker exec -w /tmp my-ubuntu touch test.txt
+
+# 预期输出：
+# 在/tmp目录创建test.txt文件
+
+# 示例：带环境变量执行命令
+$ docker exec -e DEBUG=true my-ubuntu env
+
+# 示例：后台执行命令
+$ docker exec -d my-ubuntu /scripts/backup.sh</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">docker attach 与 docker exec 的区别</div>
+            <div class="kp-content">
+              <p><span class="key-point">docker attach</span>：附加到容器的主进程（PID 1），直接连接到容器的标准输入/输出/错误流</p>
+              <p><span class="key-point">docker exec</span>：在容器内启动一个新的进程，不影响主进程运行</p>
+              <p>attach 适合查看容器主进程的实时输出，exec 适合在容器内执行命令和调试</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker attach - 附加到容器主进程</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker attach [OPTIONS] CONTAINER
+# 作用：连接到容器主进程的标准输入/输出/错误流，实时查看容器日志
+
+# 附加到运行中的容器（查看实时输出）
+$ docker attach my-ubuntu
+
+# 预期输出：
+# 直接看到容器主进程的输出内容
+
+# 参数详解：
+# --no-stdin=true      不附加标准输入，只查看输出，无法输入命令
+#                      适用场景：只想查看日志，不想意外输入影响容器
+# --sig-proxy=true     代理信号到容器（默认开启）
+#                      开启时：Ctrl+C 会发送 SIGINT 到容器主进程，可能导致容器停止
+#                      关闭时：Ctrl+C 只断开连接，容器继续运行
+
+# 示例：只查看输出，不接受输入
+$ docker attach --no-stdin my-ubuntu
+
+# 示例：关闭信号代理，Ctrl+C不会停止容器
+$ docker attach --sig-proxy=false my-ubuntu
+
+# 重要提示：
+# 1. 使用 Ctrl+C 可能会停止容器（当 --sig-proxy=true 时）
+# 2. 安全退出（不停止容器）：按 Ctrl+P 然后按 Ctrl+Q
+# 3. attach 连接的是容器启动时的主进程，不是新开shell</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">attach 连接主进程</span>：退出可能影响容器运行状态</p>
+              <p>- <span class="highlight">推荐使用 exec</span>：更安全，不会影响容器主进程</p>
+              <p>- <span class="highlight">安全退出方式</span>：Ctrl+P Ctrl+Q 分离而不停止容器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">容器资源管理</h1>
+          <p class="section-desc">控制容器的资源使用</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">CPU资源限制</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">CPU限制参数</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --cpus &lt;value&gt; --cpu-shares &lt;value&gt; --cpuset-cpus &lt;value&gt; IMAGE
+
+# 示例：限制Ubuntu容器使用1个CPU核心
+$ docker run -d --name ubuntu-cpu1 --cpus 1 ubuntu:22.04 sleep infinity
+
+# 示例：设置CPU权重（相对值）
+$ docker run -d --name ubuntu-high --cpu-shares 1024 ubuntu:22.04 sleep infinity
+$ docker run -d --name ubuntu-low --cpu-shares 512 ubuntu:22.04 sleep infinity
+# 当CPU资源竞争时，ubuntu-high获得2倍于ubuntu-low的CPU时间
+
+# 示例：指定容器使用特定CPU核心（0和1）
+$ docker run -d --name ubuntu-pinned --cpuset-cpus 0,1 ubuntu:22.04 sleep infinity
+
+# 示例：限制CPU使用百分比
+$ docker run -d --name ubuntu-half --cpus 0.5 ubuntu:22.04 sleep infinity  # 使用50%的CPU
+
+# 示例：设置CPU周期和配额
+$ docker run -d --name ubuntu-quota --cpu-period 100000 --cpu-quota 50000 ubuntu:22.04 sleep infinity
+# cpu-period：CPU周期（微秒）
+# cpu-quota：CPU配额（微秒）
+# 50000/100000 = 50% CPU使用率
+
+# 验证CPU限制
+$ docker inspect --format '{{.HostConfig.NanoCpus}}' ubuntu-cpu1
+# 输出：1000000000（1个CPU核心，单位纳秒）</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">CPU限制说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">--cpus</span>：限制容器可以使用的CPU核心数</p>
+              <p>- <span class="key-point">--cpu-shares</span>：设置CPU权重，当CPU资源竞争时生效</p>
+              <p>- <span class="key-point">--cpuset-cpus</span>：指定容器可以使用的CPU核心</p>
+              <p>- <span class="key-point">--cpu-period/--cpu-quota</span>：更精细的CPU使用限制</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">内存资源限制</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">内存限制参数</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --memory &lt;value&gt; --memory-swap &lt;value&gt; IMAGE
+
+# 示例：限制Ubuntu容器使用512MB内存
+$ docker run -d --name ubuntu-mem --memory 512m ubuntu:22.04 sleep infinity
+
+# 示例：限制内存和交换空间
+$ docker run -d --name ubuntu-swap --memory 512m --memory-swap 1g ubuntu:22.04 sleep infinity
+# memory-swap = memory + swap，所以swap = 1g - 512m = 512m
+
+# 示例：设置内存软限制（警告但不强制）
+$ docker run -d --name ubuntu-soft --memory 512m --memory-reservation 256m ubuntu:22.04 sleep infinity
+
+# 示例：禁用OOM killer（谨慎使用）
+$ docker run -d --name ubuntu-no-oom --oom-kill-disable --memory 512m ubuntu:22.04 sleep infinity
+
+# 内存单位：b, k, m, g（字节、KB、MB、GB）
+
+# 验证内存限制
+$ docker inspect --format '{{.HostConfig.Memory}}' ubuntu-mem
+# 输出：536870912（512MB的字节数）
+
+# 在容器内查看内存限制
+$ docker exec ubuntu-mem cat /sys/fs/cgroup/memory/memory.limit_in_bytes
+536870912</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">内存限制说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">--memory</span>：硬限制，容器使用的内存不能超过此值</p>
+              <p>- <span class="key-point">--memory-swap</span>：内存+交换空间的总限制</p>
+              <p>- <span class="key-point">--memory-reservation</span>：软限制，内存紧张时会触发</p>
+              <p>- <span class="key-point">--oom-kill-disable</span>：禁用OOM killer（谨慎使用）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">IO资源限制</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">IO限制参数</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --blkio-weight &lt;value&gt; --device-read-bps &lt;value&gt; --device-write-bps &lt;value&gt; IMAGE
+
+# 示例：设置块设备IO权重（10-1000）
+$ docker run -d --name ubuntu-io --blkio-weight 500 ubuntu:22.04 sleep infinity
+
+# 示例：限制设备读取速度（每秒1MB）
+$ docker run -d --name ubuntu-read --device-read-bps /dev/sda:1mb ubuntu:22.04 sleep infinity
+
+# 示例：限制设备写入速度（每秒512KB）
+$ docker run -d --name ubuntu-write --device-write-bps /dev/sda:512kb ubuntu:22.04 sleep infinity
+
+# 示例：限制设备读取IOPS
+$ docker run -d --name ubuntu-riops --device-read-iops /dev/sda:100 ubuntu:22.04 sleep infinity
+
+# 示例：限制设备写入IOPS
+$ docker run -d --name ubuntu-wiops --device-write-iops /dev/sda:50 ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">IO限制说明</div>
+            <p><span class="highlight">--blkio-weight</span>：设置相对权重，影响IO调度</p>
+            <p><span class="highlight">--device-read-bps/write-bps</span>：限制每秒读写字节数</p>
+            <p><span class="highlight">--device-read-iops/write-iops</span>：限制每秒IO操作数</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：容器操作命令综合练习</h1>
+          <p class="section-desc">巩固容器生命周期管理命令</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">容器操作命令综合练习</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">容器生命周期管理综合实践</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>通过综合练习，熟练掌握docker create、run、start、stop、rm、exec等核心命令的使用</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">使用docker create创建一个Nginx容器（不启动）</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">使用docker start启动该容器</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">使用docker exec进入容器查看文件</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">使用docker stop优雅停止容器</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">使用docker rm删除容器</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">使用docker run一步完成创建并启动</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验操作指南</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：使用docker create创建容器（不启动）
+$ docker create --name my-nginx -p 8080:80 nginx
+
+# 预期输出：
+# 容器ID（如：1a2b3c4d5e6f）
+
+# 步骤2：查看已创建但未启动的容器
+$ docker ps -a --filter status=created
+
+# 步骤3：启动容器
+$ docker start my-nginx
+
+# 预期输出：
+my-nginx
+
+# 步骤4：查看运行中的容器
+$ docker ps
+
+# 步骤5：进入容器查看文件
+$ docker exec -it my-nginx bash
+root@1a2b3c4d5e6f:/# ls /usr/share/nginx/html/
+root@1a2b3c4d5e6f:/# cat /etc/nginx/nginx.conf
+root@1a2b3c4d5e6f:/# exit
+
+# 步骤6：查看容器日志
+$ docker logs my-nginx
+
+# 步骤7：优雅停止容器
+$ docker stop my-nginx
+
+# 预期输出：
+my-nginx
+
+# 步骤8：删除容器
+$ docker rm my-nginx
+
+# 预期输出：
+my-nginx
+
+# 步骤9：使用docker run一步完成（常用方式）
+$ docker run -d --name web-server -p 8080:80 --restart unless-stopped nginx
+
+# 预期输出：
+# 容器ID</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">命令对比总结</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">docker create + docker start</span>：分步操作，适合需要先配置再启动的场景</p>
+              <p>- <span class="highlight">docker run</span>：一步完成创建和启动，最常用</p>
+              <p>- <span class="highlight">docker stop</span>：优雅停止，给容器时间清理资源</p>
+              <p>- <span class="highlight">docker rm</span>：删除已停止的容器，-f可强制删除运行中的容器</p>
+              <p>- <span class="highlight">docker exec</span>：在运行中的容器内执行命令，推荐用于进入容器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">容器网络管理</h1>
+          <p class="section-desc">配置容器的网络连接</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">Docker网络模式概述</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker网络模式</div>
+            <div class="definition-content">
+              Docker提供了多种网络模式来满足不同的应用场景需求。理解这些网络模式对于正确配置容器通信至关重要。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            Docker支持以下5种网络模式，每种模式适用于不同的场景：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>网络模式</th>
+                <th>说明</th>
+                <th>适用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">bridge</span></td>
+                <td>默认模式，容器连接到Docker虚拟网桥</td>
+                <td>独立应用容器，需要网络隔离</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">host</span></td>
+                <td>移除网络隔离，直接使用宿主机网络</td>
+                <td>对网络性能要求高的场景</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">none</span></td>
+                <td>禁用容器网络功能，完全隔离</td>
+                <td>不需要网络的应用，如计算任务</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">container</span></td>
+                <td>与其他容器共享网络命名空间</td>
+                <td>容器间紧密耦合，如Sidecar模式</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">自定义网络</span></td>
+                <td>用户创建的bridge或overlay网络</td>
+                <td>多容器应用，需要DNS解析</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">查看Docker网络</div>
+            <div class="kp-content">
+              <p>1. 查看所有网络：<code>docker network ls</code></p>
+              <p>2. 查看网络详情：<code>docker network inspect bridge</code></p>
+              <p>3. 查看容器网络：<code>docker inspect --format '{{.NetworkSettings.Networks}}' &lt;container&gt;</code></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">Bridge网络模式</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Bridge网络</div>
+            <div class="definition-content">
+              Bridge是Docker的<span class="highlight">默认网络模式</span>。当容器启动时，如果未指定网络模式，Docker会创建一个虚拟网桥（docker0），容器通过该网桥与外部网络通信。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Bridge网络原理</span>
+              <span class="code-lang">概念说明</span>
+            </div>
+            <pre><code>                    ┌─────────────────────────────────────┐
+                    │           宿主机                      │
+                    │                                      │
+                    │    ┌────────────────────────────┐   │
+                    │    │     docker0 网桥           │   │
+                    │    │     172.17.0.1           │   │
+                    │    └──────────┬───────────────┘   │
+                    │               │                    │
+              ┌────┴────┐    ┌────┴────┐    ┌────┴────┐
+              │ Container│    │ Container│    │ Container│
+              │ 172.17.0.2│    │ 172.17.0.3│    │ 172.17.0.4│
+              └──────────┘    └──────────┘    └──────────┘
+                    │               │                    │
+                    └───────────────┴────────────────────┘
+                                       │
+                                 ┌─────┴─────┐
+                                 │ NAT转换   │
+                                 └─────┬─────┘
+                                       │
+                                 ┌─────┴─────┐
+                                 │ 物理网卡   │
+                                 └───────────┘</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Bridge网络示例（Ubuntu容器）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看默认bridge网络信息
+$ docker network inspect bridge
+
+# 预期输出（部分）：
+{
+    "Name": "bridge",
+    "Id": "abc123...",
+    "Driver": "bridge",
+    "Subnet": "172.17.0.0/16",
+    "Gateway": "172.17.0.1"
+}
+
+# 启动Ubuntu容器（默认使用bridge网络）
+$ docker run -d --name ubuntu-bridge ubuntu:22.04 sleep infinity
+
+# 查看容器IP地址
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' ubuntu-bridge
+172.17.0.2
+
+# 从容器内测试网络连接
+$ docker exec ubuntu-bridge ping -c 3 baidu.com
+
+# 容器间通信（通过容器名，需要使用自定义网络）
+$ docker run -d --name ubuntu-1 ubuntu:22.04 sleep infinity
+$ docker exec ubuntu-1 ping -c 3 ubuntu-1
+# ping: bad address 'ubuntu-1'  （默认bridge不支持DNS解析）</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">Bridge网络特点</div>
+            <p>- 每个容器有独立的IP地址</p>
+            <p>- 容器可以访问外部网络（通过NAT）</p>
+            <p>- 外部访问容器需要端口映射</p>
+            <p>- 同一bridge网络的容器可以通过IP通信，但不能通过容器名通信</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">Host网络模式</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Host网络</div>
+            <div class="definition-content">
+              Host模式<span class="highlight">移除容器与宿主机之间的网络隔离</span>，容器直接使用宿主机的网络命名空间。容器不会获得独立的IP地址，而是共享宿主机的IP地址和端口。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Host网络示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 使用host网络模式启动Ubuntu容器
+$ docker run -d --name ubuntu-host --network host ubuntu:22.04 sleep infinity
+
+# 查看容器网络信息
+$ docker inspect --format '{{.NetworkSettings.Networks}}' ubuntu-host
+# 输出：{} （无独立网络，使用宿主机网络）
+
+# 在容器内查看网络
+$ docker exec ubuntu-host hostname -I
+192.168.1.100  # 与宿主机IP相同
+
+# 端口监听测试
+$ docker exec ubuntu-host netstat -tuln | grep :80
+# 容器内可直接绑定宿主机的80端口</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Host网络 vs Bridge网络对比</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Bridge网络（需要端口映射）
+$ docker run -d --name nginx-bridge -p 8080:80 nginx
+# 访问：http://localhost:8080
+
+# Host网络（直接使用宿主机端口）
+$ docker run -d --name nginx-host --network host nginx
+# 访问：http://localhost:80  （无需映射）
+
+# 性能对比
+# Host网络：性能最好，延迟最低，无NAT开销
+# Bridge网络：有NAT转换，性能略低</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>- 端口冲突：如果宿主机已有服务占用端口，容器无法启动</p>
+              <p>- 网络隔离：容器与宿主机共享网络，无法隔离</p>
+              <p>- Windows/Mac：Host网络在Docker Desktop中行为不同</p>
+            </div>
+          </div>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>Bridge</th>
+                <th>Host</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>IP地址</td>
+                <td>独立IP（172.17.0.x）</td>
+                <td>与宿主机共享</td>
+              </tr>
+              <tr>
+                <td>端口映射</td>
+                <td>需要（-p 参数）</td>
+                <td>不需要</td>
+              </tr>
+              <tr>
+                <td>网络性能</td>
+                <td>有NAT开销</td>
+                <td>最优</td>
+              </tr>
+              <tr>
+                <td>隔离性</td>
+                <td>网络隔离</td>
+                <td>无隔离</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.4</span>
+          <h1 class="page-title">None与Container网络模式</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">None网络</div>
+            <div class="definition-content">
+              None模式<span class="highlight">完全禁用容器的网络功能</span>。容器拥有独立的网络命名空间，但不配置任何网络接口（除loopback外）。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">None网络示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动无网络Ubuntu容器
+$ docker run -d --name ubuntu-none --network none ubuntu:22.04 sleep infinity
+
+# 查看容器网络
+$ docker inspect --format '{{.NetworkSettings.Networks}}' ubuntu-none
+# 输出：null 或 {}
+
+# 在容器内查看网络接口
+$ docker exec ubuntu-none ip addr
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+# 注意：没有eth0，只有loopback</code></pre>
+          </div>
+          
+          <div class="definition-box">
+            <div class="definition-term">Container网络</div>
+            <div class="definition-content">
+              Container模式<span class="highlight">与其他容器共享网络命名空间</span>。新容器不会创建自己的网络接口，而是与指定容器共享同一网络栈。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Container网络示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动第一个容器（作为网络基础）
+$ docker run -d --name ubuntu-base ubuntu:22.04 sleep infinity
+
+# 查看基础容器的IP
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' ubuntu-base
+172.17.0.2
+
+# 启动新容器，共享基础容器的网络
+$ docker run -d --name ubuntu-share --network container:ubuntu-base ubuntu:22.04 sleep infinity
+
+# 验证：两个容器IP相同
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' ubuntu-share
+172.17.0.2
+
+# 在新容器内测试
+$ docker exec ubuntu-share ping -c 3 ubuntu-base
+# 可以通信（因为共享网络命名空间）
+
+# 端口测试
+$ docker exec ubuntu-base nc -l 8888 &
+$ docker exec ubuntu-share nc localhost 8888
+# 可以直接通过localhost通信</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">适用场景</div>
+            <p><strong>None网络</strong>：批处理任务、离线计算、安全隔离场景</p>
+            <p><strong>Container网络</strong>：Sidecar模式、多容器共享配置、紧密耦合的应用</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.5</span>
+          <h1 class="page-title">端口映射详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">端口映射</div>
+            <div class="definition-content">
+              端口映射（Port Mapping）是将<span class="highlight">宿主机的端口</span>与<span class="highlight">容器的端口</span>进行关联，使外部流量可以通过宿主机端口访问容器内服务。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口映射语法与示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：-p &lt;host-port&gt;:&lt;container-port&gt;[:&lt;protocol&gt;]
+
+# 基本端口映射
+$ docker run -d --name nginx-web -p 8080:80 nginx
+# 访问：http://localhost:8080
+
+# 映射多个端口
+$ docker run -d --name nginx-multi -p 8080:80 -p 8443:443 nginx
+
+# 指定协议（tcp/udp）
+$ docker run -d --name dns-server -p 53:53/udp redis:alpine
+
+# 绑定到特定IP（仅本地访问）
+$ docker run -d --name nginx-local -p 127.0.0.1:8080:80 nginx
+# 只能通过 localhost:8080 访问
+
+# 绑定到所有IP（默认）
+$ docker run -d --name nginx-all -p 0.0.0.0:8080:80 nginx
+# 可以通过任何网络接口访问
+
+# 随机端口映射（仅指定容器端口）
+$ docker run -d --name nginx-random -p 80 nginx
+# Docker自动分配一个宿主机端口
+
+# 查看端口映射
+$ docker port nginx-web
+80/tcp -> 0.0.0.0:8080
+
+# 查看所有映射端口
+$ docker ps --format "table {{.Names}}\t{{.Ports}}"
+NAMES        PORTS
+nginx-web    0.0.0.0:8080->80/tcp</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口映射原理</span>
+              <span class="code-lang">概念说明</span>
+            </div>
+            <pre><code># 端口映射工作流程：
+# 1. 宿主机监听 8080 端口
+# 2. 收到请求后，NAT转换目的地址
+# 3. 转发到容器 IP:80 端口
+# 4. 容器处理请求，返回响应
+# 5. NAT转换源地址，返回客户端
+
+# 示例流程：
+# 客户端 -> http://192.168.1.100:8080
+#      -> 宿主机eth0:8080
+#      -> NAT转换（目的IP改为172.17.0.2:80）
+#      -> 容器eth0:80
+#      -> 处理请求
+#      -> 返回响应
+#      -> NAT转换（源IP改为192.168.1.100）
+#      -> 客户端</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>- 端口冲突：确保宿主机端口未被占用</p>
+              <p>- 防火墙：检查防火墙是否允许访问映射端口</p>
+              <p>- 容器重启：端口映射在容器重启后保持不变</p>
+              <p>- 动态端口：生产环境建议使用固定端口</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.6</span>
+          <h1 class="page-title">自定义网络与DNS解析</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">自定义网络</div>
+            <div class="definition-content">
+              自定义网络允许用户创建<span class="highlight">自定义的bridge网络</span>，支持容器间通过容器名进行DNS解析，无需手动配置链接。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建和管理自定义网络</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看所有网络
+$ docker network ls
+
+# 预期输出：
+NETWORK ID     NAME        DRIVER      SCOPE
+abc123...      bridge      bridge      local
+def456...      host        host        local
+ghi789...      none        null        local
+jkl012...      my-network  bridge      local
+
+# 创建自定义bridge网络
+$ docker network create my-network
+
+# 创建时指定子网和网关
+$ docker network create \
+  --driver bridge \
+  --subnet 192.168.100.0/24 \
+  --gateway 192.168.100.1 \
+  my-subnet
+
+# 查看网络详情
+$ docker network inspect my-network
+
+# 删除网络
+$ docker network rm my-network
+
+# 清理未使用的网络
+$ docker network prune</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">使用自定义网络（Ubuntu容器示例）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建自定义网络
+$ docker network create app-network
+
+# 启动容器并连接到自定义网络
+$ docker run -d --name ubuntu-web --network app-network ubuntu:22.04 sleep infinity
+$ docker run -d --name ubuntu-db --network app-network ubuntu:22.04 sleep infinity
+$ docker run -d --name ubuntu-api --network app-network ubuntu:22.04 sleep infinity
+
+# 查看容器IP地址
+$ docker inspect --format '{{.NetworkSettings.Networks.app-network.IPAddress}}' ubuntu-web
+192.168.100.2
+
+$ docker inspect --format '{{.NetworkSettings.Networks.app-network.IPAddress}}' ubuntu-db
+192.168.100.3
+
+# 容器间通过名称通信（DNS解析）
+$ docker exec ubuntu-web ping -c 3 ubuntu-db
+# PING ubuntu-db (192.168.100.3) 56(84) bytes of data.
+
+$ docker exec ubuntu-api ping -c 3 ubuntu-web
+# PING ubuntu-web (192.168.100.2) 56(84) bytes of data.
+
+# 验证DNS解析
+$ docker exec ubuntu-web nslookup ubuntu-db
+Server:    127.0.0.11
+Address:   127.0.0.11#53
+
+Name:      ubuntu-db
+Address:   192.168.100.3</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">容器多网络连接</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 容器连接到多个网络
+$ docker network create frontend-network
+$ docker network create backend-network
+
+# 启动应用服务器，连接两个网络
+$ docker run -d --name app-server --network frontend-network ubuntu:22.04 sleep infinity
+
+# 将应用服务器连接到后端网络
+$ docker network connect backend-network app-server
+
+# 验证网络连接
+$ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
+[backend-network frontend-network]
+
+# 查看各网络IP
+$ docker inspect --format '{{.NetworkSettings.Networks.frontend-network.IPAddress}}' app-server
+192.168.1.2
+
+$ docker inspect --format '{{.NetworkSettings.Networks.backend-network.IPAddress}}' app-server
+192.168.2.2
+
+# 断开网络连接
+$ docker network disconnect backend-network app-server</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">自定义网络优势</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">DNS解析</span>：容器可以通过名称相互访问，无需手动配置IP</p>
+              <p>- <span class="highlight">网络隔离</span>：不同项目可以使用不同网络，相互隔离</p>
+              <p>- <span class="highlight">灵活配置</span>：可自定义子网、网关、IP范围</p>
+              <p>- <span class="highlight">多网络支持</span>：容器可以同时加入多个网络</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.7</span>
+          <h1 class="page-title">容器网络故障排查</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用排查命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 查看容器网络配置
+$ docker inspect --format '{{json .NetworkSettings}}' &lt;container&gt; | jq
+
+# 2. 查看容器IP地址
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' &lt;container&gt;
+
+# 3. 查看端口映射
+$ docker port &lt;container&gt;
+
+# 4. 查看网络列表
+$ docker network ls
+
+# 5. 查看网络详情
+$ docker network inspect &lt;network-name&gt;
+
+# 6. 在容器内测试网络
+$ docker exec &lt;container&gt; ping -c 3 8.8.8.8
+$ docker exec &lt;container&gt; curl http://example.com
+$ docker exec &lt;container&gt; nslookup baidu.com
+$ docker exec &lt;container&gt; ip addr
+$ docker exec &lt;container&gt; netstat -tuln</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常见问题与解决方案</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 问题1：容器无法访问外网
+# 原因：DNS配置错误或网络不通
+# 解决：
+$ docker exec &lt;container&gt; ping 8.8.8.8
+# 如果IP能通但域名不通，检查DNS：
+$ docker exec &lt;container&gt; cat /etc/resolv.conf
+
+# 问题2：无法通过端口访问容器
+# 原因：端口未映射、防火墙阻止、服务未启动
+# 解决：
+$ docker port &lt;container&gt;
+$ curl http://localhost:&lt;port&gt;
+$ docker logs &lt;container&gt;
+
+# 问题3：容器间无法通信
+# 原因：不在同一网络、未使用自定义网络
+# 解决：
+$ docker network inspect &lt;network&gt;
+# 确保容器在同一网络中
+
+# 问题4：容器名无法解析
+# 原因：未使用自定义网络
+# 解决：
+$ docker network create my-network
+$ docker run --network my-network ...</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">网络调试流程</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">确认网络模式</span>：检查容器使用的网络模式（bridge/host/custom）</p>
+              <p>2. <span class="key-point">检查IP配置</span>：确认容器IP和网络设置正确</p>
+              <p>3. <span class="key-point">测试连通性</span>：先ping IP，再ping域名</p>
+              <p>4. <span class="key-point">检查端口映射</span>：确认-p参数正确，端口未被占用</p>
+              <p>5. <span class="key-point">查看日志</span>：docker logs查看应用日志</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">容器数据管理</h1>
+          <p class="section-desc">实现容器数据的持久化</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.1</span>
+          <h1 class="page-title">数据卷</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">数据卷定义</div>
+            <div class="definition-content">
+              数据卷（Volume）是<span class="highlight">持久化存储</span>的一种方式，是独立于容器生命周期的存储单元，可以在容器之间共享和重用。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">数据卷基本命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建数据卷
+$ docker volume create my-volume
+
+# 查看数据卷列表
+$ docker volume ls
+
+# 预期输出：
+DRIVER    VOLUME NAME
+local     my-volume
+
+# 查看数据卷详情
+$ docker volume inspect my-volume
+
+# 预期输出：
+[
+    {
+        "CreatedAt": "2024-01-15T10:00:00Z",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/docker/volumes/my-volume/_data",
+        "Name": "my-volume",
+        "Scope": "local"
+    }
+]
+
+# 删除数据卷
+$ docker volume rm my-volume
+
+# 删除未使用的数据卷
+$ docker volume prune</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Ubuntu容器使用数据卷示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建数据卷
+$ docker volume create ubuntu-data
+
+# 运行Ubuntu容器并挂载数据卷
+$ docker run -it --name ubuntu-test -v ubuntu-data:/data ubuntu:22.04
+
+# 在容器内操作（已进入容器）
+root@container:/# echo "Hello Docker Volume" > /data/test.txt
+root@container:/# ls /data/
+test.txt
+root@container:/# cat /data/test.txt
+Hello Docker Volume
+root@container:/# exit
+
+# 删除容器后，数据卷中的数据仍然存在
+$ docker rm ubuntu-test
+
+# 重新创建容器，数据仍然存在
+$ docker run -it --name ubuntu-new -v ubuntu-data:/data ubuntu:22.04
+
+# 验证数据持久化
+root@container:/# cat /data/test.txt
+Hello Docker Volume</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">数据卷特点</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">持久化</span>：数据卷独立于容器生命周期，容器删除后数据不丢失</p>
+              <p>2. <span class="key-point">共享</span>：多个容器可以同时使用同一个数据卷</p>
+              <p>3. <span class="key-point">备份</span>：容易备份和迁移数据</p>
+              <p>4. <span class="key-point">性能</span>：直接挂载到宿主机，性能较好</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2</span>
+          <h1 class="page-title">绑定挂载</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">绑定挂载定义</div>
+            <div class="definition-content">
+              绑定挂载（Bind Mount）是将<span class="highlight">宿主机的目录或文件</span>直接挂载到容器中，实现宿主机与容器之间的数据共享。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">绑定挂载语法</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run -v &lt;host-path&gt;:&lt;container-path&gt;[:&lt;options&gt;] IMAGE
+# host-path    宿主机路径（绝对路径或相对路径）
+# container-path 容器内路径
+# options      可选：ro（只读）、rw（读写，默认）
+
+# 基本格式
+$ docker run -v /host/path:/container/path IMAGE
+$ docker run -v $(pwd):/app IMAGE           # 当前目录
+$ docker run -v ./data:/app IMAGE           # 相对路径</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Ubuntu容器绑定挂载示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在宿主机创建测试目录
+$ mkdir -p ~/docker-share
+$ echo "Hello from host" > ~/docker-share/host.txt
+
+# 运行Ubuntu容器并挂载目录
+$ docker run -it --name ubuntu-bind -v ~/docker-share:/share ubuntu:22.04
+
+# 在容器内查看（已进入容器）
+root@container:/# ls /share/
+host.txt
+root@container:/# cat /share/host.txt
+Hello from host
+
+# 在容器内创建文件
+root@container:/# echo "Hello from container" > /share/container.txt
+root@container:/# exit
+
+# 在宿主机查看容器创建的文件
+$ ls ~/docker-share/
+container.txt  host.txt
+$ cat ~/docker-share/container.txt
+Hello from container
+
+# 挂载为只读模式
+$ docker run -it --name ubuntu-readonly -v ~/docker-share:/share:ro ubuntu:22.04
+root@container:/# touch /share/new.txt
+touch: cannot touch '/share/new.txt': Read-only file system</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">挂载单个文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在宿主机创建配置文件
+$ echo "export MY_VAR=hello" > ~/my-config.sh
+
+# 挂载单个文件到容器
+$ docker run -it --name ubuntu-file -v ~/my-config.sh:/etc/profile.d/my-config.sh ubuntu:22.04
+
+# 在容器内验证
+root@container:/# cat /etc/profile.d/my-config.sh
+export MY_VAR=hello
+root@container:/# source /etc/profile.d/my-config.sh
+root@container:/# echo $MY_VAR
+hello</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">绑定挂载 vs 数据卷</div>
+            <p><span class="highlight">绑定挂载</span>：直接使用宿主机路径，适合开发环境，方便实时编辑</p>
+            <p><span class="highlight">数据卷</span>：由Docker管理，适合生产环境，更安全可靠</p>
+            <p><span class="highlight">选择建议</span>：开发时用绑定挂载，部署时用数据卷</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3</span>
+          <h1 class="page-title">tmpfs挂载</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">tmpfs挂载定义</div>
+            <div class="definition-content">
+              tmpfs挂载是将<span class="highlight">内存</span>作为存储挂载到容器中，数据仅保存在内存中，容器停止后数据丢失，适合存储临时或敏感数据。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">tmpfs挂载语法</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --tmpfs &lt;container-path&gt; IMAGE
+# 或使用 --mount 参数
+# docker run --mount type=tmpfs,destination=&lt;path&gt;[,tmpfs-size=&lt;size&gt;] IMAGE
+
+# 常用参数：
+# --tmpfs &lt;path&gt;          直接指定挂载点
+# tmpfs-size=&lt;bytes&gt;      设置tmpfs大小限制
+# tmpfs-mode=&lt;mode&gt;       设置文件权限模式（如1777）</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Ubuntu容器tmpfs挂载示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 运行Ubuntu容器并挂载tmpfs到/tmp
+$ docker run -it --name ubuntu-tmpfs --tmpfs /tmp ubuntu:22.04
+
+# 在容器内测试（已进入容器）
+root@container:/# df -h /tmp
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs            64M     0   64M   0% /tmp
+
+# 写入数据到tmpfs
+root@container:/# echo "temporary data" > /tmp/test.txt
+root@container:/# cat /tmp/test.txt
+temporary data
+
+# 查看内存使用变化
+root@container:/# df -h /tmp
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs            64M  4.0K   64M   1% /tmp
+
+# 退出容器
+root@container:/# exit
+
+# 重新启动容器，数据已丢失
+$ docker start -ai ubuntu-tmpfs
+root@container:/# cat /tmp/test.txt
+cat: /tmp/test.txt: No such file or directory</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">设置tmpfs大小限制</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 使用--tmpfs参数设置大小
+$ docker run -it --name ubuntu-limited --tmpfs /tmp:size=128m ubuntu:22.04
+
+# 使用--mount参数（更灵活）
+$ docker run -it --name ubuntu-mount \
+  --mount type=tmpfs,destination=/tmp,tmpfs-size=134217728 ubuntu:22.04
+# tmpfs-size单位为字节，134217728 = 128MB
+
+# 在容器内验证
+root@container:/# df -h /tmp
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           128M     0  128M   0% /tmp
+
+# 测试写入超过限制
+root@container:/# dd if=/dev/zero of=/tmp/bigfile bs=1M count=200
+dd: error writing '/tmp/bigfile': No space left on device</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">tmpfs挂载适用场景</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">临时数据</span>：缓存文件、临时计算结果</p>
+              <p>- <span class="highlight">敏感数据</span>：密码、密钥等不想写入磁盘的数据</p>
+              <p>- <span class="highlight">高IO操作</span>：需要高速读写的临时数据处理</p>
+              <p>- <span class="highlight">安全考虑</span>：容器停止后自动清除敏感信息</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：容器数据管理实践</h1>
+          <p class="section-desc">掌握数据卷、绑定挂载和tmpfs的使用</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">Ubuntu容器数据管理综合实验</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">数据持久化与共享实践</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>通过Ubuntu容器实践数据卷、绑定挂载和tmpfs的使用，理解数据持久化和容器间数据共享</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建数据卷并在Ubuntu容器中使用</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">验证数据卷的持久化特性</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">使用绑定挂载实现宿主机与容器数据共享</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">使用tmpfs存储临时数据</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">实现两个容器间的数据共享</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验一：数据卷持久化</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建数据卷
+$ docker volume create shared-data
+
+# 步骤2：运行第一个Ubuntu容器并写入数据
+$ docker run -it --name ubuntu-vol1 -v shared-data:/app ubuntu:22.04
+
+# 在容器内创建文件
+root@container:/# mkdir -p /app
+root@container:/# echo "Data from container 1" > /app/data.txt
+root@container:/# ls /app/
+data.txt
+root@container:/# exit
+
+# 步骤3：删除容器后数据卷仍然存在
+$ docker rm ubuntu-vol1
+
+# 步骤4：运行第二个容器验证数据持久化
+$ docker run -it --name ubuntu-vol2 -v shared-data:/app ubuntu:22.04
+
+# 验证数据仍然存在
+root@container:/# cat /app/data.txt
+Data from container 1
+
+# 添加新数据
+root@container:/# echo "Data from container 2" >> /app/data.txt
+root@container:/# exit</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">实验二：绑定挂载数据共享</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：在宿主机创建共享目录
+$ mkdir -p ~/docker-lab
+$ echo "Host file content" > ~/docker-lab/host.txt
+
+# 步骤2：运行Ubuntu容器并挂载目录
+$ docker run -it --name ubuntu-bind -v ~/docker-lab:/lab ubuntu:22.04
+
+# 查看宿主机文件
+root@container:/# cat /lab/host.txt
+Host file content
+
+# 在容器内创建文件
+root@container:/# echo "Container file content" > /lab/container.txt
+root@container:/# exit
+
+# 步骤3：在宿主机验证
+$ ls ~/docker-lab/
+container.txt  host.txt
+$ cat ~/docker-lab/container.txt
+Container file content
+
+# 步骤4：修改文件后再次进入容器查看
+$ echo "Updated by host" >> ~/docker-lab/host.txt
+$ docker start -ai ubuntu-bind
+root@container:/# cat /lab/host.txt
+Host file content
+Updated by host</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">实验三：容器间数据共享</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：启动两个Ubuntu容器共享同一个数据卷
+$ docker run -d --name ubuntu-writer -v shared-data:/data ubuntu:22.04 tail -f /dev/null
+$ docker run -d --name ubuntu-reader -v shared-data:/data ubuntu:22.04 tail -f /dev/null
+
+# 步骤2：在writer容器中写入数据
+$ docker exec ubuntu-writer bash -c "echo 'Hello from writer' > /data/message.txt"
+
+# 步骤3：在reader容器中读取数据
+$ docker exec ubuntu-reader cat /data/message.txt
+Hello from writer
+
+# 步骤4：清理容器
+$ docker stop ubuntu-writer ubuntu-reader
+$ docker rm ubuntu-writer ubuntu-reader</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功创建并使用数据卷</p>
+              <p>- [ ] 验证容器删除后数据卷数据仍然存在</p>
+              <p>- [ ] 实现宿主机与容器的双向数据共享</p>
+              <p>- [ ] 实现两个容器间的数据共享</p>
+              <p>- [ ] 理解数据卷、绑定挂载、tmpfs的区别和适用场景</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 6</span>
+          <h1 class="section-title">容器监控与日志</h1>
+          <p class="section-desc">监控容器运行状态和查看日志</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.1</span>
+          <h1 class="page-title">容器日志</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker logs - 查看容器日志</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker logs [OPTIONS] CONTAINER
+
+# 基础用法 - 查看容器日志
+$ docker logs my-nginx
+
+# 常用参数说明：
+# --follow, -f         实时跟踪日志
+# --tail               显示最后n行
+# --timestamps, -t     显示时间戳
+# --since              显示指定时间之后的日志
+# --until              显示指定时间之前的日志
+
+# 示例：实时跟踪日志
+$ docker logs -f my-nginx
+
+# 示例：显示最后100行日志
+$ docker logs --tail 100 my-nginx
+
+# 示例：显示带时间戳的日志
+$ docker logs -t my-nginx
+
+# 示例：显示过去1小时的日志
+$ docker logs --since 1h my-nginx
+
+# 示例：显示特定时间段的日志
+$ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-nginx</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">日志驱动</div>
+            <p>Docker支持多种日志驱动，如json-file（默认）、syslog、journald、gelf等。可以在docker run时通过--log-driver参数指定。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.2</span>
+          <h1 class="page-title">容器监控</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker stats - 查看容器资源使用情况</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker stats [OPTIONS] [CONTAINER...]
+
+# 基础用法 - 查看所有容器的资源使用情况
+$ docker stats
+
+# 预期输出：
+CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+1a2b3c4d5e6f   my-nginx  0.03%     2.562MiB / 1.945GiB   0.13%     648B / 648B       0B / 0B           2
+
+# 常用参数说明：
+# --all, -a           显示所有容器（包括停止的）
+# --format            使用Go模板格式化输出
+# --no-stream         只显示当前状态，不持续更新
+# --no-trunc          不截断输出
+
+# 示例：查看特定容器的资源使用情况
+$ docker stats my-nginx
+
+# 示例：只显示当前状态
+$ docker stats --no-stream
+
+# 示例：格式化输出
+$ docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
+
+# 预期输出：
+NAME       CPU %     MEM USAGE / LIMIT
+my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">监控指标说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">CPU %</span>：CPU使用率</p>
+              <p>- <span class="key-point">MEM USAGE / LIMIT</span>：内存使用量/限制</p>
+              <p>- <span class="key-point">MEM %</span>：内存使用率</p>
+              <p>- <span class="key-point">NET I/O</span>：网络输入/输出</p>
+              <p>- <span class="key-point">BLOCK I/O</span>：块设备输入/输出</p>
+              <p>- <span class="key-point">PIDS</span>：进程数量</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 7</span>
+          <h1 class="section-title">容器安全</h1>
+          <p class="section-desc">保障容器的安全运行</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 7.1</span>
+          <h1 class="page-title">容器安全最佳实践</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>使用官方镜像</h3>
+              <p>从Docker Hub官方仓库拉取镜像，避免使用未知来源的镜像</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>最小化镜像</h3>
+              <p>使用Alpine等轻量级基础镜像，减少攻击面</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>定期更新镜像</h3>
+              <p>及时更新镜像以修复安全漏洞</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>使用非root用户</h3>
+              <p>在Dockerfile中创建并使用普通用户，避免以root身份运行容器</p>
+            </div>
+          </div>
+          
+          <div class="card-grid" style="margin-top: 1rem;">
+            <div class="card">
+              <h3><span class="card-num">5</span>限制容器权限</h3>
+              <p>使用--cap-drop参数移除不必要的Linux能力</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">6</span>网络隔离</h3>
+              <p>使用自定义网络，限制容器间的网络访问</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">7</span>资源限制</h3>
+              <p>设置CPU、内存等资源限制，防止资源耗尽攻击</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">8</span>安全扫描</h3>
+              <p>使用工具扫描镜像中的安全漏洞</p>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">安全配置示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 示例：以非root用户运行容器
+$ docker run --user 1000:1000 nginx
+
+# 示例：限制容器能力
+$ docker run --cap-drop ALL --cap-add NET_BIND_SERVICE nginx
+
+# 示例：只读文件系统
+$ docker run --read-only nginx
+
+# 示例：禁用特权模式
+$ docker run --privileged=false nginx
+
+# 示例：设置seccomp配置
+$ docker run --security-opt seccomp=profile.json nginx</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 7.2</span>
+          <h1 class="page-title">容器安全工具</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>工具名称</th>
+                <th>功能</th>
+                <th>使用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">Trivy</span></td>
+                <td>容器镜像安全扫描</td>
+                <td>CI/CD流水线中的安全检查</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">Docker Bench for Security</span></td>
+                <td>Docker配置安全检查</td>
+                <td>Docker主机安全评估</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">Clair</span></td>
+                <td>静态容器漏洞分析</td>
+                <td>镜像仓库的安全扫描</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">Falco</span></td>
+                <td>容器运行时安全监控</td>
+                <td>实时安全事件检测</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">Notary</span></td>
+                <td>容器镜像签名</td>
+                <td>确保镜像完整性和来源</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="tip-box">
+            <div class="tip-title">安全工具使用建议</div>
+            <p>将安全扫描集成到CI/CD流水线中，确保每个构建的镜像都经过安全检查。定期使用Docker Bench for Security检查Docker主机配置，及时发现并修复安全问题。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：Docker容器管理实践</h1>
+          <p class="section-desc">掌握容器的创建、管理和监控</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">容器管理操作练习</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">容器生命周期管理</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Docker容器的创建、启动、停止、删除等基本操作，以及容器的资源限制、网络配置和数据管理</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建并运行Nginx容器，映射端口</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">查看容器状态和资源使用情况</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">进入容器并执行命令</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">设置容器资源限制</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">配置容器网络</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">使用数据卷持久化数据</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">7</span>
+                <span class="step-text">查看容器日志</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">8</span>
+                <span class="step-text">停止并删除容器</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验操作指南</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建并运行Nginx容器
+$ docker run --name my-nginx -d -p 8080:80 nginx
+
+# 步骤2：查看容器状态和资源使用情况
+$ docker ps
+$ docker stats --no-stream my-nginx
+$ docker inspect my-nginx
+
+# 步骤3：进入容器并执行命令
+$ docker exec -it my-nginx bash
+$ ls -la /usr/share/nginx/html
+$ echo "Hello Docker" > /usr/share/nginx/html/index.html
+$ exit
+
+# 步骤4：设置容器资源限制
+$ docker run --name limited-app -d --cpus 0.5 --memory 256m nginx
+$ docker stats --no-stream limited-app
+
+# 步骤5：配置容器网络
+$ docker network create my-network
+$ docker run --name app1 --network my-network -d nginx
+$ docker run --name app2 --network my-network -d busybox sleep 3600
+$ docker exec app2 ping app1
+
+# 步骤6：使用数据卷持久化数据
+$ docker volume create nginx-data
+$ docker run --name data-nginx -d -p 8081:80 -v nginx-data:/usr/share/nginx/html nginx
+$ echo "Persistent Data" > /var/lib/docker/volumes/nginx-data/_data/index.html
+
+# 步骤7：查看容器日志
+$ docker logs my-nginx
+$ docker logs -f my-nginx
+
+# 步骤8：停止并删除容器
+$ docker stop my-nginx limited-app app1 app2 data-nginx
+$ docker rm my-nginx limited-app app1 app2 data-nginx
+$ docker network rm my-network
+$ docker volume rm nginx-data
+
+# 验证结果
+$ docker ps -a
+$ docker network ls
+$ docker volume ls</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功创建并运行Nginx容器</p>
+              <p>- [ ] 能够查看容器状态和资源使用情况</p>
+              <p>- [ ] 成功进入容器并执行命令</p>
+              <p>- [ ] 能够设置容器资源限制</p>
+              <p>- [ ] 成功配置容器网络</p>
+              <p>- [ ] 能够使用数据卷持久化数据</p>
+              <p>- [ ] 成功查看容器日志</p>
+              <p>- [ ] 能够停止并删除容器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验：容器网络与数据管理</h1>
+          <p class="section-desc">掌握容器网络配置和数据持久化</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">容器网络配置与数据卷使用</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">网络配置与数据持久化</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Docker网络的配置方法和数据卷的使用，实现容器间通信和数据持久化</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">创建自定义网络</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">运行多个容器并加入网络</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">测试容器间通信</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">创建和使用数据卷</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">验证数据持久化</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验操作指南</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建自定义网络
+$ docker network create my-network
+
+# 步骤2：运行Nginx容器并加入网络
+$ docker run --name web-server --network my-network -d -p 8080:80 nginx
+
+# 步骤3：运行Busybox容器并加入网络
+$ docker run --name test-client --network my-network -d busybox sleep 3600
+
+# 步骤4：测试容器间通信（通过容器名称）
+$ docker exec test-client ping web-server
+
+# 步骤5：测试容器间通信（通过IP地址）
+$ WEB_IP=$(docker inspect --format '{{.NetworkSettings.Networks.my-network.IPAddress}}' web-server)
+$ docker exec test-client ping $WEB_IP
+
+# 步骤6：创建数据卷
+$ docker volume create web-data
+
+# 步骤7：运行带数据卷的Nginx容器
+$ docker run --name web-with-volume --network my-network -d -p 8081:80 -v web-data:/usr/share/nginx/html nginx
+
+# 步骤8：向数据卷写入数据
+$ echo "<h1>Persistent Data</h1><p>This data is stored in a volume.</p>" > /var/lib/docker/volumes/web-data/_data/index.html
+
+# 步骤9：访问应用验证数据
+$ curl http://localhost:8081
+
+# 步骤10：停止并删除容器
+$ docker stop web-server test-client web-with-volume
+$ docker rm web-server test-client web-with-volume
+
+# 步骤11：重新运行容器，验证数据持久化
+$ docker run --name web-new --network my-network -d -p 8082:80 -v web-data:/usr/share/nginx/html nginx
+
+# 步骤12：验证数据仍然存在
+$ curl http://localhost:8082
+
+# 步骤13：清理资源
+$ docker stop web-new
+$ docker rm web-new
+$ docker network rm my-network
+$ docker volume rm web-data
+
+# 验证结果
+$ docker network ls
+$ docker volume ls
+$ docker ps -a</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功创建自定义网络</p>
+              <p>- [ ] 容器能够通过名称和IP地址通信</p>
+              <p>- [ ] 成功创建和使用数据卷</p>
+              <p>- [ ] 数据在容器重启后仍然存在</p>
+              <p>- [ ] 成功清理所有资源</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">Docker容器管理小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">容器概念</span>：镜像的运行实例，轻量级、隔离、可移植</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">生命周期</span>：Created → Running → Paused → Stopped → Deleted</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">核心命令</span>：run、start、stop、rm、exec、ps</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">资源管理</span>：CPU、内存、IO限制</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">网络配置</span>：bridge、host、none、自定义网络</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">数据管理</span>：数据卷、绑定挂载、tmpfs</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">监控日志</span>：docker stats、docker logs</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">安全最佳实践</span>：最小化镜像、非root用户、资源限制</span>
+            </div>
+          </div>
+          
+          <div class="key-conclusion" style="margin-top: 1.5rem;">
+            <div class="conclusion-title">核心要点回顾</div>
+            <div class="conclusion-content">
+              <p>1. 容器是Docker的核心运行单元，具有轻量级、隔离性和可移植性</p>
+              <p>2. 掌握容器的生命周期管理是Docker使用的基础</p>
+              <p>3. 合理配置资源限制和网络设置可以提高容器的安全性和性能</p>
+              <p>4. 数据持久化是生产环境中必须考虑的重要因素</p>
+              <p>5. 监控和日志管理有助于及时发现和解决容器运行中的问题</p>
+              <p>6. 遵循安全最佳实践可以减少容器环境的安全风险</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">1</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>
