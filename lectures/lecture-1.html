@@ -63,7 +63,7 @@
           <div class="knowledge-point">
             <div class="kp-title">学习建议</div>
             <div class="kp-content">
-              <p>Linux是容器技术的基石，本讲内容是后续课程的重要基础。建议学员<span class="highlight">边学边练</span>，每个命令都要亲自执行验证。两个实验分别安排在常用命令和权限管理之后，便于及时巩固所学内容。</p>
+              <p>Linux是容器技术的基石，本讲内容是后续课程的重要基础。建议学员<span class="highlight">边学边练</span>，每个命令都要亲自执行验证。本讲重点掌握<span class="highlight">权限管理</span>中所有者、所属组、其他用户的区别，这是理解Linux安全机制的关键。</p>
             </div>
           </div>
         </div>
@@ -190,6 +190,75 @@
           <div class="tip-box">
             <div class="tip-title">提示</div>
             <p>本课程推荐使用 <span class="highlight">Ubuntu 20.04/22.04</span> 或 <span class="highlight">CentOS 7/8</span> 作为学习环境，这也是Docker官方推荐的基础镜像。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">Linux与Windows的区别</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            理解Linux与Windows的区别有助于更好地掌握Linux系统特性和容器技术基础。
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>Linux</th>
+                <th>Windows</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">内核类型</span></td>
+                <td>单内核（Monolithic）</td>
+                <td>混合内核（Hybrid）</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">文件系统</span></td>
+                <td>EXT4、XFS、Btrfs</td>
+                <td>NTFS、FAT32</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">路径分隔符</span></td>
+                <td>/（正斜杠）</td>
+                <td>\（反斜杠）</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">文件名大小写</span></td>
+                <td>区分大小写</td>
+                <td>不区分大小写</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">用户界面</span></td>
+                <td>命令行为主，GUI可选</td>
+                <td>GUI为主</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">软件安装</span></td>
+                <td>包管理器（apt/yum）</td>
+                <td>安装包（.exe/.msi）</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">权限模型</span></td>
+                <td>rwx权限位 + 用户组</td>
+                <td>ACL访问控制列表</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">容器技术为什么选择Linux？</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">内核特性</span>：Linux内核原生支持Namespaces、CGroups等容器核心技术</p>
+              <p>2. <span class="key-point">轻量级</span>：Linux容器共享宿主机内核，启动快、资源占用少</p>
+              <p>3. <span class="key-point">开源生态</span>：丰富的开源工具和社区支持</p>
+              <p>4. <span class="key-point">服务器主导</span>：绝大多数服务器运行Linux系统</p>
+            </div>
           </div>
         </div>
       </div>
@@ -326,6 +395,154 @@ find . -name "*.log" | xargs grep "error"</code></pre>
             <div class="card">
               <h3><span class="card-num">2</span>grep命令</h3>
               <p>用于<span class="highlight">搜索文本</span>内容，支持正则表达式，是日志分析的利器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">系统信息与进程管理</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">系统信息命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看系统信息
+uname -a              # 显示所有系统信息
+uname -r              # 显示内核版本
+cat /proc/version     # 查看内核版本信息
+hostname              # 显示主机名
+
+# 查看资源使用
+df -h                 # 查看磁盘空间使用情况
+df -h /home           # 查看指定目录所在磁盘
+free -h               # 查看内存使用情况
+free -m               # 以MB为单位显示内存
+
+# 查看系统负载
+uptime                # 查看系统运行时间
+top                   # 实时查看系统进程（按q退出）
+htop                  # 交互式进程查看（需要安装）
+
+# 查看当前用户
+whoami                # 显示当前用户名
+who                   # 显示当前登录用户
+w                     # 显示详细登录信息</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">进程管理命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看进程
+ps                    # 查看当前终端的进程
+ps -ef                # 查看所有进程（详细格式）
+ps aux                # 查看所有进程（BSD格式）
+pstree                # 以树形显示进程
+
+# 查找特定进程
+ps -ef | grep nginx  # 查找nginx进程
+pgrep -a nginx       # 查找nginx进程PID和命令
+
+# 终止进程
+kill PID              # 终止指定PID的进程
+kill -9 PID           # 强制终止进程（SIGKILL）
+killall nginx         # 终止所有nginx进程
+
+# 后台任务
+Ctrl+Z                # 暂停当前任务
+jobs                  # 查看后台任务
+bg                    # 后台继续运行
+fg                    # 切换到前台
+
+# 示例：在后台运行任务
+$ sleep 100 &
+[1] 12345
+$ jobs
+[1]+  Running                 sleep 100 &
+$ fg %1                      # 切换到前台</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">提示</div>
+            <p>进程管理命令在容器调试中非常重要，可以帮助您<span class="highlight">查看容器内运行的进程</span>和<span class="highlight">排查问题</span>。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5</span>
+          <h1 class="page-title">文本处理三剑客</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Linux中有三个强大的文本处理工具，被称为<span class="highlight">文本处理三剑客</span>：grep（搜索）、sed（编辑）、awk（分析）。
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">sed命令 - 流编辑器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># sed基本用法
+sed 's/old/new/' file.txt           # 替换每行第一个匹配
+sed 's/old/new/g' file.txt          # 替换所有匹配
+sed -i 's/old/new/' file.txt       # 直接修改文件
+
+# 删除行
+sed '/pattern/d' file.txt           # 删除匹配的行
+sed '1d' file.txt                   # 删除第一行
+sed '1,5d' file.txt                # 删除1-5行
+
+# 显示特定行
+sed -n '1p' file.txt               # 显示第一行
+sed -n '1,5p' file.txt             # 显示1-5行
+sed -n '/pattern/p' file.txt        # 显示匹配的行
+
+# 常用示例
+sed 's/localhost/127.0.0.1/' hosts.txt
+sed -n '/^#/!p' file.txt           # 显示非注释行</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">awk命令 - 文本分析</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># awk基本用法
+awk '{print}' file.txt              # 打印所有行
+awk '{print $1}' file.txt          # 打印第一列
+awk '{print $1, $3}' file.txt      # 打印第一和第三列
+
+# 字段分隔符
+awk -F':' '{print $1}' /etc/passwd # 以冒号为分隔符
+awk -F':' '{print $1, $NF}' /etc/passwd  # 用户名和最后一列
+
+# 条件过滤
+awk '/pattern/' file.txt            # 打印匹配的行
+awk '$1 > 100' file.txt            # 打印第一列大于100的行
+awk 'NR==1' file.txt               # 打印第一行
+
+# 内置变量
+# NR: 行号, NF: 字段数, $0: 整行, $1-$n: 各字段
+
+# 常用示例
+awk -F':' '{print "用户:" $1 ", shell:" $7}' /etc/passwd
+awk '{sum+=$1} END {print sum}' numbers.txt  # 求和</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">三剑客对比</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">grep</span>：文本搜索，适合查找匹配行</p>
+              <p>- <span class="highlight">sed</span>：流编辑器，适合批量替换、删除</p>
+              <p>- <span class="highlight">awk</span>：文本分析工具，适合数据处理和报表生成</p>
             </div>
           </div>
         </div>
@@ -599,6 +816,174 @@ ls: cannot access 'test': No such file or directory</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">用户与用户组详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">所有者 Owner</div>
+            <div class="definition-content">
+              文件的<span class="highlight">创建者</span>，拥有对该文件的最高控制权。所有者可以修改文件的权限设置，也可以将文件转让给其他用户。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">所有者相关操作</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看文件所有者
+$ ls -l file.txt
+-rw-r--r-- 1 alice developers 1024 Jan 15 10:00 file.txt
+#            ^^^^^ 所有者是alice
+
+# 查看当前用户
+$ whoami
+alice
+
+# 查看用户信息
+$ id alice
+uid=1000(alice) gid=1000(alice) groups=1000(alice),27(sudo),100(users)
+
+# 修改文件所有者（需要root权限）
+$ sudo chown bob file.txt
+$ ls -l file.txt
+-rw-r--r-- 1 bob developers 1024 Jan 15 10:00 file.txt
+
+# 同时修改所有者和所属组
+$ sudo chown bob:admin file.txt</code></pre>
+          </div>
+          
+          <div class="definition-box">
+            <div class="definition-term">所属组 Group</div>
+            <div class="definition-content">
+              文件所属的<span class="highlight">用户组</span>。组内的所有成员都拥有该文件的组权限。用户组是Linux实现<span class="highlight">权限共享</span>的重要机制。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">用户组相关操作</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看所有用户组
+$ cat /etc/group
+root:x:0:
+developers:x:1001:alice,bob,charlie
+admin:x:1002:
+
+# 查看当前用户所属的组
+$ groups
+alice sudo developers
+
+# 查看指定用户所属的组
+$ groups bob
+bob : bob admin developers
+
+# 创建新用户组（需要root权限）
+$ sudo groupadd project-team
+
+# 将用户添加到组
+$ sudo usermod -aG project-team alice
+
+# 修改文件所属组
+$ sudo chgrp developers file.txt
+
+# 查看组成员
+$ getent group developers
+developers:x:1001:alice,bob,charlie</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">三种权限身份的区别</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            理解所有者、所属组和其他用户的区别是掌握Linux权限管理的关键。下面通过具体场景说明三者的关系：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>身份</th>
+                <th>定义</th>
+                <th>权限范围</th>
+                <th>典型场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">所有者 u</span></td>
+                <td>文件的创建者</td>
+                <td>拥有最高权限，可修改权限设置</td>
+                <td>个人文件、配置文件</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">所属组 g</span></td>
+                <td>文件关联的用户组</td>
+                <td>组内成员共享组权限</td>
+                <td>团队协作、项目文件</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">其他用户 o</span></td>
+                <td>非所有者、非组成员</td>
+                <td>权限最受限</td>
+                <td>公开文件、系统文件</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">权限身份示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建项目文件
+$ touch project.txt
+$ ls -l project.txt
+-rw-r--r-- 1 alice alice 0 Jan 15 10:00 project.txt
+
+# 将文件所属组改为开发组
+$ sudo chgrp developers project.txt
+$ ls -l project.txt
+-rw-r--r-- 1 alice developers 0 Jan 15 10:00 project.txt
+#            ^^^^^ 所有者    ^^^^^^^^^ 所属组
+
+# 设置权限：所有者读写，组成员读写，其他人只读
+$ chmod 664 project.txt
+$ ls -l project.txt
+-rw-rw-r-- 1 alice developers 0 Jan 15 10:00 project.txt
+#  || || ||
+#  || || |+-- 其他用户：只读(r--)
+#  || || +--- 其他用户：只读(r--)
+#  || |+----- 所属组：读写(rw-)
+#  || +------ 所属组：读写(rw-)
+#  |+-------- 所有者：读写(rw-)
+#  +--------- 所有者：读写(rw-)
+
+# 权限验证
+# alice（所有者）：可以读写
+# bob（developers组成员）：可以读写
+# charlie（其他用户）：只能读</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">权限继承规则</div>
+            <div class="highlight-content">
+              <p>- 用户首先匹配<span class="highlight">所有者</span>身份，匹配成功则使用所有者权限</p>
+              <p>- 若不是所有者，检查是否在<span class="highlight">所属组</span>中，在组内则使用组权限</p>
+              <p>- 若既不是所有者也不在组内，则使用<span class="highlight">其他用户</span>权限</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.4</span>
           <h1 class="page-title">权限查看与修改</h1>
         </div>
         <div class="page-body">
@@ -633,7 +1018,7 @@ chgrp group file.txt          # 仅修改所属组</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.3</span>
+          <span class="page-number">Part 4.5</span>
           <h1 class="page-title">权限计算方法</h1>
         </div>
         <div class="page-body">
@@ -685,6 +1070,93 @@ chgrp group file.txt          # 仅修改所属组</code></pre>
               <p>- <span class="highlight">644</span>：普通文件（所有者可读写，其他人只读）</p>
               <p>- <span class="highlight">700</span>：私有目录（仅所有者可访问）</p>
               <p>- <span class="highlight">600</span>：敏感文件（仅所有者可读写）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.6</span>
+          <h1 class="page-title">特殊权限</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            除了基本的rwx权限外，Linux还支持三种<span class="highlight">特殊权限</span>，用于实现更精细的权限控制。
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>特殊权限</th>
+                <th>符号</th>
+                <th>数值</th>
+                <th>作用</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">SUID</span></td>
+                <td>s（所有者执行位）</td>
+                <td>4</td>
+                <td>执行时获得文件所有者权限</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">SGID</span></td>
+                <td>s（组执行位）</td>
+                <td>2</td>
+                <td>执行时获得文件所属组权限</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">Sticky Bit</span></td>
+                <td>t（其他执行位）</td>
+                <td>1</td>
+                <td>目录中只能删除自己的文件</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">特殊权限示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># SUID示例：passwd命令
+$ ls -l /usr/bin/passwd
+-rwsr-xr-x 1 root root 59640 Mar  3  2022 /usr/bin/passwd
+#  ^ SUID位，普通用户执行时获得root权限
+
+# 设置SUID
+$ chmod u+s program
+$ chmod 4755 program
+
+# SGID示例：共享目录
+$ mkdir /shared
+$ chmod 2775 /shared
+# 新建文件自动继承目录的组
+
+# Sticky Bit示例：/tmp目录
+$ ls -ld /tmp
+drwxrwxrwt 15 root root 4096 Jan 15 10:00 /tmp
+#             ^ Sticky Bit，用户只能删除自己的文件
+
+# 设置Sticky Bit
+$ chmod +t /shared
+$ chmod 1777 /shared
+
+# 查看特殊权限
+$ stat file.txt
+  File: file.txt
+  Access: (0755/-rwxr-xr-x)  # 0755中的0表示无特殊权限
+  Access: (4755/-rwsr-xr-x)  # 4755表示有SUID</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">安全警告</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">SUID</span>程序存在安全风险，谨慎设置</p>
+              <p>- 定期检查系统中的SUID程序：<code>find / -perm -4000 2>/dev/null</code></p>
+              <p>- <span class="highlight">Sticky Bit</span>常用于临时目录，防止用户互相删除文件</p>
             </div>
           </div>
         </div>
@@ -888,7 +1360,7 @@ ls: cannot access 'linux-lab': No such file or directory</code></pre>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">20</span>
+        <span class="total" id="totalPages">28</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
