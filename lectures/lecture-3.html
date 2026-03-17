@@ -150,6 +150,243 @@
 
       <div class="page content-page">
         <div class="page-header">
+          <span class="page-number">Part 1.1.1</span>
+          <h1 class="page-title">为什么容器能隔离环境？</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            作为开发者，你是否遇到过这些问题？
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">开发中的常见痛点</div>
+            <div class="kp-content">
+              <p>- 项目A需要Python 3.8，项目B需要Python 3.11，怎么办？</p>
+              <p>- 本地开发正常，部署到服务器就报错？</p>
+              <p>- 两个项目都要用80端口，冲突了？</p>
+              <p>- 新同事入职，配环境花了一整天？</p>
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            容器的<span class="highlight">隔离机制</span>完美解决了这些问题！每个容器就像一个独立的"小房间"，互不干扰。
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>隔离内容</th>
+                <th>实际好处</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">文件系统隔离</span></td>
+                <td>每个容器有独立的文件系统，Python 3.8和3.11可以共存</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">网络隔离</span></td>
+                <td>每个容器有独立的端口空间，都能用80端口</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">进程隔离</span></td>
+                <td>容器内的进程互不可见，互不影响</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">用户隔离</span></td>
+                <td>容器内的root不是宿主机的root，更安全</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">一句话理解</div>
+            <div class="highlight-content">
+              <p>容器让每个应用都以为自己独占一台服务器，实际上它们共享同一台服务器的资源。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1.2</span>
+          <h1 class="page-title">为什么容器能节约资源？</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            传统虚拟机和容器的资源占用对比：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>虚拟机</th>
+                <th>容器</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>启动时间</td>
+                <td>几分钟</td>
+                <td><span class="highlight">几秒钟</span></td>
+              </tr>
+              <tr>
+                <td>内存占用</td>
+                <td>几GB（含完整操作系统）</td>
+                <td><span class="highlight">几十MB（仅应用本身）</span></td>
+              </tr>
+              <tr>
+                <td>磁盘占用</td>
+                <td>几十GB</td>
+                <td><span class="highlight">几百MB</span></td>
+              </tr>
+              <tr>
+                <td>单机数量</td>
+                <td>10-20个</td>
+                <td><span class="highlight">100-1000个</span></td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">为什么差这么多？</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">共享内核</span>：容器不需要单独的操作系统，直接用宿主机的Linux内核</p>
+              <p>2. <span class="key-point">按需分配</span>：容器只占用应用需要的资源，不像虚拟机要预留整块内存</p>
+              <p>3. <span class="key-point">快速启停</span>：秒级启动，不用的容器可以随时停掉，释放资源</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">实际案例：一台4核8G服务器</span>
+              <span class="code-lang">text</span>
+            </div>
+            <pre><code>虚拟机方案：
+- 每个虚拟机分配 1核2G
+- 最多运行 3-4 个虚拟机
+- 大量资源浪费在虚拟机系统上
+
+容器方案：
+- 每个容器按需分配（如 0.5核512M）
+- 可以运行 20-50 个容器
+- 资源利用率提升 5-10 倍</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1.3</span>
+          <h1 class="page-title">为什么容器让开发更省事？</h1>
+        </div>
+        <div class="page-body">
+          <div class="knowledge-point">
+            <div class="kp-title">镜像分层：一次构建，处处运行</div>
+            <div class="kp-content">
+              <p>Docker镜像采用<span class="key-point">分层设计</span>，就像盖楼一样：</p>
+              <p>- 底层：Ubuntu基础镜像（别人已经做好了）</p>
+              <p>- 中层：安装Python、依赖库（可以复用）</p>
+              <p>- 顶层：你的应用代码（每次更新只改这层）</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">分层带来的好处</span>
+              <span class="code-lang">text</span>
+            </div>
+            <pre><code>场景：你有10个Python项目
+
+传统方式：
+- 每个项目都要安装一次Python环境
+- 重复下载、重复安装
+- 总共需要 10 × 500MB = 5GB
+
+容器方式：
+- 基础Python镜像只存一份
+- 10个项目共享同一层
+- 总共只需要 500MB + 10×10MB ≈ 600MB
+
+节省 90% 的存储空间！</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">开发者的一天</div>
+            <div class="highlight-content">
+              <p><strong>以前：</strong></p>
+              <p>- 早上配环境 → 中午终于跑起来 → 下午发现版本不对 → 晚上加班重装</p>
+              <p><strong>现在：</strong></p>
+              <p>- 早上 docker run → 秒级启动 → 开始写代码 → 准时下班</p>
+            </div>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">一句话总结</div>
+            <p>容器把"配环境"这件烦心事变成了"一条命令搞定"，让开发者专注于写代码，而不是折腾环境。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1.4</span>
+          <h1 class="page-title">容器技术的核心优势</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>环境一致性</h3>
+              <p>开发、测试、生产环境完全相同，告别"在我机器上能跑"的问题</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>快速部署</h3>
+              <p>从几小时缩短到几秒，新服务上线只需一条命令</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>资源高效</h3>
+              <p>一台服务器跑几十个容器，硬件成本降低80%</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>版本管理</h3>
+              <p>镜像就是代码的"快照"，随时回滚到任意版本</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">对比：部署一个Web应用</span>
+              <span class="code-lang">text</span>
+            </div>
+            <pre><code>传统部署：
+1. 购买服务器 → 等待交付（1-3天）
+2. 安装系统、配置环境 → 半天
+3. 部署应用、调试问题 → 半天
+4. 总计：2-4天
+
+容器部署：
+1. docker run my-app → 5秒
+2. 完成！
+
+效率提升：几千倍</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">为什么大厂都在用容器？</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Google</span>：每周启动超过20亿个容器</p>
+              <p>- <span class="key-point">阿里</span>：双11期间运行数百万容器</p>
+              <p>- <span class="key-point">腾讯</span>：微信后台全部容器化</p>
+              <p>容器让大规模服务管理变得简单可行</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
           <span class="page-number">Part 1.2</span>
           <h1 class="page-title">容器 vs 虚拟机</h1>
         </div>
@@ -693,32 +930,118 @@ This message shows that your installation appears to be working correctly.
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 5.2</span>
-          <h1 class="page-title">Docker基础命令</h1>
+          <span class="page-number">Part 5.2.1</span>
+          <h1 class="page-title">Docker帮助命令 - 基础</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">常用Docker命令</span>
+              <span class="code-title">docker --help - 查看所有命令</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 镜像操作
-docker images              # 列出本地镜像
-docker pull nginx:latest   # 拉取镜像
-docker rmi hello-world     # 删除镜像
+            <pre><code># 查看Docker总体帮助
+$ docker --help
 
-# 容器操作
-docker ps                  # 列出运行中的容器
-docker ps -a               # 列出所有容器（包括停止的）
-docker run -d nginx        # 后台运行容器
-docker stop container_id   # 停止容器
-docker start container_id  # 启动容器
-docker rm container_id     # 删除容器
+# 预期输出（部分）：
+Usage:  docker [OPTIONS] COMMAND
 
-# 交互操作
-docker exec -it container_id /bin/bash  # 进入容器内部
-docker logs container_id                # 查看容器日志
-docker inspect container_id             # 查看容器详情</code></pre>
+A self-sufficient runtime for containers
+
+Options:
+      --config string      Location of client config files (default
+                           "/home/user/.docker")
+  -c, --context string     Name of the context to use to connect to
+                           the daemon
+  -D, --debug              Enable debug mode
+  -H, --host list          Daemon socket(s) to connect to
+  -l, --log-level string   Set the logging level ("debug"|"info"|
+                           "warn"|"error"|"fatal") (default "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            Print version information and quit
+
+Management Commands:
+  builder     Manage builds
+  compose     Docker Compose
+  container   Manage containers
+  image       Manage images
+  network     Manage networks
+  volume      Manage volumes
+
+Commands:
+  build       Build an image from a Dockerfile
+  cp          Copy files/folders between a container and the local
+              filesystem
+  exec        Run a command in a running container
+  images      List images
+  info        Display system-wide information
+  logs        Fetch the logs of a container
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  start       Start one or more stopped containers
+  stop        Stop one or more running containers
+
+Run 'docker COMMAND --help' for more information on a command.</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">帮助命令使用技巧</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">docker --help</span>：查看所有可用命令列表</p>
+              <p>2. <span class="key-point">docker COMMAND --help</span>：查看特定命令的详细参数</p>
+              <p>3. <span class="key-point">docker version</span>：查看客户端和服务端版本信息</p>
+              <p>4. <span class="key-point">docker info</span>：查看Docker系统配置和运行状态</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.2.2</span>
+          <h1 class="page-title">docker run 命令参数</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker run --help - 查看run命令参数</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看run命令的详细帮助
+$ docker run --help
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Run a command in a new container
+
+Options:
+  -d, --detach                         Run container in background
+                                       and print container ID
+  -e, --env list                       Set environment variables
+  -h, --hostname string                Container host name
+  -i, --interactive                    Keep STDIN open even if not
+                                       attached
+      --name string                    Assign a name to the container
+      --network network                Connect a container to a network
+  -p, --publish list                   Publish a container's port(s)
+                                       to the host
+  -P, --publish-all                    Publish all exposed ports
+                                       to random ports
+      --restart string                 Restart policy to apply when
+                                       a container exits
+      --rm                             Automatically remove the
+                                       container when it exits
+  -t, --tty                            Allocate a pseudo-TTY
+  -u, --user string                    Username or UID
+  -v, --volume list                    Bind mount a volume
+  -w, --workdir string                 Working directory inside the
+                                       container
+      --cpus decimal                   Number of CPUs
+  -m, --memory bytes                   Memory limit</code></pre>
           </div>
           
           <div class="highlight-box">
@@ -729,6 +1052,10 @@ docker inspect container_id             # 查看容器详情</code></pre>
               <p>- <span class="highlight">-v</span>：挂载卷（如 -v /host:/container）</p>
               <p>- <span class="highlight">--name</span>：指定容器名称</p>
               <p>- <span class="highlight">-e</span>：设置环境变量</p>
+              <p>- <span class="highlight">-i</span>：保持STDIN打开（交互式）</p>
+              <p>- <span class="highlight">-t</span>：分配伪终端（tty）</p>
+              <p>- <span class="highlight">--rm</span>：容器停止后自动删除</p>
+              <p>- <span class="highlight">--restart</span>：自动重启策略</p>
             </div>
           </div>
         </div>
@@ -736,7 +1063,505 @@ docker inspect container_id             # 查看容器详情</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 5.3</span>
+          <span class="page-number">Part 5.2.3</span>
+          <h1 class="page-title">docker version 与 docker info</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker version - 查看版本信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker版本信息
+$ docker version
+
+# 预期输出：
+Client: Docker Engine - Community
+ Version:           24.0.7
+ API version:       1.43
+ Go version:        go1.20.10
+ Git commit:        afdd53b
+ Built:             Thu Oct 26 09:08:01 2023
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          24.0.7
+  API version:      1.43 (minimum version 1.12)
+  Go version:       go1.20.10
+  Git commit:       311b9ff
+  OS/Arch:          linux/amd64
+ containerd:
+  Version:          1.6.24
+ runc:
+  Version:          1.1.9
+ docker-init:
+  Version:          0.19.0</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker info - 查看系统信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker系统信息
+$ docker info
+
+# 预期输出（部分）：
+Client:
+ Context:    default
+ Debug Mode: false
+
+Server:
+ Containers: 5
+  Running: 2
+  Paused: 0
+  Stopped: 3
+ Images: 15
+ Server Version: 24.0.7
+ Storage Driver: overlay2
+ Cgroup Driver: systemd
+ Cgroup Version: 2
+ Kernel Version: 5.15.0
+ Operating System: Ubuntu 22.04.3 LTS
+ CPUs: 4
+ Total Memory: 7.773GiB
+ Docker Root Dir: /var/lib/docker</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">提示</div>
+            <p>更多命令详情可使用 <span class="highlight">man docker</span> 查看完整手册页，或访问官方文档：<br>https://docs.docker.com/engine/reference/commandline/docker/</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3.1</span>
+          <h1 class="page-title">镜像与容器操作命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">镜像操作命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># <strong>docker images</strong> - 列出本地所有镜像（常用）
+# 作用：查看已下载的镜像列表、大小、创建时间
+docker images
+
+# <strong>docker pull</strong> - 从仓库拉取镜像（常用）
+# 作用：下载指定镜像到本地，默认从Docker Hub拉取
+docker pull nginx:latest
+docker pull ubuntu:22.04
+
+# docker rmi - 删除本地镜像
+# 作用：清理不需要的镜像，释放磁盘空间
+docker rmi hello-world</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">容器操作命令（最常用）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># <strong>docker ps</strong> - 列出运行中的容器（常用）
+docker ps
+
+# <strong>docker ps -a</strong> - 列出所有容器（常用）
+docker ps -a
+
+# <strong>docker run</strong> - 创建并启动新容器（最常用）
+docker run -d nginx                    # -d: 后台运行
+docker run -it ubuntu /bin/bash        # -it: 交互式运行
+
+# <strong>docker stop</strong> - 停止运行中的容器（常用）
+docker stop container_id
+docker stop my-nginx
+
+# <strong>docker start</strong> - 启动已停止的容器（常用）
+docker start container_id
+docker start my-nginx
+
+# docker restart - 重启容器
+docker restart my-nginx
+
+# <strong>docker rm</strong> - 删除容器（常用）
+docker rm container_id
+docker rm -f my-nginx                  # -f: 强制删除运行中的容器</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">run命令常用参数</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">-d</span>：后台运行（detached）</p>
+              <p>- <span class="highlight">-p</span>：端口映射（如 -p 8080:80）</p>
+              <p>- <span class="highlight">-v</span>：挂载卷（如 -v /host:/container）</p>
+              <p>- <span class="highlight">--name</span>：指定容器名称</p>
+              <p>- <span class="highlight">-e</span>：设置环境变量</p>
+              <p>- <span class="highlight">--rm</span>：容器停止后自动删除</p>
+              <p>- <span class="highlight">--restart</span>：自动重启策略</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3.2</span>
+          <h1 class="page-title">交互与调试命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker exec - 在容器内执行命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># <strong>docker exec</strong> - 在运行中的容器内执行命令（常用）
+docker exec -it container_id /bin/bash  # 进入容器获得bash shell
+docker exec my-nginx nginx -t           # 测试nginx配置
+
+# <strong>docker logs</strong> - 查看容器日志（常用）
+docker logs container_id                # 查看全部日志
+docker logs -f my-nginx                 # -f: 持续跟踪日志
+docker logs --tail 100 my-nginx         # 查看最后100行日志
+
+# docker inspect - 查看容器/镜像详细信息
+docker inspect container_id             # 查看容器详情
+docker inspect nginx                    # 查看镜像详情</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">容器进入与退出</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># <strong>docker run -it</strong> - 创建并进入交互式容器
+$ docker run -it ubuntu:22.04 /bin/bash
+root@3a2b1c4d5e6f:/#     # 已进入容器
+
+# <strong>退出容器的方法</strong>：
+# 方法1：exit 命令 - 退出并停止容器
+root@3a2b1c4d5e6f:/# exit
+
+# 方法2：Ctrl + D - 快捷键退出（等效于exit）
+
+# 方法3：Ctrl + P + Q - 分离容器（不停止容器）
+root@3a2b1c4d5e6f:/#    # 按 Ctrl+P，然后按 Q
+
+# <strong>docker exec -it</strong> - 进入运行中的容器（推荐）
+$ docker exec -it my-nginx /bin/bash
+root@3a2b1c4d5e6f:/#     # 已进入容器
+
+# 在容器内执行命令
+root@3a2b1c4d5e6f:/# ls -la /etc/nginx/
+root@3a2b1c4d5e6f:/# ps aux
+
+# 退出（exec进入的，exit不会停止容器）
+root@3a2b1c4d5e6f:/# exit</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">进入容器的两种方式对比</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">docker run -it</span>：创建新容器并进入，适合一次性调试</p>
+              <p>2. <span class="key-point">docker exec -it</span>：进入已运行的容器，推荐日常使用</p>
+              <p>3. <span class="key-point">docker attach</span>：附加到主进程，exit会停止容器，不推荐</p>
+            </div>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">退出容器的三种方式</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">exit</span>：退出shell，前台容器会停止</p>
+              <p>2. <span class="key-point">Ctrl + D</span>：等效于exit命令</p>
+              <p>3. <span class="key-point">Ctrl + P + Q</span>：分离容器，容器继续运行</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.3.3</span>
+          <h1 class="page-title">其他实用命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">容器管理实用命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># docker cp - 在容器和主机之间复制文件
+$ docker cp index.html my-nginx:/usr/share/nginx/html/     # 主机->容器
+$ docker cp my-nginx:/etc/nginx/nginx.conf ./nginx.conf    # 容器->主机
+
+# docker top - 查看容器内运行的进程
+$ docker top my-nginx
+
+# 预期输出：
+UID    PID    PPID   C  STIME  TTY  TIME     CMD
+root   1234   1212   0  10:00  ?    00:00:00 nginx: master process
+101    1235   1234   0  10:00  ?    00:00:00 nginx: worker process
+
+# docker stats - 实时查看容器资源使用情况
+$ docker stats my-nginx
+
+# 预期输出（实时刷新）：
+CONTAINER ID   NAME       CPU %  MEM USAGE / LIMIT   MEM %  NET I/O
+3a2b1c4d5e6f   my-nginx   0.01%  5.5MiB / 7.773GiB   0.07%  1.2kB / 2.3kB
+
+# docker port - 查看容器端口映射
+$ docker port my-nginx
+80/tcp -> 0.0.0.0:80
+
+# docker rename - 重命名容器
+$ docker rename my-nginx nginx-new
+
+# docker pause / unpause - 暂停/恢复容器
+$ docker pause my-nginx
+$ docker unpause my-nginx
+
+# docker kill - 强制停止容器（慎用）
+$ docker kill my-nginx
+
+# docker wait - 等待容器停止并返回退出码
+$ docker wait my-nginx
+0                       # 0表示正常退出</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">命令使用建议</div>
+            <p>- 使用 <span class="highlight">docker exec</span> 而非 <span class="highlight">docker attach</span> 进入容器</p>
+            <p>- 使用 <span class="highlight">docker stop</span> 而非 <span class="highlight">docker kill</span> 停止容器</p>
+            <p>- 定期使用 <span class="highlight">docker system prune</span> 清理无用资源</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.4.1</span>
+          <h1 class="page-title">传统部署方式</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            以部署Nginx Web服务器为例，传统部署需要多个步骤：
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">传统部署（Ubuntu系统）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 更新包列表
+$ sudo apt-get update
+
+# 2. 安装Nginx
+$ sudo apt-get install -y nginx
+
+# 预期输出：
+Reading package lists... Done
+Building dependency tree... Done
+The following NEW packages will be installed:
+  fontconfig-config fonts-dejavu-core libfontconfig1 libgd3 nginx-common nginx-core
+0 upgraded, 13 newly installed, 0 to remove.
+After this operation, 12.8 MB of additional disk space will be used.
+
+# 3. 启动Nginx服务
+$ sudo systemctl start nginx
+
+# 4. 设置开机自启
+$ sudo systemctl enable nginx
+
+# 5. 检查服务状态
+$ sudo systemctl status nginx
+
+# 预期输出：
+● nginx.service - A high performance web server
+     Active: active (running) since Mon 2024-01-15 10:00:00 UTC
+
+# 6. 配置防火墙
+$ sudo ufw allow 'Nginx Full'
+
+# 7. 编辑配置文件
+$ sudo nano /etc/nginx/sites-available/default
+
+# 8. 测试配置
+$ sudo nginx -t
+
+# 9. 重载配置
+$ sudo systemctl reload nginx
+
+# 10. 查看日志
+$ sudo tail -f /var/log/nginx/access.log</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">传统部署特点</div>
+            <div class="kp-content">
+              <p>- 需要<span class="key-point">10+条命令</span>完成部署</p>
+              <p>- 部署时间约<span class="key-point">5-10分钟</span></p>
+              <p>- 可能存在<span class="key-point">依赖冲突</span></p>
+              <p>- 版本切换需要<span class="key-point">卸载重装</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.4.2</span>
+          <h1 class="page-title">Docker部署方式</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker部署Nginx</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：拉取Nginx镜像
+$ docker pull nginx:latest
+
+# 预期输出：
+latest: Pulling from library/nginx
+a2abf6c4d29d: Pull complete
+a9edb18cadd1: Pull complete
+...
+Status: Downloaded newer image for nginx:latest
+
+# 步骤2：运行Nginx容器（一行命令完成部署）
+$ docker run -d \
+  --name my-nginx \
+  -p 80:80 \
+  -v /home/user/html:/usr/share/nginx/html:ro \
+  --restart unless-stopped \
+  nginx:latest
+
+# 预期输出：
+3a2b1c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t
+# 容器ID，表示创建成功
+
+# 步骤3：查看运行状态
+$ docker ps
+
+CONTAINER ID   IMAGE          COMMAND        CREATED         STATUS         PORTS                NAMES
+3a2b1c4d5e6f   nginx:latest   "/docker-..."  5 seconds ago   Up 4 seconds   0.0.0.0:80->80/tcp   my-nginx
+
+# 步骤4：查看日志
+$ docker logs -f my-nginx
+
+# 步骤5：停止容器
+$ docker stop my-nginx
+
+# 步骤6：删除容器
+$ docker rm my-nginx</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker版本升级</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Docker版本升级只需4步：
+$ docker pull nginx:latest              # 拉取最新镜像
+$ docker stop my-nginx                  # 停止旧容器
+$ docker rm my-nginx                    # 删除旧容器
+$ docker run -d --name my-nginx -p 80:80 nginx:latest
+
+# 对比传统部署：
+# - 传统方式：需卸载旧版本再安装，可能遇到依赖问题
+# - Docker方式：镜像已包含所有依赖，切换版本只需更换镜像标签</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">Docker部署特点</div>
+            <div class="kp-content">
+              <p>- 只需<span class="key-point">1条命令</span>完成部署</p>
+              <p>- 部署时间<span class="key-point">30秒内</span></p>
+              <p>- <span class="key-point">完全隔离</span>，无依赖冲突</p>
+              <p>- 版本切换<span class="key-point">简单快速</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.4.3</span>
+          <h1 class="page-title">部署方式对比总结</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>传统部署</th>
+                <th>Docker部署</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>部署时间</td>
+                <td>5-10分钟</td>
+                <td><span class="highlight">30秒内</span></td>
+              </tr>
+              <tr>
+                <td>命令数量</td>
+                <td>10+条命令</td>
+                <td><span class="highlight">1条命令</span></td>
+              </tr>
+              <tr>
+                <td>依赖冲突</td>
+                <td>可能存在库版本冲突</td>
+                <td><span class="highlight">完全隔离</span></td>
+              </tr>
+              <tr>
+                <td>环境一致性</td>
+                <td>开发/生产环境可能不同</td>
+                <td><span class="highlight">完全一致</span></td>
+              </tr>
+              <tr>
+                <td>版本切换</td>
+                <td>复杂，需卸载重装</td>
+                <td><span class="highlight">简单，切换镜像标签</span></td>
+              </tr>
+              <tr>
+                <td>资源占用</td>
+                <td>较高（整个系统环境）</td>
+                <td><span class="highlight">较低（仅容器资源）</span></td>
+              </tr>
+              <tr>
+                <td>回滚操作</td>
+                <td>困难</td>
+                <td><span class="highlight">简单，重启旧版本容器</span></td>
+              </tr>
+              <tr>
+                <td>多版本并行</td>
+                <td>困难（端口冲突）</td>
+                <td><span class="highlight">简单（不同端口映射）</span></td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">Docker部署的优势总结</div>
+            <div class="highlight-content">
+              <p>1. <span class="highlight">极速部署</span>：从10分钟缩短到30秒</p>
+              <p>2. <span class="highlight">环境一致</span>：开发、测试、生产环境完全相同</p>
+              <p>3. <span class="highlight">隔离安全</span>：应用之间相互隔离，无依赖冲突</p>
+              <p>4. <span class="highlight">易于管理</span>：启动、停止、删除、更新一条命令完成</p>
+              <p>5. <span class="highlight">版本灵活</span>：轻松切换版本，支持多版本并行运行</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 5.5</span>
           <h1 class="page-title">运行Nginx容器示例</h1>
         </div>
         <div class="page-body">
@@ -909,7 +1734,7 @@ docker rm my-nginx</code></pre>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">24</span>
+        <span class="total" id="totalPages">37</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>

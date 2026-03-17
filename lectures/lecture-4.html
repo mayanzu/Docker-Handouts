@@ -24,6 +24,583 @@
         </div>
       </div>
 
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 0</span>
+          <h1 class="section-title">Docker基础知识</h1>
+          <p class="section-desc">系统理解Docker技术体系</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.1</span>
+          <h1 class="page-title">Docker的定义与核心价值</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker定义</div>
+            <div class="definition-content">
+              Docker是一个开源的<span class="highlight">容器化平台</span>，它允许开发者将应用程序及其依赖打包到一个轻量级、可移植的容器中，从而实现"一次构建，到处运行"的目标。Docker通过操作系统级虚拟化技术，在共享宿主机内核的前提下提供隔离的运行环境。
+            </div>
+          </div>
+          
+          <p class="paragraph">
+            Docker的核心理念源自<span class="highlight">集装箱（Container）</span>的思想：就像集装箱标准化了货物运输，Docker标准化了应用程序的打包和分发。无论应用运行在开发环境、测试环境还是生产环境，容器内的行为都保持一致。
+          </p>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>环境一致性</h3>
+              <p>消除"在我机器上能跑"的问题，开发、测试、生产环境完全一致</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>快速交付</h3>
+              <p>从代码到部署的时间从数天缩短到数分钟，加速DevOps流程</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>资源高效</h3>
+              <p>相比虚拟机节省90%资源，单机可运行数百个容器实例</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>可移植性</h3>
+              <p>跨平台运行：Linux、Windows、macOS、云平台无缝迁移</p>
+            </div>
+          </div>
+          
+          <div class="highlight-box" style="margin-top: 1.5rem;">
+            <div class="highlight-title">Docker的核心价值主张</div>
+            <div class="highlight-content">
+              <p><span class="highlight">Build Once, Run Anywhere</span> - 一次构建，到处运行</p>
+              <p><span class="highlight">Ship Anywhere</span> - 任意环境部署</p>
+              <p><span class="highlight">Scale Easily</span> - 轻松扩展伸缩</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.2</span>
+          <h1 class="page-title">Docker整体架构组成</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker采用<span class="highlight">客户端-服务器（C/S）架构</span>，由多个核心组件协同工作：
+          </p>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>Docker引擎（Engine）</h3>
+              <p>Docker的核心运行时，包含<span class="highlight">Docker Daemon</span>（守护进程）、<span class="highlight">Docker CLI</span>（命令行接口）和<span class="highlight">containerd</span>（容器运行时）</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>Docker客户端（Client）</h3>
+              <p>用户与Docker交互的接口，通过<span class="highlight">REST API</span>与Daemon通信，支持本地和远程连接</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>Docker守护进程（Daemon）</h3>
+              <p><span class="highlight">dockerd</span>后台服务，监听API请求，管理镜像、容器、网络和存储卷</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>Docker注册中心（Registry）</h3>
+              <p>存储和分发Docker镜像的服务，如<span class="highlight">Docker Hub</span>、私有仓库</p>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">Docker架构工作流程</span>
+              <span class="code-lang">架构说明</span>
+            </div>
+            <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                      Docker 架构图                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│    ┌──────────────┐         REST API        ┌─────────────┐ │
+│    │ Docker CLI   │ ◄─────────────────────► │ Docker      │ │
+│    │ (docker命令)  │                         │ Daemon      │ │
+│    └──────────────┘                         │ (dockerd)   │ │
+│                                             └──────┬──────┘ │
+│                                                    │        │
+│                              ┌─────────────────────┼───────┐│
+│                              │                     │       ││
+│                              ▼                     ▼       ││
+│                       ┌──────────┐          ┌──────────┐   ││
+│                       │containerd│          │ 镜像管理  │   ││
+│                       │(容器运行时)│          │ 网络/存储 │   ││
+│                       └────┬─────┘          └──────────┘   ││
+│                            │                               ││
+│                            ▼                               ││
+│                       ┌──────────┐                         ││
+│                       │  runc    │                         ││
+│                       │(OCI运行时)│                         ││
+│                       └──────────┘                         ││
+│                                                            ││
+│    ┌──────────────┐                    ┌──────────────┐    ││
+│    │ Docker Hub   │ ◄────────────────► │ 本地镜像仓库  │    ││
+│    │ (公共仓库)    │     pull/push      │ (/var/lib/   │    ││
+│    └──────────────┘                    │  docker)     │    ││
+│                                        └──────────────┘    ││
+└─────────────────────────────────────────────────────────────┘</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">架构演进历程</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">2013年</span>：Docker发布，使用LXC作为容器运行时</p>
+              <p>- <span class="key-point">2014年</span>：开发libcontainer，摆脱对LXC的依赖</p>
+              <p>- <span class="key-point">2016年</span>：拆分为runc + containerd，遵循OCI标准</p>
+              <p>- <span class="key-point">至今</span>：形成完整的容器生态系统</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.3</span>
+          <h1 class="page-title">Docker三要素概述</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker的三大核心概念是<span class="highlight">镜像（Image）</span>、<span class="highlight">容器（Container）</span>和<span class="highlight">仓库（Registry）</span>，它们构成了Docker技术体系的基础。
+          </p>
+          
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>镜像（Image）</h3>
+              <p><span class="highlight">只读模板</span>，包含运行应用所需的所有内容：代码、运行时、库、配置文件等。镜像是容器的蓝图。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>容器（Container）</h3>
+              <p>镜像的<span class="highlight">运行实例</span>，提供隔离的运行环境。容器可以被创建、启动、停止、删除。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>仓库（Registry）</h3>
+              <p>存储和分发镜像的<span class="highlight">中央存储</span>，如Docker Hub、阿里云镜像仓库、私有仓库等。</p>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">三要素关系图</span>
+              <span class="code-lang">概念说明</span>
+            </div>
+            <pre><code>                    ┌─────────────────┐
+                    │   仓库 Registry  │
+                    │  (镜像存储中心)   │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │ pull         │         push │
+              ▼              │              ▼
+     ┌──────────────┐        │       ┌──────────────┐
+     │ 本地镜像仓库  │        │       │ 远程镜像仓库  │
+     │ (Images)     │        │       │ (Docker Hub) │
+     └──────┬───────┘        │       └──────────────┘
+            │                │
+            │ docker run     │ docker commit
+            ▼                │
+     ┌──────────────┐        │
+     │   容器        │ ◄──────┘
+     │ (Container)  │
+     │ 镜像的运行实例 │
+     └──────────────┘
+     
+     类比理解：
+     - 镜像 ≈ 类（Class）      ：定义和模板
+     - 容器 ≈ 对象（Object）   ：类的实例化
+     - 仓库 ≈ 代码仓库（Maven/npm）：存储和分发</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">理解要点</div>
+            <p>一个镜像可以创建多个容器实例，每个容器都是独立的运行环境，互不干扰。镜像通过仓库进行分发和共享。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.4</span>
+          <h1 class="page-title">Docker镜像详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">镜像定义</div>
+            <div class="definition-content">
+              Docker镜像是一个<span class="highlight">只读模板</span>，采用<span class="highlight">分层存储（Layered）</span>架构，每一层代表Dockerfile中的一条指令。镜像包含运行容器所需的所有内容：代码、运行时环境、库、环境变量和配置文件。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">镜像分层结构示意</span>
+              <span class="code-lang">概念说明</span>
+            </div>
+            <pre><code>┌────────────────────────────────────────┐
+│            应用层 (Application Layer)    │  ← 你的代码
+│            COPY app.py /app/            │
+├────────────────────────────────────────┤
+│            依赖层 (Dependencies Layer)   │  ← 依赖库
+│            RUN pip install flask        │
+├────────────────────────────────────────┤
+│            运行时层 (Runtime Layer)      │  ← Python运行时
+│            FROM python:3.9              │
+├────────────────────────────────────────┤
+│            基础层 (Base Layer)           │  ← 操作系统
+│            Ubuntu / Alpine / Debian     │
+└────────────────────────────────────────┘
+
+分层优势：
+1. 共享层：多个镜像可共享相同的基础层，节省存储
+2. 快速构建：只重建变化的层，未变化层使用缓存
+3. 高效分发：只需传输差异层，加快镜像拉取</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">镜像命名规范</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">官方镜像</span>：nginx、ubuntu、python（无命名空间前缀）</p>
+              <p>- <span class="key-point">用户镜像</span>：username/image-name（带用户名前缀）</p>
+              <p>- <span class="key-point">私有仓库</span>：registry.example.com/namespace/image:tag</p>
+              <p>- <span class="key-point">标签格式</span>：image:tag（默认latest）、image@sha256:digest</p>
+            </div>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">镜像常用操作</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">docker pull</span>：从仓库拉取镜像</p>
+              <p>- <span class="highlight">docker images</span>：列出本地镜像</p>
+              <p>- <span class="highlight">docker rmi</span>：删除本地镜像</p>
+              <p>- <span class="highlight">docker build</span>：从Dockerfile构建镜像</p>
+              <p>- <span class="highlight">docker tag</span>：给镜像打标签</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5</span>
+          <h1 class="page-title">Docker容器详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">容器定义</div>
+            <div class="definition-content">
+              容器是镜像的<span class="highlight">运行实例</span>，是一个独立运行的软件单元。容器在镜像的基础上添加了一个<span class="highlight">可写层（Container Layer）</span>，所有运行时的修改都发生在这个可写层中，采用<span class="highlight">写时复制（Copy-on-Write）</span>机制。
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">容器与镜像的关系</span>
+              <span class="code-lang">概念说明</span>
+            </div>
+            <pre><code>┌─────────────────────────────────────────────────────┐
+│                    容器运行时结构                      │
+├─────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────┐    │
+│  │        可写层 (Container Layer)              │    │
+│  │   - 运行时修改的文件                          │    │
+│  │   - 应用产生的数据                            │    │
+│  │   - 容器删除后数据丢失                        │    │
+│  └─────────────────────────────────────────────┘    │
+│                      ▲                              │
+│                      │ 写时复制 (CoW)               │
+│  ┌───────────────────┴───────────────────────┐      │
+│  │        只读镜像层 (Image Layers)            │      │
+│  │   Layer 3: 应用代码                         │      │
+│  │   Layer 2: 依赖库                           │      │
+│  │   Layer 1: 运行时环境                       │      │
+│  │   Layer 0: 基础操作系统                     │      │
+│  └─────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────┘
+
+容器生命周期：
+  Created → Running → Paused → Stopped → Deleted
+     │         │         │         │         │
+  docker   docker    docker    docker    docker
+  create   start     pause     stop       rm</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">容器核心特性</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">隔离性</span>：进程、网络、文件系统、用户相互隔离</p>
+              <p>2. <span class="key-point">轻量级</span>：共享宿主机内核，启动秒级，资源占用少</p>
+              <p>3. <span class="key-point">可移植</span>：在任何Docker环境中行为一致</p>
+              <p>4. <span class="key-point">可控制</span>：可限制CPU、内存、IO等资源使用</p>
+            </div>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">数据持久化</div>
+            <p>容器删除后，可写层数据会丢失。如需持久化数据，应使用<span class="highlight">数据卷（Volume）</span>或<span class="highlight">绑定挂载（Bind Mount）</span>。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.6</span>
+          <h1 class="page-title">Docker仓库详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">仓库定义</div>
+            <div class="definition-content">
+              Docker仓库是<span class="highlight">存储和分发Docker镜像</span>的服务。仓库分为公共仓库和私有仓库，开发者可以从仓库拉取镜像，也可以将本地镜像推送到仓库进行共享。
+            </div>
+          </div>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>仓库类型</th>
+                <th>代表产品</th>
+                <th>特点</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">公共仓库</span></td>
+                <td>Docker Hub</td>
+                <td>官方镜像源，免费使用，有速率限制</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">云厂商仓库</span></td>
+                <td>阿里云、腾讯云、AWS ECR</td>
+                <td>国内访问快，企业级服务</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">私有仓库</span></td>
+                <td>Harbor、Nexus、Registry</td>
+                <td>自建服务，安全可控</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">仓库操作命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 登录仓库
+$ docker login registry.example.com
+Username: your-username
+Password: 
+Login Succeeded
+
+# 拉取镜像
+$ docker pull nginx:latest
+$ docker pull registry.example.com/myapp:v1.0
+
+# 推送镜像（需先打标签）
+$ docker tag myapp:v1.0 registry.example.com/myapp:v1.0
+$ docker push registry.example.com/myapp:v1.0
+
+# 搜索镜像
+$ docker search nginx
+
+# 登出仓库
+$ docker logout registry.example.com</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">Docker Hub镜像命名规则</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">nginx</span> = docker.io/library/nginx:latest（官方镜像）</p>
+              <p>- <span class="highlight">username/nginx</span> = docker.io/username/nginx:latest（用户镜像）</p>
+              <p>- <span class="highlight">registry.com/nginx</span> = 私有仓库镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.7</span>
+          <h1 class="page-title">Docker工作原理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker基于Linux内核的以下关键技术实现容器的隔离和资源限制：
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>技术</th>
+                <th>功能</th>
+                <th>作用</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">Namespace</span></td>
+                <td>命名空间隔离</td>
+                <td>隔离进程、网络、文件系统、用户等资源</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">Cgroups</span></td>
+                <td>控制组</td>
+                <td>限制和监控CPU、内存、IO等资源使用</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">UnionFS</span></td>
+                <td>联合文件系统</td>
+                <td>实现镜像分层存储和写时复制</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">Namespace隔离类型</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">PID Namespace</span>：进程ID隔离，容器内进程独立编号</p>
+              <p>- <span class="key-point">Network Namespace</span>：网络隔离，独立网络栈</p>
+              <p>- <span class="key-point">Mount Namespace</span>：文件系统挂载点隔离</p>
+              <p>- <span class="key-point">UTS Namespace</span>：主机名和域名隔离</p>
+              <p>- <span class="key-point">IPC Namespace</span>：进程间通信隔离</p>
+              <p>- <span class="key-point">User Namespace</span>：用户和用户组隔离</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker工作流程</span>
+              <span class="code-lang">流程说明</span>
+            </div>
+            <pre><code>1. 用户执行 docker run nginx
+   ↓
+2. Docker CLI 解析命令，通过REST API发送给Daemon
+   ↓
+3. Daemon 检查本地是否存在nginx镜像
+   ↓
+4. 不存在则从Registry拉取镜像（分层下载）
+   ↓
+5. 使用UnionFS叠加镜像层，创建可写层
+   ↓
+6. 通过Namespace创建隔离环境
+   ↓
+7. 通过Cgroups设置资源限制
+   ↓
+8. 启动容器进程，分配独立网络
+   ↓
+9. 容器运行中，用户可通过CLI管理</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.8</span>
+          <h1 class="page-title">Docker典型应用场景</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>微服务架构</h3>
+              <p>每个微服务打包为独立容器，实现<span class="highlight">服务解耦</span>、独立部署、弹性伸缩</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>CI/CD流水线</h3>
+              <p>构建、测试、部署环境<span class="highlight">标准化</span>，实现自动化持续交付</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>开发环境统一</h3>
+              <p>团队成员使用相同容器环境，消除<span class="highlight">"环境配置差异"</span>问题</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>应用隔离</h3>
+              <p>多租户场景下，不同应用运行在隔离容器中，<span class="highlight">安全可靠</span></p>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">典型应用场景示例</span>
+              <span class="code-lang">场景说明</span>
+            </div>
+            <pre><code>场景1：Web应用部署
+┌─────────────────────────────────────────────┐
+│  Nginx容器  ←→  App容器  ←→  MySQL容器       │
+│   (负载均衡)     (应用服务)     (数据存储)    │
+└─────────────────────────────────────────────┘
+
+场景2：微服务架构
+┌─────────────────────────────────────────────┐
+│  API网关  →  用户服务  →  订单服务  →  支付服务 │
+│   容器        容器          容器        容器   │
+└─────────────────────────────────────────────┘
+
+场景3：开发环境
+┌─────────────────────────────────────────────┐
+│  开发者A: Python 3.8容器 + PostgreSQL容器     │
+│  开发者B: Python 3.11容器 + MySQL容器         │
+│  开发者C: Node.js容器 + MongoDB容器           │
+│  各自独立，互不干扰                            │
+└─────────────────────────────────────────────┘</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">企业级应用案例</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">Google</span>：每周启动超过20亿个容器</p>
+              <p>- <span class="highlight">阿里巴巴</span>：双11期间运行数百万容器支撑流量洪峰</p>
+              <p>- <span class="highlight">腾讯</span>：微信后台全面容器化，支撑亿级用户</p>
+              <p>- <span class="highlight">Netflix</span>：使用容器实现弹性扩缩容</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">Docker基础知识小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">Docker定义</span>：容器化平台，实现"一次构建，到处运行"</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">架构组成</span>：Engine、Client、Daemon、Registry四大组件</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">三要素</span>：镜像（模板）、容器（实例）、仓库（存储）</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">底层技术</span>：Namespace隔离、Cgroups限制、UnionFS分层</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text"><span class="highlight">应用场景</span>：微服务、CI/CD、开发环境、应用隔离</span>
+            </div>
+          </div>
+          
+          <div class="key-conclusion" style="margin-top: 1.5rem;">
+            <div class="conclusion-title">核心要点回顾</div>
+            <div class="conclusion-content">
+              <p>1. Docker通过<span class="highlight">容器技术</span>实现应用的标准化打包和运行</p>
+              <p>2. <span class="highlight">镜像分层</span>机制是Docker高效存储和分发的核心</p>
+              <p>3. 容器是镜像的运行实例，具有<span class="highlight">隔离性、轻量级、可移植</span>特性</p>
+              <p>4. 仓库是镜像的<span class="highlight">存储和分发中心</span>，支持公共和私有部署</p>
+              <p>5. Docker已成为<span class="highlight">云原生</span>和<span class="highlight">DevOps</span>的基础设施</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">目录</span>
@@ -34,12 +611,24 @@
             <div class="toc-title">课程大纲</div>
             <ul class="toc-list">
               <li>
+                <span class="toc-num">00</span>
+                <span class="toc-text">预备部分：Docker基础知识</span>
+              </li>
+              <li>
+                <span class="toc-num">00.5</span>
+                <span class="toc-text">预备部分：Docker系统基础命令</span>
+              </li>
+              <li>
                 <span class="toc-num">01</span>
                 <span class="toc-text">第一部分：Docker镜像概述</span>
               </li>
               <li>
                 <span class="toc-num">02</span>
                 <span class="toc-text">第二部分：镜像操作命令</span>
+              </li>
+              <li>
+                <span class="toc-num">实验</span>
+                <span class="toc-text">动手实验：Docker镜像命令实践</span>
               </li>
               <li>
                 <span class="toc-num">03</span>
@@ -110,6 +699,500 @@
                 <h3>镜像分发管理</h3>
                 <p>掌握<span class="highlight">镜像导出导入</span>和仓库推送</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 0.5</span>
+          <h1 class="section-title">Docker系统基础命令</h1>
+          <p class="section-desc">掌握Docker命令体系的基础</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.1</span>
+          <h1 class="page-title">Docker服务状态管理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            在使用Docker之前，需要了解如何管理Docker服务的运行状态。Docker作为系统服务，可以通过<span class="highlight">systemctl</span>命令进行管理。
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker服务管理命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker服务状态
+$ sudo systemctl status docker
+
+# 预期输出：
+● docker.service - Docker Application Container Engine
+     Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2024-01-15 10:00:00 UTC; 1h 30min ago
+       Docs: https://docs.docker.com
+   Main PID: 1234 (dockerd)
+      Tasks: 25
+     Memory: 120.5M
+     CGroup: /system.slice/docker.service
+             └─1234 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+
+# 启动Docker服务
+$ sudo systemctl start docker
+
+# 停止Docker服务
+$ sudo systemctl stop docker
+
+# 重启Docker服务
+$ sudo systemctl restart docker
+
+# 设置开机自启动
+$ sudo systemctl enable docker
+
+# 取消开机自启动
+$ sudo systemctl disable docker
+
+# 重新加载Docker配置（修改配置后执行）
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">服务状态说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">active (running)</span>：服务正在运行</p>
+              <p>- <span class="key-point">inactive (dead)</span>：服务已停止</p>
+              <p>- <span class="key-point">failed</span>：服务启动失败，需检查日志</p>
+              <p>- <span class="key-point">enabled</span>：已设置开机自启</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.2</span>
+          <h1 class="page-title">Docker版本信息查看</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker version - 查看版本信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker版本详细信息
+$ docker version
+
+# 预期输出：
+Client: Docker Engine - Community
+ Version:           24.0.7
+ API version:       1.43
+ Go version:        go1.20.10
+ Git commit:        afdd53b
+ Built:             Thu Oct 26 09:08:01 2023
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          24.0.7
+  API version:      1.43 (minimum version 1.12)
+  Go version:       go1.20.10
+  Git commit:       311b9ff
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.6.24
+  GitCommit:        61f9fd88f79f081d64d6fa3bbb1b0e01
+ runc:
+  Version:          1.1.9
+  GitCommit:        v1.1.9-0-gccaecfc
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+
+# 只查看客户端版本
+$ docker version --format '{{.Client.Version}}'
+24.0.7
+
+# 只查看服务端版本
+$ docker version --format '{{.Server.Version}}'
+24.0.7</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">版本信息解读</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">Client</span>：Docker客户端信息（docker命令）</p>
+              <p>- <span class="highlight">Server</span>：Docker服务端信息（dockerd守护进程）</p>
+              <p>- <span class="highlight">API version</span>：客户端与服务端通信的API版本</p>
+              <p>- <span class="highlight">containerd/runc</span>：底层容器运行时组件版本</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.3</span>
+          <h1 class="page-title">Docker系统信息查看</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker info - 查看系统信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker系统详细信息
+$ docker info
+
+# 预期输出：
+Client:
+ Context:    default
+ Debug Mode: false
+ Plugins:
+  buildx: Docker Buildx (Docker Inc.)
+   Version:  v0.11.2
+  compose: Docker Compose (Docker Inc.)
+   Version:  v2.21.0
+
+Server:
+ Containers: 15
+  Running: 3
+  Paused: 0
+  Stopped: 12
+ Images: 28
+ Server Version: 24.0.7
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Using metacopy: false
+  Native Overlay Diff: true
+ Cgroup Driver: systemd
+ Cgroup Version: 2
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local
+    logentries splunk syslog
+ Swarm: inactive
+ Runtimes: io.containerd.runc.v2 runc
+ Default Runtime: runc
+ Kernel Version: 5.15.0-91-generic
+ Operating System: Ubuntu 22.04.3 LTS
+ OSType: linux
+ Architecture: x86_64
+ CPUs: 4
+ Total Memory: 7.773GiB
+ Name: docker-host
+ ID: ABCD:1234:EFGH:5678:IJKL:9012:MNOP:3456
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Registry: https://index.docker.io/v1/
+ Labels:
+  Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Registry Mirrors:
+  https://xxx.mirror.aliyuncs.com/
+ Live Restore Enabled: false</code></pre>
+          </div>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">关键信息解读</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Containers</span>：容器总数、运行中、暂停、停止数量</p>
+              <p>- <span class="key-point">Images</span>：本地镜像数量</p>
+              <p>- <span class="key-point">Storage Driver</span>：存储驱动（overlay2推荐）</p>
+              <p>- <span class="key-point">Cgroup Driver</span>：cgroup驱动（systemd推荐）</p>
+              <p>- <span class="key-point">Registry Mirrors</span>：配置的镜像加速地址</p>
+              <p>- <span class="key-point">Docker Root Dir</span>：Docker数据存储目录</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.4</span>
+          <h1 class="page-title">Docker帮助命令</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker提供了完善的<span class="highlight">帮助系统</span>，是学习和使用Docker命令的重要工具。掌握帮助命令的使用方法，可以快速了解任何命令的功能和参数。
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker --help - 全局帮助命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker全局帮助
+$ docker --help
+
+# 预期输出：
+Usage:  docker [OPTIONS] COMMAND
+
+A self-sufficient runtime for containers
+
+Options:
+      --config string      Location of client config files
+                           (default "/root/.docker")
+  -c, --context string     Name of the context to use
+  -D, --debug              Enable debug mode
+  -H, --host list          Daemon socket(s) to connect to
+  -l, --log-level string   Set the logging level
+                           ("debug"|"info"|"warn"|"error"|"fatal")
+  --tls                Use TLS; implied by --tlsverify
+  --tlscacert string   Trust certs signed only by this CA
+  --tlscert string     Path to TLS certificate file
+  --tlskey string      Path to TLS key file
+  --tlsverify          Use TLS and verify the remote
+  -v, --version         Print version information and quit
+
+Management Commands:
+  builder     Manage builds
+  compose     Docker Compose
+  config      Manage Docker configs
+  container   Manage containers
+  context     Manage contexts
+  image       Manage images
+  manifest    Manage Docker image manifests
+  network     Manage networks
+  node        Manage Swarm nodes
+  plugin      Manage plugins
+  secret      Manage Docker secrets
+  service     Manage services
+  stack       Manage Docker stacks
+  swarm       Manage Swarm
+  system      Manage Docker
+  trust       Manage trust on Docker images
+  volume      Manage volumes
+
+Commands:
+  attach      Attach local standard input, output, and error
+  build       Build an image from a Dockerfile
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and local
+  create      Create a new container
+  diff        Inspect changes to files or directories
+  events      Get real time events from the server
+  exec        Run a command in a running container
+  export      Export a container's filesystem as a tar archive
+  history     Show the history of an image
+  images      List images
+  import      Import the contents from a tarball to create a fs
+  info        Display system-wide information
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  login       Log in to a Docker registry
+  logout      Log out from a Docker registry
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  save        Save one or more images to a tar archive
+  search      Search the Docker Hub for images
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  version     Show the Docker version information
+  wait        Block until one or more containers stop
+
+Run 'docker COMMAND --help' for more information on a command.</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.5</span>
+          <h1 class="page-title">特定命令帮助查询</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            对于每个具体的Docker命令，都可以使用<span class="highlight">--help</span>参数查看详细的用法说明。
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker COMMAND --help - 查看特定命令帮助</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法格式
+$ docker [COMMAND] --help
+$ docker [COMMAND] [SUBCOMMAND] --help
+
+# 示例1：查看run命令帮助
+$ docker run --help
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Run a command in a new container
+
+Options:
+  --add-host list                  Add a custom host-to-IP mapping
+  -a, --attach list                Attach to STDIN, STDOUT or STDERR
+  --blkio-weight uint16            Block IO (relative weight)
+  --blkio-weight-device list       Block IO weight (relative device weight)
+  --cap-add list                   Add Linux capabilities
+  --cap-drop list                  Drop Linux capabilities
+  --cgroup-parent string           Optional parent cgroup for the container
+  --cgroupns string                Cgroup namespace to use
+  --cidfile string                 Write the container ID to the file
+  --cpu-period int                 Limit CPU CFS (Completely Fair Scheduler)
+  --cpu-quota int                  Limit CPU CFS (Completely Fair Scheduler)
+  --cpu-rt-period int              Limit CPU real-time period in microseconds
+  --cpu-rt-runtime int             Limit CPU real-time runtime in microseconds
+  -c, --cpu-shares int             CPU shares (relative weight)
+  --cpus decimal                   Number of CPUs
+  --cpuset-cpus string             CPUs in which to allow execution (0-3, 0,1)
+  --cpuset-mems string             MEMs in which to allow execution (0-3, 0,1)
+  -d, --detach                     Run container in background and print ID
+  --detach-keys string             Override the key sequence for detaching
+  --device list                    Add a host device to the container
+  ...（输出较长，省略部分）
+
+# 示例2：查看image子命令帮助
+$ docker image --help
+
+Usage:  docker image COMMAND
+
+Manage images
+
+Commands:
+  build       Build an image from a Dockerfile
+  history     Show the history of an image
+  import      Import the contents from a tarball to create a fs
+  inspect     Display detailed information on one or more images
+  load        Load an image from a tar archive or STDIN
+  ls          List images
+  prune       Remove unused images
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rm          Remove one or more images
+  save        Save one or more images to a tar archive
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+Run 'docker image COMMAND --help' for more information on a command.
+
+# 示例3：查看image pull命令帮助
+$ docker image pull --help
+
+Usage:  docker image pull [OPTIONS] NAME[:TAG|@DIGEST]
+
+Pull an image or a repository from a registry
+
+Options:
+  -a, --all-tags                    Download all tagged images in the
+                                    repository
+      --disable-content-trust       Skip image verification (default true)
+      --platform string             Set platform if server is multi-platform
+                                    capable
+  -q, --quiet                       Suppress verbose output</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">帮助命令使用技巧</div>
+            <p>1. <span class="highlight">docker --help</span>：查看所有可用命令列表</p>
+            <p>2. <span class="highlight">docker COMMAND --help</span>：查看特定命令的详细参数</p>
+            <p>3. <span class="highlight">docker MANAGEMENT-COMMAND --help</span>：查看管理命令的子命令</p>
+            <p>4. 帮助信息中<span class="highlight">大写</span>的参数是必填项，<span class="highlight">中括号[]</span>内的是可选项</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.6</span>
+          <h1 class="page-title">Docker命令体系概览</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker命令分为<span class="highlight">管理命令（Management Commands）</span>和<span class="highlight">顶层命令（Commands）</span>两大类，理解命令分类有助于快速定位所需命令。
+          </p>
+          
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>命令类别</th>
+                <th>管理对象</th>
+                <th>常用命令示例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">docker image</span></td>
+                <td>镜像管理</td>
+                <td>ls, pull, push, rm, build, tag</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">docker container</span></td>
+                <td>容器管理</td>
+                <td>ls, run, start, stop, rm, exec, logs</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">docker network</span></td>
+                <td>网络管理</td>
+                <td>ls, create, rm, connect, disconnect</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">docker volume</span></td>
+                <td>存储卷管理</td>
+                <td>ls, create, rm, inspect, prune</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">docker system</span></td>
+                <td>系统管理</td>
+                <td>info, df, prune, events</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">新旧命令格式对比</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Docker 1.13+ 引入了新的管理命令格式，两种格式等效：
+
+# 镜像操作
+docker images          ≈  docker image ls
+docker rmi nginx       ≈  docker image rm nginx
+docker pull nginx      ≈  docker image pull nginx
+
+# 容器操作
+docker ps              ≈  docker container ls
+docker rm container    ≈  docker container rm container
+docker run nginx       ≈  docker container run nginx
+
+# 推荐使用新的管理命令格式，语义更清晰
+# 本课程将同时介绍两种格式，以适应不同环境</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">学习建议</div>
+            <div class="highlight-content">
+              <p>1. 先掌握<span class="highlight">docker --help</span>查看命令列表</p>
+              <p>2. 遇到不熟悉的命令，使用<span class="highlight">COMMAND --help</span>查看详细用法</p>
+              <p>3. 理解命令的<span class="highlight">分类体系</span>，便于记忆和查找</p>
+              <p>4. 多动手实践，命令参数可通过帮助系统随时查询</p>
             </div>
           </div>
         </div>
@@ -765,6 +1848,104 @@ mysql         8.0       3218b38490ce   4 weeks ago    538MB</code></pre>
           <div class="tip-box">
             <div class="tip-title">导出导入 vs 仓库推送</div>
             <p><span class="highlight">docker save/load</span>适合离线环境传输镜像；<span class="highlight">docker push/pull</span>适合联网环境共享镜像。导出文件包含所有镜像层和标签信息。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">动手实验：Docker镜像命令实践</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">镜像命令操作练习</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Docker镜像相关命令的使用，熟悉镜像的搜索、拉取、查看、删除等操作</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text">搜索并拉取不同版本的Ubuntu镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text">查看本地镜像列表和镜像详细信息</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text">为镜像添加自定义标签</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text">删除指定镜像和悬空镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">导出镜像为tar文件并重新导入</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">6</span>
+                <span class="step-text">清理系统中的无用镜像</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验操作指南</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：搜索并拉取Ubuntu镜像
+$ docker search ubuntu
+$ docker pull ubuntu:latest
+$ docker pull ubuntu:22.04
+$ docker pull ubuntu:20.04
+
+# 步骤2：查看本地镜像
+$ docker images
+$ docker images ubuntu
+$ docker inspect ubuntu:latest
+
+# 步骤3：为镜像添加标签
+$ docker tag ubuntu:latest my-ubuntu:1.0
+$ docker tag ubuntu:22.04 my-ubuntu:22.04
+$ docker images my-ubuntu
+
+# 步骤4：删除镜像
+$ docker rmi ubuntu:20.04
+$ docker rmi my-ubuntu:1.0
+
+# 步骤5：导出和导入镜像
+$ docker save -o ubuntu-backup.tar ubuntu:22.04
+$ ls -lh ubuntu-backup.tar
+$ docker rmi ubuntu:22.04
+$ docker load -i ubuntu-backup.tar
+$ docker images ubuntu
+
+# 步骤6：清理无用镜像
+$ docker image prune
+$ docker image prune -a
+
+# 验证结果
+$ docker images</code></pre>
+          </div>
+          
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功搜索并拉取多个版本的Ubuntu镜像</p>
+              <p>- [ ] 能够查看本地镜像列表和详细信息</p>
+              <p>- [ ] 成功为镜像添加自定义标签</p>
+              <p>- [ ] 能够删除指定镜像</p>
+              <p>- [ ] 成功导出和导入镜像</p>
+              <p>- [ ] 能够清理系统中的无用镜像</p>
+            </div>
           </div>
         </div>
       </div>
@@ -2195,6 +3376,7 @@ $ docker run -d \
         </div>
       </div>
 
+
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验</span>
@@ -2331,7 +3513,7 @@ $ docker run -d \
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">40</span>
+        <span class="total" id="totalPages">58</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
