@@ -760,8 +760,8 @@ EOF'
 
 # 步骤3：初始化网页内容
 $ docker run --rm -v nginx-web-data:/html ubuntu:22.04 sh -c 'cat > /html/index.html << "EOF"
-<!DOCTYPE html><html><head><title>Production Nginx</title></head>
-<body><h1>Welcome to Production Nginx</h1></body></html>
+&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Production Nginx&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;&lt;h1&gt;Welcome to Production Nginx&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
 EOF'
 
 # 步骤4：启动生产nginx容器
@@ -998,12 +998,12 @@ EOF
 
 # 步骤3：创建网页内容
 $ cat > html/index.html << 'EOF'
-<!DOCTYPE html>
-<html><head><title>Nginx Custom Config</title></head>
-<body><h1>Welcome to Custom Nginx</h1>
-<p>Configuration managed via bind mount</p>
-<ul><li><a href="/status">Server Status</a></li><li><a href="/api">API</a></li></ul>
-</body></html>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;title&gt;Nginx Custom Config&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;&lt;h1&gt;Welcome to Custom Nginx&lt;/h1&gt;
+&lt;p&gt;Configuration managed via bind mount&lt;/p&gt;
+&lt;ul&gt;&lt;li&gt;&lt;a href="/status"&gt;Server Status&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="/api"&gt;API&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;/body&gt;&lt;/html&gt;
 EOF
 
 # 步骤4：启动nginx容器
