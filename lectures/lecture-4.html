@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -2029,11 +2029,11 @@ EOF
 
 # 步骤3：创建index.html文件
 $ cat > index.html << 'EOF'
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Docker App</title>
-    <style>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Docker App&lt;/title&gt;
+    &lt;style&gt;
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -2046,13 +2046,13 @@ $ cat > index.html << 'EOF'
             font-size: 18px;
             color: #666;
         }
-    </style>
-</head>
-<body>
-    <h1>Hello from Docker!</h1>
-    <p>This is a custom Nginx image built with Dockerfile.</p>
-</body>
-</html>
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello from Docker!&lt;/h1&gt;
+    &lt;p&gt;This is a custom Nginx image built with Dockerfile.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 EOF
 
 # 步骤4：构建镜像

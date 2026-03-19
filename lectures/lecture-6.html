@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第六讲 Docker数据管理 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+      
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第六讲</h1>
+          <h2 class="sub-title">Docker数据管理</h2>
+          <p class="tagline">掌握数据卷与挂载技术，实现容器数据的<span class="highlight">安全存储</span>与<span class="highlight">高效共享</span></p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li><span class="toc-num">01</span><span class="toc-text">第一部分：数据卷基础概念</span></li>
+              <li><span class="toc-num">02</span><span class="toc-text">第二部分：数据卷操作命令</span></li>
+              <li><span class="toc-num">03</span><span class="toc-text">第三部分：挂载类型详解</span></li>
+              <li><span class="toc-num">04</span><span class="toc-text">第四部分：实战与最佳实践</span></li>
+            </ul>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>本讲是<span class="highlight">Docker数据持久化</span>的核心内容，包含<span class="highlight">两个nginx实验</span>，建议在Linux环境或WSL中完成所有实验操作。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解数据卷概念</h3>
+                <p>掌握Docker<span class="key-point">数据卷</span>的定义、作用和重要性，理解容器数据的临时性问题</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>掌握数据卷命令</h3>
+                <p>熟练使用<span class="highlight">docker volume create/ls/inspect/rm</span>等命令管理数据卷</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>理解挂载技术</h3>
+                <p>深入理解<span class="key-point">三种挂载类型</span>：volume、bind mount、tmpfs的区别和使用场景</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>实战nginx数据持久化</h3>
+                <p>通过<span class="highlight">两个实验</span>掌握nginx容器的数据卷挂载和配置文件管理</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">数据卷基础概念</h1>
+          <p class="section-desc">理解容器数据存储的核心问题</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">为什么容器数据会丢失？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">容器文件系统特性</div>
+            <div class="definition-content">
+              Docker容器的文件系统具有<span class="highlight">临时性</span>和<span class="highlight">分层结构</span>。当容器被删除时，容器内的所有数据都会丢失。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">模拟数据丢失场景（Ubuntu容器）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动一个Ubuntu容器，在容器中创建重要数据
+$ docker run -it --name test-container ubuntu:22.04 bash
+
+# 在容器中创建测试文件
+root@abc123def456:/# mkdir -p /app/data
+root@abc123def456:/# echo "这是重要数据" > /app/data/info.txt
+root@abc123def456:/# ls -la /app/data/
+
+# 退出容器并删除
+root@abc123def456:/# exit
+$ docker rm test-container
+
+# 重新创建容器尝试访问数据
+$ docker run -it --name new-container ubuntu:22.04 bash
+root@xyz789abc012:/# cat /app/data/info.txt
+cat: /app/data/info.txt: No such file or directory
+# 数据已经丢失！</code></pre>
+          </div>
+          <div class="highlight-box warning">
+            <div class="highlight-title">核心问题</div>
+            <div class="highlight-content">
+              <p>✓ 容器删除后数据<span class="highlight">无法恢复</span></p>
+              <p>✓ 容器层数据读写<span class="highlight">性能较差</span>（多层叠加）</p>
+              <p>✓ 多个容器<span class="highlight">无法共享</span>同一份数据</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">什么是Docker数据卷？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">数据卷（Volume）</div>
+            <div class="definition-content">
+              Docker数据卷是一个<span class="highlight">可供容器使用的特殊目录</span>，它绕过容器文件系统，直接挂载到宿主机的文件系统中。数据卷的生命周期独立于容器，可以跨多个容器共享和重用。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">数据卷工作原理</span>
+              <span class="code-lang">图示</span>
+            </div>
+            <pre><code>宿主机文件系统                        Ubuntu容器
+┌────────────────────┐            ┌────────────────────┐
+│ /var/lib/docker/   │            │ /app/data          │
+│ volumes/my-data/   │◄──────────►│ (挂载点)           │
+│ _data/             │   挂载     │                    │
+│  - info.txt        │            │  - info.txt        │
+│  - logs/           │            │  - logs/           │
+└────────────────────┘            └────────────────────┘
+     数据持久化保存                    容器内访问</code></pre>
+          </div>
+          <div class="card-grid">
+            <div class="card"><h3><span class="card-num">1</span>独立生命周期</h3><p>删除容器<span class="highlight">不影响数据卷</span></p></div>
+            <div class="card"><h3><span class="card-num">2</span>高性能读写</h3><p>绕过容器层，<span class="key-point">直接与宿主机交互</span></p></div>
+            <div class="card"><h3><span class="card-num">3</span>跨容器共享</h3><p>可同时挂载给<span class="highlight">多个容器</span></p></div>
+            <div class="card"><h3><span class="card-num">4</span>双向同步</h3><p>修改<span class="key-point">立即生效</span></p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.3</span>
+          <h1 class="page-title">数据卷的存储位置</h1>
+        </div>
+        <div class="page-body">
+          <div class="term-box">
+            <div class="term-title">Linux系统数据卷默认位置</div>
+            <p>数据卷默认存储在 <code>/var/lib/docker/volumes/</code> 目录下</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看Ubuntu容器的数据卷信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建一个带数据卷的Ubuntu容器
+$ docker run -d --name ubuntu-data -v my-data:/data ubuntu:22.04 sleep 3600
+
+# 查看数据卷详情
+$ docker volume inspect my-data
+[
+    {
+        "CreatedAt": "2024-01-15T10:30:00Z",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/docker/volumes/my-data/_data",
+        "Name": "my-data",
+        "Scope": "local"
+    }
+]
+
+# 在宿主机上查看数据卷内容
+$ ls -la /var/lib/docker/volumes/my-data/_data/
+
+# 在容器中写入数据
+$ docker exec ubuntu-data sh -c 'echo "Hello from container" > /data/test.txt'
+
+# 在宿主机上验证
+$ cat /var/lib/docker/volumes/my-data/_data/test.txt
+Hello from container</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">Windows/Mac系统说明</div>
+            <div class="kp-content">
+              <p>• <span class="highlight">Windows</span>：<code>C:\ProgramData\docker\volumes\</code></p>
+              <p>• <span class="highlight">Mac</span>：通过Linux虚拟机存储</p>
+              <p>• <span class="highlight">建议</span>：使用docker命令查看</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.4</span>
+          <h1 class="page-title">三种存储方式对比</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">Docker提供了三种不同的数据存储方式：</p>
+          <table class="compare-table">
+            <thead>
+              <tr><th>存储类型</th><th>说明</th><th>数据持久性</th><th>适用场景</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="highlight">数据卷（Volume）</span></td><td>Docker管理的特殊目录</td><td>持久，独立于容器</td><td>生产数据库、日志</td></tr>
+              <tr><td><span class="highlight">绑定挂载（Bind Mount）</span></td><td>宿主机任意目录</td><td>持久，依赖宿主机</td><td>配置文件、开发源码</td></tr>
+              <tr><td><span class="highlight">tmpfs挂载</span></td><td>内存中的文件系统</td><td>临时，容器停止即丢失</td><td>敏感数据、临时缓存</td></tr>
+              <tr><td><span class="highlight">容器存储层</span></td><td>容器的可写层</td><td>随容器删除而丢失</td><td>临时测试数据</td></tr>
+            </tbody>
+          </table>
+          <div class="key-conclusion">
+            <div class="conclusion-title">选择建议</div>
+            <div class="conclusion-content">
+              <p>• <span class="highlight">生产数据库</span>（MySQL）→ 使用数据卷</p>
+              <p>• <span class="highlight">配置文件</span>（nginx配置）→ 使用绑定挂载</p>
+              <p>• <span class="highlight">敏感信息</span>（密钥）→ 使用tmpfs挂载</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">数据卷操作命令</h1>
+          <p class="section-desc">掌握Docker数据卷的完整生命周期管理</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">docker volume create - 创建数据卷</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker volume create命令详解</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker volume create [OPTIONS] [VOLUME_NAME]
+
+# 1. 创建命名数据卷（最常用的方式）
+$ docker volume create my-nginx-html
+
+# 2. 创建带标签的数据卷（便于管理）
+$ docker volume create \
+  --label env=production \
+  --label app=nginx \
+  nginx-production-data
+
+# 3. 查看创建的数据卷
+$ docker volume ls
+DRIVER    VOLUME NAME
+local     my-nginx-html
+local     nginx-production-data
+
+# 4. 查看数据卷详情
+$ docker volume inspect my-nginx-html</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">命名数据卷 vs 匿名数据卷</div>
+            <div class="kp-content">
+              <p>• <span class="highlight">命名数据卷</span>：有明确名称，便于管理和识别</p>
+              <p>• <span class="highlight">匿名数据卷</span>：自动生成随机ID，难以管理</p>
+              <p>• <span class="highlight">推荐</span>：始终使用命名数据卷</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">docker volume ls/inspect/rm - 查看和管理</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看数据卷</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 列出所有数据卷
+$ docker volume ls
+
+# 列出数据卷（过滤）
+$ docker volume ls -f name=nginx
+
+# 查看数据卷详细信息
+$ docker volume inspect my-nginx-html
+
+# 使用Go模板格式化输出
+$ docker volume inspect --format '{{.Mountpoint}}' my-nginx-html
+/var/lib/docker/volumes/my-nginx-html/_data</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">删除数据卷</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 删除指定数据卷（必须是未使用的）
+$ docker volume rm my-nginx-html
+
+# 清理所有未使用的数据卷（谨慎使用！）
+$ docker volume prune
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+
+# 查看清理结果
+$ docker volume ls</code></pre>
+          </div>
+          <div class="tip-box">
+            <div class="tip-title">删除注意事项</div>
+            <p>• <span class="highlight">无法删除</span>正在被容器使用的数据卷</p>
+            <p>• <span class="highlight">删除容器</span>不会自动删除关联的数据卷</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">docker run -v 挂载数据卷详解</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph"><code>docker run -v</code> 是最常用的数据卷挂载方式：</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">语法：-v volume-name:container-path（推荐）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 使用已存在的数据卷
+$ docker run -d --name nginx-web \
+  -v my-nginx-html:/usr/share/nginx/html \
+  nginx:alpine
+
+# 自动创建数据卷（如果不存在）
+$ docker run -d --name nginx-web \
+  -v nginx-html:/usr/share/nginx/html \
+  nginx:alpine
+
+# 参数说明：
+# -v 数据卷名称:容器挂载点
+#   数据卷名称：可以是已存在的或自动创建的
+#   容器挂载点：容器内的目标路径</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">语法：-v /host/path:/container/path（绑定挂载）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 绑定挂载宿主机目录
+$ docker run -d --name nginx-web \
+  -v /home/user/nginx/html:/usr/share/nginx/html \
+  nginx:alpine
+
+# 自定义nginx配置
+$ docker run -d --name nginx-web \
+  -v /home/user/nginx/conf:/etc/nginx/conf.d \
+  -v /home/user/nginx/logs:/var/log/nginx \
+  nginx:alpine</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">docker run --mount 挂载详解</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph"><code>--mount</code> 是更明确的挂载方式，语法更清晰，推荐在生产环境使用：</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--mount 挂载数据卷</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 基本语法：--mount type=volume,source=卷名,target=容器路径
+
+# 使用数据卷挂载
+$ docker run -d --name nginx-web \
+  --mount type=volume,source=nginx-html,target=/usr/share/nginx/html \
+  nginx:alpine
+
+# 只读挂载（readonly）
+$ docker run -d --name nginx-web \
+  --mount type=volume,source=nginx-html,target=/usr/share/nginx/html,readonly \
+  nginx:alpine
+
+# 同时挂载多个数据卷
+$ docker run -d --name nginx-web \
+  --mount type=volume,source=nginx-html,target=/usr/share/nginx/html \
+  --mount type=volume,source=nginx-logs,target=/var/log/nginx \
+  nginx:alpine</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">对比：-v 和 --mount</span>
+              <span class="code-lang">对比</span>
+            </div>
+            <pre><code># -v 语法（简洁）
+$ docker run -d --name web -v nginx-data:/app nginx:alpine
+
+# --mount 语法（明确，推荐）
+$ docker run -d --name web --mount type=volume,source=nginx-data,target=/app nginx:alpine
+
+# 为什么推荐 --mount？
+# 1. 语法更清晰，明确指定 type、source、target
+# 2. 错误提示更详细
+# 3. 支持更多选项（readonly、volume-opt等）</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5</span>
+          <h1 class="page-title">查看容器挂载信息</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看Ubuntu容器挂载信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建带多个数据卷的Ubuntu容器
+$ docker run -d --name ubuntu-app \
+  -v nginx-html:/var/www/html \
+  -v nginx-logs:/var/log/app \
+  ubuntu:22.04 sleep 3600
+
+# 查看容器所有信息
+$ docker inspect ubuntu-app
+
+# 只查看挂载信息（Mounts部分）
+$ docker inspect --format '{{json .Mounts}}' ubuntu-app | jq
+[
+  {
+    "Type": "volume",
+    "Name": "nginx-html",
+    "Source": "/var/lib/docker/volumes/nginx-html/_data",
+    "Destination": "/var/www/html",
+    "RW": true
+  }
+]</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">字段说明</span>
+              <span class="code-lang">解释</span>
+            </div>
+            <pre><code>Type: volume          # 挂载类型（volume/bind/tmpfs）
+Name: nginx-html      # 数据卷名称
+Source: /var/lib/... # 宿主机上的路径（Mountpoint）
+Destination: /var/www/html  # 容器内的挂载点
+RW: true              # 读写权限（true=可写，false=只读）</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验一</span>
+          <h1 class="page-title">动手实验：nginx数据卷挂载</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">nginx容器数据卷完整操作</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握使用Ubuntu容器创建nginx数据卷、挂载、自定义网页内容，并验证数据持久化</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建nginx数据卷</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">启动nginx容器并挂载数据卷</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">自定义网页内容</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">验证数据持久化</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">清理环境</span></div>
+            </div>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建数据卷
+$ docker volume create nginx-html
+$ docker volume create nginx-logs
+
+# 步骤2：启动nginx容器挂载数据卷
+$ docker run -d --name my-nginx \
+  -p 8080:80 \
+  -v nginx-html:/usr/share/nginx/html \
+  -v nginx-logs:/var/log/nginx \
+  nginx:alpine
+
+# 步骤3：通过Ubuntu容器写入自定义网页
+$ docker run --rm -v nginx-html:/usr/share/nginx/html ubuntu:22.04 \
+  sh -c 'echo "<h1>Welcome to Custom Nginx!</h1>" > /usr/share/nginx/html/index.html'
+
+# 步骤4：验证网页
+$ curl http://localhost:8080
+
+# 步骤5：验证持久化 - 删除并重建容器
+$ docker stop my-nginx && docker rm my-nginx
+$ docker run -d --name new-nginx \
+  -p 8080:80 \
+  -v nginx-html:/usr/share/nginx/html \
+  -v nginx-logs:/var/log/nginx \
+  nginx:alpine
+
+# 验证数据依然存在
+$ curl http://localhost:8080
+
+# 步骤6：清理
+$ docker stop new-nginx && docker rm new-nginx
+$ docker volume rm nginx-html nginx-logs</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">挂载类型详解</h1>
+          <p class="section-desc">深入理解三种挂载方式的特点和使用场景</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">绑定挂载（Bind Mounts）详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">绑定挂载</div>
+            <div class="definition-content">
+              绑定挂载将宿主机上的<span class="highlight">任意目录或文件</span>挂载到容器中。容器可以完全访问宿主机指定路径的内容。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">绑定挂载nginx配置文件（Ubuntu容器示例）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建宿主机上的配置目录
+$ mkdir -p ~/nginx-config ~/nginx-html ~/nginx-logs
+
+# 创建自定义nginx配置文件
+$ cat > ~/nginx-config/default.conf << 'EOF'
+server {
+    listen 80;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    location /health {
+        return 200 "OK";
+        add_header Content-Type text/plain;
+    }
+}
+EOF
+
+# 创建网页文件
+$ echo "<h1>Custom Website via Bind Mount</h1>" > ~/nginx-html/index.html
+
+# 启动nginx使用绑定挂载
+$ docker run -d --name nginx-bind \
+  -p 8080:80 \
+  -v ~/nginx-config:/etc/nginx/conf.d:ro \
+  -v ~/nginx-html:/usr/share/nginx/html:ro \
+  -v ~/nginx-logs:/var/log/nginx \
+  nginx:alpine
+
+# 测试
+$ curl http://localhost:8080
+$ curl http://localhost:8080/health</code></pre>
+          </div>
+          <div class="highlight-box">
+            <div class="highlight-title">使用场景</div>
+            <div class="highlight-content">
+              <p>• <span class="highlight">开发环境</span>：挂载源代码，修改实时生效</p>
+              <p>• <span class="highlight">配置文件</span>：使用宿主机编辑器修改配置</p>
+              <p>• <span class="highlight">日志收集</span>：宿主机直接访问容器日志</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">tmpfs挂载详解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">tmpfs挂载</div>
+            <div class="definition-content">
+              tmpfs挂载将数据存储在<span class="highlight">宿主机的内存中</span>，而不是磁盘上。读写速度极快，但容器停止后数据会丢失。
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">tmpfs挂载示例（Ubuntu容器）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建带tmpfs挂载的Ubuntu容器
+$ docker run -d --name ubuntu-tmpfs \
+  --tmpfs /app/secrets \
+  --tmpfs /app/cache \
+  ubuntu:22.04 sleep 3600
+
+# 使用--mount语法指定更多选项
+$ docker run -d --name ubuntu-tmpfs2 \
+  --mount type=tmpfs,target=/app/secrets,tmpfs-size=512m,tmpfs-mode=0770 \
+  ubuntu:22.04 sleep 3600
+
+# 参数说明：
+# tmpfs-size: 限制内存大小（默认无限制）
+# tmpfs-mode: 文件权限模式（默认1777）
+
+# 验证tmpfs挂载
+$ docker exec ubuntu-tmpfs df -h | grep tmpfs
+tmpfs  512M     0  512M   0% /app/secrets
+tmpfs  512M     0  512M   0% /app/cache
+
+# 写入数据到tmpfs
+$ docker exec ubuntu-tmpfs sh -c 'echo "sensitive data" > /app/secrets/token.txt'
+$ docker exec ubuntu-tmpfs cat /app/secrets/token.txt
+
+# 重启容器后数据丢失
+$ docker restart ubuntu-tmpfs
+$ docker exec ubuntu-tmpfs cat /app/secrets/token.txt
+cat: /app/secrets/token.txt: No such file or directory</code></pre>
+          </div>
+          <div class="card-grid">
+            <div class="card"><h3><span class="card-num">1</span>高性能</h3><p>基于内存，<span class="highlight">读写速度极快</span></p></div>
+            <div class="card"><h3><span class="card-num">2</span>数据安全</h3><p>容器停止后<span class="key-point">自动清空</span></p></div>
+            <div class="card"><h3><span class="card-num">3</span>内存占用</h3><p>会占用<span class="highlight">宿主机内存</span></p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">三种挂载类型详细对比</h1>
+        </div>
+        <div class="page-body">
+          <table class="compare-table">
+            <thead>
+              <tr><th>特性</th><th>Volume</th><th>Bind Mount</th><th>tmpfs</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>存储位置</td><td>/var/lib/docker/volumes</td><td>宿主机任意位置</td><td><span class="highlight">宿主机内存</span></td></tr>
+              <tr><td>数据持久性</td><td><span class="highlight">持久</span></td><td>持久（依赖宿主机）</td><td>容器停止即丢失</td></tr>
+              <tr><td>读写性能</td><td>优秀</td><td>优秀</td><td><span class="highlight">极快</span></td></tr>
+              <tr><td>宿主机访问</td><td>通过Docker命令</td><td><span class="highlight">可直接访问</span></td><td>不可访问</td></tr>
+              <tr><td>跨平台</td><td>完整支持</td><td>完整支持</td><td>仅Linux</td></tr>
+              <tr><td>典型用途</td><td>数据库、日志</td><td>配置、源码</td><td>敏感数据、缓存</td></tr>
+            </tbody>
+          </table>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">综合示例：nginx多类型挂载</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 同时使用三种挂载类型
+$ docker run -d --name nginx-full \
+  -v nginx-html:/usr/share/nginx/html \
+  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -v $(pwd)/logs:/var/log/nginx \
+  --tmpfs /var/cache/nginx \
+  nginx:alpine</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">实战与最佳实践</h1>
+          <p class="section-desc">生产环境数据管理规范和实战技巧</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.1</span>
+          <h1 class="page-title">实战：nginx数据持久化完整案例</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">生产环境nginx部署（Ubuntu环境）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建必要的数据卷
+$ docker volume create nginx-web-data
+$ docker volume create nginx-config
+$ docker volume create nginx-logs
+
+# 步骤2：初始化配置文件（通过Ubuntu容器）
+$ docker run --rm -v nginx-config:/config ubuntu:22.04 sh -c 'cat > /config/default.conf << "EOF"
+server {
+    listen 80;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+    location / { index index.html index.htm; }
+}
+EOF'
+
+# 步骤3：初始化网页内容
+$ docker run --rm -v nginx-web-data:/html ubuntu:22.04 sh -c 'cat > /html/index.html << "EOF"
+<!DOCTYPE html><html><head><title>Production Nginx</title></head>
+<body><h1>Welcome to Production Nginx</h1></body></html>
+EOF'
+
+# 步骤4：启动生产nginx容器
+$ docker run -d --name production-nginx \
+  -p 80:80 \
+  -v nginx-web-data:/usr/share/nginx/html:ro \
+  -v nginx-config:/etc/nginx/conf.d:ro \
+  -v nginx-logs:/var/log/nginx \
+  --restart unless-stopped \
+  nginx:alpine
+
+# 步骤5：验证
+$ curl http://localhost</code></pre>
+          </div>
+          <div class="highlight-box">
+            <div class="highlight-title">生产环境要点</div>
+            <div class="highlight-content">
+              <p>✓ 使用<span class="highlight">命名数据卷</span>便于管理</p>
+              <p>✓ 配置文件和网页目录<span class="highlight">只读挂载</span>（:ro）</p>
+              <p>✓ 设置<span class="highlight">restart unless-stopped</span>自动重启</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.2</span>
+          <h1 class="page-title">数据卷权限管理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">数据卷权限问题是一个常见的坑，需要注意<span class="highlight">UID/GID匹配</span>：</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">权限问题排查（Ubuntu容器示例）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 问题：nginx无法写入日志
+$ docker run -d --name nginx-perm -v nginx-logs:/var/log/nginx nginx:alpine
+$ docker logs nginx-perm
+# 错误：Permission denied
+
+# 排查方法1：查看容器内进程用户
+$ docker exec nginx-perm id
+uid=101(nginx) gid=101(nginx) groups=101(nginx)
+
+# 排查方法2：查看数据卷宿主机权限
+$ ls -la /var/lib/docker/volumes/nginx-logs/_data/
+drwxr-xr-x 2 root root 999 root 4096 Jan 15 10:30 .
+
+# 解决方案1：修改宿主机权限
+$ sudo chown -R 101:101 /var/lib/docker/volumes/nginx-logs/_data
+
+# 解决方案2：使用Z标签（SELinux）
+$ docker run -d --name nginx-selinux \
+  -v nginx-logs:/var/log/nginx:Z \
+  nginx:alpine
+
+# 解决方案3：使用ro只读挂载日志目录
+$ docker run -d --name nginx-ro \
+  -v nginx-web:/usr/share/nginx/html:ro \
+  nginx:alpine</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">常见容器用户UID参考</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># nginx容器
+$ docker run --rm nginx:alpine id
+uid=101(nginx) gid=101(nginx)
+
+# Ubuntu容器
+$ docker run --rm ubuntu:22.04 id
+uid=0(root) gid=0(root)
+
+# MySQL容器
+$ docker run --rm mysql:8.0 id
+uid=999(mysql) gid=999(mysql)</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.3</span>
+          <h1 class="page-title">数据卷备份与恢复</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">数据安全至关重要，定期备份数据卷是生产环境的必要操作：</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">备份数据卷（使用Ubuntu容器）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建测试数据
+$ docker run -d --name nginx-backup \
+  -v nginx-backup-data:/data \
+  nginx:alpine
+$ docker exec nginx-backup sh -c 'echo "Important data $(date)" > /data/backup.txt'
+
+# 方法1：备份到宿主机
+$ docker run --rm -v nginx-backup-data:/data -v $(pwd):/backup ubuntu:22.04 \
+  tar czf /backup/nginx-backup-$(date +%Y%m%d).tar.gz -C /data .
+
+# 验证备份
+$ ls -lh nginx-backup-*.tar.gz
+
+# 方法2：备份到指定目录
+$ mkdir -p ~/backups
+$ docker run --rm \
+  -v nginx-backup-data:/data \
+  -v ~/backups:/backup \
+  ubuntu:22.04 \
+  tar czf /backup/nginx-backup-latest.tar.gz -C /data .</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">恢复数据卷</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建新数据卷
+$ docker volume create nginx-restore-data
+
+# 步骤2：从备份恢复
+$ docker run --rm \
+  -v nginx-restore-data:/data \
+  -v ~/backups:/backup \
+  ubuntu:22.04 \
+  tar xzf /backup/nginx-backup-latest.tar.gz -C /data
+
+# 步骤3：验证恢复
+$ docker run -d --name nginx-restore \
+  -v nginx-restore-data:/usr/share/nginx/html \
+  nginx:alpine
+$ docker exec nginx-restore cat /usr/share/nginx/html/backup.txt</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.4</span>
+          <h1 class="page-title">数据卷使用最佳实践总结</h1>
+        </div>
+        <div class="page-body">
+          <div class="two-column">
+            <div>
+              <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem; color: var(--color-text);">推荐做法</h3>
+              <ul>
+                <li>使用<span class="highlight">命名数据卷</span>而非匿名卷</li>
+                <li>不需要写入的数据使用<span class="highlight">只读挂载</span>（:ro）</li>
+                <li>为数据卷设置<span class="highlight">合理的备份策略</span></li>
+                <li>定期使用 <code>docker volume prune</code> 清理</li>
+                <li>监控数据卷的<span class="highlight">空间使用情况</span></li>
+                <li>生产环境使用专门的<span class="highlight">存储驱动</span></li>
+                <li>注意数据卷的<span class="highlight">权限和SELinux问题</span></li>
+              </ul>
+            </div>
+            <div>
+              <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem; color: var(--color-text);">避免做法</h3>
+              <ul>
+                <li>在容器内直接存储<span class="highlight">重要数据</span></li>
+                <li>使用绑定挂载访问<span class="key-point">系统敏感目录</span></li>
+                <li>多个容器写入同一数据卷时<span class="key-point">未考虑并发</span></li>
+                <li>忽略数据卷的<span class="key-point">权限问题</span></li>
+                <li>生产环境使用<span class="key-point">匿名卷</span></li>
+                <li>删除容器前<span class="key-point">未备份</span>重要数据</li>
+                <li>使用 <code>docker volume prune</code> 前<span class="key-point">未确认</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">检查数据卷使用情况</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker存储使用
+$ docker system df
+
+# 类型    空间      镜像数    容器数    本地卷数
+# Images   1.5GB        12         0           0
+# Containers  0B         0         5           0
+# Local Volumes   500MB         0         0           8</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验二</span>
+          <h1 class="page-title">动手实验：nginx+配置文件管理</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">nginx自定义配置与多容器数据共享</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握nginx配置文件的绑定挂载、多个容器共享数据卷、自定义网页</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建宿主机目录结构</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">编写自定义nginx配置</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">创建网页内容</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">启动nginx并测试</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">修改配置验证热更新</span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">清理环境</span></div>
+            </div>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：创建宿主机目录结构
+$ mkdir -p ~/nginx-project/{html,config,logs}
+$ cd ~/nginx-project
+
+# 步骤2：编写nginx配置文件
+$ cat > config/default.conf << 'EOF'
+server {
+    listen 80;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    location / { index index.html; }
+    location /status { stub_status on; access_log off; }
+    location /api { return 200 '{"status":"ok"}'; add_header Content-Type application/json; }
+}
+EOF
+
+# 步骤3：创建网页内容
+$ cat > html/index.html << 'EOF'
+<!DOCTYPE html>
+<html><head><title>Nginx Custom Config</title></head>
+<body><h1>Welcome to Custom Nginx</h1>
+<p>Configuration managed via bind mount</p>
+<ul><li><a href="/status">Server Status</a></li><li><a href="/api">API</a></li></ul>
+</body></html>
+EOF
+
+# 步骤4：启动nginx容器
+$ docker run -d --name my-nginx-config \
+  -p 8080:80 \
+  -v $(pwd)/config:/etc/nginx/conf.d:ro \
+  -v $(pwd)/html:/usr/share/nginx/html:ro \
+  -v $(pwd)/logs:/var/log/nginx \
+  nginx:alpine
+
+# 步骤5：测试
+$ curl http://localhost:8080
+$ curl http://localhost:8080/status
+$ curl http://localhost:8080/api
+
+# 步骤6：修改配置验证热更新
+$ cat > config/default.conf << 'EOF'
+server {
+    listen 80;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    location / { index index.html; }
+    location /status { stub_status on; access_log off; }
+    location /api { return 200 '{"version":"2.0","status":"healthy"}'; add_header Content-Type application/json; }
+    location /time { return 200 "{\"time\":\"$(date -Iseconds)\"}"; add_header Content-Type application/json; }
+}
+EOF
+
+# 重新加载nginx配置
+$ docker exec my-nginx-config nginx -s reload
+
+# 验证更新
+$ curl http://localhost:8080/api
+$ curl http://localhost:8080/time
+
+# 步骤7：清理
+$ docker stop my-nginx-config && docker rm my-nginx-config
+$ rm -rf ~/nginx-project</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.5</span>
+          <h1 class="page-title">常见问题与解决方案</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">问题1：权限被拒绝</span>
+              <span class="code-lang">问题</span>
+            </div>
+            <pre><code># 症状：容器无法写入数据卷
+$ docker logs my-nginx
+# [alert] open() failed (13: Permission denied)
+
+# 解决方案：使用Z标签
+$ docker stop my-nginx && docker rm my-nginx
+$ docker run -d --name my-nginx \
+  -v nginx-logs:/var/log/nginx:Z \
+  nginx:alpine</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">问题2：数据卷空间不足</span>
+              <span class="code-lang">问题</span>
+            </div>
+            <pre><code># 排查
+$ docker system df -v | grep -A 5 "Local Volumes"
+
+# 解决方案1：清理未使用的卷
+$ docker volume prune -f
+
+# 解决方案2：扩大Docker存储空间
+# Docker Desktop -> Settings -> Resources -> Disk image size</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">问题3：Windows路径问题</span>
+              <span class="code-lang">问题</span>
+            </div>
+            <pre><code># 错误：invalid mount path
+
+# 解决方案1：使用绝对路径
+docker run -v //c/users/project:/app nginx:alpine
+
+# 解决方案2：使用PowerShell变量
+docker run -v ${PWD}:/app nginx:alpine
+
+# 解决方案3：Docker Desktop设置共享驱动器
+# Settings -> Resources -> File Sharing</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本讲小结</h1>
+        </div>
+        <div class="page-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">理解<span class="highlight">数据卷概念</span>：掌握容器数据持久化的核心原理和数据丢失风险</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">掌握<span class="highlight">三种挂载类型</span>：volume、bind mount、tmpfs的特性对比</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">熟练<span class="highlight">数据卷命令</span>：create、ls、inspect、rm、prune的用法</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-icon">*</span>
+              <span class="summary-text">实战<span class="highlight">nginx数据持久化</span>：通过两个实验掌握数据卷在nginx中的应用</span>
+            </div>
+          </div>
+          <div class="key-conclusion" style="margin-top: 1.5rem;">
+            <div class="conclusion-title">核心要点回顾</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">数据卷</span>是容器数据持久化的标准解决方案</p>
+              <p>2. <span class="highlight">绑定挂载</span>适合配置文件和开发环境源码</p>
+              <p>3. <span class="highlight">tmpfs</span>适合敏感数据和临时高性能存储</p>
+              <p>4. 生产环境应使用<span class="highlight">命名数据卷</span>并建立备份机制</p>
+              <p>5. 始终使用 <code>:ro</code> 只读挂载<span class="highlight">不需要写入</span>的目录</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预告</span>
+          <h1 class="page-title">下讲预告</h1>
+        </div>
+        <div class="page-body">
+          <div class="next-lecture">
+            <h3>第七讲：<span class="highlight">Docker镜像构建</span></h3>
+            <ul>
+              <li>深入理解<span class="key-point">Dockerfile</span>的语法和指令</li>
+              <li>掌握<span class="key-point">镜像构建</span>的完整流程</li>
+              <li>学习<span class="key-point">镜像优化</span>技巧和多阶段构建</li>
+              <li>实战<span class="key-point">自定义nginx镜像</span>的构建</li>
+            </ul>
+          </div>
+          <div class="knowledge-point" style="margin-top: 1.5rem;">
+            <div class="kp-title">预习建议</div>
+            <div class="kp-content">
+              <p>1. 复习本讲的<span class="highlight">nginx数据持久化</span>实验</p>
+              <p>2. 了解<span class="highlight">Dockerfile</span>的基本概念</p>
+              <p>3. 准备Ubuntu环境用于镜像构建实验</p>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <span>2024 课程讲义</span>
+          <span>感谢您的学习</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">28</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>
