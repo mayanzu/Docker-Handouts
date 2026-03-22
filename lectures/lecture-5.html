@@ -2207,7 +2207,7 @@ my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
           <div class="definition-box">
             <div class="definition-term">实战目标</div>
             <div class="definition-content">
-              通过本节实战，您将掌握使用Docker部署静态Web网站的完整流程，包括：创建网页文件、挂载数据卷、修改网页内容、部署上线。
+              通过本节实战，您将掌握使用Docker部署静态Web网站的完整流程，包括：启动Nginx容器、配置端口映射、进入容器修改网页内容、部署上线。
             </div>
           </div>
 
@@ -2275,25 +2275,16 @@ my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">步骤2：启动Nginx容器并挂载网页目录</span>
+              <span class="code-title">步骤2：启动Nginx容器</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动Nginx容器，将主机网页目录挂载到容器内
-# Windows PowerShell
-$ docker run -d -p 8080:80 --name my-website `
-  -v /path/to/html:/usr/share/nginx/html `
-  nginx
-
-# Linux/Mac
-$ docker run -d -p 8080:80 --name my-website \
-  -v $(pwd):/usr/share/nginx/html \
-  nginx
+            <pre><code># 启动Nginx容器
+$ docker run -d -p 8080:80 --name my-website nginx
 
 # 参数说明：
 # -d              后台运行
 # -p 8080:80      端口映射（宿主机8080 -> 容器80）
 # --name          容器名称
-# -v              挂载数据卷（主机路径:容器路径）
 # nginx           使用的镜像</code></pre>
           </div>
 
@@ -2312,7 +2303,10 @@ $ docker port my-website
 $ docker logs my-website
 
 # 浏览器访问
-# 打开浏览器访问 http://localhost:8080</code></pre>
+# 打开浏览器访问 http://localhost:8080
+# 应该看到 Nginx 默认页面
+
+# 刷新浏览器查看修改后的内容</code></pre>
           </div>
 
           <div class="code-block">
@@ -2320,47 +2314,54 @@ $ docker logs my-website
               <span class="code-title">步骤4：修改网页内容</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 方法1：直接修改主机文件（推荐）
-# 直接编辑主机的 index.html 文件，刷新浏览器即可看到更新
-
-# 方法2：进入容器修改
+            <pre><code># 方法1：进入容器修改
 $ docker exec -it my-website bash
 root@abc123:/# cd /usr/share/nginx/html
-root@abc123:/# echo '&lt;h1&gt;Hello Docker!&lt;/h1&gt;' > index.html
+root@abc123:/# cat > index.html &lt;&lt;EOF
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;我的个人主页&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;你好，Docker!&lt;/h1&gt;
+    &lt;p&gt;这是我在容器中修改的网页&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF
 root@abc123:/# exit
 
-# 方法3：使用docker cp拷贝文件
+# 方法2：使用docker cp拷贝文件
 $ docker cp index.html my-website:/usr/share/nginx/html/
 
 # 验证修改
 # 刷新浏览器 http://localhost:8080</code></pre>
           </div>
 
-          <div class="tip-box">
-            <div class="tip-title">数据卷挂载的优势</div>
-            <p><strong>实时同步：</strong>主机修改文件，容器内立即生效</p>
-            <p><strong>数据持久化：</strong>删除容器后数据不丢失</p>
-            <p><strong>便于开发：</strong>可以使用主机编辑器开发，容器即时预览</p>
-          </div>
-
           <div class="highlight-box warning">
             <div class="highlight-title">常见问题排查</div>
             <div class="highlight-content">
-              <p><strong>问题1：403 Forbidden错误</strong></p>
-              <p>原因：没有index.html或文件权限问题</p>
-              <pre><code># 检查文件是否存在
-$ docker exec my-website ls -l /usr/share/nginx/html/
+              <p><strong>问题1：端口被占用</strong></p>
+              <p>错误信息：<code>port is already allocated</code></p>
+              <pre><code># 解决方案1：更换端口
+$ docker run -d -p 8081:80 --name my-website nginx
 
-# 修复权限
-$ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
+# 解决方案2：停止占用端口的进程或容器</code></pre>
 
-              <p><strong>问题2：Windows路径问题</strong></p>
-              <p>原因：反斜杠需要改为正斜杠</p>
-              <pre><code># 错误
--v C:\Users\...\html:/usr/share/nginx/html
+              <p><strong>问题2：容器启动后立即退出</strong></p>
+              <pre><code># 查看容器日志
+$ docker logs my-website
 
-# 正确
--v C:/Users/.../html:/usr/share/nginx/html</code></pre>
+# 可能原因：端口冲突、Nginx配置错误等</code></pre>
+
+              <p><strong>问题3：网页修改后未生效</strong></p>
+              <pre><code># 重启容器使修改生效
+$ docker restart my-website
+
+# 或重新拷贝文件
+$ docker cp index.html my-website:/usr/share/nginx/html/
+$ docker restart my-website</code></pre>
             </div>
           </div>
         </div>
