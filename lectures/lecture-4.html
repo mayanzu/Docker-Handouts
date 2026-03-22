@@ -356,7 +356,7 @@
               Docker仓库是<span class="highlight">存储和分发Docker镜像</span>的服务。仓库分为公共仓库和私有仓库，开发者可以从仓库拉取镜像，也可以将本地镜像推送到仓库进行共享。
             </div>
           </div>
-          
+
           <table class="compare-table">
             <thead>
               <tr>
@@ -383,39 +383,216 @@
               </tr>
             </tbody>
           </table>
-          
-          <div class="code-block" style="margin-top: 1.5rem;">
+
+          <div class="knowledge-point">
+            <div class="kp-title">Docker Hub镜像命名规则</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">ubuntu</span> = docker.io/library/ubuntu:latest（官方镜像）</p>
+              <p>- <span class="key-point">username/ubuntu</span> = docker.io/username/ubuntu:latest（用户镜像）</p>
+              <p>- <span class="key-point">registry.com/ubuntu</span> = 私有仓库镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.6.1</span>
+          <h1 class="page-title">docker login - 仓库登录</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker login</span>命令用于登录到Docker仓库。登录后才能从私有仓库拉取镜像或向私有仓库推送镜像。
+          </p>
+
+          <div class="code-block">
             <div class="code-header">
-              <span class="code-title">仓库操作命令</span>
+              <span class="code-title">docker login - 登录仓库</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 登录仓库
+            <pre><code># 登录到Docker Hub
+$ docker login
+
+# 登录到私有仓库
 $ docker login registry.example.com
+
+# 预期输出：
 Username: your-username
-Password: 
+Password:
 Login Succeeded
 
-# 拉取镜像
+# 登录后，凭证会保存在 ~/.docker/config.json</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">参数说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">无参数</span>：登录Docker Hub（默认）</p>
+              <p>- <span class="key-point">registry URL</span>：登录到指定的私有仓库</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">安全提示</div>
+            <p>密码不会以明文形式保存，Docker使用加密方式存储凭证。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.6.2</span>
+          <h1 class="page-title">docker pull - 拉取镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker pull</span>命令用于从仓库拉取镜像到本地。如果本地已有该镜像，会使用已存在的版本。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker pull - 拉取镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 拉取官方镜像（默认tag为latest）
 $ docker pull ubuntu:latest
+
+# 拉取特定版本标签
+$ docker pull ubuntu:22.04
+
+# 拉取私有仓库镜像
 $ docker pull registry.example.com/myapp:v1.0
 
-# 推送镜像（需先打标签）
+# 拉取所有标签（如果仓库支持）
+$ docker pull -a ubuntu</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">参数说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">NAME[:TAG|@DIGEST]</span>：镜像名称和标签</p>
+              <p>- <span class="key-point">-a, --all-tags</span>：下载所有标签的镜像</p>
+              <p>- <span class="key-point">--platform</span>：指定平台（多平台镜像）</p>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <div class="highlight-title">镜像拉取流程</div>
+            <div class="highlight-content">
+              <p>1. 解析镜像名称，确定仓库地址</p>
+              <p>2. 向仓库API请求镜像清单</p>
+              <p>3. 从仓库下载各个镜像层</p>
+              <p>4. 组合所有层创建本地镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.6.3</span>
+          <h1 class="page-title">docker tag 与 docker push - 推送镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker push</span>命令用于将本地镜像推送到远程仓库。推送前需要先用<span class="highlight">docker tag</span>给镜像打上目标仓库的标签。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker tag 与 docker push - 推送镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 给镜像打标签（格式：registry/namespace/image:tag）
 $ docker tag myapp:v1.0 registry.example.com/myapp:v1.0
+
+# 2. 推送到私有仓库
 $ docker push registry.example.com/myapp:v1.0
 
-# 搜索镜像
+# 3. 推送成功输出示例：
+# The push refers to repository [registry.example.com/myapp]
+# v1.0: digest: sha256:abc123... size: 2048</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">docker tag参数说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">SOURCE_IMAGE</span>：源镜像名称或ID</p>
+              <p>- <span class="key-point">TARGET_IMAGE</span>：目标镜像名称（通常包含仓库地址）</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">docker push参数说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">NAME[:TAG]</span>：要推送的镜像名称</p>
+              <p>- <span class="key-point">-a, --all-tags</span>：推送所有标签</p>
+              <p>- <span class="key-point">--disable-content-trust</span>：跳过镜像签名验证</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">注意事项</div>
+            <p>推送前必须先登录到目标仓库，且当前用户有推送权限。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.6.4</span>
+          <h1 class="page-title">docker search 与 docker logout</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker search</span>命令用于在Docker Hub搜索公开镜像。<span class="highlight">docker logout</span>命令用于从已登录的仓库登出。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker search - 搜索镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 搜索镜像
 $ docker search ubuntu
 
-# 登出仓库
-$ docker logout registry.example.com</code></pre>
+# 预期输出：
+NAME                DESCRIPTION                STARS    OFFICIAL    AUTOMATED
+ubuntu              Ubuntu is a Debian-based…  12345    [OK]
+...
+
+
+# 搜索私有仓库镜像（需先登录）
+$ docker search registry.example.com/myapp
+
+# 参数说明：
+# --limit 100：限制搜索结果数量
+# --filter stars=100：筛选stars大于100的镜像</code></pre>
           </div>
-          
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker logout - 登出仓库</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 登出Docker Hub
+$ docker logout
+
+# 登出私有仓库
+$ docker logout registry.example.com
+
+# 登出后，凭证会从 ~/.docker/config.json 中移除</code></pre>
+          </div>
+
           <div class="highlight-box">
-            <div class="highlight-title">Docker Hub镜像命名规则</div>
+            <div class="highlight-title">仓库操作完整流程</div>
             <div class="highlight-content">
-              <p>- <span class="highlight">ubuntu</span> = docker.io/library/ubuntu:latest（官方镜像）</p>
-              <p>- <span class="highlight">username/ubuntu</span> = docker.io/username/ubuntu:latest（用户镜像）</p>
-              <p>- <span class="highlight">registry.com/ubuntu</span> = 私有仓库镜像</p>
+              <p>1. <span class="highlight">docker login</span> - 登录仓库</p>
+              <p>2. <span class="highlight">docker pull</span> - 拉取镜像</p>
+              <p>3. <span class="highlight">docker tag</span> - 打标签</p>
+              <p>4. <span class="highlight">docker push</span> - 推送镜像</p>
+              <p>5. <span class="highlight">docker search</span> - 搜索镜像</p>
+              <p>6. <span class="highlight">docker logout</span> - 登出仓库</p>
             </div>
           </div>
         </div>
@@ -715,16 +892,16 @@ $ docker logout registry.example.com</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 0.5.1</span>
-          <h1 class="page-title">Docker服务状态管理</h1>
+          <h1 class="page-title">Docker服务状态查看</h1>
         </div>
         <div class="page-body">
           <p class="paragraph">
-            在使用Docker之前，需要了解如何管理Docker服务的运行状态。Docker作为系统服务，可以通过<span class="highlight">systemctl</span>命令进行管理。
+            在使用Docker之前，需要了解如何管理Docker服务的运行状态。<span class="highlight">systemctl status docker</span>命令用于查看Docker服务的运行状态。
           </p>
-          
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Docker服务管理命令</span>
+              <span class="code-title">systemctl status - 查看Docker服务状态</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 查看Docker服务状态
@@ -739,28 +916,20 @@ $ sudo systemctl status docker
       Tasks: 25
      Memory: 120.5M
      CGroup: /system.slice/docker.service
-             └─1234 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-
-# 启动Docker服务
-$ sudo systemctl start docker
-
-# 停止Docker服务
-$ sudo systemctl stop docker
-
-# 重启Docker服务
-$ sudo systemctl restart docker
-
-# 设置开机自启动
-$ sudo systemctl enable docker
-
-# 取消开机自启动
-$ sudo systemctl disable docker
-
-# 重新加载Docker配置（修改配置后执行）
-$ sudo systemctl daemon-reload
-$ sudo systemctl restart docker</code></pre>
+             └─1234 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock</code></pre>
           </div>
-          
+
+          <div class="knowledge-point">
+            <div class="kp-title">输出信息解读</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Loaded</span>：服务是否已加载到系统，enabled表示开机自启</p>
+              <p>- <span class="key-point">Active</span>：服务运行状态，active (running) 表示正常运行中</p>
+              <p>- <span class="key-point">Main PID</span>：主进程ID，1234 表示dockerd进程</p>
+              <p>- <span class="key-point">Tasks</span>：服务包含的线程数</p>
+              <p>- <span class="key-point">Memory</span>：服务使用的内存</p>
+            </div>
+          </div>
+
           <div class="knowledge-point">
             <div class="kp-title">服务状态说明</div>
             <div class="kp-content">
@@ -776,6 +945,93 @@ $ sudo systemctl restart docker</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 0.5.2</span>
+          <h1 class="page-title">Docker服务启停管理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">systemctl</span>命令可以启动、停止和重启Docker服务。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">systemctl start/stop/restart - 服务启停控制</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动Docker服务
+$ sudo systemctl start docker
+
+# 停止Docker服务
+$ sudo systemctl stop docker
+
+# 重启Docker服务（停止后自动启动）
+$ sudo systemctl restart docker
+
+# 重载配置（不中断服务，仅重载配置）
+$ sudo systemctl reload docker
+# 注意：reload不一定支持所有服务</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">使用场景</div>
+            <p>- <span class="highlight">start</span>：服务未运行且需要启动时</p>
+            <p>- <span class="highlight">stop</span>：需要临时停止服务时</p>
+            <p>- <span class="highlight">restart</span>：修改配置后需要重新加载，或服务异常时</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.3</span>
+          <h1 class="page-title">Docker服务开机自启管理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">systemctl enable/disable</span>命令用于设置Docker服务开机自启动。<span class="highlight">systemctl daemon-reload</span>用于重新加载systemd配置。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">systemctl enable/disable - 开机自启设置</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 设置Docker服务开机自启动
+$ sudo systemctl enable docker
+
+# 取消Docker服务开机自启动
+$ sudo systemctl disable docker
+
+# 检查服务是否为开机自启
+$ systemctl is-enabled docker
+enabled</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">systemctl daemon-reload - 重新加载配置</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 修改Docker配置文件后，需要重新加载systemd配置
+$ sudo systemctl daemon-reload
+
+# 然后重启Docker服务使配置生效
+$ sudo systemctl restart docker</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">常见配置修改场景</div>
+            <div class="kp-content">
+              <p>修改<span class="key-point">/etc/docker/daemon.json</span>后需要执行：</p>
+              <p>1. <span class="highlight">sudo systemctl daemon-reload</span> - 重载systemd配置</p>
+              <p>2. <span class="highlight">sudo systemctl restart docker</span> - 重启Docker服务</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.4</span>
           <h1 class="page-title">Docker版本信息查看</h1>
         </div>
         <div class="page-body">
@@ -838,7 +1094,7 @@ $ docker version --format '{{.Server.Version}}'
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 0.5.3</span>
+          <span class="page-number">Part 0.5.5</span>
           <h1 class="page-title">Docker系统信息查看</h1>
         </div>
         <div class="page-body">
@@ -918,7 +1174,7 @@ Server:
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 0.5.4</span>
+          <span class="page-number">Part 0.5.6</span>
           <h1 class="page-title">Docker帮助命令</h1>
         </div>
         <div class="page-body">
@@ -1022,24 +1278,20 @@ Run 'docker COMMAND --help' for more information on a command.</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 0.5.5</span>
-          <h1 class="page-title">特定命令帮助查询</h1>
+          <span class="page-number">Part 0.5.7</span>
+          <h1 class="page-title">docker run --help 查看运行命令帮助</h1>
         </div>
         <div class="page-body">
           <p class="paragraph">
-            对于每个具体的Docker命令，都可以使用<span class="highlight">--help</span>参数查看详细的用法说明。
+            <span class="highlight">docker run</span>是最常用的命令之一，使用<span class="highlight">--help</span>可以查看完整参数说明。
           </p>
-          
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker COMMAND --help - 查看特定命令帮助</span>
+              <span class="code-title">docker run --help - 查看容器运行命令帮助</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 语法格式
-$ docker [COMMAND] --help
-$ docker [COMMAND] [SUBCOMMAND] --help
-
-# 示例1：查看run命令帮助
+            <pre><code># 查看run命令完整帮助
 $ docker run --help
 
 Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
@@ -1067,9 +1319,37 @@ Options:
   -d, --detach                     Run container in background and print ID
   --detach-keys string             Override the key sequence for detaching
   --device list                    Add a host device to the container
-  ...（输出较长，省略部分）
+  ...（输出较长，省略部分）</code></pre>
+          </div>
 
-# 示例2：查看image子命令帮助
+          <div class="knowledge-point">
+            <div class="kp-title">参数阅读技巧</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">大写参数</span>：必填项</p>
+              <p>- <span class="key-point">中括号[]</span>：可选项</p>
+              <p>- <span class="key-point">-a, --attach</span>：短参数和长参数等效</p>
+              <p>- <span class="key-point">list</span>：该参数可以多次指定</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.8</span>
+          <h1 class="page-title">docker image --help 查看镜像子命令帮助</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker image</span>是镜像管理命令，使用<span class="highlight">--help</span>可以查看所有镜像子命令。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker image --help - 查看镜像管理子命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看image子命令帮助
 $ docker image --help
 
 Usage:  docker image COMMAND
@@ -1090,9 +1370,38 @@ Commands:
   save        Save one or more images to a tar archive
   tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
 
-Run 'docker image COMMAND --help' for more information on a command.
+Run 'docker image COMMAND --help' for more information on a command.</code></pre>
+          </div>
 
-# 示例3：查看image pull命令帮助
+          <div class="knowledge-point">
+            <div class="kp-title">常用子命令速查</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">docker image ls</span>：列出本地镜像</p>
+              <p>- <span class="key-point">docker image pull</span>：拉取镜像</p>
+              <p>- <span class="key-point">docker image push</span>：推送镜像</p>
+              <p>- <span class="key-point">docker image rm</span>：删除镜像</p>
+              <p>- <span class="key-point">docker image build</span>：构建镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.9</span>
+          <h1 class="page-title">docker image pull --help 查看拉取命令帮助</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker image pull</span>用于从仓库拉取镜像，使用<span class="highlight">--help</span>查看详细参数。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker image pull --help - 查看镜像拉取命令帮助</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看image pull命令帮助
 $ docker image pull --help
 
 Usage:  docker image pull [OPTIONS] NAME[:TAG|@DIGEST]
@@ -1107,7 +1416,7 @@ Options:
                                     capable
   -q, --quiet                       Suppress verbose output</code></pre>
           </div>
-          
+
           <div class="tip-box">
             <div class="tip-title">帮助命令使用技巧</div>
             <p>1. <span class="highlight">docker --help</span>：查看所有可用命令列表</p>
@@ -1120,7 +1429,7 @@ Options:
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 0.5.6</span>
+          <span class="page-number">Part 0.5.10</span>
           <h1 class="page-title">Docker命令体系概览</h1>
         </div>
         <div class="page-body">

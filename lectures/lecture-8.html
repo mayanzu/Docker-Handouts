@@ -1058,6 +1058,23 @@ $ docker push your_username/myapp:v1</code></pre>
       });
     });
 
+    // 按钮点击事件
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
+        updateNavigation();
+      }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentPage < pages.length - 1) {
+        currentPage++;
+        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
+        updateNavigation();
+      }
+    });
+
     updateNavigation();
   </script>
 </body>
