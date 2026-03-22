@@ -246,8 +246,8 @@
 │            依赖层 (Dependencies Layer)   │  ← 依赖库
 │            RUN pip install flask        │
 ├────────────────────────────────────────┤
-│            运行时层 (Runtime Layer)      │  ← Python运行时
-│            FROM python:3.9              │
+│            运行时层 (Runtime Layer)      │  ← Ubuntu系统
+│            FROM ubuntu:22.04            │
 ├────────────────────────────────────────┤
 │            基础层 (Base Layer)           │  ← 操作系统
 │            Ubuntu / Alpine / Debian     │
@@ -262,7 +262,7 @@
           <div class="knowledge-point">
             <div class="kp-title">镜像命名规范</div>
             <div class="kp-content">
-              <p>- <span class="key-point">官方镜像</span>：nginx、ubuntu、python（无命名空间前缀）</p>
+              <p>- <span class="key-point">官方镜像</span>：ubuntu、alpine、debian（无命名空间前缀）</p>
               <p>- <span class="key-point">用户镜像</span>：username/image-name（带用户名前缀）</p>
               <p>- <span class="key-point">私有仓库</span>：registry.example.com/namespace/image:tag</p>
               <p>- <span class="key-point">标签格式</span>：image:tag（默认latest）、image@sha256:digest</p>
@@ -396,7 +396,7 @@ Password:
 Login Succeeded
 
 # 拉取镜像
-$ docker pull nginx:latest
+$ docker pull ubuntu:latest
 $ docker pull registry.example.com/myapp:v1.0
 
 # 推送镜像（需先打标签）
@@ -404,7 +404,7 @@ $ docker tag myapp:v1.0 registry.example.com/myapp:v1.0
 $ docker push registry.example.com/myapp:v1.0
 
 # 搜索镜像
-$ docker search nginx
+$ docker search ubuntu
 
 # 登出仓库
 $ docker logout registry.example.com</code></pre>
@@ -413,9 +413,9 @@ $ docker logout registry.example.com</code></pre>
           <div class="highlight-box">
             <div class="highlight-title">Docker Hub镜像命名规则</div>
             <div class="highlight-content">
-              <p>- <span class="highlight">nginx</span> = docker.io/library/nginx:latest（官方镜像）</p>
-              <p>- <span class="highlight">username/nginx</span> = docker.io/username/nginx:latest（用户镜像）</p>
-              <p>- <span class="highlight">registry.com/nginx</span> = 私有仓库镜像</p>
+              <p>- <span class="highlight">ubuntu</span> = docker.io/library/ubuntu:latest（官方镜像）</p>
+              <p>- <span class="highlight">username/ubuntu</span> = docker.io/username/ubuntu:latest（用户镜像）</p>
+              <p>- <span class="highlight">registry.com/ubuntu</span> = 私有仓库镜像</p>
             </div>
           </div>
         </div>
@@ -475,11 +475,11 @@ $ docker logout registry.example.com</code></pre>
               <span class="code-title">Docker工作流程</span>
               <span class="code-lang">流程说明</span>
             </div>
-            <pre><code>1. 用户执行 docker run nginx
+            <pre><code>1. 用户执行 docker run ubuntu
    ↓
 2. Docker CLI 解析命令，通过REST API发送给Daemon
    ↓
-3. Daemon 检查本地是否存在nginx镜像
+3. Daemon 检查本地是否存在ubuntu镜像
    ↓
 4. 不存在则从Registry拉取镜像（分层下载）
    ↓
@@ -1174,13 +1174,13 @@ Options:
 
 # 镜像操作
 docker images          ≈  docker image ls
-docker rmi nginx       ≈  docker image rm nginx
-docker pull nginx      ≈  docker image pull nginx
+docker rmi ubuntu       ≈  docker image rm ubuntu
+docker pull ubuntu      ≈  docker image pull ubuntu
 
 # 容器操作
 docker ps              ≈  docker container ls
 docker rm container    ≈  docker container rm container
-docker run nginx       ≈  docker container run nginx
+docker run ubuntu       ≈  docker container run ubuntu
 
 # 推荐使用新的管理命令格式，语义更清晰
 # 本课程将同时介绍两种格式，以适应不同环境</code></pre>
@@ -1250,23 +1250,12 @@ docker run nginx       ≈  docker container run nginx
               <span class="code-title">镜像分层示例</span>
               <span class="code-lang">概念说明</span>
             </div>
-            <pre><code># 以Nginx镜像为例，查看其分层结构
-$ docker history nginx:latest
+            <pre><code># 以Ubuntu镜像为例，查看其分层结构
+$ docker history ubuntu:latest
 
 IMAGE          CREATED        CREATED BY                                      SIZE
-605c77e624dd   2 weeks ago    /bin/sh -c #(nop)  CMD ["nginx" "-g" "dae...   0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  STOPSIGNAL SIGQUIT          0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  EXPOSE 80                   0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  ENTRYPOINT ["/docker-e...   0B
-<missing>      2 weeks ago    /bin/sh -c #(nop) COPY file:... in /            4.19kB
-<missing>      2 weeks ago    /bin/sh -c #(nop) COPY dir:... in /etc/ngi...  6.32kB
-<missing>      2 weeks ago    /bin/sh -c set -x     && addgroup --system...   61.2MB
-<missing>      2 weeks ago    /bin/sh -c #(nop)  ENV PKG_RELEASE=1~bull...   0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  ENV NJS_VERSION=0.7.1       0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  ENV NGINX_VERSION=1.21.5   0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  LABEL maintainer=NGINX...   0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  CMD ["bash"]                0B
-<missing>      2 weeks ago    /bin/sh -c #(nop) ADD file:... in /            80.4MB</code></pre>
+605c77e624dd   2 weeks ago    /bin/sh -c #(nop)  CMD ["bash"]                0B
+<missing>      2 weeks ago    /bin/sh -c #(nop)  ADD file:... in /            80.4MB</code></pre>
           </div>
           
           <div class="highlight-box">
@@ -1340,29 +1329,25 @@ IMAGE          CREATED        CREATED BY                                      SI
             </div>
             <pre><code># 语法：docker search [OPTIONS] TERM
 
-# 基础用法 - 搜索nginx镜像
-$ docker search nginx
+# 基础用法 - 搜索ubuntu镜像
+$ docker search ubuntu
 
 # 预期输出：
 NAME                              DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
-nginx                             Official build of Nginx.                        18000     [OK]       
-bitnami/nginx                     Bitnami nginx Docker Image                      150                  [OK]
-ubuntu/nginx                      Nginx, a high-performance reverse proxy & ...   80        
-nginx/nginx-ingress               NGINX and  NGINX Plus Ingress Controllers ...   80        
+ubuntu                            Ubuntu is a Debian-based Linux operating sys…   15000     [OK]       
+bitnami/ubuntu                    Bitnami Ubuntu Docker Image                     80                   [OK]
 
 # 常用参数说明：
 # --filter=stars=100    只显示100星以上的镜像
 # --limit=10            限制显示结果数量为10
 # --no-trunc            不截断描述信息
 
-# 示例：搜索高星级的mysql镜像
-$ docker search --filter=stars=1000 mysql
+# 示例：搜索高星级的ubuntu镜像
+$ docker search --filter=stars=1000 ubuntu
 
 # 预期输出：
 NAME                 DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
-mysql                MySQL is a widely used, open-source relation…   14000     [OK]       
-mariadb              MariaDB Server is a high performing open sou…   5000      [OK]       
-percona              Percona Server is a fork of the MySQL relati…   600       [OK]</code></pre>
+ubuntu               Ubuntu is a Debian-based Linux operating sys…   15000     [OK]</code></pre>
           </div>
           
           <div class="code-block">
@@ -1372,21 +1357,16 @@ percona              Percona Server is a fork of the MySQL relati…   600      
             </div>
             <pre><code># 语法：docker pull [OPTIONS] NAME[:TAG|@DIGEST]
 
-# 基础用法 - 拉取最新版nginx
-$ docker pull nginx
+# 基础用法 - 拉取最新版ubuntu
+$ docker pull ubuntu
 
 # 预期输出：
 Using default tag: latest
-latest: Pulling from library/nginx
-a2abf6c4d29d: Pull complete
-a9edb18cadd1: Pull complete
-589b7251471a: Pull complete
-186b1aaa4aa6: Pull complete
-b4df32aa5a72: Pull complete
-a0bcbecc962e: Pull complete
-Digest: sha256:0d17b565c37bcbd895e9d92315a05c1c3c9a29f762b011a10c54a66cd53c9b31
-Status: Downloaded newer image for nginx:latest
-docker.io/library/nginx:latest
+latest: Pulling from library/ubuntu
+d5fd17ec1767: Pull complete
+Digest: sha256:9a0bdde4188b896a372804be2384015e90e3f8493751292d5de9e3e5f8a6f3c8
+Status: Downloaded newer image for ubuntu:latest
+docker.io/library/ubuntu:latest
 
 # 常用参数说明：
 # --all-tags, -a        拉取所有标签的镜像
@@ -1403,18 +1383,14 @@ Status: Downloaded newer image for ubuntu:22.04
 docker.io/library/ubuntu:22.04
 
 # 示例：拉取指定平台的镜像
-$ docker pull --platform linux/amd64 nginx:alpine
+$ docker pull --platform linux/amd64 ubuntu:22.04
 
 # 预期输出：
-alpine: Pulling from library/nginx
-59bf1c3509f3: Pull complete
-f2b891a61c0e: Pull complete
-4e9f2cdf4387: Pull complete
-6f54c7b5e1f4: Pull complete
-5f60a7c9a7b9: Pull complete
+22.04: Pulling from library/ubuntu
+d5fd17ec1767: Pull complete
 Digest: sha256:...（省略）
-Status: Downloaded newer image for nginx:alpine
-docker.io/library/nginx:alpine</code></pre>
+Status: Downloaded newer image for ubuntu:22.04
+docker.io/library/ubuntu:22.04</code></pre>
           </div>
         </div>
       </div>
@@ -1437,11 +1413,10 @@ $ docker images
 
 # 预期输出：
 REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
-nginx         latest    605c77e624dd   2 weeks ago    141MB
+ubuntu        latest    605c77e624dd   2 weeks ago    77.8MB
 ubuntu        22.04     a8780b506fa4   3 weeks ago    77.8MB
-mysql         8.0       3218b38490ce   4 weeks ago    538MB
-redis         latest    7614ae9453d1   5 weeks ago    113MB
-hello-world   latest    feb5d9fea6a5   6 months ago   13.3kB
+myapp         1.0       3218b38490ce   4 weeks ago    180MB
+myapp         2.0       7614ae9453d1   5 weeks ago    190MB
 
 # 常用参数说明：
 # --all, -a             显示所有镜像（包括中间层）
@@ -1460,23 +1435,20 @@ a8780b506fa4
 7614ae9453d1
 feb5d9fea6a5
 
-# 示例：过滤显示nginx相关镜像
-$ docker images nginx
+# 示例：过滤显示ubuntu相关镜像
+$ docker images ubuntu
 
 # 预期输出：
 REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
-nginx         latest    605c77e624dd   2 weeks ago    141MB
-nginx         alpine    c1f6e5674542   2 weeks ago    23.5MB
+ubuntu        latest    605c77e624dd   2 weeks ago    77.8MB
+ubuntu        22.04     a8780b506fa4   2 weeks ago    77.8MB
 
 # 示例：格式化输出（只显示仓库和大小）
 $ docker images --format "{{.Repository}}: {{.Size}}"
 
 # 预期输出：
-nginx: 141MB
 ubuntu: 77.8MB
-mysql: 538MB
-redis: 113MB
-hello-world: 13.3kB
+myapp: 180MB
 
 # 示例：显示所有镜像（包括中间层）
 $ docker images -a
@@ -1484,7 +1456,7 @@ $ docker images -a
 # 预期输出（示例）：
 REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
 <none>        <none>    abc123def456   2 hours ago    150MB
-nginx         latest    605c77e624dd   2 weeks ago    141MB
+ubuntu        latest    605c77e624dd   2 weeks ago    77.8MB
 <none>        <none>    def789ghi012   2 weeks ago    50MB</code></pre>
           </div>
           
@@ -1495,18 +1467,18 @@ nginx         latest    605c77e624dd   2 weeks ago    141MB
             </div>
             <pre><code># 语法：docker inspect [OPTIONS] NAME|ID [NAME|ID...]
 
-# 查看nginx镜像详细信息
-$ docker inspect nginx
+# 查看ubuntu镜像详细信息
+$ docker inspect ubuntu
 
 # 预期输出（部分关键信息）：
 [
     {
         "Id": "sha256:605c77e624ddb75e6110f997c58876baa13f8754486b461117934b24a9dc3a85",
         "RepoTags": [
-            "nginx:latest"
+            "ubuntu:latest"
         ],
         "RepoDigests": [
-            "nginx@sha256:0d17b565c37bcbd895e9d92315a05c1c3c9a29f762b011a10c54a66cd53c9b31"
+            "ubuntu@sha256:9a0bdde4188b896a372804be2384015e90e3f8493751292d5de9e3e5f8a6f3c8"
         ],
         "Parent": "",
         "Comment": "",
@@ -1519,35 +1491,23 @@ $ docker inspect nginx
             "AttachStdin": false,
             "AttachStdout": false,
             "AttachStderr": false,
-            "ExposedPorts": {
-                "80/tcp": {}
-            },
             "Tty": false,
             "OpenStdin": false,
             "StdinOnce": false,
             "Env": [
-                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                "NGINX_VERSION=1.21.5",
-                "NJS_VERSION=0.7.1",
-                "PKG_RELEASE=1~bullseye"
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
             ],
             "Cmd": [
                 "/bin/sh",
                 "-c",
                 "#(nop) ",
-                "CMD [\"nginx\" \"-g\" \"daemon off;\"]"
+                "CMD [\"bash\"]"
             ],
             "Image": "...",
             "Volumes": null,
             "WorkingDir": "",
-            "Entrypoint": [
-                "/docker-entrypoint.sh"
-            ],
             "OnBuild": null,
-            "Labels": {
-                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
-            },
-            "StopSignal": "SIGQUIT"
+            "Labels": {}
         },
         "DockerVersion": "20.10.7",
         "Author": "",
@@ -1556,8 +1516,8 @@ $ docker inspect nginx
         },
         "Architecture": "amd64",
         "Os": "linux",
-        "Size": 141479488,
-        "VirtualSize": 141479488,
+        "Size": 77800000,
+        "VirtualSize": 77800000,
         "GraphDriver": {
             "Data": {
                 "LowerDir": "/var/lib/docker/overlay2/.../diff",
@@ -1585,16 +1545,16 @@ $ docker inspect nginx
 # --format, -f          使用Go模板格式化输出
 
 # 示例：只查看镜像的创建时间和大小
-$ docker inspect --format='{{.Created}} {{.Size}}' nginx
+$ docker inspect --format='{{.Created}} {{.Size}}' ubuntu
 
 # 预期输出：
-2021-12-29T19:28:29.892127472Z 141479488
+2021-12-29T19:28:29.892127472Z 77800000
 
 # 示例：查看镜像的环境变量
-$ docker inspect --format='{{.Config.Env}}' nginx
+$ docker inspect --format='{{.Config.Env}}' ubuntu
 
 # 预期输出：
-[PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin NGINX_VERSION=1.21.5 NJS_VERSION=0.7.1 PKG_RELEASE=1~bullseye]</code></pre>
+[PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]</code></pre>
           </div>
         </div>
       </div>
@@ -1613,11 +1573,10 @@ $ docker inspect --format='{{.Config.Env}}' nginx
             <pre><code># 语法：docker rmi [OPTIONS] IMAGE [IMAGE...]
 
 # 基础用法 - 删除指定镜像
-$ docker rmi hello-world
+$ docker rmi myapp:1.0
 
 # 预期输出：
-Untagged: hello-world:latest
-Untagged: hello-world@sha256:97f37607ac3fa5f5e46255330be19ed1f8f47c...
+Untagged: myapp:1.0
 Deleted: sha256:feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412
 Deleted: sha256:e07ee1baac5fae6a26f30cabfe54a36d3402f96f76c7baf2f9b7f3e8b0e6f8a5
 
@@ -1626,21 +1585,21 @@ Deleted: sha256:e07ee1baac5fae6a26f30cabfe54a36d3402f96f76c7baf2f9b7f3e8b0e6f8a5
 # --no-prune            不删除未标记的父镜像
 
 # 示例：通过镜像ID删除
-$ docker rmi feb5d9fea6a5
+$ docker rmi a8780b506fa4
 
 # 预期输出：
-Untagged: hello-world:latest
-Deleted: sha256:feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412
+Untagged: ubuntu:22.04
+Deleted: sha256:a8780b506fa4e9603fe8af3e3ac99c20e2de5e3c2a1c8e8e3e3ac99c20e2de5e
 
 # 示例：强制删除正在使用的镜像
-$ docker rmi -f nginx
+$ docker rmi -f ubuntu
 
 # 预期输出：
-Untagged: nginx:latest
+Untagged: ubuntu:latest
 Deleted: sha256:605c77e624ddb75e6110f997c58876baa13f8754486b461117934b24a9dc3a85
 
 # 示例：删除多个镜像
-$ docker rmi nginx redis mysql
+$ docker rmi ubuntu myapp:1.0 myapp:2.0
 
 # 预期输出：
 Untagged: nginx:latest
@@ -1704,35 +1663,34 @@ Total reclaimed space: 500.2MB</code></pre>
             <pre><code># 语法：docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
 
 # 基础用法 - 为镜像添加新标签
-$ docker tag nginx:latest my-nginx:v1.0
+$ docker tag ubuntu:latest my-ubuntu:v1.0
 
 # 预期输出：
 # 命令成功执行，无输出（可通过docker images验证）
 
 # 验证标签是否添加成功
-$ docker images my-nginx
+$ docker images my-ubuntu
 
 # 预期输出：
 REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
-my-nginx      v1.0      605c77e624dd   2 weeks ago    141MB
+my-ubuntu     v1.0      605c77e624dd   2 weeks ago    77.8MB
 
 # 示例：为镜像添加多个标签
-$ docker tag nginx:latest my-nginx:latest
-$ docker tag nginx:latest my-nginx:1.21
-$ docker tag nginx:latest my-nginx:1.21.5
+$ docker tag ubuntu:latest my-ubuntu:latest
+$ docker tag ubuntu:latest my-ubuntu:22.04
+$ docker tag ubuntu:latest my-ubuntu:v1.0
 
 # 验证
-$ docker images my-nginx
+$ docker images my-ubuntu
 
 # 预期输出：
 REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
-my-nginx      1.21.5    605c77e624dd   2 weeks ago    141MB
-my-nginx      1.21      605c77e624dd   2 weeks ago    141MB
-my-nginx      latest    605c77e624dd   2 weeks ago    141MB
-my-nginx      v1.0      605c77e624dd   2 weeks ago    141MB
+my-ubuntu     v1.0      605c77e624dd   2 weeks ago    77.8MB
+my-ubuntu     22.04     605c77e624dd   2 weeks ago    77.8MB
+my-ubuntu     latest    605c77e624dd   2 weeks ago    77.8MB
 
 # 示例：为私有仓库准备镜像标签
-$ docker tag my-nginx:v1.0 registry.example.com/my-nginx:v1.0
+$ docker tag my-ubuntu:v1.0 registry.example.com/my-ubuntu:v1.0
 
 # 预期输出：
 # 命令成功执行，无输出
@@ -1741,7 +1699,7 @@ $ docker tag my-nginx:v1.0 registry.example.com/my-nginx:v1.0
 $ docker images | grep registry.example.com
 
 # 预期输出：
-registry.example.com/my-nginx   v1.0      605c77e624dd   2 weeks ago    141MB</code></pre>
+registry.example.com/my-ubuntu   v1.0      605c77e624dd   2 weeks ago    77.8MB</code></pre>
           </div>
           
           <div class="knowledge-point">
@@ -1770,23 +1728,23 @@ registry.example.com/my-nginx   v1.0      605c77e624dd   2 weeks ago    141MB</c
             <pre><code># 语法：docker save [OPTIONS] IMAGE [IMAGE...]
 
 # 基础用法 - 导出单个镜像
-$ docker save -o nginx-backup.tar nginx:latest
+$ docker save -o ubuntu-backup.tar ubuntu:latest
 
 # 预期输出：
 # 命令成功执行，无输出
-# 会在当前目录生成 nginx-backup.tar 文件
+# 会在当前目录生成 ubuntu-backup.tar 文件
 
 # 验证文件生成
-$ ls -lh nginx-backup.tar
+$ ls -lh ubuntu-backup.tar
 
 # 预期输出：
--rw------- 1 user group 135M Jan 15 10:30 nginx-backup.tar
+-rw------- 1 user group 78M Jan 15 10:30 ubuntu-backup.tar
 
 # 常用参数说明：
 # --output, -o          指定输出文件（代替重定向）
 
 # 示例：导出多个镜像到一个文件
-$ docker save -o my-images.tar nginx:latest redis:latest mysql:8.0
+$ docker save -o my-images.tar ubuntu:latest myapp:1.0 myapp:2.0
 
 # 预期输出：
 # 命令成功执行，无输出
@@ -1795,10 +1753,10 @@ $ docker save -o my-images.tar nginx:latest redis:latest mysql:8.0
 $ ls -lh my-images.tar
 
 # 预期输出：
--rw------- 1 user group 785M Jan 15 10:35 my-images.tar
+-rw------- 1 user group 350M Jan 15 10:35 my-images.tar
 
 # 示例：使用重定向方式导出
-$ docker save nginx:latest > nginx-backup.tar
+$ docker save ubuntu:latest > ubuntu-backup.tar
 
 # 预期输出：
 # 命令成功执行，无输出</code></pre>
@@ -1812,37 +1770,37 @@ $ docker save nginx:latest > nginx-backup.tar
             <pre><code># 语法：docker load [OPTIONS]
 
 # 基础用法 - 从tar文件导入镜像
-$ docker load -i nginx-backup.tar
+$ docker load -i ubuntu-backup.tar
 
 # 预期输出：
-Loaded image: nginx:latest
+Loaded image: ubuntu:latest
 
 # 常用参数说明：
 # --input, -i           从tar文件读取（代替重定向）
 # --quiet, -q           静默模式，减少输出
 
 # 示例：使用重定向方式导入
-$ docker load < nginx-backup.tar
+$ docker load < ubuntu-backup.tar
 
 # 预期输出：
-Loaded image: nginx:latest
+Loaded image: ubuntu:latest
 
 # 示例：导入多个镜像
 $ docker load -i my-images.tar
 
 # 预期输出：
-Loaded image: nginx:latest
-Loaded image: redis:latest
-Loaded image: mysql:8.0
+Loaded image: ubuntu:latest
+Loaded image: myapp:1.0
+Loaded image: myapp:2.0
 
 # 验证导入的镜像
 $ docker images
 
 # 预期输出：
 REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
-nginx         latest    605c77e624dd   2 weeks ago    141MB
-redis         latest    7614ae9453d1   2 weeks ago    113MB
-mysql         8.0       3218b38490ce   4 weeks ago    538MB</code></pre>
+ubuntu        latest    605c77e624dd   2 weeks ago    77.8MB
+myapp         1.0       7614ae9453d1   2 weeks ago    180MB
+myapp         2.0       3218b38490ce   4 weeks ago    190MB</code></pre>
           </div>
           
           <div class="tip-box">
@@ -2009,18 +1967,11 @@ $ cd myapp
 
 # 步骤2：创建Dockerfile文件
 $ cat > Dockerfile << 'EOF'
-FROM ubuntu:22.04
+FROM nginx:alpine
 
 LABEL maintainer="your-email@example.com"
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && \
-    apt-get install -y nginx && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY index.html /var/www/html/
+COPY index.html /usr/share/nginx/html/
 
 EXPOSE 80
 
@@ -2295,13 +2246,13 @@ FROM ubuntu
 FROM ubuntu:22.04
 
 # 示例3：使用指定平台的镜像
-FROM --platform=linux/amd64 nginx:alpine
+FROM --platform=linux/amd64 ubuntu:22.04
 
 # 示例4：使用镜像摘要（确保使用特定版本）
 FROM ubuntu@sha256:9a0bdde4188b896a372804be2384015e90e3f8493751292d5de9e3e5f8a6f3c8
 
 # 示例5：多阶段构建，指定阶段名称
-FROM golang:1.19 AS builder
+FROM ubuntu:22.04 AS builder
 
 # 示例6：从零开始构建（空镜像）
 FROM scratch</code></pre>
@@ -2550,7 +2501,7 @@ ENV API_URL=$BASE_URL/v1
 ARG VERSION=latest
 
 # 示例2：使用构建参数
-FROM node:$VERSION
+FROM ubuntu:$VERSION
 
 # 示例3：多个构建参数
 ARG NODE_VERSION=18
@@ -2565,8 +2516,8 @@ ARG BASE_IMAGE=ubuntu:22.04
 FROM $BASE_IMAGE
 
 # 示例6：ARG作用域（在FROM之后需要重新定义）
-ARG VERSION=latest
-FROM node:$VERSION
+ARG VERSION=22.04
+FROM ubuntu:$VERSION
 ARG VERSION              # 需要重新定义才能在FROM后使用
 RUN echo "Building version: $VERSION"
 
@@ -2580,7 +2531,7 @@ RUN echo "Building version: $VERSION"
 # BUILDARCH - 构建架构
 # BUILDVARIANT - 构建变体
 
-FROM alpine
+FROM ubuntu:22.04
 ARG TARGETPLATFORM
 RUN echo "Building for $TARGETPLATFORM"
 
@@ -2631,13 +2582,14 @@ ENV APP_HOME=/app
 WORKDIR $APP_HOME
 
 # 示例5：完整示例
-FROM node:18
+FROM ubuntu:22.04
 WORKDIR /app                    # 设置工作目录
-COPY package*.json ./           # 复制到/app/
-RUN npm install                 # 在/app/中执行
+COPY requirements.txt ./        # 复制到/app/
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r requirements.txt  # 在/app/中执行
 COPY . .                        # 复制所有文件到/app/
 EXPOSE 3000
-CMD ["npm", "start"]            # 在/app/中启动
+CMD ["python3", "app.py"]       # 在/app/中启动
 
 # 效果说明：
 # - 后续的RUN、CMD、ENTRYPOINT、COPY、ADD都在此目录执行
@@ -2672,19 +2624,20 @@ RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 USER appuser
 
 # 示例5：完整的安全实践示例
-FROM node:18
+FROM ubuntu:22.04
 
 # 创建非root用户
-RUN groupadd -r nodejs && useradd -r -g nodejs -s /bin/false nodejs
+RUN groupadd -r appgroup && useradd -r -g appgroup -s /bin/false appuser
 
 WORKDIR /app
 
 # 先以root安装依赖
-COPY package*.json ./
-RUN npm ci --only=production
+COPY requirements.txt ./
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r requirements.txt
 
 # 更改文件所有者
-RUN chown -R nodejs:nodejs /app
+RUN chown -R appuser:appgroup /app
 
 # 切换到非root用户运行
 USER nodejs
@@ -2738,10 +2691,11 @@ EXPOSE 53/udp
 EXPOSE 8000-8010
 
 # 示例5：完整示例
-FROM node:18
+FROM ubuntu:22.04
 WORKDIR /app
 COPY . .
-RUN npm install
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r requirements.txt
 
 # 暴露应用端口
 EXPOSE 3000
@@ -2749,7 +2703,7 @@ EXPOSE 3000
 # 暴露调试端口
 EXPOSE 9229/tcp
 
-CMD ["npm", "start"]
+CMD ["python3", "app.py"]
 
 # 使用说明：
 # EXPOSE只是声明，不会自动映射到主机端口
@@ -2815,13 +2769,14 @@ CMD ["echo", "Hello from default CMD"]
 # Custom command
 
 # 示例5：完整的Web应用示例
-FROM node:18
+FROM ubuntu:22.04
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
+COPY requirements.txt ./
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r requirements.txt
 COPY . .
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["python3", "app.py"]
 
 # 注意：
 # - Dockerfile中只能有一个CMD，多个时只有最后一个生效
@@ -2926,26 +2881,29 @@ VOLUME /data /config
 VOLUME ["/data", "/config", "/logs"]
 
 # 示例4：数据库应用示例
-FROM mysql:8.0
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y mysql-server
 VOLUME /var/lib/mysql
 EXPOSE 3306
 
 # 示例5：Web应用示例
-FROM nginx:alpine
-VOLUME ["/usr/share/nginx/html", "/etc/nginx/conf.d", "/var/log/nginx"]
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y nginx
+VOLUME ["/var/www/html", "/etc/nginx/sites-enabled", "/var/log/nginx"]
 EXPOSE 80
 
 # 示例6：应用数据持久化
-FROM node:18
+FROM ubuntu:22.04
 WORKDIR /app
 COPY . .
-RUN npm install
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r requirements.txt
 
 # 创建数据卷
 VOLUME ["/app/data", "/app/uploads"]
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["python3", "app.py"]
 
 # 使用说明：
 # 运行时挂载卷：
@@ -3059,7 +3017,7 @@ HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
   CMD mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD || exit 1
 
 # 示例5：禁用继承的健康检查
-FROM parent-image
+FROM ubuntu:22.04
 HEALTHCHECK NONE
 
 # 查看健康检查状态：
@@ -3097,50 +3055,49 @@ HEALTHCHECK NONE
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 5.1</span>
-          <h1 class="page-title">构建Node.js应用镜像</h1>
+          <h1 class="page-title">构建Web应用镜像</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Node.js Dockerfile示例</span>
+              <span class="code-title">Web应用 Dockerfile示例</span>
               <span class="code-lang">Dockerfile</span>
             </div>
-            <pre><code># 使用官方Node.js运行时作为基础镜像
-FROM node:18-alpine
+            <pre><code># 使用Ubuntu作为基础镜像
+FROM ubuntu:22.04
 
 # 设置维护者信息
 LABEL maintainer="your-email@example.com"
 LABEL version="1.0.0"
 
-# 创建应用目录
-WORKDIR /usr/src/app
+# 设置环境变量
+ENV DEBIAN_FRONTEND=noninteractive
 
-# 复制package文件（利用缓存）
-COPY package*.json ./
+# 安装Python和依赖
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# 安装依赖
-RUN npm ci --only=production
+# 设置工作目录
+WORKDIR /app
 
 # 复制应用代码
-COPY . .
+COPY app.py /app/
+COPY requirements.txt /app/
 
-# 创建非root用户
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# 更改文件所有者
-RUN chown -R nextjs:nodejs /usr/src/app
-USER nextjs
+# 安装Python依赖
+RUN pip3 install -r requirements.txt
 
 # 暴露端口
-EXPOSE 3000
+EXPOSE 5000
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
-  CMD node healthcheck.js || exit 1
+  CMD curl -f http://localhost:5000/health || exit 1
 
 # 启动应用
-CMD ["node", "server.js"]</code></pre>
+CMD ["python3", "app.py"]</code></pre>
           </div>
           
           <div class="code-block">
@@ -3149,33 +3106,33 @@ CMD ["node", "server.js"]</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 构建镜像
-$ docker build -t my-node-app:1.0 .
+$ docker build -t my-web-app:1.0 .
 
 # 预期输出：
 Sending build context to Docker daemon  15.36kB
-Step 1/12 : FROM node:18-alpine
+Step 1/8 : FROM ubuntu:22.04
  ---> 5e8ac87e3f12
-Step 2/12 : LABEL maintainer="your-email@example.com"
+Step 2/8 : LABEL maintainer="your-email@example.com"
  ---> Running in 1a2b3c4d5e6f
  ---> 7b8c9d0e1f2a
 Removing intermediate container 1a2b3c4d5e6f
 ...
-Step 12/12 : CMD ["node", "server.js"]
+Step 8/8 : CMD ["python3", "app.py"]
  ---> Running in 9i0j1k2l3m4n
  ---> 5e6f7g8h9i0j
 Removing intermediate container 9i0j1k2l3m4n
 Successfully built 5e6f7g8h9i0j
-Successfully tagged my-node-app:1.0
+Successfully tagged my-web-app:1.0
 
 # 查看构建的镜像
-$ docker images my-node-app
+$ docker images my-web-app
 
 # 预期输出：
 REPOSITORY      TAG       IMAGE ID       CREATED          SIZE
-my-node-app     1.0       5e6f7g8h9i0j   10 seconds ago   185MB
+my-web-app      1.0       5e6f7g8h9i0j   10 seconds ago   180MB
 
 # 运行容器
-$ docker run -d -p 3000:3000 --name myapp my-node-app:1.0
+$ docker run -d -p 5000:5000 --name myweb my-web-app:1.0
 
 # 预期输出：
 3a2b1c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z
@@ -3184,14 +3141,14 @@ $ docker run -d -p 3000:3000 --name myapp my-node-app:1.0
 $ docker ps
 
 # 预期输出：
-CONTAINER ID   IMAGE             COMMAND                  STATUS                    PORTS
-3a2b1c4d5e6f   my-node-app:1.0   "node server.js"         Up 5 seconds (healthy)    0.0.0.0:3000->3000/tcp
+CONTAINER ID   IMAGE              COMMAND                  STATUS                    PORTS
+3a2b1c4d5e6f   my-web-app:1.0     "python3 app.py"         Up 5 seconds (healthy)    0.0.0.0:5000->5000/tcp
 
 # 测试访问
-$ curl http://localhost:3000
+$ curl http://localhost:5000
 
 # 预期输出：
-Hello from Node.js!</code></pre>
+Hello from Web App!</code></pre>
           </div>
         </div>
       </div>
@@ -3204,42 +3161,51 @@ Hello from Node.js!</code></pre>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">多阶段构建示例（Go应用）</span>
+              <span class="code-title">多阶段构建示例（Python应用）</span>
               <span class="code-lang">Dockerfile</span>
             </div>
             <pre><code># 第一阶段：构建阶段
-FROM golang:1.21-alpine AS builder
+FROM ubuntu:22.04 AS builder
 
-# 安装构建依赖
-RUN apk add --no-cache git
+# 安装Python和构建依赖
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 # 设置工作目录
 WORKDIR /app
 
 # 复制依赖文件
-COPY go.mod go.sum ./
-RUN go mod download
+COPY requirements.txt ./
+
+# 创建虚拟环境并安装依赖
+RUN python3 -m venv /opt/venv
+RUN /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # 复制源代码
 COPY . .
 
-# 构建应用（静态链接）
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
-
 # 第二阶段：运行阶段（使用最小镜像）
-FROM alpine:latest
+FROM ubuntu:22.04
 
-# 安装CA证书（用于HTTPS请求）
-RUN apk --no-cache add ca-certificates
+# 安装Python运行时（最小化安装）
+RUN apt-get update && apt-get install -y python3 && rm -rf /var/lib/apt/lists/*
+
+# 从构建阶段复制虚拟环境
+COPY --from=builder /opt/venv /opt/venv
+
+# 设置环境变量
+ENV PATH="/opt/venv/bin:$PATH"
 
 # 创建非root用户
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # 设置工作目录
-WORKDIR /root/
+WORKDIR /app
 
-# 从构建阶段复制二进制文件
-COPY --from=builder /app/main .
+# 复制应用代码
+COPY --from=builder /app .
+
+# 更改文件所有者
+RUN chown -R appuser:appgroup /app
 
 # 切换到非root用户
 USER appuser
@@ -3248,7 +3214,7 @@ USER appuser
 EXPOSE 8080
 
 # 启动应用
-CMD ["./main"]</code></pre>
+CMD ["python3", "app.py"]</code></pre>
           </div>
           
           <div class="code-block">
@@ -3257,41 +3223,41 @@ CMD ["./main"]</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 构建多阶段镜像
-$ docker build -t my-go-app:multi -f Dockerfile.multi .
+$ docker build -t my-python-app:multi -f Dockerfile.multi .
 
 # 预期输出：
 Sending build context to Docker daemon  25.6kB
-Step 1/12 : FROM golang:1.21-alpine AS builder
+Step 1/12 : FROM ubuntu:22.04 AS builder
  ---> 3a4b5c6d7e8f
 ...
-Step 12/12 : CMD ["./main"]
+Step 12/12 : CMD ["python3", "app.py"]
  ---> Running in 1a2b3c4d5e6f
  ---> 9f8e7d6c5b4a
 Successfully built 9f8e7d6c5b4a
-Successfully tagged my-go-app:multi
+Successfully tagged my-python-app:multi
 
 # 查看多阶段构建的镜像大小
-$ docker images my-go-app:multi
+$ docker images my-python-app:multi
 
 # 预期输出：
 REPOSITORY      TAG       IMAGE ID       CREATED          SIZE
-my-go-app       multi     9f8e7d6c5b4a   10 seconds ago   15.2MB
+my-python-app   multi     9f8e7d6c5b4a   10 seconds ago   120MB
 
-# 对比：单阶段构建（使用完整Go镜像）
-$ docker build -t my-go-app:single -f Dockerfile.single .
+# 对比：单阶段构建（使用完整Ubuntu镜像）
+$ docker build -t my-python-app:single -f Dockerfile.single .
 
 # 查看单阶段镜像大小
-$ docker images my-go-app
+$ docker images my-python-app
 
 # 预期输出：
 REPOSITORY      TAG       IMAGE ID       CREATED          SIZE
-my-go-app       single    1a2b3c4d5e6f   1 minute ago     850MB
-my-go-app       multi     9f8e7d6c5b4a   2 minutes ago    15.2MB
+my-python-app   single    1a2b3c4d5e6f   1 minute ago     450MB
+my-python-app   multi     9f8e7d6c5b4a   2 minutes ago    120MB
 
 # 大小对比：
-# 单阶段：850MB（包含完整的Go编译环境）
-# 多阶段：15.2MB（只包含编译后的二进制文件和Alpine基础）
-# 节省空间：约98%</code></pre>
+# 单阶段：450MB（包含完整的构建工具）
+# 多阶段：120MB（只包含运行时和依赖）
+# 节省空间：约73%</code></pre>
           </div>
           
           <div class="highlight-box">
@@ -3353,13 +3319,13 @@ RUN apt-get update && \
 # 优化前镜像大小：约250MB
 # 优化后镜像大小：约180MB
 
-# 进一步优化（使用slim版本）
-FROM debian:bullseye-slim
+# 进一步优化（清理缓存）
+FROM ubuntu:22.04
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl vim git && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 最终镜像大小：约90MB</code></pre>
+# 最终镜像大小：约120MB</code></pre>
           </div>
           
           <div class="knowledge-point">
