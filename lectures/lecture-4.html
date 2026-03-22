@@ -883,6 +883,14 @@ $ docker logout registry.example.com
 
       <div class="page section-page">
         <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">Docker镜像概述</h1>
+          <p class="section-desc">理解Docker镜像的概念与特点</p>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
           <span class="section-label">Part 0.5</span>
           <h1 class="section-title">Docker系统基础命令</h1>
           <p class="section-desc">掌握Docker命令体系的基础</p>
@@ -1509,74 +1517,367 @@ docker run ubuntu       ≈  docker container run ubuntu
 
       <div class="page section-page">
         <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">Docker镜像概述</h1>
+          <p class="section-desc">理解Docker镜像的概念与特点</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.1</span>
+          <h1 class="page-title">镜像的基本概念</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">镜像定义</div>
+            <div class="definition-content">
+              Docker镜像是一个<span class="highlight">只读模板</span>，采用<span class="highlight">分层存储（Layered）</span>架构。镜像包含运行容器所需的所有内容：代码、运行时环境、库、环境变量和配置文件。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">镜像分层结构示意</span>
+              <span class="code-lang">概念说明</span>
+            </div>
+            <pre><code>┌────────────────────────────────────────┐
+│            应用层 (Application Layer)    │  ← 你的代码
+│            COPY app.py /app/            │
+├────────────────────────────────────────┤
+│            依赖层 (Dependencies Layer)   │  ← 依赖库
+│            RUN pip install flask        │
+├────────────────────────────────────────┤
+│            运行时层 (Runtime Layer)      │  ← Ubuntu系统
+│            FROM ubuntu:22.04            │
+├────────────────────────────────────────┤
+│            基础层 (Base Layer)           │  ← 操作系统
+│            Ubuntu / Alpine / Debian     │
+└────────────────────────────────────────┘
+
+分层优势：
+1. 共享层：多个镜像可共享相同的基础层，节省存储
+2. 快速构建：只重建变化的层，未变化层使用缓存
+3. 高效分发：只需传输差异层，加快镜像拉取</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">镜像命名规范</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">官方镜像</span>：ubuntu、alpine、debian（无命名空间前缀）</p>
+              <p>- <span class="key-point">用户镜像</span>：username/image-name（带用户名前缀）</p>
+              <p>- <span class="key-point">私有仓库</span>：registry.example.com/namespace/image:tag</p>
+              <p>- <span class="key-point">标签格式</span>：image:tag（默认latest）、image@sha256:digest</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 1.2</span>
+          <h1 class="page-title">docker images - 列出本地镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker images</span>命令用于列出本地已有的Docker镜像。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker images - 列出本地镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 列出本地所有镜像
+$ docker images
+
+# 预期输出：
+REPOSITORY    TAG       IMAGE ID       CREATED       SIZE
+ubuntu        22.04     8a3cdc5b6e1a   2 weeks ago   77.8MB
+nginx         alpine    516ad2c2e2a9   3 weeks ago   22.5MB
+hello-world   latest    feb5d9fea6a5   8 months ago  13.3kB
+
+# 参数说明：
+# -a, --all           显示所有镜像（包括中间层）
+# -q, --quiet         只显示镜像ID
+# --filter            根据条件过滤镜像</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">输出字段说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">REPOSITORY</span>：镜像仓库名称</p>
+              <p>- <span class="key-point">TAG</span>：镜像标签版本</p>
+              <p>- <span class="key-point">IMAGE ID</span>：镜像唯一标识符</p>
+              <p>- <span class="key-point">CREATED</span>：镜像创建时间</p>
+              <p>- <span class="key-point">SIZE</span>：镜像大小</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">镜像操作命令</h1>
+          <p class="section-desc">掌握镜像的搜索、拉取、标记、推送等操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">docker pull - 拉取镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker pull</span>命令用于从Docker仓库拉取镜像到本地。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker pull - 拉取镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 拉取官方镜像（默认tag为latest）
+$ docker pull ubuntu:latest
+
+# 拉取特定版本标签
+$ docker pull ubuntu:22.04
+
+# 拉取私有仓库镜像
+$ docker pull registry.example.com/myapp:v1.0
+
+# 拉取所有标签（如果仓库支持）
+$ docker pull -a ubuntu
+
+# 参数说明：
+# -a, --all-tags           下载所有标签的镜像
+# --platform               指定平台（多平台镜像）
+# -q, --quiet              静默模式，不显示进度</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">镜像拉取流程</div>
+            <div class="kp-content">
+              <p>1. 解析镜像名称，确定仓库地址</p>
+              <p>2. 向仓库API请求镜像清单</p>
+              <p>3. 从仓库下载各个镜像层</p>
+              <p>4. 组合所有层创建本地镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
+          <h1 class="page-title">docker tag - 标记镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker tag</span>命令用于给镜像打标签，通常在推送镜像到仓库前使用。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker tag - 标记镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 给镜像打标签（格式：registry/namespace/image:tag）
+$ docker tag myapp:v1.0 registry.example.com/myapp:v1.0
+
+# 给镜像打一个新标签（不修改原标签）
+$ docker tag ubuntu:22.04 my-ubuntu:custom
+
+# 参数说明：
+# SOURCE_IMAGE：源镜像名称或ID
+# TARGET_IMAGE：目标镜像名称（通常包含仓库地址）</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.3</span>
+          <h1 class="page-title">docker push - 推送镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker push</span>命令用于将本地镜像推送到远程仓库。推送前需要先登录并标记镜像。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker push - 推送镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 登录到私有仓库
+$ docker login registry.example.com
+
+# 2. 给镜像打标签
+$ docker tag myapp:v1.0 registry.example.com/myapp:v1.0
+
+# 3. 推送到私有仓库
+$ docker push registry.example.com/myapp:v1.0
+
+# 推送成功输出示例：
+# The push refers to repository [registry.example.com/myapp]
+# v1.0: digest: sha256:abc123... size: 2048</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">注意事项</div>
+            <p>推送前必须先登录到目标仓库，且当前用户有推送权限。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.4</span>
+          <h1 class="page-title">docker rmi - 删除镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker rmi</span>命令用于删除本地镜像。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker rmi - 删除镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 删除单个镜像
+$ docker rmi ubuntu:22.04
+
+# 强制删除镜像（即使有容器使用）
+$ docker rmi -f nginx:alpine
+
+# 删除多个镜像
+$ docker rmi ubuntu:22.04 nginx:alpine
+
+# 删除所有未使用的镜像
+$ docker image prune -a
+
+# 参数说明：
+# -f, --force          强制删除
+# --no-prune           不删除未标签的父镜像</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5</span>
+          <h1 class="page-title">docker search - 搜索镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker search</span>命令用于在Docker Hub搜索公开镜像。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker search - 搜索镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 搜索镜像
+$ docker search ubuntu
+
+# 预期输出：
+NAME                DESCRIPTION                STARS    OFFICIAL    AUTOMATED
+ubuntu              Ubuntu is a Debian-based…  12345    [OK]
+...
+
+# 参数说明：
+# --limit 100            限制搜索结果数量
+# --filter stars=100     筛选stars大于100的镜像
+
+# 示例：搜索star超过100的nginx镜像
+$ docker search nginx --filter stars=100</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
           <span class="section-label">实验</span>
-          <h1 class="section-title">动手实验</h1>
-          <p class="section-desc">掌握Docker基础命令和镜像操作</p>
+          <h1 class="section-title">动手实验：Docker镜像命令实践</h1>
+          <p class="section-desc">掌握Docker镜像的搜索、拉取、标记、推送等操作</p>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验一</span>
-          <h1 class="page-title">Docker安装与基础验证</h1>
+          <h1 class="page-title">Docker镜像基础操作</h1>
         </div>
         <div class="page-body">
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">Docker安装与基础验证</span>
+              <span class="experiment-title">Docker镜像基础操作练习</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>掌握Docker的安装方法，验证Docker运行状态，理解Docker基础概念</p>
+              <p>掌握Docker镜像的搜索、拉取、查看、删除等基本操作</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
               <div class="step-item">
                 <span class="step-num">1</span>
-                <span class="step-text"><strong>检查Docker安装状态</strong>：使用docker version和docker info查看Docker版本和系统信息</span>
+                <span class="step-text">使用docker search搜索镜像</span>
               </div>
               <div class="step-item">
                 <span class="step-num">2</span>
-                <span class="step-text"><strong>验证Docker服务状态</strong>：使用systemctl status docker检查服务是否正常运行</span>
+                <span class="step-text">使用docker pull拉取镜像</span>
               </div>
               <div class="step-item">
                 <span class="step-num">3</span>
-                <span class="step-text"><strong>运行测试容器</strong>：运行docker run hello-world验证Docker功能是否正常</span>
+                <span class="step-text">使用docker images查看本地镜像</span>
               </div>
               <div class="step-item">
                 <span class="step-num">4</span>
-                <span class="step-text"><strong>查看Docker帮助</strong>：使用docker --help查看所有可用命令</span>
+                <span class="step-text">使用docker tag标记镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text">使用docker rmi删除镜像</span>
               </div>
             </div>
           </div>
+
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
               <span class="code-title">实验命令</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 步骤1：检查Docker版本
-$ docker version
+            <pre><code># 步骤1：搜索镜像
+$ docker search ubuntu
 
-# 步骤2：查看Docker系统信息
-$ docker info
+# 步骤2：拉取镜像
+$ docker pull ubuntu:22.04
+$ docker pull nginx:alpine
 
-# 步骤3：检查Docker服务状态
-$ sudo systemctl status docker
+# 步骤3：查看本地镜像
+$ docker images
 
-# 步骤4：运行测试容器
-$ docker run hello-world
+# 步骤4：给镜像打标签
+$ docker tag ubuntu:22.04 my-ubuntu:v1.0
 
-# 步骤5：查看帮助信息
-$ docker --help</code></pre>
+# 步骤5：删除镜像
+$ docker rmi my-ubuntu:v1.0</code></pre>
           </div>
+
           <div class="highlight-box">
             <div class="highlight-title">验证清单</div>
             <div class="highlight-content">
-              <p>- [ ] docker version显示Client和Server版本</p>
-              <p>- [ ] docker info显示Containers和Images数量</p>
-              <p>- [ ] Docker服务状态为active (running)</p>
-              <p>- [ ] hello-world容器运行成功</p>
+              <p>- [ ] 成功搜索并找到ubuntu镜像</p>
+              <p>- [ ] 成功拉取两个镜像</p>
+              <p>- [ ] docker images显示正确的镜像信息</p>
+              <p>- [ ] 成功给镜像打上新标签</p>
+              <p>- [ ] 成功删除不需要的镜像</p>
             </div>
           </div>
         </div>
@@ -1585,78 +1886,67 @@ $ docker --help</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验二</span>
-          <h1 class="page-title">Docker镜像与容器基础操作</h1>
+          <h1 class="page-title">Docker镜像管理与仓库操作</h1>
         </div>
         <div class="page-body">
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">Docker镜像与容器基础操作</span>
+              <span class="experiment-title">Docker镜像管理与仓库操作</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>掌握Docker镜像的拉取、查看、删除操作，以及容器的创建、查看、删除操作</p>
+              <p>掌握Docker镜像的导出导入和仓库推送操作</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
               <div class="step-item">
                 <span class="step-num">1</span>
-                <span class="step-text"><strong>拉取镜像</strong>：从Docker Hub拉取ubuntu和nginx镜像</span>
+                <span class="step-text">使用docker save导出镜像</span>
               </div>
               <div class="step-item">
                 <span class="step-num">2</span>
-                <span class="step-text"><strong>查看本地镜像</strong>：使用docker images列出本地镜像</span>
+                <span class="step-text">使用docker load导入镜像</span>
               </div>
               <div class="step-item">
                 <span class="step-num">3</span>
-                <span class="step-text"><strong>运行容器</strong>：运行ubuntu交互式容器和nginx后台容器</span>
+                <span class="step-text">使用docker history查看镜像分层</span>
               </div>
               <div class="step-item">
                 <span class="step-num">4</span>
-                <span class="step-text"><strong>查看容器</strong>：使用docker ps查看运行中的容器，docker ps -a查看所有容器</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text"><strong>清理环境</strong>：停止并删除容器，删除不需要的镜像</span>
+                <span class="step-text">清理环境，删除不需要的镜像</span>
               </div>
             </div>
           </div>
+
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
               <span class="code-title">实验命令</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 步骤1：拉取镜像
-$ docker pull ubuntu:22.04
-$ docker pull nginx:alpine
+            <pre><code># 步骤1：导出镜像为tar文件
+$ docker save ubuntu:22.04 -o ubuntu22.tar
 
-# 步骤2：查看本地镜像
-$ docker images
+# 步骤2：导入镜像
+$ docker load -i ubuntu22.tar
 
-# 步骤3：运行交互式Ubuntu容器
-$ docker run -it --name my-ubuntu ubuntu:22.04 /bin/bash
-# 退出容器：exit或Ctrl+P+Q
+# 步骤3：查看镜像分层历史
+$ docker history ubuntu:22.04
 
-# 步骤4：后台运行Nginx容器
-$ docker run -d --name my-nginx -p 8080:80 nginx:alpine
+# 步骤4：清理环境
+$ docker rmi ubuntu:22.04
 
-# 步骤5：查看容器
-$ docker ps
-$ docker ps -a
-
-# 步骤6：清理环境
-$ docker stop my-ubuntu my-nginx
-$ docker rm my-ubuntu my-nginx
-$ docker rmi ubuntu:22.04 nginx:alpine</code></pre>
+# 验证结果
+$ docker images</code></pre>
           </div>
+
           <div class="highlight-box">
             <div class="highlight-title">验证清单</div>
             <div class="highlight-content">
-              <p>- [ ] 成功拉取ubuntu和nginx镜像</p>
-              <p>- [ ] docker images显示两个镜像</p>
-              <p>- [ ] Ubuntu容器可以交互式操作</p>
-              <p>- [ ] Nginx容器后台运行，访问localhost:8080有响应</p>
-              <p>- [ ] 成功清理所有容器和镜像</p>
+              <p>- [ ] 成功导出镜像到tar文件</p>
+              <p>- [ ] 成功从tar文件导入镜像</p>
+              <p>- [ ] docker history显示镜像分层信息</p>
+              <p>- [ ] 成功清理所有镜像</p>
             </div>
           </div>
         </div>
