@@ -1407,6 +1407,47 @@ nginx-web    0.0.0.0:8080->80/tcp</code></pre>
               <p>- 动态端口：生产环境建议使用固定端口</p>
             </div>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">端口映射故障排查</div>
+            <div class="kp-content">
+              <p><strong>问题1：端口被占用</strong></p>
+              <p>错误信息：<code>port is already allocated</code></p>
+              <pre><code># Windows查看端口占用
+$ netstat -ano | findstr :8080
+
+# Linux/Mac查看端口占用
+$ lsof -i :8080
+
+# 解决方案1：更换端口
+$ docker run -d -p 8081:80 --name web nginx
+
+# 解决方案2：停止占用端口的进程或容器</code></pre>
+
+              <p><strong>问题2：容器启动成功但访问失败</strong></p>
+              <p>错误信息：<code>ERR_CONNECTION_REFUSED</code></p>
+              <pre><code># 1. 确认容器正在运行
+$ docker ps
+
+# 2. 检查端口映射
+$ docker port web
+# 预期输出：80/tcp -> 0.0.0.0:8080
+
+# 3. 查看容器日志
+$ docker logs web
+
+# 4. 检查防火墙（Windows）
+# 关闭防火墙或添加端口例外</code></pre>
+
+              <p><strong>问题3：混淆端口映射方向</strong></p>
+              <p>常见错误：<code>-p 80:8080</code>（写反了）</p>
+              <pre><code># 正确理解：-p 宿主机端口:容器端口
+# 外部访问 -> 宿主机:8080 -> 容器:80
+$ docker run -d -p 8080:80 nginx
+
+# 记忆方法：外部 -> 内部，从左到右</code></pre>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2152,6 +2193,174 @@ my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
               <p>- <span class="key-point">NET I/O</span>：网络输入/输出</p>
               <p>- <span class="key-point">BLOCK I/O</span>：块设备输入/输出</p>
               <p>- <span class="key-point">PIDS</span>：进程数量</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.3</span>
+          <h1 class="page-title">实战：部署Web个人主页</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">实战目标</div>
+            <div class="definition-content">
+              通过本节实战，您将掌握使用Docker部署静态Web网站的完整流程，包括：创建网页文件、挂载数据卷、修改网页内容、部署上线。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤1：创建网页文件</span>
+              <span class="code-lang">HTML</span>
+            </div>
+            <pre><code># 在主机创建网页目录和文件
+# 创建 index.html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;我的个人主页&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .info { font-size: 1.1rem; margin: 0.5rem 0; opacity: 0.9; }
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.5rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="container"&gt;
+        &lt;h1&gt;你好，我是张三&lt;/h1&gt;
+        &lt;p class="info"&gt;计算机科学与技术专业&lt;/p&gt;
+        &lt;p class="info"&gt;XX大学&lt;/p&gt;
+        &lt;div style="margin-top: 2rem;"&gt;
+            &lt;span class="badge"&gt;Docker&lt;/span&gt;
+            &lt;span class="badge"&gt;Web开发&lt;/span&gt;
+            &lt;span class="badge"&gt;云计算&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style="margin-top: 2rem; opacity: 0.7;"&gt;
+            Powered by Docker + Nginx
+        &lt;/p&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤2：启动Nginx容器并挂载网页目录</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动Nginx容器，将主机网页目录挂载到容器内
+# Windows PowerShell
+$ docker run -d -p 8080:80 --name my-website `
+  -v /path/to/html:/usr/share/nginx/html `
+  nginx
+
+# Linux/Mac
+$ docker run -d -p 8080:80 --name my-website \
+  -v $(pwd):/usr/share/nginx/html \
+  nginx
+
+# 参数说明：
+# -d              后台运行
+# -p 8080:80      端口映射（宿主机8080 -> 容器80）
+# --name          容器名称
+# -v              挂载数据卷（主机路径:容器路径）
+# nginx           使用的镜像</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤3：验证部署</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 检查容器状态
+$ docker ps | grep my-website
+
+# 查看端口映射
+$ docker port my-website
+
+# 查看容器日志
+$ docker logs my-website
+
+# 浏览器访问
+# 打开浏览器访问 http://localhost:8080</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤4：修改网页内容</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 方法1：直接修改主机文件（推荐）
+# 直接编辑主机的 index.html 文件，刷新浏览器即可看到更新
+
+# 方法2：进入容器修改
+$ docker exec -it my-website bash
+root@abc123:/# cd /usr/share/nginx/html
+root@abc123:/# echo '&lt;h1&gt;Hello Docker!&lt;/h1&gt;' > index.html
+root@abc123:/# exit
+
+# 方法3：使用docker cp拷贝文件
+$ docker cp index.html my-website:/usr/share/nginx/html/
+
+# 验证修改
+# 刷新浏览器 http://localhost:8080</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">数据卷挂载的优势</div>
+            <p><strong>实时同步：</strong>主机修改文件，容器内立即生效</p>
+            <p><strong>数据持久化：</strong>删除容器后数据不丢失</p>
+            <p><strong>便于开发：</strong>可以使用主机编辑器开发，容器即时预览</p>
+          </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">常见问题排查</div>
+            <div class="highlight-content">
+              <p><strong>问题1：403 Forbidden错误</strong></p>
+              <p>原因：没有index.html或文件权限问题</p>
+              <pre><code># 检查文件是否存在
+$ docker exec my-website ls -l /usr/share/nginx/html/
+
+# 修复权限
+$ docker exec my-website chmod -R 755 /usr/share/nginx/html</code></pre>
+
+              <p><strong>问题2：Windows路径问题</strong></p>
+              <p>原因：反斜杠需要改为正斜杠</p>
+              <pre><code># 错误
+-v C:\Users\...\html:/usr/share/nginx/html
+
+# 正确
+-v C:/Users/.../html:/usr/share/nginx/html</code></pre>
             </div>
           </div>
         </div>
