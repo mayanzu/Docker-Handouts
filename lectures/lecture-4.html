@@ -993,6 +993,39 @@ hello-world   latest    feb5d9fea6a5   8 months ago  13.3kB
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 2.1</span>
+          <h1 class="page-title">docker search - 搜索镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker search</span>命令用于在Docker Hub搜索公开镜像，是发现镜像的第一步。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker search - 搜索镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 搜索镜像
+$ docker search ubuntu
+
+# 预期输出：
+NAME                DESCRIPTION                STARS    OFFICIAL    AUTOMATED
+ubuntu              Ubuntu is a Debian-based…  12345    [OK]
+...
+
+# 参数说明：
+# --limit 100            限制搜索结果数量
+# --filter stars=100     筛选stars大于100的镜像
+
+# 示例：搜索star超过100的nginx镜像
+$ docker search nginx --filter stars=100</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.2</span>
           <h1 class="page-title">docker pull - 拉取镜像</h1>
         </div>
         <div class="page-body">
@@ -1037,7 +1070,7 @@ $ docker pull -a ubuntu
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.2</span>
+          <span class="page-number">Part 2.3</span>
           <h1 class="page-title">docker tag - 标记镜像</h1>
         </div>
         <div class="page-body">
@@ -1065,7 +1098,7 @@ $ docker tag ubuntu:22.04 my-ubuntu:custom
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.3</span>
+          <span class="page-number">Part 2.4</span>
           <h1 class="page-title">docker push - 推送镜像</h1>
         </div>
         <div class="page-body">
@@ -1101,12 +1134,12 @@ $ docker push registry.example.com/myapp:v1.0
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.4</span>
+          <span class="page-number">Part 2.5</span>
           <h1 class="page-title">docker rmi - 删除镜像</h1>
         </div>
         <div class="page-body">
           <p class="paragraph">
-            <span class="highlight">docker rmi</span>命令用于删除本地镜像。
+            <span class="highlight">docker rmi</span>命令用于删除本地镜像，释放存储空间。
           </p>
 
           <div class="code-block">
@@ -1129,39 +1162,6 @@ $ docker image prune -a
 # 参数说明：
 # -f, --force          强制删除
 # --no-prune           不删除未标签的父镜像</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 2.5</span>
-          <h1 class="page-title">docker search - 搜索镜像</h1>
-        </div>
-        <div class="page-body">
-          <p class="paragraph">
-            <span class="highlight">docker search</span>命令用于在Docker Hub搜索公开镜像。
-          </p>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker search - 搜索镜像</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 搜索镜像
-$ docker search ubuntu
-
-# 预期输出：
-NAME                DESCRIPTION                STARS    OFFICIAL    AUTOMATED
-ubuntu              Ubuntu is a Debian-based…  12345    [OK]
-...
-
-# 参数说明：
-# --limit 100            限制搜索结果数量
-# --filter stars=100     筛选stars大于100的镜像
-
-# 示例：搜索star超过100的nginx镜像
-$ docker search nginx --filter stars=100</code></pre>
           </div>
         </div>
       </div>
