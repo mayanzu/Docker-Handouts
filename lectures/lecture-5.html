@@ -739,48 +739,85 @@ $ docker attach --sig-proxy=false my-ubuntu
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 3.1</span>
-          <h1 class="page-title">CPU资源限制</h1>
+          <h1 class="page-title">CPU资源限制 --cpus</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">CPU限制参数</span>
+              <span class="code-title">--cpus 限制CPU核心数</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 语法：docker run --cpus &lt;value&gt; --cpu-shares &lt;value&gt; --cpuset-cpus &lt;value&gt; IMAGE
+            <pre><code># 语法：docker run --cpus &lt;value&gt; IMAGE
+# 作用：限制容器可以使用的CPU核心数
 
 # 示例：限制Ubuntu容器使用1个CPU核心
 $ docker run -d --name ubuntu-cpu1 --cpus 1 ubuntu:22.04 sleep infinity
-
-# 示例：设置CPU权重（相对值）
-$ docker run -d --name ubuntu-high --cpu-shares 1024 ubuntu:22.04 sleep infinity
-$ docker run -d --name ubuntu-low --cpu-shares 512 ubuntu:22.04 sleep infinity
-# 当CPU资源竞争时，ubuntu-high获得2倍于ubuntu-low的CPU时间
-
-# 示例：指定容器使用特定CPU核心（0和1）
-$ docker run -d --name ubuntu-pinned --cpuset-cpus 0,1 ubuntu:22.04 sleep infinity
-
-# 示例：限制CPU使用百分比
-$ docker run -d --name ubuntu-half --cpus 0.5 ubuntu:22.04 sleep infinity  # 使用50%的CPU
-
-# 示例：设置CPU周期和配额
-$ docker run -d --name ubuntu-quota --cpu-period 100000 --cpu-quota 50000 ubuntu:22.04 sleep infinity
-# cpu-period：CPU周期（微秒）
-# cpu-quota：CPU配额（微秒）
-# 50000/100000 = 50% CPU使用率
 
 # 验证CPU限制
 $ docker inspect --format '{{.HostConfig.NanoCpus}}' ubuntu-cpu1
 # 输出：1000000000（1个CPU核心，单位纳秒）</code></pre>
           </div>
-          
           <div class="knowledge-point">
-            <div class="kp-title">CPU限制说明</div>
+            <div class="kp-title">说明</div>
             <div class="kp-content">
-              <p>- <span class="key-point">--cpus</span>：限制容器可以使用的CPU核心数</p>
-              <p>- <span class="key-point">--cpu-shares</span>：设置CPU权重，当CPU资源竞争时生效</p>
-              <p>- <span class="key-point">--cpuset-cpus</span>：指定容器可以使用的CPU核心</p>
-              <p>- <span class="key-point">--cpu-period/--cpu-quota</span>：更精细的CPU使用限制</p>
+              <p><span class="key-point">--cpus</span>：限制容器可以使用的CPU核心数，可以是小数（如0.5表示半个核心）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">CPU资源限制 --cpu-shares</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--cpu-shares 设置CPU权重</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --cpu-shares &lt;value&gt; IMAGE
+# 作用：设置CPU权重，当CPU资源竞争时生效（相对值）
+
+# 示例：设置CPU权重（相对值）
+$ docker run -d --name ubuntu-high --cpu-shares 1024 ubuntu:22.04 sleep infinity
+$ docker run -d --name ubuntu-low --cpu-shares 512 ubuntu:22.04 sleep infinity
+# 当CPU资源竞争时，ubuntu-high获得2倍于ubuntu-low的CPU时间</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--cpu-shares</span>：设置CPU权重，当CPU资源竞争时生效。默认值为1024，值越大权重越高</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.1</span>
+          <h1 class="page-title">CPU资源限制 --cpuset-cpus</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--cpuset-cpus 指定CPU核心</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --cpuset-cpus &lt;value&gt; IMAGE
+# 作用：指定容器可以使用的CPU核心（逗号分隔或范围）
+
+# 示例：指定容器使用特定CPU核心（0和1）
+$ docker run -d --name ubuntu-pinned --cpuset-cpus 0,1 ubuntu:22.04 sleep infinity
+
+# 示例：使用范围表示法（等同于0,1）
+$ docker run -d --name ubuntu-range --cpuset-cpus 0-1 ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--cpuset-cpus</span>：指定容器可以使用的CPU核心。可以是逗号分隔的列表（如"0,1,2"）或范围（如"0-3"）</p>
             </div>
           </div>
         </div>
@@ -789,28 +826,19 @@ $ docker inspect --format '{{.HostConfig.NanoCpus}}' ubuntu-cpu1
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 3.2</span>
-          <h1 class="page-title">内存资源限制</h1>
+          <h1 class="page-title">内存资源限制 --memory</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">内存限制参数</span>
+              <span class="code-title">--memory 硬内存限制</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 语法：docker run --memory &lt;value&gt; --memory-swap &lt;value&gt; IMAGE
+            <pre><code># 语法：docker run --memory &lt;value&gt; IMAGE
+# 作用：限制容器使用的内存，不能超过此值
 
 # 示例：限制Ubuntu容器使用512MB内存
 $ docker run -d --name ubuntu-mem --memory 512m ubuntu:22.04 sleep infinity
-
-# 示例：限制内存和交换空间
-$ docker run -d --name ubuntu-swap --memory 512m --memory-swap 1g ubuntu:22.04 sleep infinity
-# memory-swap = memory + swap，所以swap = 1g - 512m = 512m
-
-# 示例：设置内存软限制（警告但不强制）
-$ docker run -d --name ubuntu-soft --memory 512m --memory-reservation 256m ubuntu:22.04 sleep infinity
-
-# 示例：禁用OOM killer（谨慎使用）
-$ docker run -d --name ubuntu-no-oom --oom-kill-disable --memory 512m ubuntu:22.04 sleep infinity
 
 # 内存单位：b, k, m, g（字节、KB、MB、GB）
 
@@ -822,14 +850,118 @@ $ docker inspect --format '{{.HostConfig.Memory}}' ubuntu-mem
 $ docker exec ubuntu-mem cat /sys/fs/cgroup/memory/memory.limit_in_bytes
 536870912</code></pre>
           </div>
-          
           <div class="knowledge-point">
-            <div class="kp-title">内存限制说明</div>
+            <div class="kp-title">说明</div>
             <div class="kp-content">
-              <p>- <span class="key-point">--memory</span>：硬限制，容器使用的内存不能超过此值</p>
-              <p>- <span class="key-point">--memory-swap</span>：内存+交换空间的总限制</p>
-              <p>- <span class="key-point">--memory-reservation</span>：软限制，内存紧张时会触发</p>
-              <p>- <span class="key-point">--oom-kill-disable</span>：禁用OOM killer（谨慎使用）</p>
+              <p><span class="key-point">--memory</span>：硬限制，容器使用的内存不能超过此值。如果容器尝试使用更多内存，会被OOM killer终止</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">内存资源限制 --memory-swap</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--memory-swap 交换空间限制</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --memory &lt;mem&gt; --memory-swap &lt;swap&gt; IMAGE
+# 作用：memory-swap = memory + swap，限制总内存使用
+
+# 示例：限制内存512MB，交换空间1GB
+$ docker run -d --name ubuntu-swap \
+  --memory 512m --memory-swap 1g ubuntu:22.04 sleep infinity
+# swap = 1g - 512m = 512m
+
+# 注意：--memory-swap必须大于--memory</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--memory-swap</span>：内存+交换空间的总限制。当物理内存不足时，使用交换空间</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">内存资源限制 --memory-reservation</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--memory-reservation 软限制</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --memory &lt;mem&gt; --memory-reservation &lt;res&gt; IMAGE
+# 作用：设置软限制，内存紧张时触发，不强制执行
+
+# 示例：硬限制512MB，软限制256MB
+$ docker run -d --name ubuntu-soft \
+  --memory 512m --memory-reservation 256m ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--memory-reservation</span>：软限制，当系统内存不足时会提前警告，不会强制终止容器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.2</span>
+          <h1 class="page-title">内存资源限制 --oom-kill-disable</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--oom-kill-disable 禁用OOM killer</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --oom-kill-disable --memory &lt;mem&gt; IMAGE
+# 作用：禁用Out-Of-Memory killer，容器内存不足时不会自动终止
+
+# 示例：禁用OOM killer
+$ docker run -d --name ubuntu-no-oom \
+  --oom-kill-disable --memory 512m ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          <div class="tip-box">
+            <div class="tip-title">警告</div>
+            <p><span class="highlight">谨慎使用</span>：禁用OOM killer后，如果容器耗尽内存，可能会影响宿主机上其他进程</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">IO资源限制 --blkio-weight</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--blkio-weight IO权重</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --blkio-weight &lt;value&gt; IMAGE
+# 作用：设置块设备IO权重（10-1000），影响IO调度优先级
+
+# 示例：设置IO权重为500（默认100）
+$ docker run -d --name ubuntu-io --blkio-weight 500 ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--blkio-weight</span>：设置相对权重，值越大，容器获得IO时间越多。权重仅在多个容器竞争IO时生效</p>
             </div>
           </div>
         </div>
@@ -838,37 +970,65 @@ $ docker exec ubuntu-mem cat /sys/fs/cgroup/memory/memory.limit_in_bytes
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 3.3</span>
-          <h1 class="page-title">IO资源限制</h1>
+          <h1 class="page-title">IO资源限制 --device-read-bps/write-bps</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">IO限制参数</span>
+              <span class="code-title">限制设备读写速度</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 语法：docker run --blkio-weight &lt;value&gt; --device-read-bps &lt;value&gt; --device-write-bps &lt;value&gt; IMAGE
-
-# 示例：设置块设备IO权重（10-1000）
-$ docker run -d --name ubuntu-io --blkio-weight 500 ubuntu:22.04 sleep infinity
+            <pre><code># 语法：docker run --device-read-bps &lt;device&gt;:&lt;rate&gt; IMAGE
+# 语法：docker run --device-write-bps &lt;device&gt;:&lt;rate&gt; IMAGE
+# 作用：限制每秒读写字节数
 
 # 示例：限制设备读取速度（每秒1MB）
-$ docker run -d --name ubuntu-read --device-read-bps /dev/sda:1mb ubuntu:22.04 sleep infinity
+$ docker run -d --name ubuntu-read \
+  --device-read-bps /dev/sda:1mb ubuntu:22.04 sleep infinity
 
 # 示例：限制设备写入速度（每秒512KB）
-$ docker run -d --name ubuntu-write --device-write-bps /dev/sda:512kb ubuntu:22.04 sleep infinity
-
-# 示例：限制设备读取IOPS
-$ docker run -d --name ubuntu-riops --device-read-iops /dev/sda:100 ubuntu:22.04 sleep infinity
-
-# 示例：限制设备写入IOPS
-$ docker run -d --name ubuntu-wiops --device-write-iops /dev/sda:50 ubuntu:22.04 sleep infinity</code></pre>
+$ docker run -d --name ubuntu-write \
+  --device-write-bps /dev/sda:512kb ubuntu:22.04 sleep infinity</code></pre>
           </div>
-          
-          <div class="tip-box">
-            <div class="tip-title">IO限制说明</div>
-            <p><span class="highlight">--blkio-weight</span>：设置相对权重，影响IO调度</p>
-            <p><span class="highlight">--device-read-bps/write-bps</span>：限制每秒读写字节数</p>
-            <p><span class="highlight">--device-read-iops/write-iops</span>：限制每秒IO操作数</p>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--device-read-bps</span>：限制每秒读取字节数</p>
+              <p><span class="key-point">--device-write-bps</span>：限制每秒写入字节数</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 3.3</span>
+          <h1 class="page-title">IO资源限制 --device-read-iops/write-iops</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">限制设备IOPS</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker run --device-read-iops &lt;device&gt;:&lt;iops&gt; IMAGE
+# 语法：docker run --device-write-iops &lt;device&gt;:&lt;iops&gt; IMAGE
+# 作用：限制每秒IO操作数
+
+# 示例：限制设备读取IOPS为100
+$ docker run -d --name ubuntu-riops \
+  --device-read-iops /dev/sda:100 ubuntu:22.04 sleep infinity
+
+# 示例：限制设备写入IOPS为50
+$ docker run -d --name ubuntu-wiops \
+  --device-write-iops /dev/sda:50 ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--device-read-iops</span>：限制每秒读取操作数</p>
+              <p><span class="key-point">--device-write-iops</span>：限制每秒写入操作数</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1450,7 +1610,7 @@ $ docker run -d -p 8080:80 nginx
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 4.6</span>
-          <h1 class="page-title">自定义网络与DNS解析</h1>
+          <h1 class="page-title">自定义网络创建与管理</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
@@ -1459,10 +1619,10 @@ $ docker run -d -p 8080:80 nginx
               自定义网络允许用户创建<span class="highlight">自定义的bridge网络</span>，支持容器间通过容器名进行DNS解析，无需手动配置链接。
             </div>
           </div>
-          
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">创建和管理自定义网络</span>
+              <span class="code-title">docker network create - 创建网络</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 查看所有网络
@@ -1473,7 +1633,6 @@ NETWORK ID     NAME        DRIVER      SCOPE
 abc123...      bridge      bridge      local
 def456...      host        host        local
 ghi789...      none        null        local
-jkl012...      my-network  bridge      local
 
 # 创建自定义bridge网络
 $ docker network create my-network
@@ -1483,9 +1642,15 @@ $ docker network create \
   --driver bridge \
   --subnet 192.168.100.0/24 \
   --gateway 192.168.100.1 \
-  my-subnet
+  my-subnet</code></pre>
+          </div>
 
-# 查看网络详情
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker network inspect/rm/prune - 管理网络</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看网络详情
 $ docker network inspect my-network
 
 # 删除网络
@@ -1494,33 +1659,53 @@ $ docker network rm my-network
 # 清理未使用的网络
 $ docker network prune</code></pre>
           </div>
-          
+
+          <div class="highlight-box">
+            <div class="highlight-title">自定义网络优势</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">DNS解析</span>：容器可以通过名称相互访问</p>
+              <p>- <span class="highlight">网络隔离</span>：不同项目使用不同网络</p>
+              <p>- <span class="highlight">灵活配置</span>：可自定义子网、网关、IP范围</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.6</span>
+          <h1 class="page-title">自定义网络DNS解析</h1>
+        </div>
+        <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">使用自定义网络（Ubuntu容器示例）</span>
+              <span class="code-title">容器间DNS解析（Ubuntu示例）</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建自定义网络
 $ docker network create app-network
 
 # 启动容器并连接到自定义网络
-$ docker run -d --name ubuntu-web --network app-network ubuntu:22.04 sleep infinity
-$ docker run -d --name ubuntu-db --network app-network ubuntu:22.04 sleep infinity
-$ docker run -d --name ubuntu-api --network app-network ubuntu:22.04 sleep infinity
+$ docker run -d --name ubuntu-web \
+  --network app-network ubuntu:22.04 sleep infinity
 
-# 查看容器IP地址
-$ docker inspect --format '{{.NetworkSettings.Networks.app-network.IPAddress}}' ubuntu-web
+$ docker run -d --name ubuntu-db \
+  --network app-network ubuntu:22.04 sleep infinity</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看容器IP与DNS解析</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看容器IP地址
+$ docker inspect --format \
+  '{{.NetworkSettings.Networks.app-network.IPAddress}}' ubuntu-web
 192.168.100.2
-
-$ docker inspect --format '{{.NetworkSettings.Networks.app-network.IPAddress}}' ubuntu-db
-192.168.100.3
 
 # 容器间通过名称通信（DNS解析）
 $ docker exec ubuntu-web ping -c 3 ubuntu-db
 # PING ubuntu-db (192.168.100.3) 56(84) bytes of data.
-
-$ docker exec ubuntu-api ping -c 3 ubuntu-web
-# PING ubuntu-web (192.168.100.2) 56(84) bytes of data.
 
 # 验证DNS解析
 $ docker exec ubuntu-web nslookup ubuntu-db
@@ -1530,44 +1715,60 @@ Address:   127.0.0.11#53
 Name:      ubuntu-db
 Address:   192.168.100.3</code></pre>
           </div>
-          
+
+          <div class="tip-box">
+            <div class="tip-title">说明</div>
+            <p>自定义网络的DNS服务器地址为<span class="highlight">127.0.0.11</span>，Docker内置DNS服务</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.6</span>
+          <h1 class="page-title">容器多网络连接</h1>
+        </div>
+        <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">容器多网络连接</span>
+              <span class="code-title">docker network connect - 连接网络</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 容器连接到多个网络
+            <pre><code># 创建两个网络
 $ docker network create frontend-network
 $ docker network create backend-network
 
-# 启动应用服务器，连接两个网络
-$ docker run -d --name app-server --network frontend-network ubuntu:22.04 sleep infinity
+# 启动应用服务器，连接前端网络
+$ docker run -d --name app-server \
+  --network frontend-network ubuntu:22.04 sleep infinity
 
 # 将应用服务器连接到后端网络
-$ docker network connect backend-network app-server
+$ docker network connect backend-network app-server</code></pre>
+          </div>
 
-# 验证网络连接
-$ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">验证与断开网络</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 验证网络连接
+$ docker inspect --format \
+  '{{keys .NetworkSettings.Networks}}' app-server
 [backend-network frontend-network]
 
 # 查看各网络IP
-$ docker inspect --format '{{.NetworkSettings.Networks.frontend-network.IPAddress}}' app-server
+$ docker inspect --format \
+  '{{.NetworkSettings.Networks.frontend-network.IPAddress}}' app-server
 192.168.1.2
-
-$ docker inspect --format '{{.NetworkSettings.Networks.backend-network.IPAddress}}' app-server
-192.168.2.2
 
 # 断开网络连接
 $ docker network disconnect backend-network app-server</code></pre>
           </div>
-          
-          <div class="highlight-box">
-            <div class="highlight-title">自定义网络优势</div>
-            <div class="highlight-content">
-              <p>- <span class="highlight">DNS解析</span>：容器可以通过名称相互访问，无需手动配置IP</p>
-              <p>- <span class="highlight">网络隔离</span>：不同项目可以使用不同网络，相互隔离</p>
-              <p>- <span class="highlight">灵活配置</span>：可自定义子网、网关、IP范围</p>
-              <p>- <span class="highlight">多网络支持</span>：容器可以同时加入多个网络</p>
+
+          <div class="knowledge-point">
+            <div class="kp-title">说明</div>
+            <div class="kp-content">
+              <p>容器可以同时加入<span class="key-point">多个网络</span>，每个网络分配独立的IP地址</p>
             </div>
           </div>
         </div>
@@ -1576,58 +1777,80 @@ $ docker network disconnect backend-network app-server</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 4.7</span>
-          <h1 class="page-title">容器网络故障排查</h1>
+          <h1 class="page-title">容器网络故障排查 - 排查命令</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">常用排查命令</span>
+              <span class="code-title">查看网络配置命令</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 1. 查看容器网络配置
+            <pre><code># 1. 查看容器网络配置（JSON格式）
 $ docker inspect --format '{{json .NetworkSettings}}' &lt;container&gt; | jq
 
 # 2. 查看容器IP地址
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' &lt;container&gt;
+$ docker inspect --format \
+  '{{.NetworkSettings.Networks.bridge.IPAddress}}' &lt;container&gt;
 
 # 3. 查看端口映射
 $ docker port &lt;container&gt;
 
 # 4. 查看网络列表
-$ docker network ls
+$ docker network ls</code></pre>
+          </div>
 
-# 5. 查看网络详情
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">测试网络连接</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 5. 查看网络详情
 $ docker network inspect &lt;network-name&gt;
 
 # 6. 在容器内测试网络
 $ docker exec &lt;container&gt; ping -c 3 8.8.8.8
 $ docker exec &lt;container&gt; curl http://example.com
-$ docker exec &lt;container&gt; nslookup baidu.com
-$ docker exec &lt;container&gt; ip addr
-$ docker exec &lt;container&gt; netstat -tuln</code></pre>
+$ docker exec &lt;container&gt; nslookup baidu.com</code></pre>
           </div>
-          
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.7</span>
+          <h1 class="page-title">容器网络故障排查 - 常见问题</h1>
+        </div>
+        <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">常见问题与解决方案</span>
+              <span class="code-title">问题1：容器无法访问外网</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 问题1：容器无法访问外网
-# 原因：DNS配置错误或网络不通
+            <pre><code># 原因：DNS配置错误或网络不通
 # 解决：
 $ docker exec &lt;container&gt; ping 8.8.8.8
 # 如果IP能通但域名不通，检查DNS：
-$ docker exec &lt;container&gt; cat /etc/resolv.conf
+$ docker exec &lt;container&gt; cat /etc/resolv.conf</code></pre>
+          </div>
 
-# 问题2：无法通过端口访问容器
-# 原因：端口未映射、防火墙阻止、服务未启动
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">问题2：无法通过端口访问容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 原因：端口未映射、防火墙阻止、服务未启动
 # 解决：
 $ docker port &lt;container&gt;
 $ curl http://localhost:&lt;port&gt;
-$ docker logs &lt;container&gt;
+$ docker logs &lt;container&gt;</code></pre>
+          </div>
 
-# 问题3：容器间无法通信
-# 原因：不在同一网络、未使用自定义网络
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">问题3：容器间无法通信</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 原因：不在同一网络、未使用自定义网络
 # 解决：
 $ docker network inspect &lt;network&gt;
 # 确保容器在同一网络中
@@ -1638,7 +1861,15 @@ $ docker network inspect &lt;network&gt;
 $ docker network create my-network
 $ docker run --network my-network ...</code></pre>
           </div>
-          
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 4.7</span>
+          <h1 class="page-title">容器网络故障排查 - 调试流程</h1>
+        </div>
+        <div class="page-body">
           <div class="knowledge-point">
             <div class="kp-title">网络调试流程</div>
             <div class="kp-content">
@@ -1648,6 +1879,13 @@ $ docker run --network my-network ...</code></pre>
               <p>4. <span class="key-point">检查端口映射</span>：确认-p参数正确，端口未被占用</p>
               <p>5. <span class="key-point">查看日志</span>：docker logs查看应用日志</p>
             </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">调试技巧</div>
+            <p>使用<code>docker network inspect</code>查看详细网络配置</p>
+            <p>使用<code>docker exec &lt;container&gt; ip addr</code>查看容器内网络接口</p>
+            <p>使用<code>docker logs &lt;container&gt;</code>查看应用日志</p>
           </div>
         </div>
       </div>
@@ -1663,12 +1901,12 @@ $ docker run --network my-network ...</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 6.1</span>
-          <h1 class="page-title">容器日志</h1>
+          <h1 class="page-title">docker logs 查看日志</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker logs - 查看容器日志</span>
+              <span class="code-title">docker logs 基础用法</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 语法：docker logs [OPTIONS] CONTAINER
@@ -1678,30 +1916,65 @@ $ docker logs my-nginx
 
 # 常用参数说明：
 # --follow, -f         实时跟踪日志
-# --tail               显示最后n行
-# --timestamps, -t     显示时间戳
-# --since              显示指定时间之后的日志
-# --until              显示指定时间之前的日志
+# --tail              显示最后n行
+# --timestamps, -t    显示时间戳
+# --since             显示指定时间之后的日志
+# --until             显示指定时间之前的日志</code></pre>
+          </div>
 
-# 示例：实时跟踪日志
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--follow 和 --tail 参数</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 示例：实时跟踪日志
 $ docker logs -f my-nginx
 
 # 示例：显示最后100行日志
-$ docker logs --tail 100 my-nginx
+$ docker logs --tail 100 my-nginx</code></pre>
+          </div>
 
-# 示例：显示带时间戳的日志
+          <div class="tip-box">
+            <div class="tip-title">日志驱动</div>
+            <p>Docker支持多种日志驱动，如json-file（默认）、syslog、journald、gelf等</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.1</span>
+          <h1 class="page-title">docker logs 时间过滤</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--timestamps 和 --since 参数</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 示例：显示带时间戳的日志
 $ docker logs -t my-nginx
 
 # 示例：显示过去1小时的日志
-$ docker logs --since 1h my-nginx
-
-# 示例：显示特定时间段的日志
-$ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-nginx</code></pre>
+$ docker logs --since 1h my-nginx</code></pre>
           </div>
-          
-          <div class="tip-box">
-            <div class="tip-title">日志驱动</div>
-            <p>Docker支持多种日志驱动，如json-file（默认）、syslog、journald、gelf等。可以在docker run时通过--log-driver参数指定。</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--since 和 --until 时间段</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 示例：显示特定时间段的日志
+$ docker logs --since "2024-01-15T10:00:00" \
+  --until "2024-01-15T11:00:00" my-nginx</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">时间格式说明</div>
+            <div class="kp-content">
+              <p><span class="key-point">--since</span>：支持相对时间（如1h、30m）和绝对时间</p>
+              <p><span class="key-point">--until</span>：与--since配合使用，指定结束时间</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1709,12 +1982,12 @@ $ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-ngi
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 6.2</span>
-          <h1 class="page-title">容器监控</h1>
+          <h1 class="page-title">docker stats 容器监控</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker stats - 查看容器资源使用情况</span>
+              <span class="code-title">docker stats 基础用法</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 语法：docker stats [OPTIONS] [CONTAINER...]
@@ -1723,12 +1996,17 @@ $ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-ngi
 $ docker stats
 
 # 预期输出：
-CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
-1a2b3c4d5e6f   my-nginx  0.03%     2.562MiB / 1.945GiB   0.13%     648B / 648B       0B / 0B           2
+CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %
+1a2b3c4d5e6f   my-nginx  0.03%     2.562MiB / 1.945GiB   0.13%</code></pre>
+          </div>
 
-# 常用参数说明：
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker stats 参数说明</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 常用参数说明：
 # --all, -a           显示所有容器（包括停止的）
-# --format            使用Go模板格式化输出
 # --no-stream         只显示当前状态，不持续更新
 # --no-trunc          不截断输出
 
@@ -1736,16 +2014,9 @@ CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O      
 $ docker stats my-nginx
 
 # 示例：只显示当前状态
-$ docker stats --no-stream
-
-# 示例：格式化输出
-$ docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
-
-# 预期输出：
-NAME       CPU %     MEM USAGE / LIMIT
-my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
+$ docker stats --no-stream</code></pre>
           </div>
-          
+
           <div class="knowledge-point">
             <div class="kp-title">监控指标说明</div>
             <div class="kp-content">
@@ -1753,8 +2024,41 @@ my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
               <p>- <span class="key-point">MEM USAGE / LIMIT</span>：内存使用量/限制</p>
               <p>- <span class="key-point">MEM %</span>：内存使用率</p>
               <p>- <span class="key-point">NET I/O</span>：网络输入/输出</p>
-              <p>- <span class="key-point">BLOCK I/O</span>：块设备输入/输出</p>
-              <p>- <span class="key-point">PIDS</span>：进程数量</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.2</span>
+          <h1 class="page-title">docker stats 格式化输出</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">--format 格式化输出</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 示例：格式化输出
+$ docker stats --format \
+  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
+
+# 预期输出：
+NAME       CPU %     MEM USAGE / LIMIT
+my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">常用格式化字段</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">{{.Name}}</span>：容器名称</p>
+              <p>- <span class="key-point">{{.CPUPerc}}</span>：CPU使用率</p>
+              <p>- <span class="key-point">{{.MemUsage}}</span>：内存使用情况</p>
+              <p>- <span class="key-point">{{.MemPerc}}</span>：内存使用率</p>
+              <p>- <span class="key-point">{{.NetIO}}</span>：网络IO</p>
+              <p>- <span class="key-point">{{.BlockIO}}</span>：块设备IO</p>
+              <p>- <span class="key-point">{{.Pids}}</span>：进程数</p>
             </div>
           </div>
         </div>
