@@ -1086,27 +1086,6 @@ $ docker build -t my-python-app:single -f Dockerfile.single .</code></pre>
             </div>
           </div>
 
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">Docker Hub操作</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 登录Docker Hub
-$ docker login
-
-# 标记镜像（为推送做准备）
-$ docker tag myapp:latest your-username/myapp:latest
-
-# 推送镜像到Docker Hub
-$ docker push your-username/myapp:latest
-
-# 从Docker Hub拉取镜像（公开镜像无需登录）
-$ docker pull your-username/myapp:latest
-
-# 登出Docker Hub
-$ docker logout</code></pre>
-          </div>
-
           <div class="tip-box">
             <div class="tip-title">Docker Hub网址</div>
             <p>访问 <span class="highlight">https://hub.docker.com</span> 注册账号、搜索镜像、管理仓库</p>
@@ -1116,7 +1095,138 @@ $ docker logout</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 6.2</span>
+          <span class="page-number">Part 6.1.1</span>
+          <h1 class="page-title">docker login - 登录Docker Hub</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker login</span>命令用于登录Docker Hub。登录后才能推送镜像到Docker Hub或从私有仓库拉取镜像。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker login - 登录仓库</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 登录Docker Hub
+$ docker login
+
+# 预期输出：
+Username: your-username
+Password:
+Login Succeeded
+
+# 登录信息会保存在 ~/.docker/config.json</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">参数说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">无参数</span>：登录Docker Hub（默认）</p>
+              <p>- <span class="key-point">-u, --username</span>：指定用户名</p>
+              <p>- <span class="key-point">-p, --password</span>：指定密码（不建议在命令行使用）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.1.2</span>
+          <h1 class="page-title">docker tag 与 docker push - 推送镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            推送镜像到Docker Hub需要先<span class="highlight">打标签</span>，然后<span class="highlight">推送</span>。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker tag - 给镜像打标签</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 标记本地镜像
+# 格式：docker tag 源镜像 目标仓库/用户名/镜像名:标签
+$ docker tag myapp:latest your-username/myapp:latest
+
+# 如果镜像没有tag，默认使用latest</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker push - 推送镜像到仓库</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 推送镜像到Docker Hub
+$ docker push your-username/myapp:latest
+
+# 预期输出：
+# The push refers to repository [docker.io/your-username/myapp]
+# latest: digest: sha256:abc123... size: 2048</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">推送流程</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">docker login</span> - 登录Docker Hub</p>
+              <p>2. <span class="key-point">docker tag</span> - 给镜像打上仓库标签</p>
+              <p>3. <span class="key-point">docker push</span> - 推送到仓库</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.1.3</span>
+          <h1 class="page-title">docker pull 与 docker logout</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker pull</span>用于从仓库拉取镜像。<span class="highlight">docker logout</span>用于登出仓库。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker pull - 拉取镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 拉取公开镜像（无需登录）
+$ docker pull your-username/myapp:latest
+
+# 拉取官方镜像
+$ docker pull ubuntu:22.04
+
+# 公开镜像无需登录即可拉取</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker logout - 登出仓库</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 登出Docker Hub
+$ docker logout
+
+# 登出后，凭证会从 ~/.docker/config.json 中移除</code></pre>
+          </div>
+
+          <div class="highlight-box">
+            <div class="highlight-title">Docker Hub操作完整流程</div>
+            <div class="highlight-content">
+              <p>1. <span class="highlight">docker login</span> - 登录仓库</p>
+              <p>2. <span class="highlight">docker tag</span> - 打标签</p>
+              <p>3. <span class="highlight">docker push</span> - 推送镜像</p>
+              <p>4. <span class="highlight">docker pull</span> - 拉取镜像</p>
+              <p>5. <span class="highlight">docker logout</span> - 登出仓库</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 6.4</span>
           <h1 class="page-title">私有镜像仓库</h1>
         </div>
         <div class="page-body">
