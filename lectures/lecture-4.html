@@ -778,6 +778,476 @@ $ docker logout registry.example.com
         </div>
       </div>
 
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 0.5</span>
+          <h1 class="section-title">Docker系统基础命令</h1>
+          <p class="section-desc">掌握Docker服务的状态管理与基础操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.1</span>
+          <h1 class="page-title">Docker服务状态查看</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">systemctl status docker</span>命令查看Docker服务的运行状态。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">systemctl status - 查看服务状态</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker服务状态
+$ systemctl status docker
+
+# 预期输出：
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
+   Active: active (running) since Mon 2024-01-01 00:00:00 CST; 1 day ago
+     Docs: https://docs.docker.com
+ Main PID: 1234 (dockerd)
+    Tasks: 15
+   Memory: 128M
+      CPU: 0.5s
+   CGroup: /system.slice/docker.service
+           └─1234 /usr/bin/dockerd -H fd:// ...
+
+# 状态说明：
+# ● docker.service - Docker服务名称
+# Loaded: loaded - 服务已加载
+# Active: active (running) - 服务正在运行
+# vendor preset: enabled - 开机自启已启用</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">服务状态说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">active (running)</span>：服务正在运行</p>
+              <p>- <span class="key-point">active (exited)</span>：服务已退出（正常停止）</p>
+              <p>- <span class="key-point">inactive (dead)</span>：服务未运行</p>
+              <p>- <span class="key-point">failed</span>：服务启动失败</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.2</span>
+          <h1 class="page-title">Docker服务启停管理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">systemctl start</span>、<span class="highlight">stop</span>、<span class="highlight">restart</span>命令管理Docker服务。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">systemctl start/stop/restart - 服务启停</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动Docker服务
+$ sudo systemctl start docker
+
+# 停止Docker服务
+$ sudo systemctl stop docker
+
+# 重启Docker服务
+$ sudo systemctl restart docker
+
+# 查看服务是否运行
+$ sudo systemctl is-active docker
+active</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">注意事项</div>
+            <p>停止Docker服务会导致所有运行中的容器停止，请确保已妥善处理运行中的容器。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.3</span>
+          <h1 class="page-title">Docker服务开机自启管理</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">systemctl enable</span>、<span class="highlight">disable</span>命令管理Docker服务的开机自启动。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">systemctl enable/disable - 开机自启管理</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 设置Docker服务开机自启动
+$ sudo systemctl enable docker
+
+# 预期输出：
+Created symlink /etc/systemd/system/multi-user.target.wants/docker.service → /usr/lib/systemd/system/docker.service.
+
+# 取消Docker服务开机自启动
+$ sudo systemctl disable docker
+
+# 预期输出：
+Removed symlink /etc/systemd/system/multi-user.target.wants/docker.service.
+
+# 检查服务是否设为开机自启
+$ sudo systemctl is-enabled docker
+enabled</code></pre>
+          </div>
+
+          <div class="highlight-box">
+            <div class="highlight-title">enable vs disable</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">enable</span>：创建符号链接，开机时自动启动服务</p>
+              <p>- <span class="highlight">disable</span>：删除符号链接，开机时不自动启动</p>
+              <p>- <span class="highlight">is-enabled</span>：检查服务是否设为开机自启</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.4</span>
+          <h1 class="page-title">Docker版本信息查看</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">docker version</span>命令查看Docker客户端和服务器端的版本信息。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker version - 查看版本信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker版本
+$ docker version
+
+# 预期输出：
+Client:
+ Version:           24.0.7
+ API version:       1.43
+ Go version:        go1.21.0
+ Git commit:        311b9ff
+ Built:             Tue Oct 24 09:53:00 2023
+ OS/Arch:           linux/amd64
+ Context:           default
+ Debug mode:        off
+
+Server:
+ Engine:
+  Version:          24.0.7
+  API version:      1.43 (minimum version 1.24)
+  Go version:       go1.21.0
+  Git commit:       311b9ff
+  OS/Arch:          linux/amd64
+  OS version:       Ubuntu 22.04.3 LTS
+  Kernel version:   5.15.0-generic
+  Experimental:     false</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">版本信息说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Client</span>：Docker CLI客户端信息</p>
+              <p>- <span class="key-point">Server (Engine)</span>：Docker Daemon服务端信息</p>
+              <p>- <span class="key-point">API version</span>：REST API版本，需与Client匹配</p>
+              <p>- <span class="key-point">Go version</span>：Go语言版本</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.5</span>
+          <h1 class="page-title">Docker系统信息查看</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">docker info</span>命令查看Docker系统的详细信息，包括镜像数量、容器数量、存储驱动等。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker info - 查看系统信息</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker系统信息
+$ docker info
+
+# 预期输出（部分）：
+Client:
+ Version:    24.0.7
+ Context:    default
+ Debug Mode: false
+
+Server:
+ Containers: 5
+  Running: 2
+  Paused: 0
+  Stopped: 3
+ Images: 10
+ Server Version: 24.0.7
+ Storage Driver: overlay2
+ Backing Filesystem: extfs
+ Supports d_type: true
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Registry: https://index.docker.io/v1/
+ Labels:
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Registry Mirrors:
+  https://mirror.example.com/
+ Live Restore Enabled: false</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">关键信息说明</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Containers</span>：本地容器数量（运行/停止/总数）</p>
+              <p>- <span class="key-point">Images</span>：本地镜像数量</p>
+              <p>- <span class="key-point">Storage Driver</span>：存储驱动（overlay2为推荐）</p>
+              <p>- <span class="key-point">Docker Root Dir</span>：Docker数据存储目录</p>
+              <p>- <span class="key-point">Registry</span>：默认镜像仓库</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.6</span>
+          <h1 class="page-title">Docker帮助命令</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">docker --help</span>命令查看Docker命令的帮助信息。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker --help - 查看帮助</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看Docker所有可用命令
+$ docker --help
+
+# 预期输出：
+Usage:  docker [OPTIONS] COMMAND
+
+A self-sufficient runtime for containers.
+
+Common Commands:
+  run         Create and run a new container from an image
+  ps          List containers
+  pull        Pull an image or repository from a registry
+  build       Build an image from Dockerfile
+  images      List images
+  ...
+
+Options:
+  --config    Location of client config files
+  -D, --debug  Enable debug mode
+  -H, --host   Daemon socket(s) to connect to
+  -l, --log-level  Set log level
+  --version   Show the Docker version
+
+For more help on a specific command, use: docker COMMAND --help</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">学习技巧</div>
+            <p>docker --help显示了Docker命令的完整体系，是学习Docker命令的重要参考。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.7</span>
+          <h1 class="page-title">docker run --help 帮助详解</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">docker run --help</span>查看docker run命令的详细用法。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker run --help - 查看run命令帮助</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看docker run命令详细帮助
+$ docker run --help
+
+# 预期输出：
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Create and start a container in one operation.
+
+Options:
+  -d, --detach          Run container in background
+  -i, --interactive     Keep STDIN open
+  -t, --tty             Allocate a pseudo-TTY
+  -p, --publish list    Publish container ports to host
+  -v, --volume list     Bind mount a volume
+  -e, --env list        Set environment variables
+  --name string         Assign a name to the container
+  --rm                  Remove container after exit
+  --it                  Interactive with TTY (combined -i -t)
+  ...
+
+# 示例：交互式运行Ubuntu
+$ docker run -it ubuntu /bin/bash</code></pre>
+          </div>
+
+          <div class="highlight-box">
+            <div class="highlight-title">docker run 常用选项</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">-d</span>：后台运行容器</p>
+              <p>- <span class="highlight">-it</span>：交互式运行（进入容器终端）</p>
+              <p>- <span class="highlight">-p</span>：端口映射（主机端口:容器端口）</p>
+              <p>- <span class="highlight">-v</span>：数据卷挂载</p>
+              <p>- <span class="highlight">-e</span>：设置环境变量</p>
+              <p>- <span class="highlight">--name</span>：指定容器名称</p>
+              <p>- <span class="highlight">--rm</span>：容器退出后自动删除</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.8</span>
+          <h1 class="page-title">docker container --help 帮助详解</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            使用<span class="highlight">docker container --help</span>查看容器相关子命令。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker container --help - 查看容器子命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看容器相关子命令
+$ docker container --help
+
+# 预期输出：
+Usage:  docker container COMMAND
+
+Manage containers
+
+Commands:
+  ls          List all containers (shorthand: docker ps)
+  inspect     Display detailed container information
+  logs        Fetch the logs of a container
+  run         Create and start a new container
+  start       Start one or more stopped containers
+  stop        Stop one or more running containers
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  exec        Execute a command in a running container
+  commit      Create a new image from a container's changes
+  cp          Copy files between container and host
+  ...
+
+# 查看特定容器子命令帮助
+$ docker container ls --help</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">docker ps 是 docker container ls 的简写</div>
+            <div class="kp-content">
+              <p>这两个命令功能完全相同，都是列出容器：</p>
+              <p>$ docker ps = $ docker container ls</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 0.5.9</span>
+          <h1 class="page-title">Docker命令体系概览</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Docker命令采用<span class="highlight">层级结构</span>，具有清晰的组织形式。理解这个体系可以帮助你更好地掌握Docker命令。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker命令体系结构</span>
+              <span class="code-lang">命令说明</span>
+            </div>
+            <pre><code>                    docker
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+       container     image       network
+          │            │            │
+      ┌───┼───┐     ┌──┼──┐       ┌──┴──┐
+      │   │   │     │  │  │       │     │
+      ls  run  rm   pull push  inspect rm
+     start stop      │  tag      │      │
+     restart         images     network │
+                     │           create  │
+                    rmi         connect │
+                   build              │
+                   history            │
+                                      │
+                              volume
+                                │
+                              ┌──┴──┐
+                              │     │
+                            create rm
+                            inspect
+                            ls</code></pre>
+          </div>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>docker container</h3>
+              <p>容器管理命令，如<span class="highlight">run、ps、rm、start、stop</span></p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>docker image</h3>
+              <p>镜像管理命令，如<span class="highlight">pull、push、rmi、build</span></p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>docker network</h3>
+              <p>网络管理命令，如<span class="highlight">create、connect、ls</span></p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>docker volume</h3>
+              <p>数据卷命令，如<span class="highlight">create、ls、rm</span></p>
+            </div>
+          </div>
+
+          <div class="highlight-box" style="margin-top: 1.5rem;">
+            <div class="highlight-title">命令格式</div>
+            <div class="highlight-content">
+              <p><span class="highlight">docker [顶层命令] [子命令] [选项]</span></p>
+              <p>示例：docker container run -it ubuntu /bin/bash</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">目录</span>
