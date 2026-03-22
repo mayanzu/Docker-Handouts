@@ -1507,6 +1507,161 @@ docker run ubuntu       ≈  docker container run ubuntu
         </div>
       </div>
 
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">实验</span>
+          <h1 class="section-title">动手实验</h1>
+          <p class="section-desc">掌握Docker基础命令和镜像操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验一</span>
+          <h1 class="page-title">Docker安装与基础验证</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">Docker安装与基础验证</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Docker的安装方法，验证Docker运行状态，理解Docker基础概念</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text"><strong>检查Docker安装状态</strong>：使用docker version和docker info查看Docker版本和系统信息</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text"><strong>验证Docker服务状态</strong>：使用systemctl status docker检查服务是否正常运行</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text"><strong>运行测试容器</strong>：运行docker run hello-world验证Docker功能是否正常</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text"><strong>查看Docker帮助</strong>：使用docker --help查看所有可用命令</span>
+              </div>
+            </div>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：检查Docker版本
+$ docker version
+
+# 步骤2：查看Docker系统信息
+$ docker info
+
+# 步骤3：检查Docker服务状态
+$ sudo systemctl status docker
+
+# 步骤4：运行测试容器
+$ docker run hello-world
+
+# 步骤5：查看帮助信息
+$ docker --help</code></pre>
+          </div>
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] docker version显示Client和Server版本</p>
+              <p>- [ ] docker info显示Containers和Images数量</p>
+              <p>- [ ] Docker服务状态为active (running)</p>
+              <p>- [ ] hello-world容器运行成功</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验二</span>
+          <h1 class="page-title">Docker镜像与容器基础操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">Docker镜像与容器基础操作</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Docker镜像的拉取、查看、删除操作，以及容器的创建、查看、删除操作</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span class="step-text"><strong>拉取镜像</strong>：从Docker Hub拉取ubuntu和nginx镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span class="step-text"><strong>查看本地镜像</strong>：使用docker images列出本地镜像</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">3</span>
+                <span class="step-text"><strong>运行容器</strong>：运行ubuntu交互式容器和nginx后台容器</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">4</span>
+                <span class="step-text"><strong>查看容器</strong>：使用docker ps查看运行中的容器，docker ps -a查看所有容器</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">5</span>
+                <span class="step-text"><strong>清理环境</strong>：停止并删除容器，删除不需要的镜像</span>
+              </div>
+            </div>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">实验命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：拉取镜像
+$ docker pull ubuntu:22.04
+$ docker pull nginx:alpine
+
+# 步骤2：查看本地镜像
+$ docker images
+
+# 步骤3：运行交互式Ubuntu容器
+$ docker run -it --name my-ubuntu ubuntu:22.04 /bin/bash
+# 退出容器：exit或Ctrl+P+Q
+
+# 步骤4：后台运行Nginx容器
+$ docker run -d --name my-nginx -p 8080:80 nginx:alpine
+
+# 步骤5：查看容器
+$ docker ps
+$ docker ps -a
+
+# 步骤6：清理环境
+$ docker stop my-ubuntu my-nginx
+$ docker rm my-ubuntu my-nginx
+$ docker rmi ubuntu:22.04 nginx:alpine</code></pre>
+          </div>
+          <div class="highlight-box">
+            <div class="highlight-title">验证清单</div>
+            <div class="highlight-content">
+              <p>- [ ] 成功拉取ubuntu和nginx镜像</p>
+              <p>- [ ] docker images显示两个镜像</p>
+              <p>- [ ] Ubuntu容器可以交互式操作</p>
+              <p>- [ ] Nginx容器后台运行，访问localhost:8080有响应</p>
+              <p>- [ ] 成功清理所有容器和镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">预告</span>
