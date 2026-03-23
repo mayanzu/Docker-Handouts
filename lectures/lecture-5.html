@@ -879,6 +879,339 @@ $ docker run -d --name ubuntu-wiops --device-write-iops /dev/sda:50 ubuntu:22.04
 
       <div class="page section-page">
         <div class="section-content">
+          <span class="section-label">Part 2.5</span>
+          <h1 class="section-title">容器与镜像交互</h1>
+          <p class="section-desc">容器与镜像之间的转换操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5.1</span>
+          <h1 class="page-title">docker export与docker import - 容器归档</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker export</span>用于将容器的当前文件系统导出为tar归档文件，<span class="highlight">docker import</span>用于从tar文件创建一个新的镜像。这与docker save/load不同，export操作的是容器，保存的是容器运行时的快照。
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker export - 导出容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker export [OPTIONS] CONTAINER
+
+# 导出容器文件系统到文件
+$ docker export my-container -o container-filesystem.tar
+
+# 使用标准输出重定向
+$ docker export my-container > container.tar
+
+# 参数说明：
+# -o, --output    指定输出文件名
+# --pause          导出时暂停容器（默认true）
+
+# 示例：导出容器
+$ docker export my-container -o my-container-export.tar
+
+# 预期输出：
+# my-container-export.tar 文件已创建</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker import - 导入镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker import [OPTIONS] URL|- [REPOSITORY[:TAG]]
+
+# 从tar文件创建镜像
+$ docker import container-filesystem.tar my-image:v1.0
+
+# 使用标准输入
+$ docker import - my-image:v1.0 < container-filesystem.tar
+
+# 从URL导入
+$ docker import http://example.com/rootfs.tar x.tar.gz rootfs:v1.0
+
+# 参数说明：
+# -c, --change    应用Dockerfile指令到创建的镜像
+# -m, --message   设置导入的说明信息
+
+# 示例：从导出文件创建镜像
+$ docker import my-container-export.tar my-custom-image:v1
+
+# 预期输出：
+# sha256:def456... Importing from tar
+sha256:def456... 72.8MB</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker export/import - 实战场景</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 场景1：从容器创建新镜像（包含修改）
+# 先在容器中做修改
+$ docker run -it --name temp-container ubuntu:22.04 bash
+root@xxx:/# apt update && apt install -y vim curl git
+root@xxx:/# exit
+
+# 导出修改后的容器
+$ docker export temp-container -o my-modified.tar
+
+# 从导出文件创建新镜像
+$ docker import my-modified.tar my-dev-env:v1.0
+
+# 验证新镜像
+$ docker run -it my-dev-env:v1.0 bash
+
+# 清理临时容器
+$ docker rm temp-container
+
+# 场景2：最小化镜像创建
+$ docker export base-container -o base.tar
+$ docker import base.tar minimal-image:latest
+
+# 场景3：离线环境部署
+# 在有网络环境导出
+$ docker export app-container -o app-for-offline.tar
+# 传输到离线服务器
+$ scp app-for-offline.tar offline-server:/tmp/
+# 在离线服务器导入
+$ docker load -i /tmp/app-for-offline.tar</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">重要区别：export/import vs save/load</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">docker export</span>：导出容器的当前状态（不包括镜像历史和元数据）</p>
+              <p>- <span class="highlight">docker import</span>：创建一个新的空白镜像（无CMD/ENTRYPOINT等配置）</p>
+              <p>- <span class="highlight">docker save</span>：保存完整镜像（包括历史和所有元数据）</p>
+              <p>- <span class="highlight">docker load</span>：恢复完整镜像</p>
+              <p>- export导出的文件通常更小，适合基础系统镜像</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5.2</span>
+          <h1 class="page-title">docker commit - 从容器创建镜像</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            <span class="highlight">docker commit</span>命令用于从运行中的容器创建一个新的镜像。这个功能适合快速保存容器当前状态的快照，但不推荐用于生产环境的镜像构建（生产环境应使用Dockerfile）。
+          </p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker commit - 从容器创建镜像</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+
+# 基本用法 - 创建镜像
+$ docker commit my-container my-image:v1.0
+
+# 预期输出：
+sha256:abc123...  0B
+
+# 参数详解：
+# -a, --author "作者名"    添加作者信息
+# -m, --message "说明"     添加提交说明
+# -c, --change CMD [...]   应用Dockerfile指令到镜像
+# -p, --pause             提交时暂停容器（默认true）
+
+# 示例：添加作者和说明
+$ docker commit -a "Developer Name" -m "Added development tools" \
+    my-container my-image:v1.0
+
+# 示例：提交时暂停容器（默认行为）
+$ docker commit --pause=true my-container my-image:v1.0
+
+# 示例：不暂停容器提交
+$ docker commit -p=false my-container my-image:v1.0</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker commit - 实战示例</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 场景1：保存容器修改为新镜像
+$ docker run -it --name my-dev-container ubuntu:22.04 bash
+root@xxx:/# apt update
+root@xxx:/# apt install -y vim curl git
+root@xxx:/# exit
+
+$ docker commit my-dev-container my-dev-env:v1.0
+sha256:abc123...
+
+$ docker run -it my-dev-env:v1.0 bash
+# 已包含vim、curl、git
+
+# 场景2：保存配置好的应用容器
+$ docker run -d --name configured-app ubuntu:22.04 sleep infinity
+$ docker exec configured-app bash -c "echo 'configured' > /app/config.txt"
+$ docker commit configured-app my-configured-app:v1
+
+# 场景3：使用--change应用Dockerfile指令
+$ docker commit --change='CMD ["sleep", "infinity"]' \
+    configured-app my-ubuntu-configured:v1
+
+# 场景4：查看提交后的镜像历史
+$ docker history my-image:v1.0
+
+IMAGE          CREATED        CREATED BY                                      SIZE
+abc123...      1 minute ago   sleep infinity                                 0B
+08d22c0f15e2   3 weeks ago    /bin/sh -c #(nop) CMD ["/bin/bash"]           77.8MB</code></pre>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">注意事项</div>
+            <div class="highlight-content">
+              <p>- docker commit只保存文件系统的<span class="highlight">当前状态</span>，不包括镜像历史</p>
+              <p>- 不推荐用于生产环境，应使用<span class="highlight">Dockerfile</span>进行镜像构建</p>
+              <p>- 提交前确保容器内没有敏感信息（密码、密钥等）</p>
+              <p>- 使用<span class="highlight">-m</span>参数添加清晰的提交说明</p>
+              <p>- 查看提交后的镜像：docker history IMAGE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">Part 2.5.3</span>
+          <h1 class="page-title">容器打包成镜像的省空间技巧</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            在使用docker export/import或docker commit将容器打包成镜像时，有一些优化技巧可以帮助减少镜像体积，节省存储空间和加快传输速度。
+          </p>
+          
+          <div class="knowledge-point">
+            <div class="kp-title">省空间优化核心原则</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">清理缓存和临时文件</span>：删除apt/yum缓存、日志文件、临时文件</p>
+              <p>2. <span class="key-point">使用精简基础镜像</span>：alpine比ubuntu更小</p>
+              <p>3. <span class="key-point">压缩传输</span>：使用gzip等压缩工具</p>
+              <p>4. <span class="key-point">多阶段构建</span>：生产环境推荐使用Dockerfile</p>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">技巧1：打包前清理容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 清理包管理器缓存（Ubuntu/Debian）
+$ docker exec my-container apt clean
+$ docker exec my-container rm -rf /var/lib/apt/lists/*
+
+# 清理临时文件
+$ docker exec my-container rm -rf /tmp/*
+$ docker exec my-container rm -rf /var/tmp/*
+
+# 清理日志文件
+$ docker exec my-container sh -c "find /var/log -type f -exec truncate -s 0 {} \;"
+
+# 清理其他不需要的文件
+$ docker exec my-container rm -rf /root/.cache/*
+$ docker exec my-container rm -rf /var/cache/*</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">技巧2：清理用户进程和日志</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 停止容器前清空日志
+$ docker exec my-container sh -c "echo '' > /var/log/access.log"
+$ docker exec my-container sh -c "echo '' > /var/log/error.log"
+
+# 查看容器大小
+$ docker exec my-container du -sh /
+
+# 查看占用空间最大的目录
+$ docker exec my-container du -sh /var/*
+
+# 常见可以清理的目录
+# /var/log/*        - 日志文件
+# /var/cache/*      - 缓存文件
+# /tmp/*            - 临时文件
+# /root/.cache/*    - 用户缓存</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">技巧3：使用压缩减少传输大小</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 未压缩的导出
+$ docker export my-container -o my-container.tar
+# 大小示例：500MB
+
+# 使用gzip压缩（压缩率约70%）
+$ docker export my-container | gzip > my-container.tar.gz
+# 大小示例：150MB
+
+# 使用xz压缩（压缩率更高，但速度慢）
+$ docker export my-container | xz > my-container.tar.xz
+# 大小示例：100MB
+
+# 恢复时解压导入
+$ gunzip -c my-container.tar.gz | docker import - my-image:v1
+$ unxz -c my-container.tar.xz | docker import - my-image:v1</code></pre>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">技巧4：优化commit操作</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在commit前暂停容器确保数据一致
+$ docker pause my-container
+$ docker commit my-container my-image:v1
+$ docker unpause my-container
+
+# 使用--change添加最小化启动命令
+$ docker commit \
+    --change='CMD ["tail", "-f", "/dev/null"]' \
+    my-container my-image:v1
+
+# 查看生成的镜像大小
+$ docker images | grep my-image
+
+# 对比优化前后的镜像大小
+$ docker history my-image:v1</code></pre>
+          </div>
+          
+          <div class="tip-box">
+            <div class="tip-title">最佳实践建议</div>
+            <p>1. <span class="highlight">开发测试</span>：可以使用docker commit快速保存状态</p>
+            <p>2. <span class="highlight">生产环境</span>：必须使用Dockerfile构建镜像</p>
+            <p>3. <span class="highlight">离线部署</span>：使用export+压缩方式传输</p>
+            <p>4. <span class="highlight">镜像优化</span>：优先使用多阶段构建</p>
+          </div>
+          
+          <div class="highlight-box warning">
+            <div class="highlight-title">重要提示</div>
+            <div class="highlight-content">
+              <p>- <span class="highlight">commit和export</span>会丢失镜像的构建历史</p>
+              <p>- 导出的镜像<span class="highlight">无法回滚</span>到之前的状态</p>
+              <p>- 对于重要应用，<span class="highlight">强烈建议使用Dockerfile</span>进行镜像构建</p>
+              <p>- Dockerfile可以<span class="highlight">版本控制</span>，方便团队协作</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
           <span class="section-label">实验</span>
           <h1 class="section-title">动手实验：容器操作命令综合练习</h1>
           <p class="section-desc">巩固容器生命周期管理命令</p>
@@ -904,7 +1237,7 @@ $ docker run -d --name ubuntu-wiops --device-write-iops /dev/sda:50 ubuntu:22.04
               <h4>实验步骤</h4>
               <div class="step-item">
                 <span class="step-num">1</span>
-                <span class="step-text">使用docker create创建一个Nginx容器（不启动）</span>
+                <span class="step-text">使用docker create创建一个Ubuntu容器（不启动）</span>
               </div>
               <div class="step-item">
                 <span class="step-num">2</span>
@@ -912,7 +1245,7 @@ $ docker run -d --name ubuntu-wiops --device-write-iops /dev/sda:50 ubuntu:22.04
               </div>
               <div class="step-item">
                 <span class="step-num">3</span>
-                <span class="step-text">使用docker exec进入容器查看文件</span>
+                <span class="step-text">使用docker exec进入容器查看文件系统</span>
               </div>
               <div class="step-item">
                 <span class="step-num">4</span>
@@ -935,7 +1268,7 @@ $ docker run -d --name ubuntu-wiops --device-write-iops /dev/sda:50 ubuntu:22.04
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 步骤1：使用docker create创建容器（不启动）
-$ docker create --name my-nginx -p 8080:80 nginx
+$ docker create --name my-ubuntu ubuntu:22.04
 
 # 预期输出：
 # 容器ID（如：1a2b3c4d5e6f）
@@ -944,37 +1277,37 @@ $ docker create --name my-nginx -p 8080:80 nginx
 $ docker ps -a --filter status=created
 
 # 步骤3：启动容器
-$ docker start my-nginx
+$ docker start my-ubuntu
 
 # 预期输出：
-my-nginx
+my-ubuntu
 
 # 步骤4：查看运行中的容器
 $ docker ps
 
-# 步骤5：进入容器查看文件
-$ docker exec -it my-nginx bash
-root@1a2b3c4d5e6f:/# ls /usr/share/nginx/html/
-root@1a2b3c4d5e6f:/# cat /etc/nginx/nginx.conf
+# 步骤5：进入容器查看文件系统
+$ docker exec -it my-ubuntu bash
+root@1a2b3c4d5e6f:/# ls /home
+root@1a2b3c4d5e6f:/# pwd
 root@1a2b3c4d5e6f:/# exit
 
 # 步骤6：查看容器日志
-$ docker logs my-nginx
+$ docker logs my-ubuntu
 
 # 步骤7：优雅停止容器
-$ docker stop my-nginx
+$ docker stop my-ubuntu
 
 # 预期输出：
-my-nginx
+my-ubuntu
 
 # 步骤8：删除容器
-$ docker rm my-nginx
+$ docker rm my-ubuntu
 
 # 预期输出：
-my-nginx
+my-ubuntu
 
 # 步骤9：使用docker run一步完成（常用方式）
-$ docker run -d --name web-server -p 8080:80 --restart unless-stopped nginx
+$ docker run -d --name ubuntu-server ubuntu:22.04 sleep infinity
 
 # 预期输出：
 # 容器ID</code></pre>
@@ -1191,12 +1524,12 @@ $ docker exec ubuntu-host netstat -tuln | grep :80
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># Bridge网络（需要端口映射）
-$ docker run -d --name nginx-bridge -p 8080:80 nginx
-# 访问：http://localhost:8080
+$ docker run -d --name app-bridge -p 8080:80 ubuntu:22.04 sleep infinity
+# 容器监听8080端口
 
 # Host网络（直接使用宿主机端口）
-$ docker run -d --name nginx-host --network host nginx
-# 访问：http://localhost:80  （无需映射）
+$ docker run -d --name app-host --network host ubuntu:22.04 sleep infinity
+# 直接使用宿主机网络栈
 
 # 性能对比
 # Host网络：性能最好，延迟最低，无NAT开销
@@ -1344,35 +1677,35 @@ $ docker exec ubuntu-share nc localhost 8888
             <pre><code># 语法：-p &lt;host-port&gt;:&lt;container-port&gt;[:&lt;protocol&gt;]
 
 # 基本端口映射
-$ docker run -d --name nginx-web -p 8080:80 nginx
-# 访问：http://localhost:8080
+$ docker run -d --name app-web -p 8080:80 ubuntu:22.04 sleep infinity
+# 容器监听8080端口
 
 # 映射多个端口
-$ docker run -d --name nginx-multi -p 8080:80 -p 8443:443 nginx
+$ docker run -d --name app-multi -p 8080:80 -p 8443:443 ubuntu:22.04 sleep infinity
 
 # 指定协议（tcp/udp）
-$ docker run -d --name dns-server -p 53:53/udp redis:alpine
+$ docker run -d --name dns-server -p 53:53/udp ubuntu:22.04 sleep infinity
 
 # 绑定到特定IP（仅本地访问）
-$ docker run -d --name nginx-local -p 127.0.0.1:8080:80 nginx
+$ docker run -d --name app-local -p 127.0.0.1:8080:80 ubuntu:22.04 sleep infinity
 # 只能通过 localhost:8080 访问
 
 # 绑定到所有IP（默认）
-$ docker run -d --name nginx-all -p 0.0.0.0:8080:80 nginx
+$ docker run -d --name app-all -p 0.0.0.0:8080:80 ubuntu:22.04 sleep infinity
 # 可以通过任何网络接口访问
 
 # 随机端口映射（仅指定容器端口）
-$ docker run -d --name nginx-random -p 80 nginx
+$ docker run -d --name app-random -p 80 ubuntu:22.04 sleep infinity
 # Docker自动分配一个宿主机端口
 
 # 查看端口映射
-$ docker port nginx-web
+$ docker port app-web
 80/tcp -> 0.0.0.0:8080
 
 # 查看所有映射端口
 $ docker ps --format "table {{.Names}}\t{{.Ports}}"
 NAMES        PORTS
-nginx-web    0.0.0.0:8080->80/tcp</code></pre>
+app-web    0.0.0.0:8080->80/tcp</code></pre>
           </div>
           
           <div class="code-block">
@@ -2071,7 +2404,7 @@ $ docker rm ubuntu-writer ubuntu-reader</code></pre>
             <pre><code># 语法：docker logs [OPTIONS] CONTAINER
 
 # 基础用法 - 查看容器日志
-$ docker logs my-nginx
+$ docker logs my-ubuntu
 
 # 常用参数说明：
 # --follow, -f         实时跟踪日志
@@ -2081,19 +2414,19 @@ $ docker logs my-nginx
 # --until              显示指定时间之前的日志
 
 # 示例：实时跟踪日志
-$ docker logs -f my-nginx
+$ docker logs -f my-ubuntu
 
 # 示例：显示最后100行日志
-$ docker logs --tail 100 my-nginx
+$ docker logs --tail 100 my-ubuntu
 
 # 示例：显示带时间戳的日志
-$ docker logs -t my-nginx
+$ docker logs -t my-ubuntu
 
 # 示例：显示过去1小时的日志
-$ docker logs --since 1h my-nginx
+$ docker logs --since 1h my-ubuntu
 
 # 示例：显示特定时间段的日志
-$ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-nginx</code></pre>
+$ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-ubuntu</code></pre>
           </div>
           
           <div class="tip-box">
@@ -2120,8 +2453,8 @@ $ docker logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" my-ngi
 $ docker stats
 
 # 预期输出：
-CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
-1a2b3c4d5e6f   my-nginx  0.03%     2.562MiB / 1.945GiB   0.13%     648B / 648B       0B / 0B           2
+CONTAINER ID   NAME        CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+1a2b3c4d5e6f   my-ubuntu  0.03%     2.562MiB / 1.945GiB   0.13%     648B / 648B       0B / 0B           2
 
 # 常用参数说明：
 # --all, -a           显示所有容器（包括停止的）
@@ -2130,7 +2463,7 @@ CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O      
 # --no-trunc          不截断输出
 
 # 示例：查看特定容器的资源使用情况
-$ docker stats my-nginx
+$ docker stats my-ubuntu
 
 # 示例：只显示当前状态
 $ docker stats --no-stream
@@ -2139,8 +2472,8 @@ $ docker stats --no-stream
 $ docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 
 # 预期输出：
-NAME       CPU %     MEM USAGE / LIMIT
-my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
+NAME        CPU %     MEM USAGE / LIMIT
+my-ubuntu   0.03%     2.562MiB / 1.945GiB</code></pre>
           </div>
           
           <div class="knowledge-point">
@@ -2215,19 +2548,19 @@ my-nginx   0.03%     2.562MiB / 1.945GiB</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 示例：以非root用户运行容器
-$ docker run --user 1000:1000 nginx
+$ docker run --user 1000:1000 ubuntu:22.04 whoami
 
 # 示例：限制容器能力
-$ docker run --cap-drop ALL --cap-add NET_BIND_SERVICE nginx
+$ docker run --cap-drop ALL --cap-add NET_BIND_SERVICE ubuntu:22.04 sleep infinity
 
 # 示例：只读文件系统
-$ docker run --read-only nginx
+$ docker run --read-only ubuntu:22.04 sleep infinity
 
 # 示例：禁用特权模式
-$ docker run --privileged=false nginx
+$ docker run --privileged=false ubuntu:22.04 sleep infinity
 
 # 示例：设置seccomp配置
-$ docker run --security-opt seccomp=profile.json nginx</code></pre>
+$ docker run --security-opt seccomp=profile.json ubuntu:22.04 sleep infinity</code></pre>
           </div>
         </div>
       </div>
@@ -2309,7 +2642,7 @@ $ docker run --security-opt seccomp=profile.json nginx</code></pre>
               <h4>实验步骤</h4>
               <div class="step-item">
                 <span class="step-num">1</span>
-                <span class="step-text">创建并运行Nginx容器，映射端口</span>
+                <span class="step-text">创建并运行Ubuntu容器，配置基本环境</span>
               </div>
               <div class="step-item">
                 <span class="step-num">2</span>
@@ -2347,44 +2680,44 @@ $ docker run --security-opt seccomp=profile.json nginx</code></pre>
               <span class="code-title">实验操作指南</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 步骤1：创建并运行Nginx容器
-$ docker run --name my-nginx -d -p 8080:80 nginx
+            <pre><code># 步骤1：创建并运行Ubuntu容器
+$ docker run --name my-ubuntu -d ubuntu:22.04 sleep infinity
 
 # 步骤2：查看容器状态和资源使用情况
 $ docker ps
-$ docker stats --no-stream my-nginx
-$ docker inspect my-nginx
+$ docker stats --no-stream my-ubuntu
+$ docker inspect my-ubuntu
 
 # 步骤3：进入容器并执行命令
-$ docker exec -it my-nginx bash
-$ ls -la /usr/share/nginx/html
-$ echo "Hello Docker" > /usr/share/nginx/html/index.html
+$ docker exec -it my-ubuntu bash
+$ ls -la /home
+$ apt update
 $ exit
 
 # 步骤4：设置容器资源限制
-$ docker run --name limited-app -d --cpus 0.5 --memory 256m nginx
+$ docker run --name limited-app -d --cpus 0.5 --memory 256m ubuntu:22.04 sleep infinity
 $ docker stats --no-stream limited-app
 
 # 步骤5：配置容器网络
 $ docker network create my-network
-$ docker run --name app1 --network my-network -d nginx
-$ docker run --name app2 --network my-network -d busybox sleep 3600
-$ docker exec app2 ping app1
+$ docker run --name app1 --network my-network -d ubuntu:22.04 sleep infinity
+$ docker run --name app2 --network my-network -d ubuntu:22.04 sleep infinity
+$ docker exec app2 ping -c 3 app1
 
 # 步骤6：使用数据卷持久化数据
-$ docker volume create nginx-data
-$ docker run --name data-nginx -d -p 8081:80 -v nginx-data:/usr/share/nginx/html nginx
-$ echo "Persistent Data" > /var/lib/docker/volumes/nginx-data/_data/index.html
+$ docker volume create app-data
+$ docker run --name data-app -d -v app-data:/data ubuntu:22.04 sleep infinity
+$ docker exec data-app bash -c "echo 'Persistent Data' > /data/info.txt"
 
 # 步骤7：查看容器日志
-$ docker logs my-nginx
-$ docker logs -f my-nginx
+$ docker logs my-ubuntu
+$ docker logs -f my-ubuntu
 
 # 步骤8：停止并删除容器
-$ docker stop my-nginx limited-app app1 app2 data-nginx
-$ docker rm my-nginx limited-app app1 app2 data-nginx
+$ docker stop my-ubuntu limited-app app1 app2 data-app
+$ docker rm my-ubuntu limited-app app1 app2 data-app
 $ docker network rm my-network
-$ docker volume rm nginx-data
+$ docker volume rm app-data
 
 # 验证结果
 $ docker ps -a
@@ -2395,7 +2728,7 @@ $ docker volume ls</code></pre>
           <div class="highlight-box">
             <div class="highlight-title">验证清单</div>
             <div class="highlight-content">
-              <p>- [ ] 成功创建并运行Nginx容器</p>
+              <p>- [ ] 成功创建并运行Ubuntu容器</p>
               <p>- [ ] 能够查看容器状态和资源使用情况</p>
               <p>- [ ] 成功进入容器并执行命令</p>
               <p>- [ ] 能够设置容器资源限制</p>
@@ -2439,7 +2772,7 @@ $ docker volume ls</code></pre>
               </div>
               <div class="step-item">
                 <span class="step-num">2</span>
-                <span class="step-text">运行多个容器并加入网络</span>
+                <span class="step-text">运行多个Ubuntu容器并加入网络</span>
               </div>
               <div class="step-item">
                 <span class="step-num">3</span>
@@ -2464,46 +2797,46 @@ $ docker volume ls</code></pre>
             <pre><code># 步骤1：创建自定义网络
 $ docker network create my-network
 
-# 步骤2：运行Nginx容器并加入网络
-$ docker run --name web-server --network my-network -d -p 8080:80 nginx
+# 步骤2：运行第一个Ubuntu容器并加入网络
+$ docker run --name container1 --network my-network -d ubuntu:22.04 sleep infinity
 
-# 步骤3：运行Busybox容器并加入网络
-$ docker run --name test-client --network my-network -d busybox sleep 3600
+# 步骤3：运行第二个Ubuntu容器并加入网络
+$ docker run --name container2 --network my-network -d ubuntu:22.04 sleep infinity
 
 # 步骤4：测试容器间通信（通过容器名称）
-$ docker exec test-client ping web-server
+$ docker exec container1 ping -c 3 container2
 
 # 步骤5：测试容器间通信（通过IP地址）
-$ WEB_IP=$(docker inspect --format '{{.NetworkSettings.Networks.my-network.IPAddress}}' web-server)
-$ docker exec test-client ping $WEB_IP
+$ CONTAINER2_IP=$(docker inspect --format '{{.NetworkSettings.Networks.my-network.IPAddress}}' container2)
+$ docker exec container1 ping -c 3 $CONTAINER2_IP
 
 # 步骤6：创建数据卷
-$ docker volume create web-data
+$ docker volume create shared-data
 
-# 步骤7：运行带数据卷的Nginx容器
-$ docker run --name web-with-volume --network my-network -d -p 8081:80 -v web-data:/usr/share/nginx/html nginx
+# 步骤7：运行带数据卷的Ubuntu容器
+$ docker run --name data-container --network my-network -d -v shared-data:/data ubuntu:22.04 sleep infinity
 
 # 步骤8：向数据卷写入数据
-$ echo "<h1>Persistent Data</h1><p>This data is stored in a volume.</p>" > /var/lib/docker/volumes/web-data/_data/index.html
+$ docker exec data-container bash -c "echo 'Hello from container' > /data/message.txt"
 
-# 步骤9：访问应用验证数据
-$ curl http://localhost:8081
+# 步骤9：验证数据
+$ docker exec data-container cat /data/message.txt
 
 # 步骤10：停止并删除容器
-$ docker stop web-server test-client web-with-volume
-$ docker rm web-server test-client web-with-volume
+$ docker stop container1 container2 data-container
+$ docker rm container1 container2 data-container
 
 # 步骤11：重新运行容器，验证数据持久化
-$ docker run --name web-new --network my-network -d -p 8082:80 -v web-data:/usr/share/nginx/html nginx
+$ docker run --name new-container --network my-network -d -v shared-data:/data ubuntu:22.04 sleep infinity
 
 # 步骤12：验证数据仍然存在
-$ curl http://localhost:8082
+$ docker exec new-container cat /data/message.txt
 
 # 步骤13：清理资源
-$ docker stop web-new
-$ docker rm web-new
+$ docker stop new-container
+$ docker rm new-container
 $ docker network rm my-network
-$ docker volume rm web-data
+$ docker volume rm shared-data
 
 # 验证结果
 $ docker network ls

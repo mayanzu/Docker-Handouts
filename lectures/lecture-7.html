@@ -35,39 +35,27 @@
             <ul class="toc-list">
               <li>
                 <span class="toc-num">01</span>
-                <span class="toc-text">第一部分：Docker镜像概述</span>
+                <span class="toc-text">第一部分：Dockerfile基础</span>
               </li>
               <li>
                 <span class="toc-num">02</span>
-                <span class="toc-text">第二部分：镜像操作命令</span>
-              </li>
-              <li>
-                <span class="toc-num">实验</span>
-                <span class="toc-text">动手实验：Docker镜像命令实践</span>
+                <span class="toc-text">第二部分：Dockerfile指令详解</span>
               </li>
               <li>
                 <span class="toc-num">03</span>
-                <span class="toc-text">第三部分：Dockerfile基础</span>
+                <span class="toc-text">第三部分：镜像构建实践</span>
               </li>
               <li>
                 <span class="toc-num">04</span>
-                <span class="toc-text">第四部分：Dockerfile指令详解</span>
-              </li>
-              <li>
-                <span class="toc-num">05</span>
-                <span class="toc-text">第五部分：镜像构建实践</span>
-              </li>
-              <li>
-                <span class="toc-num">06</span>
-                <span class="toc-text">第六部分：镜像仓库与分发</span>
+                <span class="toc-text">第四部分：镜像构建优化</span>
               </li>
             </ul>
           </div>
-
+          
           <div class="knowledge-point">
             <div class="kp-title">学习建议</div>
             <div class="kp-content">
-              <p>本讲是<span class="highlight">Docker核心技能</span>，Dockerfile的每个指令都需要理解其用途和参数。建议跟随示例动手实践。</p>
+              <p>本讲专注于<span class="highlight">Dockerfile编写与镜像构建</span>，建议先完成第四讲的镜像管理基础学习。Dockerfile的每个指令都需要理解其用途和参数，建议跟随示例动手实践。</p>
             </div>
           </div>
         </div>
@@ -84,35 +72,28 @@
               <div class="objective-num">01</div>
               <div class="objective-content">
                 <h3>理解镜像概念</h3>
-                <p>掌握<span class="key-point">镜像分层机制</span>和存储原理</p>
+                <p>理解<span class="key-point">Dockerfile的作用</span>和基本语法</p>
               </div>
             </div>
             <div class="objective-item">
               <div class="objective-num">02</div>
               <div class="objective-content">
-                <h3>掌握镜像操作</h3>
-                <p>熟练使用<span class="highlight">镜像管理命令</span>（搜索、拉取、删除等）</p>
+                <h3>掌握核心指令</h3>
+                <p>熟练使用<span class="highlight">FROM、RUN、COPY、CMD</span>等核心指令</p>
               </div>
             </div>
             <div class="objective-item">
               <div class="objective-num">03</div>
               <div class="objective-content">
                 <h3>编写Dockerfile</h3>
-                <p>理解<span class="key-point">Dockerfile语法</span>，能编写基础构建文件</p>
+                <p>能够<span class="key-point">编写完整的Dockerfile</span>构建自定义镜像</p>
               </div>
             </div>
             <div class="objective-item">
               <div class="objective-num">04</div>
               <div class="objective-content">
-                <h3>构建自定义镜像</h3>
-                <p>能够<span class="highlight">构建、优化</span>自己的Docker镜像</p>
-              </div>
-            </div>
-            <div class="objective-item">
-              <div class="objective-num">05</div>
-              <div class="objective-content">
-                <h3>镜像分发管理</h3>
-                <p>掌握<span class="key-point">镜像仓库</span>的使用和镜像分发</p>
+                <h3>构建与优化</h3>
+                <p>掌握<span class="highlight">docker build</span>构建镜像，并进行优化</p>
               </div>
             </div>
           </div>
@@ -122,15 +103,15 @@
       <div class="page section-page">
         <div class="section-content">
           <span class="section-label">Part 1</span>
-          <h1 class="section-title">Docker镜像概述</h1>
-          <p class="section-desc">理解镜像的本质</p>
+          <h1 class="section-title">Dockerfile基础</h1>
+          <p class="section-desc">理解Dockerfile的作用与基本语法</p>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 1.1</span>
-          <h1 class="page-title">什么是Docker镜像？</h1>
+          <h1 class="page-title">什么是Dockerfile？</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">

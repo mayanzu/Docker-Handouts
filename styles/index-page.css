@@ -1,0 +1,437 @@
+/* ============================================
+   课程首页样式 - 基于 lecture-template.css
+   ============================================ */
+
+@import '../template/lecture-template.css';
+
+/* ============================================
+   全局基础样式
+   ============================================ */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   布局容器
+   ============================================ */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ============================================
+   Header 样式
+   ============================================ */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 32px 0;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.logo span {
+  color: var(--primary);
+}
+
+.header-meta {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+/* ============================================
+   Hero 区域样式
+   ============================================ */
+.hero {
+  padding: 80px 0 60px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero h1 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  max-width: 700px;
+  color: var(--text);
+}
+
+.hero h1 span {
+  color: var(--primary);
+}
+
+.hero-desc {
+  font-size: 18px;
+  color: var(--text-light);
+  max-width: 600px;
+  margin-bottom: 40px;
+  line-height: 1.7;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* ============================================
+   Section 通用样式
+   ============================================ */
+.section {
+  padding: 60px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-light);
+  margin-bottom: 24px;
+}
+
+.about-text {
+  font-size: 16px;
+  color: var(--text);
+  max-width: 800px;
+  line-height: 1.8;
+}
+
+.about-text p {
+  margin-bottom: 16px;
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+.about-text strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   Course Grid 课程网格
+   ============================================ */
+.course-section {
+  padding: 60px 0;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.course-card {
+  background: var(--bg);
+  padding: 28px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: background 0.2s ease;
+}
+
+.course-card:hover {
+  background: var(--bg-alt);
+}
+
+.course-card .num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.course-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.course-card p {
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.course-card .tags {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.course-card .tag {
+  font-size: 11px;
+  color: var(--primary);
+  background: var(--color-accent-light);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* ============================================
+   Tools Grid 工具网格
+   ============================================ */
+.tools-section {
+  padding: 60px 0;
+  background: var(--bg-alt);
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.tool-card {
+  background: var(--bg);
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: background 0.2s ease;
+}
+
+.tool-card:hover {
+  background: #ffffff;
+}
+
+.tool-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.tool-card p {
+  font-size: 12px;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================
+   Assessment Box 考核框
+   ============================================ */
+.assessment-box {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 40px;
+  border-radius: 8px;
+}
+
+.assessment-item {
+  margin-bottom: 24px;
+}
+
+.assessment-item:last-child {
+  margin-bottom: 0;
+}
+
+.assessment-item h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.assessment-item p {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.assessment-item ul {
+  list-style: none;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+  margin: 0;
+  padding: 0;
+}
+
+.assessment-item li {
+  position: relative;
+  padding-left: 16px;
+}
+
+.assessment-item li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+
+.assessment-item strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   Footer 样式
+   ============================================ */
+footer {
+  padding: 40px 0;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.footer-right {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+/* ============================================
+   响应式设计 - 平板端
+   ============================================ */
+@media (max-width: 900px) {
+  .course-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero h1 {
+    font-size: 36px;
+  }
+  
+  .hero-stats {
+    gap: 32px;
+  }
+  
+  .header-inner {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
+
+/* ============================================
+   响应式设计 - 移动端
+   ============================================ */
+@media (max-width: 600px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .course-grid, 
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero {
+    padding: 60px 0 40px;
+  }
+  
+  .hero h1 {
+    font-size: 28px;
+  }
+  
+  .hero-desc {
+    font-size: 16px;
+  }
+  
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+  }
+  
+  .section {
+    padding: 40px 0;
+  }
+  
+  .course-section,
+  .tools-section {
+    padding: 40px 0;
+  }
+  
+  .course-card,
+  .tool-card {
+    padding: 20px;
+  }
+  
+  .assessment-box {
+    padding: 24px;
+  }
+  
+  footer {
+    padding: 24px 0;
+  }
+  
+  .footer-inner {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
