@@ -509,45 +509,15 @@ RW: true              # 读写权限（true=可写，false=只读）</code></pre
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>掌握使用Docker数据卷管理nginx容器数据的方法，包括创建数据卷、挂载、写入自定义网页内容、验证数据持久化特性</p>
-            </div>
-            <div class="experiment-theory">
-              <h4>实验原理</h4>
-              <p><strong>数据卷（Volume）</strong>是Docker提供的持久化存储机制，具有以下特点：</p>
-              <ul>
-                <li>数据卷存储在宿主机的<code>/var/lib/docker/volumes/</code>目录下</li>
-                <li>数据卷独立于容器生命周期，删除容器不会删除数据卷</li>
-                <li>一个数据卷可以同时挂载给多个容器使用</li>
-                <li>数据卷支持读写和只读模式（:ro）</li>
-              </ul>
-              <p><strong>本实验原理</strong>：通过<code>docker volume create</code>创建命名数据卷，使用<code>-v</code>参数将数据卷挂载到nginx容器的网页目录，实现数据的持久化存储。验证时删除并重建容器，数据卷中的网页内容仍然存在，证明数据持久化成功。</p>
+              <p>掌握使用Ubuntu容器创建nginx数据卷、挂载、自定义网页内容，并验证数据持久化</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <span class="step-text"><strong>创建数据卷</strong>：使用docker volume create命令创建两个命名数据卷，分别用于存储网页内容和日志文件</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <span class="step-text"><strong>启动nginx容器</strong>：使用-v参数将数据卷挂载到nginx容器，-p参数进行端口映射</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">3</span>
-                <span class="step-text"><strong>写入自定义网页</strong>：通过ubuntu容器临时挂载同一数据卷，向网页目录写入自定义HTML内容</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">4</span>
-                <span class="step-text"><strong>验证网页访问</strong>：使用curl命令访问nginx，确认自定义网页内容显示正常</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text"><strong>验证持久化</strong>：停止并删除nginx容器，然后重新创建容器挂载相同数据卷，确认数据仍然存在</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">6</span>
-                <span class="step-text"><strong>清理环境</strong>：停止并删除所有容器，删除创建的数据卷</span>
-              </div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建nginx数据卷</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">启动nginx容器并挂载数据卷</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">自定义网页内容</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">验证数据持久化</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">清理环境</span></div>
             </div>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
@@ -568,7 +538,7 @@ $ docker run -d --name my-nginx \
 
 # 步骤3：通过Ubuntu容器写入自定义网页
 $ docker run --rm -v nginx-html:/usr/share/nginx/html ubuntu:22.04 \
-  sh -c 'echo "&lt;h1&gt;Welcome to Custom Nginx!&lt;/h1&gt;" &gt; /usr/share/nginx/html/index.html'
+  sh -c 'echo "<h1>Welcome to Custom Nginx!</h1>" > /usr/share/nginx/html/index.html'
 
 # 步骤4：验证网页
 $ curl http://localhost:8080
@@ -587,17 +557,6 @@ $ curl http://localhost:8080
 # 步骤6：清理
 $ docker stop new-nginx && docker rm new-nginx
 $ docker volume rm nginx-html nginx-logs</code></pre>
-          </div>
-          <div class="highlight-box">
-            <div class="highlight-title">验证清单</div>
-            <div class="highlight-content">
-              <p>- [ ] 成功创建nginx-html和nginx-logs两个数据卷</p>
-              <p>- [ ] nginx容器成功启动并监听8080端口</p>
-              <p>- [ ] 自定义网页内容写入成功</p>
-              <p>- [ ] 浏览器访问http://localhost:8080显示自定义内容</p>
-              <p>- [ ] 删除并重建容器后，数据仍然存在</p>
-              <p>- [ ] 成功清理所有容器和数据卷</p>
-            </div>
           </div>
         </div>
       </div>
@@ -1000,53 +959,20 @@ $ docker system df
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">nginx绑定挂载与热更新</span>
+              <span class="experiment-title">nginx自定义配置与多容器数据共享</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>掌握使用绑定挂载方式管理nginx配置文件和网页内容，实现配置的实时修改和热更新</p>
-            </div>
-            <div class="experiment-theory">
-              <h4>实验原理</h4>
-              <p><strong>绑定挂载（Bind Mount）</strong>是直接将宿主机目录挂载到容器的技术，与数据卷的区别在于：</p>
-              <ul>
-                <li>绑定挂载使用宿主机的任意目录路径，而数据卷由Docker管理</li>
-                <li>绑定挂载适合开发环境，可以直接使用宿主机的编辑器修改文件</li>
-                <li>绑定挂载的文件权限继承宿主机，需要注意UID/GID匹配</li>
-                <li>使用<code>:ro</code>参数可以设置只读挂载，防止容器意外修改配置文件</li>
-              </ul>
-              <p><strong>nginx热更新原理</strong>：nginx支持通过信号reload重新加载配置，无需重启容器。使用<code>docker exec nginx nginx -s reload</code>命令向nginx主进程发送HUP信号，实现配置的热更新。</p>
+              <p>掌握nginx配置文件的绑定挂载、多个容器共享数据卷、自定义网页</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <span class="step-text"><strong>创建宿主机目录结构</strong>：在用户主目录下创建nginx-project项目文件夹，包含html、config、logs三个子目录</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <span class="step-text"><strong>编写nginx配置文件</strong>：在config目录下创建default.conf，配置server块，设置监听端口、根目录、自定义location路径（如/status、/api）</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">3</span>
-                <span class="step-text"><strong>创建网页内容</strong>：在html目录下创建index.html，包含自定义HTML内容和导航链接</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">4</span>
-                <span class="step-text"><strong>启动nginx容器</strong>：使用-v参数绑定挂载三个目录到nginx容器，配置只读挂载（:ro）防止意外修改</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text"><strong>验证服务</strong>：使用curl命令测试主页、/status、/api三个端点，确认返回预期内容</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">6</span>
-                <span class="step-text"><strong>修改配置验证热更新</strong>：修改config/default.conf添加新端点，使用nginx -s reload热更新，验证新配置生效</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">7</span>
-                <span class="step-text"><strong>清理环境</strong>：停止并删除容器，删除创建的目录</span>
-              </div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建宿主机目录结构</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">编写自定义nginx配置</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">创建网页内容</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">启动nginx并测试</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">修改配置验证热更新</span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">清理环境</span></div>
             </div>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
@@ -1116,18 +1042,6 @@ $ curl http://localhost:8080/time
 # 步骤7：清理
 $ docker stop my-nginx-config && docker rm my-nginx-config
 $ rm -rf ~/nginx-project</code></pre>
-          </div>
-          <div class="highlight-box">
-            <div class="highlight-title">验证清单</div>
-            <div class="highlight-content">
-              <p>- [ ] 成功创建nginx-project目录结构</p>
-              <p>- [ ] nginx配置文件default.conf编写正确</p>
-              <p>- [ ] 自定义网页index.html内容完整</p>
-              <p>- [ ] nginx容器成功启动并监听8080端口</p>
-              <p>- [ ] curl测试主页、/status、/api三个端点均返回预期内容</p>
-              <p>- [ ] 修改配置后nginx热更新成功，新端点/time可访问</p>
-              <p>- [ ] 成功清理所有容器和目录</p>
-            </div>
           </div>
         </div>
       </div>
