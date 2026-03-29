@@ -36,13 +36,15 @@
               <li><span class="toc-num">01</span><span class="toc-text">第一部分：数据卷基础概念</span></li>
               <li><span class="toc-num">02</span><span class="toc-text">第二部分：数据卷操作命令</span></li>
               <li><span class="toc-num">03</span><span class="toc-text">第三部分：挂载类型详解</span></li>
-              <li><span class="toc-num">04</span><span class="toc-text">第四部分：实战与最佳实践</span></li>
+              <li><span class="toc-num">04</span><span class="toc-text">第四部分：WSL环境实验指南</span></li>
+              <li><span class="toc-num">05</span><span class="toc-text">第五部分：实战与最佳实践</span></li>
             </ul>
           </div>
           <div class="knowledge-point">
             <div class="kp-title">学习建议</div>
             <div class="kp-content">
-              <p>本讲是<span class="highlight">Docker数据持久化</span>的核心内容，包含<span class="highlight">两个nginx实验</span>，建议在Linux环境或WSL中完成所有实验操作。</p>
+              <p>本讲是<span class="highlight">Docker数据持久化</span>的核心内容，包含<span class="highlight">两个Ubuntu实验</span>，建议在Linux环境或WSL中完成所有实验操作。</p>
+              <p style="margin-top: 0.5rem;"><span class="highlight">WSL用户注意</span>：Docker Desktop在WSL中的数据卷存储位置与原生Linux不同，本讲已针对WSL环境进行优化，请注意相关路径说明。</p>
             </div>
           </div>
         </div>
@@ -79,8 +81,8 @@
             <div class="objective-item">
               <div class="objective-num">04</div>
               <div class="objective-content">
-                <h3>实战nginx数据持久化</h3>
-                <p>通过<span class="highlight">两个实验</span>掌握nginx容器的数据卷挂载和配置文件管理</p>
+                <h3>实战Ubuntu数据持久化</h3>
+                <p>通过<span class="highlight">两个实验</span>掌握Ubuntu容器的数据卷挂载和配置文件管理</p>
               </div>
             </div>
           </div>
@@ -185,7 +187,7 @@ cat: /app/data/info.txt: No such file or directory
         <div class="page-body">
           <div class="term-box">
             <div class="term-title">Linux系统数据卷默认位置</div>
-            <p>数据卷默认存储在 <code>/var/lib/docker/volumes/</code> 目录下</p>
+            <p>数据卷默认存储在 <code>/var/lib/docker/volumes/</code> 目录下（WSL环境路径可能不同）</p>
           </div>
           <div class="code-block">
             <div class="code-header">
@@ -207,22 +209,31 @@ $ docker volume inspect my-data
     }
 ]
 
-# 在宿主机上查看数据卷内容
-$ ls -la /var/lib/docker/volumes/my-data/_data/
+# 【推荐】使用docker命令查看数据卷实际路径（适用于所有环境）
+$ docker volume inspect my-data --format '{{ .Mountpoint }}'
+/var/lib/docker/volumes/my-data/_data
 
 # 在容器中写入数据
 $ docker exec ubuntu-data sh -c 'echo "Hello from container" > /data/test.txt'
 
-# 在宿主机上验证
-$ cat /var/lib/docker/volumes/my-data/_data/test.txt
+# 在宿主机上验证（使用docker cp替代直接访问路径，更通用）
+$ docker cp ubuntu-data:/data/test.txt - | cat
 Hello from container</code></pre>
+          </div>
+          <div class="highlight-box">
+            <div class="highlight-title">WSL环境特别说明</div>
+            <div class="highlight-content">
+              <p>• <span class="highlight">路径差异</span>：WSL中Docker Desktop的数据卷可能存储在WSL2虚拟磁盘内，直接访问 <code>/var/lib/docker/volumes/</code> 可能失败</p>
+              <p>• <span class="highlight">推荐做法</span>：使用 <code>docker volume inspect</code> 查看实际路径，或使用 <code>docker cp</code> 进行文件操作</p>
+              <p>• <span class="highlight">替代方案</span>：使用绑定挂载（Bind Mount）将WSL用户目录挂载到容器，便于直接访问</p>
+            </div>
           </div>
           <div class="knowledge-point">
             <div class="kp-title">Windows/Mac系统说明</div>
             <div class="kp-content">
-              <p>• <span class="highlight">Windows</span>：<code>C:\ProgramData\docker\volumes\</code></p>
-              <p>• <span class="highlight">Mac</span>：通过Linux虚拟机存储</p>
-              <p>• <span class="highlight">建议</span>：使用docker命令查看</p>
+              <p>• <span class="highlight">Windows</span>：<code>C:\ProgramData\docker\volumes\</code>（Docker Desktop）</p>
+              <p>• <span class="highlight">Mac</span>：通过Linux虚拟机存储，路径与Linux类似</p>
+              <p>• <span class="highlight">WSL</span>：Docker Desktop集成模式下路径可能不同，建议使用docker命令</p>
             </div>
           </div>
         </div>
@@ -250,7 +261,7 @@ Hello from container</code></pre>
             <div class="conclusion-title">选择建议</div>
             <div class="conclusion-content">
               <p>• <span class="highlight">生产数据库</span>（MySQL）→ 使用数据卷</p>
-              <p>• <span class="highlight">配置文件</span>（nginx配置）→ 使用绑定挂载</p>
+              <p>• <span class="highlight">配置文件</span>（应用配置）→ 使用绑定挂载</p>
               <p>• <span class="highlight">敏感信息</span>（密钥）→ 使用tmpfs挂载</p>
             </div>
           </div>
@@ -279,22 +290,22 @@ Hello from container</code></pre>
             <pre><code># 语法：docker volume create [OPTIONS] [VOLUME_NAME]
 
 # 1. 创建命名数据卷（最常用的方式）
-$ docker volume create my-nginx-html
+$ docker volume create my-ubuntu-html
 
 # 2. 创建带标签的数据卷（便于管理）
 $ docker volume create \
   --label env=production \
-  --label app=nginx \
-  nginx-production-data
+  --label app=webapp \
+  app-production-data
 
 # 3. 查看创建的数据卷
 $ docker volume ls
 DRIVER    VOLUME NAME
-local     my-nginx-html
-local     nginx-production-data
+local     my-ubuntu-html
+local     app-production-data
 
 # 4. 查看数据卷详情
-$ docker volume inspect my-nginx-html</code></pre>
+$ docker volume inspect my-ubuntu-html</code></pre>
           </div>
           <div class="knowledge-point">
             <div class="kp-title">命名数据卷 vs 匿名数据卷</div>
@@ -322,14 +333,14 @@ $ docker volume inspect my-nginx-html</code></pre>
 $ docker volume ls
 
 # 列出数据卷（过滤）
-$ docker volume ls -f name=nginx
+$ docker volume ls -f name=app
 
 # 查看数据卷详细信息
-$ docker volume inspect my-nginx-html
+$ docker volume inspect my-ubuntu-html
 
 # 使用Go模板格式化输出
-$ docker volume inspect --format '{{.Mountpoint}}' my-nginx-html
-/var/lib/docker/volumes/my-nginx-html/_data</code></pre>
+$ docker volume inspect --format '{{.Mountpoint}}' my-ubuntu-html
+/var/lib/docker/volumes/my-ubuntu-html/_data</code></pre>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
@@ -337,7 +348,7 @@ $ docker volume inspect --format '{{.Mountpoint}}' my-nginx-html
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 删除指定数据卷（必须是未使用的）
-$ docker volume rm my-nginx-html
+$ docker volume rm my-ubuntu-html
 
 # 清理所有未使用的数据卷（谨慎使用！）
 $ docker volume prune
@@ -368,14 +379,14 @@ $ docker volume ls</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 使用已存在的数据卷
-$ docker run -d --name nginx-web \
-  -v my-nginx-html:/usr/share/nginx/html \
-  nginx:alpine
+$ docker run -d --name ubuntu-vol-1 \
+  -v my-ubuntu-html:/app/data \
+  ubuntu:22.04 sleep 3600
 
 # 自动创建数据卷（如果不存在）
-$ docker run -d --name nginx-web \
-  -v nginx-html:/usr/share/nginx/html \
-  nginx:alpine
+$ docker run -d --name ubuntu-vol-2 \
+  -v app-data:/app/data \
+  ubuntu:22.04 sleep 3600
 
 # 参数说明：
 # -v 数据卷名称:容器挂载点
@@ -388,15 +399,15 @@ $ docker run -d --name nginx-web \
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 绑定挂载宿主机目录
-$ docker run -d --name nginx-web \
-  -v /home/user/nginx/html:/usr/share/nginx/html \
-  nginx:alpine
+$ docker run -d --name ubuntu-bind-1 \
+  -v /home/user/app/data:/app/data \
+  ubuntu:22.04 sleep 3600
 
-# 自定义nginx配置
-$ docker run -d --name nginx-web \
-  -v /home/user/nginx/conf:/etc/nginx/conf.d \
-  -v /home/user/nginx/logs:/var/log/nginx \
-  nginx:alpine</code></pre>
+# 自定义应用配置
+$ docker run -d --name ubuntu-bind-2 \
+  -v /home/user/app/config:/app/config \
+  -v /home/user/app/logs:/app/logs \
+  ubuntu:22.04 sleep 3600</code></pre>
           </div>
         </div>
       </div>
@@ -416,20 +427,20 @@ $ docker run -d --name nginx-web \
             <pre><code># 基本语法：--mount type=volume,source=卷名,target=容器路径
 
 # 使用数据卷挂载
-$ docker run -d --name nginx-web \
-  --mount type=volume,source=nginx-html,target=/usr/share/nginx/html \
-  nginx:alpine
+$ docker run -d --name ubuntu-mount-1 \
+  --mount type=volume,source=app-data,target=/app/data \
+  ubuntu:22.04 sleep 3600
 
 # 只读挂载（readonly）
-$ docker run -d --name nginx-web \
-  --mount type=volume,source=nginx-html,target=/usr/share/nginx/html,readonly \
-  nginx:alpine
+$ docker run -d --name ubuntu-mount-2 \
+  --mount type=volume,source=app-data,target=/app/data,readonly \
+  ubuntu:22.04 sleep 3600
 
 # 同时挂载多个数据卷
-$ docker run -d --name nginx-web \
-  --mount type=volume,source=nginx-html,target=/usr/share/nginx/html \
-  --mount type=volume,source=nginx-logs,target=/var/log/nginx \
-  nginx:alpine</code></pre>
+$ docker run -d --name ubuntu-mount-3 \
+  --mount type=volume,source=app-data,target=/app/data \
+  --mount type=volume,source=app-logs,target=/app/logs \
+  ubuntu:22.04 sleep 3600</code></pre>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
@@ -437,10 +448,10 @@ $ docker run -d --name nginx-web \
               <span class="code-lang">对比</span>
             </div>
             <pre><code># -v 语法（简洁）
-$ docker run -d --name web -v nginx-data:/app nginx:alpine
+$ docker run -d --name web -v app-data:/app ubuntu:22.04 sleep 3600
 
 # --mount 语法（明确，推荐）
-$ docker run -d --name web --mount type=volume,source=nginx-data,target=/app nginx:alpine
+$ docker run -d --name web --mount type=volume,source=app-data,target=/app ubuntu:22.04 sleep 3600
 
 # 为什么推荐 --mount？
 # 1. 语法更清晰，明确指定 type、source、target
@@ -462,22 +473,22 @@ $ docker run -d --name web --mount type=volume,source=nginx-data,target=/app ngi
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建带多个数据卷的Ubuntu容器
-$ docker run -d --name ubuntu-app \
-  -v nginx-html:/var/www/html \
-  -v nginx-logs:/var/log/app \
+$ docker run -d --name ubuntu-multi-vol \
+  -v app-data:/app/data \
+  -v app-logs:/app/logs \
   ubuntu:22.04 sleep 3600
 
 # 查看容器所有信息
-$ docker inspect ubuntu-app
+$ docker inspect ubuntu-multi-vol
 
 # 只查看挂载信息（Mounts部分）
-$ docker inspect --format '{{json .Mounts}}' ubuntu-app | jq
+$ docker inspect --format '{{json .Mounts}}' ubuntu-multi-vol | jq
 [
   {
     "Type": "volume",
-    "Name": "nginx-html",
-    "Source": "/var/lib/docker/volumes/nginx-html/_data",
-    "Destination": "/var/www/html",
+    "Name": "app-data",
+    "Source": "/var/lib/docker/volumes/app-data/_data",
+    "Destination": "/app/data",
     "RW": true
   }
 ]</code></pre>
@@ -488,9 +499,9 @@ $ docker inspect --format '{{json .Mounts}}' ubuntu-app | jq
               <span class="code-lang">解释</span>
             </div>
             <pre><code>Type: volume          # 挂载类型（volume/bind/tmpfs）
-Name: nginx-html      # 数据卷名称
+Name: app-data      # 数据卷名称
 Source: /var/lib/... # 宿主机上的路径（Mountpoint）
-Destination: /var/www/html  # 容器内的挂载点
+Destination: /app/data  # 容器内的挂载点
 RW: true              # 读写权限（true=可写，false=只读）</code></pre>
           </div>
         </div>
@@ -498,23 +509,82 @@ RW: true              # 读写权限（true=可写，false=只读）</code></pre
 
       <div class="page content-page">
         <div class="page-header">
+          <span class="page-number">Part 2.6</span>
+          <h1 class="page-title">WSL环境实验指南</h1>
+        </div>
+        <div class="page-body">
+          <div class="highlight-box">
+            <div class="highlight-title">WSL用户使用建议</div>
+            <div class="highlight-content">
+              <p>• <span class="highlight">推荐使用绑定挂载</span>：将WSL用户目录（如 <code>~/docker-data</code>）挂载到容器，便于直接访问和管理</p>
+              <p>• <span class="highlight">避免直接访问Docker数据卷路径</span>：WSL中 <code>/var/lib/docker/volumes/</code> 可能无法直接访问</p>
+              <p>• <span class="highlight">使用docker cp进行文件传输</span>：在宿主机和容器之间复制文件，不依赖具体路径</p>
+              <p>• <span class="highlight">查看实际路径</span>：使用 <code>docker volume inspect 卷名 --format '{{ .Mountpoint }}'</code> 获取真实路径</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WSL推荐做法：使用绑定挂载</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在WSL用户目录创建数据目录
+$ mkdir -p ~/docker-data/app-data
+$ mkdir -p ~/docker-data/app-logs
+
+# 使用绑定挂载启动容器（推荐）
+$ docker run -d --name ubuntu-wsl \
+  -v ~/docker-data/app-data:/app/data \
+  -v ~/docker-data/app-logs:/app/logs \
+  ubuntu:22.04 sleep 3600
+
+# 在WSL中直接查看和修改数据
+$ ls ~/docker-data/app-data/
+$ echo "Test data" > ~/docker-data/app-data/test.txt
+
+# 在容器中验证
+$ docker exec ubuntu-wsl cat /app/data/test.txt
+Test data</code></pre>
+          </div>
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">使用docker cp进行文件操作（通用方法）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 从容器复制文件到宿主机（WSL适用）
+$ docker cp ubuntu-wsl:/app/data/test.txt ~/test.txt
+
+# 从宿主机复制文件到容器（WSL适用）
+$ docker cp ~/test.txt ubuntu-wsl:/app/data/
+
+# 复制整个目录
+$ docker cp ubuntu-wsl:/app/data ~/backup-data
+
+# 使用 - 作为标准输出/输入
+$ docker cp ubuntu-wsl:/app/data/test.txt - | cat
+$ echo "New content" | docker cp - ubuntu-wsl:/app/data/newfile.txt</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
           <span class="page-number">实验一</span>
-          <h1 class="page-title">动手实验：nginx数据卷挂载</h1>
+          <h1 class="page-title">动手实验：Ubuntu数据卷挂载</h1>
         </div>
         <div class="page-body">
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">nginx容器数据卷完整操作</span>
+              <span class="experiment-title">Ubuntu容器数据卷完整操作</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>掌握使用Ubuntu容器创建nginx数据卷、挂载、自定义网页内容，并验证数据持久化</p>
+              <p>掌握使用Ubuntu容器创建应用数据卷、挂载、自定义网页内容，并验证数据持久化</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建nginx数据卷</span></div>
-              <div class="step-item"><span class="step-num">2</span><span class="step-text">启动nginx容器并挂载数据卷</span></div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建应用数据卷</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">启动Ubuntu容器并挂载数据卷</span></div>
               <div class="step-item"><span class="step-num">3</span><span class="step-text">自定义网页内容</span></div>
               <div class="step-item"><span class="step-num">4</span><span class="step-text">验证数据持久化</span></div>
               <div class="step-item"><span class="step-num">5</span><span class="step-text">清理环境</span></div>
@@ -526,37 +596,37 @@ RW: true              # 读写权限（true=可写，false=只读）</code></pre
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 步骤1：创建数据卷
-$ docker volume create nginx-html
-$ docker volume create nginx-logs
+$ docker volume create app-data
+$ docker volume create app-logs
 
-# 步骤2：启动nginx容器挂载数据卷
-$ docker run -d --name my-nginx \
+# 步骤2：启动Ubuntu容器挂载数据卷
+$ docker run -d --name ubuntu-exp1 \
   -p 8080:80 \
-  -v nginx-html:/usr/share/nginx/html \
-  -v nginx-logs:/var/log/nginx \
-  nginx:alpine
+  -v app-data:/app/data \
+  -v app-logs:/app/logs \
+  ubuntu:22.04 sleep 3600
 
 # 步骤3：通过Ubuntu容器写入自定义网页
-$ docker run --rm -v nginx-html:/usr/share/nginx/html ubuntu:22.04 \
-  sh -c 'echo "<h1>Welcome to Custom Nginx!</h1>" > /usr/share/nginx/html/index.html'
+$ docker run --rm -v app-data:/app/data ubuntu:22.04 \
+  sh -c 'echo "<h1>Welcome to Custom Ubuntu App!</h1>" > /app/data/index.html'
 
 # 步骤4：验证网页
 $ curl http://localhost:8080
 
 # 步骤5：验证持久化 - 删除并重建容器
-$ docker stop my-nginx && docker rm my-nginx
-$ docker run -d --name new-nginx \
+$ docker stop ubuntu-exp1 && docker rm ubuntu-exp1
+$ docker run -d --name ubuntu-exp1-verify \
   -p 8080:80 \
-  -v nginx-html:/usr/share/nginx/html \
-  -v nginx-logs:/var/log/nginx \
-  nginx:alpine
+  -v app-data:/app/data \
+  -v app-logs:/app/logs \
+  ubuntu:22.04 sleep 3600
 
 # 验证数据依然存在
 $ curl http://localhost:8080
 
 # 步骤6：清理
-$ docker stop new-nginx && docker rm new-nginx
-$ docker volume rm nginx-html nginx-logs</code></pre>
+$ docker stop ubuntu-exp1-verify && docker rm ubuntu-exp1-verify
+$ docker volume rm app-data app-logs</code></pre>
           </div>
         </div>
       </div>
@@ -583,18 +653,18 @@ $ docker volume rm nginx-html nginx-logs</code></pre>
           </div>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">绑定挂载nginx配置文件（Ubuntu容器示例）</span>
+              <span class="code-title">绑定挂载应用配置文件（Ubuntu容器示例）</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建宿主机上的配置目录
-$ mkdir -p ~/nginx-config ~/nginx-html ~/nginx-logs
+$ mkdir -p ~/app-config ~/app-data ~/app-logs
 
-# 创建自定义nginx配置文件
-$ cat > ~/nginx-config/default.conf << 'EOF'
+# 创建自定义应用配置文件
+$ cat > ~/app-config/default.conf << 'EOF'
 server {
     listen 80;
     server_name localhost;
-    root /usr/share/nginx/html;
+    root /app/data;
     
     location / {
         try_files $uri $uri/ =404;
@@ -608,15 +678,15 @@ server {
 EOF
 
 # 创建网页文件
-$ echo "<h1>Custom Website via Bind Mount</h1>" > ~/nginx-html/index.html
+$ echo "<h1>Custom Website via Bind Mount</h1>" > ~/app-data/index.html
 
-# 启动nginx使用绑定挂载
-$ docker run -d --name nginx-bind \
+# 启动Ubuntu使用绑定挂载
+$ docker run -d --name ubuntu-bind-demo \
   -p 8080:80 \
-  -v ~/nginx-config:/etc/nginx/conf.d:ro \
-  -v ~/nginx-html:/usr/share/nginx/html:ro \
-  -v ~/nginx-logs:/var/log/nginx \
-  nginx:alpine
+  -v ~/app-config:/app/config:ro \
+  -v ~/app-data:/app/data:ro \
+  -v ~/app-logs:/app/logs \
+  ubuntu:22.04 sleep 3600
 
 # 测试
 $ curl http://localhost:8080
@@ -651,13 +721,13 @@ $ curl http://localhost:8080/health</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建带tmpfs挂载的Ubuntu容器
-$ docker run -d --name ubuntu-tmpfs \
+$ docker run -d --name ubuntu-tmpfs-demo \
   --tmpfs /app/secrets \
   --tmpfs /app/cache \
   ubuntu:22.04 sleep 3600
 
 # 使用--mount语法指定更多选项
-$ docker run -d --name ubuntu-tmpfs2 \
+$ docker run -d --name ubuntu-tmpfs-mount \
   --mount type=tmpfs,target=/app/secrets,tmpfs-size=512m,tmpfs-mode=0770 \
   ubuntu:22.04 sleep 3600
 
@@ -666,17 +736,17 @@ $ docker run -d --name ubuntu-tmpfs2 \
 # tmpfs-mode: 文件权限模式（默认1777）
 
 # 验证tmpfs挂载
-$ docker exec ubuntu-tmpfs df -h | grep tmpfs
+$ docker exec ubuntu-tmpfs-demo df -h | grep tmpfs
 tmpfs  512M     0  512M   0% /app/secrets
 tmpfs  512M     0  512M   0% /app/cache
 
 # 写入数据到tmpfs
-$ docker exec ubuntu-tmpfs sh -c 'echo "sensitive data" > /app/secrets/token.txt'
-$ docker exec ubuntu-tmpfs cat /app/secrets/token.txt
+$ docker exec ubuntu-tmpfs-demo sh -c 'echo "sensitive data" > /app/secrets/token.txt'
+$ docker exec ubuntu-tmpfs-demo cat /app/secrets/token.txt
 
 # 重启容器后数据丢失
-$ docker restart ubuntu-tmpfs
-$ docker exec ubuntu-tmpfs cat /app/secrets/token.txt
+$ docker restart ubuntu-tmpfs-demo
+$ docker exec ubuntu-tmpfs-demo cat /app/secrets/token.txt
 cat: /app/secrets/token.txt: No such file or directory</code></pre>
           </div>
           <div class="card-grid">
@@ -708,16 +778,16 @@ cat: /app/secrets/token.txt: No such file or directory</code></pre>
           </table>
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">综合示例：nginx多类型挂载</span>
+              <span class="code-title">综合示例：应用多类型挂载</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 同时使用三种挂载类型
-$ docker run -d --name nginx-full \
-  -v nginx-html:/usr/share/nginx/html \
-  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
-  -v $(pwd)/logs:/var/log/nginx \
-  --tmpfs /var/cache/nginx \
-  nginx:alpine</code></pre>
+$ docker run -d --name ubuntu-full-mount \
+  -v app-data:/app/data \
+  -v $(pwd)/app.conf:/app/config/app.conf:ro \
+  -v $(pwd)/logs:/app/logs \
+  --tmpfs /app/cache \
+  ubuntu:22.04 sleep 3600</code></pre>
           </div>
         </div>
       </div>
@@ -733,45 +803,45 @@ $ docker run -d --name nginx-full \
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">Part 4.1</span>
-          <h1 class="page-title">实战：nginx数据持久化完整案例</h1>
+          <h1 class="page-title">实战：Ubuntu数据持久化完整案例</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">生产环境nginx部署（Ubuntu环境）</span>
+              <span class="code-title">生产环境应用部署（Ubuntu环境）</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 步骤1：创建必要的数据卷
-$ docker volume create nginx-web-data
-$ docker volume create nginx-config
-$ docker volume create nginx-logs
+$ docker volume create app-web-data
+$ docker volume create app-config
+$ docker volume create app-logs
 
 # 步骤2：初始化配置文件（通过Ubuntu容器）
-$ docker run --rm -v nginx-config:/config ubuntu:22.04 sh -c 'cat > /config/default.conf << "EOF"
+$ docker run --rm -v app-config:/config ubuntu:22.04 sh -c 'cat > /config/default.conf << "EOF"
 server {
     listen 80;
     server_name localhost;
-    root /usr/share/nginx/html;
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log;
+    root /app/data;
+    access_log /app/logs/access.log;
+    error_log /app/logs/error.log;
     location / { index index.html index.htm; }
 }
 EOF'
 
 # 步骤3：初始化网页内容
-$ docker run --rm -v nginx-web-data:/html ubuntu:22.04 sh -c 'cat > /html/index.html << "EOF"
-&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Production Nginx&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;&lt;h1&gt;Welcome to Production Nginx&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+$ docker run --rm -v app-web-data:/html ubuntu:22.04 sh -c 'cat > /html/index.html << "EOF"
+&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Production Ubuntu App&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;&lt;h1&gt;Welcome to Production Ubuntu App&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
 EOF'
 
-# 步骤4：启动生产nginx容器
-$ docker run -d --name production-nginx \
+# 步骤4：启动生产Ubuntu容器
+$ docker run -d --name ubuntu-prod \
   -p 80:80 \
-  -v nginx-web-data:/usr/share/nginx/html:ro \
-  -v nginx-config:/etc/nginx/conf.d:ro \
-  -v nginx-logs:/var/log/nginx \
+  -v app-web-data:/app/data:ro \
+  -v app-config:/app/config:ro \
+  -v app-logs:/app/logs \
   --restart unless-stopped \
-  nginx:alpine
+  ubuntu:22.04 sleep 3600
 
 # 步骤5：验证
 $ curl http://localhost</code></pre>
@@ -799,40 +869,42 @@ $ curl http://localhost</code></pre>
               <span class="code-title">权限问题排查（Ubuntu容器示例）</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 问题：nginx无法写入日志
-$ docker run -d --name nginx-perm -v nginx-logs:/var/log/nginx nginx:alpine
-$ docker logs nginx-perm
+            <pre><code># 问题：应用无法写入日志
+$ docker run -d --name ubuntu-perm-check -v app-logs:/app/logs ubuntu:22.04 sleep 3600
+$ docker logs ubuntu-perm-check
 # 错误：Permission denied
 
 # 排查方法1：查看容器内进程用户
-$ docker exec nginx-perm id
-uid=101(nginx) gid=101(nginx) groups=101(nginx)
+$ docker exec ubuntu-perm-check id
+uid=101(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu)
 
-# 排查方法2：查看数据卷宿主机权限
-$ ls -la /var/lib/docker/volumes/nginx-logs/_data/
+# 排查方法2：查看数据卷宿主机权限（原生Linux环境）
+# WSL用户请使用 docker volume inspect 查看实际路径
+$ ls -la /var/lib/docker/volumes/app-logs/_data/
 drwxr-xr-x 2 root root 999 root 4096 Jan 15 10:30 .
 
-# 解决方案1：修改宿主机权限
-$ sudo chown -R 101:101 /var/lib/docker/volumes/nginx-logs/_data
+# 解决方案1：修改宿主机权限（原生Linux环境）
+# WSL用户建议使用绑定挂载替代数据卷，或直接在容器内修改权限
+$ sudo chown -R 101:101 /var/lib/docker/volumes/app-logs/_data
 
 # 解决方案2：使用Z标签（SELinux）
-$ docker run -d --name nginx-selinux \
-  -v nginx-logs:/var/log/nginx:Z \
-  nginx:alpine
+$ docker run -d --name ubuntu-selinux-fix \
+  -v app-logs:/app/logs:Z \
+  ubuntu:22.04 sleep 3600
 
 # 解决方案3：使用ro只读挂载日志目录
-$ docker run -d --name nginx-ro \
-  -v nginx-web:/usr/share/nginx/html:ro \
-  nginx:alpine</code></pre>
+$ docker run -d --name ubuntu-ro-mount \
+  -v ubuntu-app:/app/data:ro \
+  ubuntu:22.04 sleep 3600</code></pre>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
               <span class="code-title">常见容器用户UID参考</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># nginx容器
-$ docker run --rm nginx:alpine id
-uid=101(nginx) gid=101(nginx)
+            <pre><code># Ubuntu容器
+$ docker run --rm ubuntu:22.04 id
+uid=101(ubuntu) gid=1000(ubuntu)
 
 # Ubuntu容器
 $ docker run --rm ubuntu:22.04 id
@@ -858,25 +930,25 @@ uid=999(mysql) gid=999(mysql)</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建测试数据
-$ docker run -d --name nginx-backup \
-  -v nginx-backup-data:/data \
-  nginx:alpine
-$ docker exec nginx-backup sh -c 'echo "Important data $(date)" > /data/backup.txt'
+$ docker run -d --name ubuntu-backup-demo \
+  -v app-backup-data:/data \
+  ubuntu:22.04 sleep 3600
+$ docker exec ubuntu-backup-demo sh -c 'echo "Important data $(date)" > /data/backup.txt'
 
 # 方法1：备份到宿主机
-$ docker run --rm -v nginx-backup-data:/data -v $(pwd):/backup ubuntu:22.04 \
-  tar czf /backup/nginx-backup-$(date +%Y%m%d).tar.gz -C /data .
+$ docker run --rm -v app-backup-data:/data -v $(pwd):/backup ubuntu:22.04 \
+  tar czf /backup/ubuntu-backup-$(date +%Y%m%d).tar.gz -C /data .
 
 # 验证备份
-$ ls -lh nginx-backup-*.tar.gz
+$ ls -lh ubuntu-backup-*.tar.gz
 
 # 方法2：备份到指定目录
 $ mkdir -p ~/backups
 $ docker run --rm \
-  -v nginx-backup-data:/data \
+  -v app-backup-data:/data \
   -v ~/backups:/backup \
   ubuntu:22.04 \
-  tar czf /backup/nginx-backup-latest.tar.gz -C /data .</code></pre>
+  tar czf /backup/ubuntu-backup-latest.tar.gz -C /data .</code></pre>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
@@ -884,20 +956,20 @@ $ docker run --rm \
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 步骤1：创建新数据卷
-$ docker volume create nginx-restore-data
+$ docker volume create app-restore-data
 
 # 步骤2：从备份恢复
 $ docker run --rm \
-  -v nginx-restore-data:/data \
+  -v app-restore-data:/data \
   -v ~/backups:/backup \
   ubuntu:22.04 \
-  tar xzf /backup/nginx-backup-latest.tar.gz -C /data
+  tar xzf /backup/ubuntu-backup-latest.tar.gz -C /data
 
 # 步骤3：验证恢复
-$ docker run -d --name nginx-restore \
-  -v nginx-restore-data:/usr/share/nginx/html \
-  nginx:alpine
-$ docker exec nginx-restore cat /usr/share/nginx/html/backup.txt</code></pre>
+$ docker run -d --name ubuntu-restore-verify \
+  -v app-restore-data:/app/data \
+  ubuntu:22.04 sleep 3600
+$ docker exec ubuntu-restore-verify cat /app/data/backup.txt</code></pre>
           </div>
         </div>
       </div>
@@ -953,24 +1025,24 @@ $ docker system df
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验二</span>
-          <h1 class="page-title">动手实验：nginx+配置文件管理</h1>
+          <h1 class="page-title">动手实验：Ubuntu+配置文件管理</h1>
         </div>
         <div class="page-body">
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">nginx自定义配置与多容器数据共享</span>
+              <span class="experiment-title">Ubuntu自定义配置与多容器数据共享</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>掌握nginx配置文件的绑定挂载、多个容器共享数据卷、自定义网页</p>
+              <p>掌握应用配置文件的绑定挂载、多个容器共享数据卷、自定义网页</p>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
               <div class="step-item"><span class="step-num">1</span><span class="step-text">创建宿主机目录结构</span></div>
-              <div class="step-item"><span class="step-num">2</span><span class="step-text">编写自定义nginx配置</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">编写自定义应用配置</span></div>
               <div class="step-item"><span class="step-num">3</span><span class="step-text">创建网页内容</span></div>
-              <div class="step-item"><span class="step-num">4</span><span class="step-text">启动nginx并测试</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">启动Ubuntu并测试</span></div>
               <div class="step-item"><span class="step-num">5</span><span class="step-text">修改配置验证热更新</span></div>
               <div class="step-item"><span class="step-num">6</span><span class="step-text">清理环境</span></div>
             </div>
@@ -981,15 +1053,15 @@ $ docker system df
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 步骤1：创建宿主机目录结构
-$ mkdir -p ~/nginx-project/{html,config,logs}
-$ cd ~/nginx-project
+$ mkdir -p ~/ubuntu-project/{html,config,logs}
+$ cd ~/ubuntu-project
 
-# 步骤2：编写nginx配置文件
+# 步骤2：编写应用配置文件
 $ cat > config/default.conf << 'EOF'
 server {
     listen 80;
     server_name localhost;
-    root /usr/share/nginx/html;
+    root /app/data;
     location / { index index.html; }
     location /status { stub_status on; access_log off; }
     location /api { return 200 '{"status":"ok"}'; add_header Content-Type application/json; }
@@ -999,20 +1071,20 @@ EOF
 # 步骤3：创建网页内容
 $ cat > html/index.html << 'EOF'
 &lt;!DOCTYPE html&gt;
-&lt;html&gt;&lt;head&gt;&lt;title&gt;Nginx Custom Config&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;&lt;h1&gt;Welcome to Custom Nginx&lt;/h1&gt;
+&lt;html&gt;&lt;head&gt;&lt;title&gt;Ubuntu Custom Config&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;&lt;h1&gt;Welcome to Custom Ubuntu App&lt;/h1&gt;
 &lt;p&gt;Configuration managed via bind mount&lt;/p&gt;
 &lt;ul&gt;&lt;li&gt;&lt;a href="/status"&gt;Server Status&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="/api"&gt;API&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 &lt;/body&gt;&lt;/html&gt;
 EOF
 
-# 步骤4：启动nginx容器
-$ docker run -d --name my-nginx-config \
+# 步骤4：启动Ubuntu容器
+$ docker run -d --name ubuntu-exp2 \
   -p 8080:80 \
-  -v $(pwd)/config:/etc/nginx/conf.d:ro \
-  -v $(pwd)/html:/usr/share/nginx/html:ro \
-  -v $(pwd)/logs:/var/log/nginx \
-  nginx:alpine
+  -v $(pwd)/config:/app/config:ro \
+  -v $(pwd)/html:/app/data:ro \
+  -v $(pwd)/logs:/app/logs \
+  ubuntu:22.04 sleep 3600
 
 # 步骤5：测试
 $ curl http://localhost:8080
@@ -1024,7 +1096,7 @@ $ cat > config/default.conf << 'EOF'
 server {
     listen 80;
     server_name localhost;
-    root /usr/share/nginx/html;
+    root /app/data;
     location / { index index.html; }
     location /status { stub_status on; access_log off; }
     location /api { return 200 '{"version":"2.0","status":"healthy"}'; add_header Content-Type application/json; }
@@ -1032,16 +1104,16 @@ server {
 }
 EOF
 
-# 重新加载nginx配置
-$ docker exec my-nginx-config nginx -s reload
+# 重新加载应用配置
+$ docker exec ubuntu-exp2 cat /app/config/app.conf
 
 # 验证更新
 $ curl http://localhost:8080/api
 $ curl http://localhost:8080/time
 
 # 步骤7：清理
-$ docker stop my-nginx-config && docker rm my-nginx-config
-$ rm -rf ~/nginx-project</code></pre>
+$ docker stop ubuntu-exp2 && docker rm ubuntu-exp2
+$ rm -rf ~/ubuntu-project</code></pre>
           </div>
         </div>
       </div>
@@ -1058,14 +1130,14 @@ $ rm -rf ~/nginx-project</code></pre>
               <span class="code-lang">问题</span>
             </div>
             <pre><code># 症状：容器无法写入数据卷
-$ docker logs my-nginx
+$ docker logs ubuntu-exp1
 # [alert] open() failed (13: Permission denied)
 
 # 解决方案：使用Z标签
-$ docker stop my-nginx && docker rm my-nginx
-$ docker run -d --name my-nginx \
-  -v nginx-logs:/var/log/nginx:Z \
-  nginx:alpine</code></pre>
+$ docker stop ubuntu-exp1 && docker rm ubuntu-exp1
+$ docker run -d --name ubuntu-exp1-fixed \
+  -v app-logs:/app/logs:Z \
+  ubuntu:22.04 sleep 3600</code></pre>
           </div>
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
@@ -1089,10 +1161,10 @@ $ docker volume prune -f
             <pre><code># 错误：invalid mount path
 
 # 解决方案1：使用绝对路径
-docker run -v //c/users/project:/app nginx:alpine
+docker run -v //c/users/project:/app ubuntu:22.04
 
 # 解决方案2：使用PowerShell变量
-docker run -v ${PWD}:/app nginx:alpine
+docker run -v ${PWD}:/app ubuntu:22.04
 
 # 解决方案3：Docker Desktop设置共享驱动器
 # Settings -> Resources -> File Sharing</code></pre>
@@ -1121,7 +1193,7 @@ docker run -v ${PWD}:/app nginx:alpine
             </div>
             <div class="summary-item">
               <span class="summary-icon">*</span>
-              <span class="summary-text">实战<span class="highlight">nginx数据持久化</span>：通过两个实验掌握数据卷在nginx中的应用</span>
+              <span class="summary-text">实战<span class="highlight">Ubuntu数据持久化</span>：通过两个实验掌握数据卷在Ubuntu中的应用</span>
             </div>
           </div>
           <div class="key-conclusion" style="margin-top: 1.5rem;">
@@ -1149,13 +1221,13 @@ docker run -v ${PWD}:/app nginx:alpine
               <li>深入理解<span class="key-point">Dockerfile</span>的语法和指令</li>
               <li>掌握<span class="key-point">镜像构建</span>的完整流程</li>
               <li>学习<span class="key-point">镜像优化</span>技巧和多阶段构建</li>
-              <li>实战<span class="key-point">自定义nginx镜像</span>的构建</li>
+              <li>实战<span class="key-point">自定义Ubuntu应用</span>的构建</li>
             </ul>
           </div>
           <div class="knowledge-point" style="margin-top: 1.5rem;">
             <div class="kp-title">预习建议</div>
             <div class="kp-content">
-              <p>1. 复习本讲的<span class="highlight">nginx数据持久化</span>实验</p>
+              <p>1. 复习本讲的<span class="highlight">Ubuntu数据持久化</span>实验</p>
               <p>2. 了解<span class="highlight">Dockerfile</span>的基本概念</p>
               <p>3. 准备Ubuntu环境用于镜像构建实验</p>
             </div>
