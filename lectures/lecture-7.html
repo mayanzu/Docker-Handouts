@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>第七讲 Dockerfile与镜像构建 - 虚拟化容器技术</title>
   <link rel="stylesheet" href="../template/lecture-template.css">
-  <style>
-    .page { overflow-x: hidden; }
-    .code-block pre { white-space: pre-wrap; word-break: break-all; }
-    .compare-table { table-layout: fixed; }
-  </style>
 </head>
 <body>
   <div class="lecture-page">
@@ -830,30 +825,87 @@ VOLUME /var/www/html</code></pre>
             <pre><code># 基础镜像（完整版Ubuntu，体积较大）
 FROM ubuntu:22.04
 
-# 安装多个软件，每个RUN一层
+# 安装vim，每个RUN一层
 RUN apt-get update
-RUN apt-get install -y curl
 RUN apt-get install -y vim
-RUN apt-get install -y iputils-ping
-
-# 复制整个项目（包含不需要的文件）
-COPY . /app
-
-# 设置环境变量
-ENV APP_ENV=production
-ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-CMD ["ping", "www.baidu.com"]</code></pre>
+CMD ["vim", "--version"]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.2</span>
+          <h1 class="page-title">docker build - 构建镜像</h1>
+            </div>
+            <div class="page-body">
+              <div class="definition-box">
+                <div class="definition-term">docker build原理</div>
+                <div class="definition-content">
+                  docker build命令读取Dockerfile，按照指令顺序执行每条命令，最终生成一个<span class="highlight">新的镜像</span>。构建过程中，Docker会为每条指令创建容器、执行命令、提交更改。
+                </div>
+              </div>
+
+              <p class="paragraph">
+                docker build的工作流程：读取Dockerfile → 创建临时容器 → 执行指令 → 提交新镜像层 → 删除临时容器 → 继续下一条指令。
+              </p>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-title">docker build命令</span>
+                  <span class="code-lang">Bash</span>
+                </div>
+                <pre><code># 语法：docker build [OPTIONS] PATH | URL | -
+
+# 基础用法 - 在当前目录构建
+$ docker build -t myapp:1.0 .
+
+# 预期输出：
+[+] Building 15.3s (8/8) FINISHED
+ => [internal] load build definition from Dockerfile
+ => [internal] load .dockerignore
+ => [1/4] FROM ubuntu:22.04
+ => [2/4] RUN apt-get update && apt-get install -y vim
+ => naming to docker.io/library/myapp:1.0</code></pre>
+              </div>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-title">常用参数说明</span>
+                  <span class="code-lang">Bash</span>
+                </div>
+                <pre><code># -t, --tag              指定镜像名称和标签（name:tag）
+# --file, -f            指定Dockerfile路径
+# --no-cache            构建时不使用缓存
+# --build-arg           设置构建参数
+
+# 指定Dockerfile路径和构建上下文
+$ docker build -t myapp:1.0 -f /path/to/Dockerfile /path/to/context
+
+# 不使用缓存构建
+$ docker build --no-cache -t myapp:1.0 .
+
+# 传递构建参数
+$ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
+              </div>
+
+              <div class="tip-box">
+                <div class="tip-title">构建上下文说明</div>
+                <p>- <span class="highlight">PATH</span>是构建上下文，docker build会在该目录下查找Dockerfile和所需文件</p>
+                <p>- <span class="highlight">.</span>表示当前目录作为构建上下文</p>
+                <p>- COPY指令只能复制构建上下文内的文件，无法访问外部文件</p>
+              </div>
+            </div>
           </div>
 
           <div class="tip-box">
             <div class="tip-title">存在的问题</div>
             <p>1. <span class="highlight">每个RUN一层</span>：产生多层镜像，体积大</p>
             <p>2. <span class="highlight">未清理缓存</span>：apt-get缓存留在镜像中</p>
-            <p>3. <span class="highlight">COPY . /app</span>：复制了所有文件，包括不需要的</p>
-            <p>4. <span class="highlight">未使用--no-install-recommends</span>：安装了不必要的依赖</p>
+            <p>3. <span class="highlight">未使用--no-install-recommends</span>：安装了不必要的依赖</p>
           </div>
 
           <div class="code-block">
@@ -880,7 +932,7 @@ myapp    unoptimized    450MB</code></pre>
           <div class="definition-box">
             <div class="definition-term">镜像优化原理</div>
             <div class="definition-content">
-              每个RUN指令都会创建一个新的镜像层。通过<span class="highlight">合并RUN指令</span>、<span class="highlight">清理缓存</span>、<span class="highlight">使用轻量基础镜像</span>等技巧，可以显著减小镜像体积。
+              每个RUN指令都会创建一个新的镜像层。通过<span class="highlight">合并RUN指令</span>、<span class="highlight">清理缓存</span>等技巧，可以显著减小镜像体积。
             </div>
           </div>
 
@@ -904,42 +956,30 @@ myapp    unoptimized    450MB</code></pre>
             <pre><code># 技巧1：合并RUN指令
 # 合并前（多Layer）
 RUN apt-get update
-RUN apt-get install -y nginx
-RUN apt-get install -y curl
+RUN apt-get install -y vim
 
 # 合并后（单Layer）
 RUN apt-get update && \
-    apt-get install -y nginx curl
+    apt-get install -y vim
 
 # 技巧2：清理缓存
 RUN apt-get update && \
-    apt-get install -y nginx && \
+    apt-get install -y vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # 技巧3：使用 --no-install-recommends
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends nginx && \
+    apt-get install -y --no-install-recommends vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # 技巧4：使用多行符提高可读性
 RUN apt-get update && \
-    apt-get install -y \
-        nginx \
-        curl \
+    apt-get install -y --no-install-recommends \
         vim && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">利用构建缓存</div>
-            <div class="kp-content">
-              <p>- <span class="key-point">依赖文件优先</span>：先复制依赖文件，再复制源代码</p>
-              <p>- <span class="key-point">不变内容在前</span>：系统包安装等不常变化的指令放前面</p>
-              <p>- <span class="key-point">变化内容在后</span>：源代码复制等经常变化的指令放后面</p>
-            </div>
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*</code></pre>
           </div>
         </div>
       </div>
@@ -967,43 +1007,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # 合并RUN指令 + 清理缓存 + 使用--no-install-recommends
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        curl \
-        vim \
-        iputils-ping && \
+    apt-get install -y --no-install-recommends vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# 只复制需要的文件（利用.dockerignore）
-COPY ./app /app
-
 WORKDIR /app
 
-CMD ["ping", "www.baidu.com"]</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">.dockerignore文件</span>
-              <span class="code-lang">文本文件</span>
-            </div>
-            <pre><code># 排除版本控制目录
-.git
-.gitignore
-
-# 排除敏感文件
-*.pem
-*.key
-.env
-
-# 排除文档和测试文件
-README.md
-*.test
-coverage/
-
-# 排除临时文件
-*.log
-tmp/</code></pre>
+CMD ["vim", "--version"]</code></pre>
           </div>
 
           <div class="code-block">
@@ -1028,73 +1038,6 @@ $ docker history myapp:optimized</code></pre>
             <div class="highlight-content">
               <p>镜像体积从 <span class="highlight">450MB 减小到 180MB</span>，减少约 <span class="highlight">60%</span></p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">3.5</span>
-          <h1 class="page-title">docker build - 构建镜像</h1>
-        </div>
-        <div class="page-body">
-          <div class="definition-box">
-            <div class="definition-term">docker build原理</div>
-            <div class="definition-content">
-              docker build命令读取Dockerfile，按照指令顺序执行每条命令，最终生成一个<span class="highlight">新的镜像</span>。构建过程中，Docker会为每条指令创建容器、执行命令、提交更改。
-            </div>
-          </div>
-
-          <p class="paragraph">
-            docker build的工作流程：读取Dockerfile → 创建临时容器 → 执行指令 → 提交新镜像层 → 删除临时容器 → 继续下一条指令。
-          </p>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker build命令</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 语法：docker build [OPTIONS] PATH | URL | -
-
-# 基础用法 - 在当前目录构建
-$ docker build -t myapp:1.0 .
-
-# 预期输出：
-[+] Building 15.3s (8/8) FINISHED
- => [internal] load build definition from Dockerfile
- => [internal] load .dockerignore
- => [1/4] FROM ubuntu:22.04@sha256:度
- => [2/4] RUN apt-get update && apt-get install -y nginx
- => [3/4] COPY index.html /var/www/html/
- => [4/4] EXPOSE 80
- => naming to docker.io/library/myapp:1.0</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">常用参数说明</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># -t, --tag              指定镜像名称和标签（name:tag）
-# --file, -f            指定Dockerfile路径
-# --no-cache            构建时不使用缓存
-# --build-arg           设置构建参数
-
-# 指定Dockerfile路径和构建上下文
-$ docker build -t myapp:1.0 -f /path/to/Dockerfile /path/to/context
-
-# 不使用缓存构建
-$ docker build --no-cache -t myapp:1.0 .
-
-# 传递构建参数
-$ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
-          </div>
-
-          <div class="tip-box">
-            <div class="tip-title">构建上下文说明</div>
-            <p>- <span class="highlight">PATH</span>是构建上下文，docker build会在该目录下查找Dockerfile和所需文件</p>
-            <p>- <span class="highlight">.</span>表示当前目录作为构建上下文</p>
-            <p>- COPY指令只能复制构建上下文内的文件，无法访问外部文件</p>
           </div>
         </div>
       </div>
