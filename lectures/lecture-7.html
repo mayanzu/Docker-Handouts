@@ -832,10 +832,9 @@ FROM ubuntu:22.04
 
 # 安装多个软件，每个RUN一层
 RUN apt-get update
-RUN apt-get install -y nginx
 RUN apt-get install -y curl
 RUN apt-get install -y vim
-RUN apt-get install -y git
+RUN apt-get install -y iputils-ping
 
 # 复制整个项目（包含不需要的文件）
 COPY . /app
@@ -846,10 +845,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-# 暴露端口
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]</code></pre>
+CMD ["ping", "www.baidu.com"]</code></pre>
           </div>
 
           <div class="tip-box">
@@ -972,10 +968,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 合并RUN指令 + 清理缓存 + 使用--no-install-recommends
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        nginx \
         curl \
         vim \
-        git && \
+        iputils-ping && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -984,9 +979,7 @@ COPY ./app /app
 
 WORKDIR /app
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]</code></pre>
+CMD ["ping", "www.baidu.com"]</code></pre>
           </div>
 
           <div class="code-block">
