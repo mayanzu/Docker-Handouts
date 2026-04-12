@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第十一讲 Docker可视化与监控 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第十一讲</h1>
+          <h2 class="sub-title">Docker可视化与监控</h2>
+          <p class="tagline">掌握容器监控工具，实现可视化运维</p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li>
+                <span class="toc-num">01</span>
+                <span class="toc-text">第一部分：监控概述</span>
+              </li>
+              <li>
+                <span class="toc-num">02</span>
+                <span class="toc-text">第二部分：Portainer可视化</span>
+              </li>
+              <li>
+                <span class="toc-num">03</span>
+                <span class="toc-text">第三部分：Prometheus监控</span>
+              </li>
+              <li>
+                <span class="toc-num">04</span>
+                <span class="toc-text">第四部分：Grafana可视化</span>
+              </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：动手实验</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>本讲介绍<span class="highlight">容器监控和可视化</span>工具，建议结合实验理解各个工具的功能和集成方式。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解监控重要性</h3>
+                <p>理解容器<span class="key-point">监控的必要性</span>和关键指标</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>使用Portainer</h3>
+                <p>掌握<span class="highlight">Portainer</span>图形化管理容器</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>部署Prometheus</h3>
+                <p>掌握<span class="key-point">Prometheus</span>部署和配置</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>配置Grafana</h3>
+                <p>掌握<span class="highlight">Grafana</span>仪表板配置</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">监控概述</h1>
+          <p class="section-desc">理解容器监控的重要性</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.1</span>
+          <h1 class="page-title">为什么需要监控？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">容器监控定义</div>
+            <div class="definition-content">
+              容器监控是<span class="highlight">对容器运行状态的持续观察和记录</span>。通过监控，可以及时发现容器故障、性能瓶颈、资源不足等问题，实现主动运维。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            想象一个大型商场：监控摄像头（指标采集）24小时记录情况，保安中心（监控系统）实时分析数据，报警系统（告警机制）在异常时通知相关人员。容器监控就是这套系统的数字化版本。
+          </p>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>故障预警</h3>
+              <p>提前发现资源不足、进程异常等问题</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>性能优化</h3>
+              <p>了解资源使用情况，合理分配资源</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>容量规划</h3>
+              <p>根据历史数据规划扩容和缩容</p>
+            </div>
+            <div class="card">
+              <h class="card-num">4</span>故障排查</h3>
+              <p>通过历史数据还原故障现场</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.2</span>
+          <h1 class="page-title">关键监控指标</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">容器关键指标</div>
+            <div class="definition-content">
+              容器监控主要关注四类指标：<span class="highlight">CPU使用率</span>、<span class="highlight">内存使用率</span>、<span class="highlight">网络流量</span>、<span class="highlight">磁盘I/O</span>。这些指标反映了容器的运行状态和性能表现。
+            </div>
+          </div>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>指标类型</th>
+                <th>说明</th>
+                <th>过高可能原因</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">CPU使用率</span></td>
+                <td>容器使用的CPU资源占比</td>
+                <td>死循环、计算密集型任务</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">内存使用率</span></td>
+                <td>容器使用的内存大小</td>
+                <td>内存泄漏、配置不当</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">网络流量</span></td>
+                <td>入站/出站带宽使用</td>
+                <td>异常流量、攻击</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">磁盘I/O</span></td>
+                <td>读写速度和IOPS</td>
+                <td>日志过多、频繁写入</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker stats查看实时指标</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看所有容器实时资源使用
+$ docker stats
+
+# 预期输出：
+# CONTAINER ID   NAME            CPU %   MEM USAGE / LIMIT     MEM %   NET I/O
+# abc123...      nginx-web       0.32%   50.5MiB / 1.952GiB   2.53%   1.5MB / 2.3MB
+# def456...      mysql-db        1.28%   320MiB / 1.952GiB    16.39%  5.2MB / 8.1MB
+
+# 只查看特定容器
+$ docker stats nginx-web mysql-db
+
+# 显示详细信息（包含网络、磁盘）
+$ docker stats --no-stream</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">Portainer可视化</h1>
+          <p class="section-desc">图形化容器管理工具</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.1</span>
+          <h1 class="page-title">Portainer概述</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Portainer定义</div>
+            <div class="definition-content">
+              Portainer是一个<span class="highlight">轻量级的Docker图形化管理工具</span>，通过Web界面管理容器、镜像、网络、数据卷等资源。适合中小规模Docker环境的管理。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            Portainer就像Docker的"控制面板"，把原本需要命令行操作的功能变成了可视化界面。即使不熟悉Linux命令，也可以通过图形界面管理Docker环境。
+          </p>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>容器管理</h3>
+              <p>创建、启动、停止、删除容器</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>镜像管理</h3>
+              <p>查看、拉取、删除镜像</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>网络管理</h3>
+              <p>查看、创建网络</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>数据卷管理</h3>
+              <p>查看、创建、删除数据卷</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.2</span>
+          <h1 class="page-title">Portainer部署与访问</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">快速部署Portainer</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 创建Portainer数据卷
+$ docker volume create portainer_data
+
+# 2. 启动Portainer容器
+$ docker run -d \
+  --name portainer \
+  --hostname portainer \
+  -p 9000:9000 \
+  -p 8000:8000 \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer
+
+# 参数说明：
+# -p 9000:9000    Web管理界面端口
+# -p 8000:8000    端口ainer Edge代理
+# -v /var/run/docker.sock   Docker socket（核心配置）
+# -v portainer_data         持久化数据</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">访问Portainer</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 访问Web界面
+http://localhost:9000
+
+# 首次访问：
+# 1. 设置管理员账号密码
+# 2. 选择"Local"管理本地Docker
+# 3. 点击"Connect"连接</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">注意事项</div>
+            <p>- 如果使用Docker Desktop，Portainer已内置</p>
+            <p>- 生产环境建议配置HTTPS和认证</p>
+            <p>- 挂载/var/run/docker.sock后，Portainer有Docker完整权限</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.3</span>
+          <h1 class="page-title">Portainer日常操作</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Portainer Web界面操作</span>
+              <span class="code-lang">说明</span>
+            </div>
+            <pre><code># 容器管理
+# 1. Dashboard - 查看总览信息
+# 2. Containers - 容器列表
+#    - 查看容器状态
+#    - 启动/停止/重启容器
+#    - 查看日志
+#    - 进入容器终端
+#    - 创建新容器
+
+# 镜像管理
+# Images - 镜像列表
+#    - 查看镜像大小
+#    - 拉取新镜像
+#    - 删除无用镜像
+
+# 网络管理
+# Networks - 网络列表
+#    - 查看网络详情
+#    - 创建新网络
+
+# 数据卷管理
+# Volumes - 数据卷列表
+#    - 查看挂载点
+#    - 创建新卷</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">App Templates快速部署</span>
+              <span class="code-lang">说明</span>
+            </div>
+            <pre><code># Portainer提供了App Templates功能
+# 可以快速部署常用应用：
+# - Nginx
+# - MySQL
+# - PostgreSQL
+# - Redis
+# - WordPress
+# - etc.
+
+# 使用方法：
+# 1. 点击左侧"App Templates"
+# 2. 选择要部署的应用
+# 3. 填写必要配置（端口、名称等）
+# 4. 点击"Deploy"即可创建容器</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">Prometheus监控</h1>
+          <p class="section-desc">时序数据库监控系统</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.1</span>
+          <h1 class="page-title">Prometheus概述</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Prometheus定义</div>
+            <div class="definition-content">
+              Prometheus是一个<span class="highlight">开源的监控和告警系统</span>，由SoundCloud开发，现已成为CNCF的毕业项目。它通过HTTP协议定期采集指标数据，存储为时序数据库。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            Prometheus的工作方式类似于"定时问卷调查"：它定期向各个目标发送HTTP请求（/metrics端点），收集监控数据并存储。当指标超过阈值时，触发告警通知管理员。
+          </p>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>多维度数据模型</h3>
+              <p>指标由指标名和标签集定义</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>PromQL查询语言</h3>
+              <p>强大的数据查询和聚合能力</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>Pull模式</h3>
+              <p>服务端主动拉取数据，无需客户端配置</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>告警管理</h3>
+              <p>支持基于PromQL的告警规则</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.2</span>
+          <h1 class="page-title">cAdvisor监控容器</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">cAdvisor定义</div>
+            <div class="definition-content">
+              cAdvisor（Container Advisor）是Google开发的<span class="highlight">容器监控工具</span>，专门用于采集容器资源使用信息。它原生支持Docker，可以监控本地所有容器。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">部署cAdvisor</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动cAdvisor
+$ docker run -d \
+  --name cadvisor \
+  --hostname cadvisor \
+  -p 8080:8080 \
+  --restart=always \
+  --mount type=bind,source=/,target=/rootfs:ro \
+  --mount type=bind,source=/var/run,target=/var/run:ro \
+  --mount type=bind,source=/sys,target=/sys:ro \
+  --mount type=bind,source=/var/lib/docker/,target=/var/lib/docker:ro \
+  google/cadvisor:latest
+
+# 参数说明：
+# -p 8080:8080       Web界面端口
+# /rootfs            挂载根文件系统（读取容器信息）
+# /var/run           Docker socket
+# /sys               系统信息
+# /var/lib/docker    Docker数据目录</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">访问cAdvisor</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Web界面
+http://localhost:8080
+
+# 查看容器指标（Prometheus格式）
+http://localhost:8080/metrics</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.3</span>
+          <h1 class="page-title">部署Prometheus</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">prometheus.yml配置文件</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动Prometheus</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建配置文件目录
+$ mkdir -p /opt/prometheus
+
+# 创建prometheus.yml
+$ cat > /opt/prometheus/prometheus.yml << 'EOF'
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+EOF
+
+# 启动Prometheus
+$ docker run -d \
+  --name prometheus \
+  --hostname prometheus \
+  -p 9090:9090 \
+  --restart=always \
+  -v /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus:latest</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">访问Prometheus</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Web界面
+http://localhost:9090
+
+# 查看监控目标状态
+Status -> Targets</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">Grafana可视化</h1>
+          <p class="section-desc">仪表板和可视化工具</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.1</span>
+          <h1 class="page-title">Grafana概述</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Grafana定义</div>
+            <div class="definition-content">
+              Grafana是一个<span class="highlight">开源的度量分析和可视化平台</span>。它可以从多种数据源（如Prometheus、InfluxDB）读取数据，提供丰富的图表类型和告警功能。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            Grafana就像一个"仪表盘制造工厂"：它从监控系统（数据源）读取原始数据，然后根据需求定制各种仪表盘（图表），并可以设置警戒线（告警）。
+          </p>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>多数据源支持</h3>
+              <p>Prometheus、InfluxDB、Elasticsearch等</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>丰富的图表</h3>
+              <p>折线图、仪表盘、热力图等</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>告警功能</h3>
+              <p>支持邮件、钉钉等多种告警方式</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>模板变量</h3>
+              <p>支持动态仪表盘</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.2</span>
+          <h1 class="page-title">部署Grafana</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动Grafana</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建Grafana数据卷
+$ docker volume create grafana_data
+
+# 启动Grafana
+$ docker run -d \
+  --name grafana \
+  --hostname grafana \
+  -p 3000:3000 \
+  --restart=always \
+  -v grafana_data:/var/lib/grafana \
+  grafana/grafana
+
+# 参数说明：
+# -p 3000:3000    Web界面端口
+# -v grafana_data 持久化存储（仪表盘配置等）</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">访问Grafana</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Web界面
+http://localhost:3000
+
+# 默认账号密码
+# Username: admin
+# Password: admin
+
+# 首次登录后会要求修改密码</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">添加Prometheus数据源</span>
+              <span class="code-lang">操作步骤</span>
+            </div>
+            <pre><code># 1. 登录Grafana后，点击左侧"Configuration"（齿轮图标）
+# 2. 点击"Data Sources"
+# 3. 点击"Add data source"
+# 4. 选择"Prometheus"
+
+# 5. 配置数据源：
+#    Name: Prometheus
+#    URL: http://prometheus:9090
+#    （如果是Docker网络内的容器，使用容器名作为主机名）
+
+# 6. 点击"Save & Test"
+#    如果显示"Data source is working"表示配置成功</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.3</span>
+          <h1 class="page-title">创建监控仪表盘</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">创建仪表盘步骤</span>
+              <span class="code-lang">操作步骤</span>
+            </div>
+            <pre><code># 1. 创建新仪表盘
+#    点击左侧"+" -> "Create" -> "Dashboard"
+
+# 2. 添加面板
+#    点击"Add new panel"
+
+# 3. 配置查询（使用PromQL）
+#    在"Metrics"输入框中输入Prometheus查询语句
+
+# 示例查询：
+# CPU使用率
+# rate(container_cpu_usage_seconds_total{name!=""}[5m])
+
+# 内存使用量
+# container_memory_usage_bytes{name!=""}
+
+# 网络流量
+# rate(container_network_receive_bytes_total[5m])</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用PromQL查询</span>
+              <span class="code-lang">PromQL</span>
+            </div>
+            <pre><code># 容器CPU使用率（百分比）
+100 * rate(container_cpu_usage_seconds_total[5m]) / machine_cpu_cores
+
+# 容器内存使用率
+100 * container_memory_usage_bytes / container_spec_memory_limit_bytes
+
+# 容器网络接收速率（字节/秒）
+rate(container_network_receive_bytes_total[5m])
+
+# 容器网络发送速率（字节/秒）
+rate(container_network_transmit_bytes_total[5m])
+
+# 容器文件系统读取速率
+rate(container_fs_reads_bytes_total[5m])</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">导入现成仪表盘</span>
+              <span class="code-lang">操作步骤</span>
+            </div>
+            <pre><code># Grafana支持导入现成的仪表盘
+# 1. 点击左侧"+" -> "Import"
+# 2. 输入Grafana Dashboard ID或上传JSON文件
+
+# 推荐仪表盘：
+# - Docker Monitoring (ID: 193)
+# - Docker and System Monitoring (ID: 10619)
+# - cAdvisor Prometheus (ID: 11949)
+
+# 导入后会自动创建相关图表和面板</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">动手实验</h1>
+          <p class="section-desc">监控工具部署与配置</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">Docker监控环境搭建</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">搭建完整的Docker监控环境</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握cAdvisor + Prometheus + Grafana监控架构的部署和使用</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">部署cAdvisor收集容器指标</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">部署Prometheus存储时序数据</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">配置Prometheus抓取cAdvisor</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">部署Grafana可视化平台</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">添加Prometheus数据源</span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">创建容器监控仪表盘</span></div>
+            </div>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">docker-compose.yml监控栈</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitor-net
+
+  cadvisor:
+    image: google/cadvisor:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitor-net
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitor-net
+
+networks:
+  monitor-net:
+
+volumes:
+  grafana-data:</code></pre>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">关键命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动监控栈
+$ docker compose up -d
+
+# 访问服务
+# cAdvisor: http://localhost:8080
+# Prometheus: http://localhost:9090
+# Grafana: http://localhost:3000 (admin/admin)
+
+# 查看日志
+$ docker compose logs -f</code></pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">15</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>

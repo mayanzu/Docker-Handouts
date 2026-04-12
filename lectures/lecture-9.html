@@ -49,6 +49,10 @@
                 <span class="toc-num">04</span>
                 <span class="toc-text">第四部分：网络管理命令</span>
               </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：动手实验</span>
+              </li>
             </ul>
           </div>
 
@@ -110,19 +114,19 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.1</span>
+          <span class="page-number">1.1</span>
           <h1 class="page-title">Docker网络组成</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Docker网络</div>
+            <div class="definition-term">Docker网络概念</div>
             <div class="definition-content">
-              Docker网络是<span class="highlight">容器间通信</span>和<span class="highlight">容器与外部通信</span>的基础，通过Docker网络驱动实现各种网络功能。
+              Docker网络是容器与外部网络通信的通道。每个容器都有自己的网络命名空间，就像每户人家有自己的门牌号（IP地址），Docker网络就是连接这些"住户"的"道路系统"。
             </div>
           </div>
 
           <p class="paragraph">
-            Docker使用<span class="highlight">Linux网络命名空间</span>实现容器网络隔离，通过<span class="highlight">veth设备对</span>连接容器和网络驱动。
+            Docker使用<span class="highlight">Linux网络命名空间</span>实现容器网络隔离，通过<span class="highlight">veth设备对</span>（虚拟以太网对）连接容器和网络驱动。就像两栋楼之间架设的专用光缆，将不同楼层的房间连接起来。
           </p>
 
           <div class="code-block">
@@ -162,7 +166,7 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.2</span>
+          <span class="page-number">1.2</span>
           <h1 class="page-title">Docker网络驱动</h1>
         </div>
         <div class="page-body">
@@ -224,16 +228,20 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.1</span>
+          <span class="page-number">2.1</span>
           <h1 class="page-title">Bridge网络模式</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Bridge网络</div>
+            <div class="definition-term">Bridge网络原理</div>
             <div class="definition-content">
-              Bridge是Docker的<span class="highlight">默认网络模式</span>。当容器启动时未指定网络模式，Docker会创建虚拟网桥（docker0），容器通过该网桥与外部通信。
+              Bridge（网桥）是Docker的<span class="highlight">默认网络模式</span>。就像小区里的交换机连接各家各户，docker0网桥连接各个容器，让它们可以互相通信，并通过NAT访问外部网络。
             </div>
           </div>
+
+          <p class="paragraph">
+            当容器启动时未指定网络模式，Docker会创建虚拟网桥（docker0），容器通过veth设备对连接到这个网桥。网桥工作在数据链路层，根据MAC地址转发数据包。
+          </p>
 
           <div class="code-block">
             <div class="code-header">
@@ -273,7 +281,7 @@ $ docker exec ubuntu-bridge ping -c 3 baidu.com</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.2</span>
+          <span class="page-number">2.2</span>
           <h1 class="page-title">Host网络模式</h1>
         </div>
         <div class="page-body">
@@ -323,7 +331,7 @@ $ docker exec nginx-host ip addr
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.3</span>
+          <span class="page-number">2.3</span>
           <h1 class="page-title">None网络模式</h1>
         </div>
         <div class="page-body">
@@ -367,7 +375,7 @@ $ docker exec ubuntu-none ip addr
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.4</span>
+          <span class="page-number">2.4</span>
           <h1 class="page-title">Container网络模式</h1>
         </div>
         <div class="page-body">
@@ -420,16 +428,20 @@ $ docker exec ubuntu-share ping -c 3 ubuntu-base
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.1</span>
+          <span class="page-number">3.1</span>
           <h1 class="page-title">自定义Bridge网络</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">自定义Bridge网络</div>
+            <div class="definition-term">自定义Bridge网络原理</div>
             <div class="definition-content">
-              自定义Bridge网络与默认Bridge的区别是支持<span class="highlight">DNS解析</span>，容器可以通过容器名相互访问。
+              自定义Bridge网络与默认Bridge的区别是支持<span class="highlight">DNS服务发现</span>。在同一自定义网络中，容器可以通过容器名相互访问，就像同一个公司的同事可以通过姓名互相找到对方，而不需要知道对方的手机号（IP地址）。
             </div>
           </div>
+
+          <p class="paragraph">
+            默认bridge网络之所以不支持DNS解析，是因为它没有内置的服务发现机制。自定义bridge网络则内置了Docker DNS，当容器需要解析另一个容器名时，Docker会自动返回对应的IP地址。
+          </p>
 
           <div class="code-block">
             <div class="code-header">
@@ -445,25 +457,15 @@ $ docker run -d \
   --network my-network \
   ubuntu:22.04 sleep infinity
 
-# 参数说明：
-# -d                          后台运行模式
-# --name ubuntu-web           容器名称
-# --network my-network        连接到my-network网络
-# ubuntu:22.04                使用Ubuntu 22.04镜像
-# sleep infinity              保持容器运行
-
+# 启动另一个容器
 $ docker run -d \
   --name ubuntu-db \
   --network my-network \
   ubuntu:22.04 sleep infinity
 
-# 查看容器IP地址
-$ docker inspect --format '{{.NetworkSettings.Networks.my-network.IPAddress}}' ubuntu-web
-192.168.100.2
-
 # 容器间通过名称通信（DNS解析）
 $ docker exec ubuntu-web ping -c 3 ubuntu-db
-# PING ubuntu-db (192.168.100.3) 56(84) bytes of data.</code></pre>
+# PING ubuntu-db (192.168.100.2) 56(84) bytes of data.</code></pre>
           </div>
 
           <div class="code-block">
@@ -476,85 +478,55 @@ $ docker network create \
   --driver bridge \
   --subnet 192.168.100.0/24 \
   --gateway 192.168.100.1 \
-  my-network
+  my-subnet
 
 # 参数说明：
 # --driver bridge      使用bridge驱动（默认）
-# --subnet 192.168.100.0/24 \
-#                     指定子网地址和掩码
-# --gateway 192.168.100.1 \
-#                     指定网关地址</parameter>
-
-  my-subnet
-
-# 创建带IP地址的网络
-$ docker network create \
-  --driver bridge \
-  --subnet 192.168.200.0/24 \
-  --ip-range 192.168.200.0/24 \
-  my-network</code></pre>
+# --subnet            指定子网地址和掩码
+# --gateway           指定网关地址</code></pre>
           </div>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.2</span>
+          <span class="page-number">3.2</span>
           <h1 class="page-title">端口映射</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">端口映射</div>
+            <div class="definition-term">端口映射原理</div>
             <div class="definition-content">
-              端口映射是将<span class="highlight">宿主机的端口</span>与<span class="highlight">容器的端口</span>进行关联，使外部流量可以通过宿主机端口访问容器内服务。
+              端口映射是将<span class="highlight">宿主机的端口</span>与<span class="highlight">容器的端口</span>进行关联。就像酒店的前台总机（宿主机），外部客人先联系前台，再被转接到具体的房间（容器）。
             </div>
           </div>
 
+          <p class="paragraph">
+            当外部请求到达宿主机的某个端口时，Docker的NAT机制会将请求转发到对应容器的指定端口。这使得容器内的服务可以被外部网络访问。
+          </p>
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">端口映射语法与示例（WSL）</span>
+              <span class="code-title">端口映射语法与示例</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 语法：-p &lt;host-port&gt;:&lt;container-port&gt;[:&lt;protocol&gt;]
 
-# 基本端口映射（将宿主机的8080端口映射到容器的80端口）
-$ docker run -d \
-  --name nginx-web \
-  -p 8080:80 \
-  nginx
-# 访问：http://localhost:8080 或 http://宿主机IP:8080
+# 基本端口映射
+$ docker run -d --name nginx-web -p 8080:80 nginx
+# 访问：http://localhost:8080
 
-# 参数说明：
-# -p 8080:80    将宿主机8080端口映射到容器80端口
-#              外部访问宿主机IP:8080即可访问容器内的Nginx
-
-# 映射多个端口（HTTP和HTTPS）
-$ docker run -d \
-  --name nginx-multi \
-  -p 8080:80 \
-  -p 8443:443 \
-  nginx
+# 映射多个端口
+$ docker run -d --name nginx-multi -p 8080:80 -p 8443:443 nginx
 
 # 指定协议（tcp/udp）
-$ docker run -d \
-  --name dns-server \
-  -p 53:53/udp \
-  redis:alpine
-# /udp指定使用UDP协议（默认是TCP）
+$ docker run -d --name dns-server -p 53:53/udp redis:alpine
 
 # 绑定到特定IP（仅本地访问）
-$ docker run -d \
-  --name nginx-local \
-  -p 127.0.0.1:8080:80 \
-  nginx
-# 只能通过 localhost:8080 访问，外部无法访问
+$ docker run -d --name nginx-local -p 127.0.0.1:8080:80 nginx
 
 # 映射到所有IP（默认行为）
-$ docker run -d \
-  --name nginx-all \
-  -p 0.0.0.0:8080:80 \
-  nginx
-# 可以通过任何网络接口访问</code></pre>
+$ docker run -d --name nginx-all -p 0.0.0.0:8080:80 nginx</code></pre>
           </div>
 
           <div class="code-block">
@@ -567,29 +539,20 @@ $ docker port nginx-web
 80/tcp -> 0.0.0.0:8080
 
 # 查看所有映射端口
-$ docker ps --format "table {{.Names}}\t{{.Ports}}"
-NAMES        PORTS
-nginx-web    0.0.0.0:8080->80/tcp</code></pre>
-          </div>
-
-          <div name="knowledge-point">
-            <div class="kp-title">说明</div>
-            <div class="kp-content">
-              <p>端口映射工作流程：外部请求 → 宿主机IP:端口 → NAT转换 → 容器IP:端口</p>
-            </div>
+$ docker ps --format "table {{.Names}}\t{{.Ports}}"</code></pre>
           </div>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.3</span>
+          <span class="page-number">3.3</span>
           <h1 class="page-title">容器多网络连接</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker network connect - 连接网络（WSL）</span>
+              <span class="code-title">docker network connect</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建两个隔离的网络
@@ -604,15 +567,6 @@ $ docker run -d \
 
 # 将运行中的容器连接到后端网络
 $ docker network connect backend-network app-server
-
-# 参数说明：
-# docker network connect    连接容器到网络
-# backend-network           要连接的网络名
-# app-server               要连接的容器名
-
-# 验证网络连接
-$ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
-[backend-network frontend-network]
 
 # 验证网络连接
 $ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
@@ -632,7 +586,7 @@ $ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
 [frontend-network]</code></pre>
           </div>
 
-          <div name="knowledge-point">
+          <div class="knowledge-point">
             <div class="kp-title">说明</div>
             <div class="kp-content">
               <p>一个容器可以同时连接<span class="key-point">多个网络</span>，每个网络分配独立的IP地址</p>
@@ -651,7 +605,7 @@ $ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.1</span>
+          <span class="page-number">4.1</span>
           <h1 class="page-title">网络查看命令</h1>
         </div>
         <div class="page-body">
@@ -687,21 +641,17 @@ $ docker network inspect my-network</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.2</span>
+          <span class="page-number">4.2</span>
           <h1 class="page-title">网络创建与删除</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker network create - 创建网络（WSL）</span>
+              <span class="code-title">docker network create - 创建网络</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建bridge网络（使用默认配置）
 $ docker network create my-network
-
-# 参数说明：
-# docker network create    创建新网络命令
-# my-network              网络名称（自定义）
 
 # 创建带配置的bridge网络
 $ docker network create \
@@ -711,15 +661,11 @@ $ docker network create \
   --attachable \
   my-network
 
-# 参数详细说明：
-# --driver bridge          网络驱动类型（bridge/host/overlay）
-# --subnet 192.168.100.0/24 \
-#                         指定子网地址和CIDR掩码（24位=256个IP）
-# --gateway 192.168.100.1 \
-#                         指定网关地址
-# --attachable            允许容器手动连接到此网络
-#                         （使用docker network connect）
-# my-network              网络名称（在此示例中）</code></pre>
+# 参数说明：
+# --driver bridge          网络驱动类型
+# --subnet                指定子网地址和CIDR掩码
+# --gateway               指定网关地址
+# --attachable            允许容器手动连接到此网络</code></pre>
           </div>
 
           <div class="code-block">
@@ -741,7 +687,7 @@ $ docker network rm -f my-network</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.3</span>
+          <span class="page-number">4.3</span>
           <h1 class="page-title">网络故障排查</h1>
         </div>
         <div class="page-body">
@@ -763,8 +709,7 @@ $ docker port &lt;container&gt;
 $ docker network ls
 
 # 5. 在容器内测试网络
-$ docker exec &lt;container&gt; ping -c 3 8.8.8.8
-$ docker exec &lt;container&gt; curl http://example.com</code></pre>
+$ docker exec &lt;container&gt; ping -c 3 8.8.8.8</code></pre>
           </div>
 
           <div class="code-block">
@@ -805,7 +750,7 @@ $ docker run --network my-network ...</code></pre>
 
       <div class="page section-page">
         <div class="section-content">
-          <span class="section-label">实验</span>
+          <span class="section-label">Part 5</span>
           <h1 class="section-title">动手实验</h1>
           <p class="section-desc">Docker网络配置综合练习</p>
         </div>
@@ -828,31 +773,35 @@ $ docker run --network my-network ...</code></pre>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <span class="step-text">查看默认bridge网络信息</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <span class="step-text">创建自定义bridge网络</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">3</span>
-                <span class="step-text">启动两个容器连接自定义网络并测试通信</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">4</span>
-                <span class="step-text">配置Nginx端口映射并验证外部访问</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text">使用docker network connect为容器添加网络</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">6</span>
-                <span class="step-text">测试不同网络间容器隔离</span>
-              </div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">查看默认bridge网络信息</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">创建自定义bridge网络</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">启动两个容器连接自定义网络并测试通信</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">配置Nginx端口映射并验证外部访问</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">使用docker network connect为容器添加网络</span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">测试不同网络间容器隔离</span></div>
             </div>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">关键命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看网络
+$ docker network ls
+$ docker network inspect bridge
+
+# 创建自定义网络
+$ docker network create --driver bridge my-network
+
+# 启动容器到指定网络
+$ docker run -d --name container1 --network my-network ubuntu:22.04 sleep infinity
+
+# 测试通信
+$ docker exec container1 ping -c 3 container2
+
+# 端口映射
+$ docker run -d --name nginx -p 8080:80 nginx</code></pre>
           </div>
         </div>
       </div>
@@ -874,34 +823,16 @@ $ docker run --network my-network ...</code></pre>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <span class="step-text">模拟容器无法访问外网的问题</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <span class="step-text">使用docker inspect检查容器网络配置</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">3</span>
-                <span class="step-text">在容器内测试ping和curl连通性</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">4</span>
-                <span class="step-text">检查宿主机防火墙规则</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text">模拟端口映射失败问题并排查</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">6</span>
-                <span class="step-text">总结常见网络问题的解决方案</span>
-              </div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">模拟容器无法访问外网的问题</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">使用docker inspect检查容器网络配置</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">在容器内测试ping和curl连通性</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">检查宿主机防火墙规则</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">模拟端口映射失败问题并排查</span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">总结常见网络问题的解决方案</span></div>
             </div>
           </div>
 
-          <div class="code-block">
+          <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
               <span class="code-title">排查命令清单</span>
               <span class="code-lang">Bash</span>
@@ -922,115 +853,20 @@ $ docker network inspect bridge</code></pre>
         </div>
       </div>
 
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">预告</span>
-          <h1 class="page-title">下讲预告</h1>
-        </div>
-        <div class="page-body">
-          <div class="next-lecture">
-            <h3>第十讲：<span class="highlight">Docker Compose</span></h3>
-            <ul>
-              <li>掌握<span class="key-point">Compose文件</span>编写语法</li>
-              <li>学习<span class="key-point">多容器编排</span>配置</li>
-              <li>理解<span class="key-point">服务依赖</span>管理</li>
-              <li>掌握<span class="key-point">一键部署</span>应用</li>
-            </ul>
-          </div>
-
-          <div class="knowledge-point" style="margin-top: 1.5rem;">
-            <div class="kp-title">预习建议</div>
-            <div class="kp-content">
-              <p>1. 复习Docker容器和网络管理</p>
-              <p>2. 了解YAML配置文件格式</p>
-              <p>3. 准备一个多容器应用架构</p>
-            </div>
-          </div>
-        </div>
-        <div class="page-footer">
-          <span>虚拟化容器技术</span>
-          <span>感谢您的学习</span>
-        </div>
-      </div>
-
     </div>
 
-    <!-- 页面导航控制 -->
     <div class="page-navigation">
       <button class="nav-btn prev" id="prevBtn">上一页</button>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">20</span>
+        <span class="total" id="totalPages">16</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
 
   </div>
 
-  <script>
-    // 页面导航逻辑
-    const pages = document.querySelectorAll('.page');
-    let currentPage = 0;
-
-    function updateNavigation() {
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const pageIndicator = document.getElementById('pageIndicator');
-
-      if (prevBtn) prevBtn.disabled = currentPage === 0;
-      if (nextBtn) nextBtn.disabled = currentPage === pages.length - 1;
-      if (pageIndicator) {
-        const current = pageIndicator.querySelector('.current');
-        const total = pageIndicator.querySelector('.total');
-        if (current) current.textContent = currentPage + 1;
-        if (total) total.textContent = pages.length;
-      }
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft' && currentPage > 0) {
-        currentPage--;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      } else if (e.key === 'ArrowRight' && currentPage < pages.length - 1) {
-        currentPage++;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      }
-    });
-
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const windowHeight = window.innerHeight;
-
-      pages.forEach((page, index) => {
-        const rect = page.getBoundingClientRect();
-        if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
-          currentPage = index;
-          updateNavigation();
-        }
-      });
-    });
-
-    // 按钮点击事件
-    document.getElementById('prevBtn').addEventListener('click', () => {
-      if (currentPage > 0) {
-        currentPage--;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      }
-    });
-
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      if (currentPage < pages.length - 1) {
-        currentPage++;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      }
-    });
-
-    updateNavigation();
-  </script>
+  <script src="../template/lecture-template.js"></script>
 </body>
 </html>

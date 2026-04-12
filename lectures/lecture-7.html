@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>第七讲 Dockerfile与镜像构建 - 虚拟化容器技术</title>
   <link rel="stylesheet" href="../template/lecture-template.css">
+  <style>
+    .page { overflow-x: hidden; }
+    .code-block pre { white-space: pre-wrap; word-break: break-all; }
+    .compare-table { table-layout: fixed; }
+  </style>
 </head>
 <body>
   <div class="lecture-page">
@@ -43,19 +48,27 @@
               </li>
               <li>
                 <span class="toc-num">03</span>
-                <span class="toc-text">第三部分：镜像构建实践</span>
+                <span class="toc-text">第三部分：镜像构建命令</span>
               </li>
               <li>
                 <span class="toc-num">04</span>
-                <span class="toc-text">第四部分：镜像构建优化</span>
+                <span class="toc-text">第四部分：镜像构建实践</span>
+              </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：镜像构建优化</span>
+              </li>
+              <li>
+                <span class="toc-num">06</span>
+                <span class="toc-text">第六部分：动手实验</span>
               </li>
             </ul>
           </div>
-          
+
           <div class="knowledge-point">
             <div class="kp-title">学习建议</div>
             <div class="kp-content">
-              <p>本讲专注于<span class="highlight">Dockerfile编写与镜像构建</span>，建议先完成第四讲的镜像管理基础学习。Dockerfile的每个指令都需要理解其用途和参数，建议跟随示例动手实践。</p>
+              <p>本讲专注于<span class="highlight">Dockerfile编写与镜像构建</span>，建议先完成前面的镜像管理基础学习。Dockerfile的每个指令都需要理解其用途和参数，建议跟随示例动手实践。</p>
             </div>
           </div>
         </div>
@@ -104,34 +117,68 @@
         <div class="section-content">
           <span class="section-label">Part 1</span>
           <h1 class="section-title">Dockerfile基础</h1>
-          <p class="section-desc">理解Dockerfile的作用与基本语法</p>
+          <p class="section-desc">理解Dockerfile的作用与基本概念</p>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.1</span>
+          <span class="page-number">1.1</span>
           <h1 class="page-title">什么是Dockerfile？</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">镜像定义</div>
+            <div class="definition-term">Dockerfile定义</div>
             <div class="definition-content">
-              Docker镜像是一个<span class="highlight">只读模板</span>，包含了运行应用程序所需的所有内容：代码、运行时环境、系统工具、系统库和配置。镜像是容器的基础，容器是镜像的运行实例。
+              Dockerfile是一个<span class="highlight">文本文件</span>，包含了构建Docker镜像的所有指令。通过读取Dockerfile中的指令，docker build命令可以自动构建出所需的镜像。
             </div>
           </div>
 
           <p class="paragraph">
-            可以把镜像理解为<span class="highlight">类（Class）</span>，容器理解为<span class="highlight">对象（Object）</span>。一个镜像可以创建多个容器实例，每个容器都是独立的运行环境。
+            可以把Dockerfile理解为<span class="highlight">镜像的构建脚本</span>。Dockerfile定义了如何创建镜像，而镜像则是容器的模板。
           </p>
 
+          <p class="paragraph">
+            打个比方：如果把制作蛋糕比作Docker镜像构建，那么<span class="highlight">基础镜像</span>就是面粉，<span class="highlight">Dockerfile</span>就是配方食谱，而<span class="highlight">docker build</span>就是按照食谱制作蛋糕的过程。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Dockerfile示例</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 基础镜像
+FROM ubuntu:22.04
+
+# 维护者信息
+LABEL maintainer="your-email@example.com"
+
+# 设置环境变量
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 安装nginx
+RUN apt-get update && \
+    apt-get install -y nginx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 复制网站文件
+COPY index.html /var/www/html/
+
+# 暴露端口
+EXPOSE 80
+
+# 启动命令
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+          </div>
+
           <div class="knowledge-point">
-            <div class="kp-title">镜像的组成</div>
+            <div class="kp-title">Dockerfile工作原理</div>
             <div class="kp-content">
-              <p>1. <span class="key-point">基础镜像层</span>：如ubuntu、alpine等操作系统基础</p>
-              <p>2. <span class="key-point">依赖层</span>：应用程序运行所需的库和工具</p>
-              <p>3. <span class="key-point">应用层</span>：应用程序代码和配置文件</p>
-              <p>4. <span class="key-point">元数据</span>：镜像的配置信息（环境变量、端口、启动命令等）</p>
+              <p>1. Docker读取Dockerfile中的<span class="key-point">指令顺序</span>执行</p>
+              <p>2. 每条指令执行后生成一个新的<span class="key-point">镜像层</span></p>
+              <p>3. 后续指令基于前面指令的结果进行操作</p>
+              <p>4. 任何步骤失败都可以从<span class="key-point">缓存点</span>恢复构建</p>
             </div>
           </div>
         </div>
@@ -139,12 +186,19 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.2</span>
+          <span class="page-number">1.2</span>
           <h1 class="page-title">镜像分层机制</h1>
         </div>
         <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">联合文件系统（UnionFS）</div>
+            <div class="definition-content">
+              Docker镜像采用<span class="highlight">联合文件系统</span>技术，由多个只读层（Layer）叠加而成。每一层代表Dockerfile中的一条指令。这种分层结构是Docker高效存储和快速构建的基础。
+            </div>
+          </div>
+
           <p class="paragraph">
-            Docker镜像采用<span class="highlight">联合文件系统（UnionFS）</span>技术，由多个只读层（Layer）叠加而成。每一层代表Dockerfile中的一条指令。
+            想象一下，镜像就像是一叠透明的塑料片，每一片上都记录着不同的修改。最底层的塑料片是基础镜像，往上每一片都是对该镜像的一次修改。最终我们看到的是所有塑料片叠加在一起的效果。
           </p>
 
           <div class="code-block">
@@ -157,7 +211,7 @@ $ docker history ubuntu:latest
 
 IMAGE          CREATED        CREATED BY                                      SIZE
 605c77e624dd   2 weeks ago    /bin/sh -c #(nop)  CMD ["bash"]                0B
-<missing>      2 weeks ago    /bin/sh -c #(nop)  ADD file:... in /            80.4MB</code></pre>
+&lt;missing&gt;      2 weeks ago    /bin/sh -c #(nop)  ADD file:... in /            80.4MB</code></pre>
           </div>
 
           <div class="highlight-box">
@@ -166,6 +220,7 @@ IMAGE          CREATED        CREATED BY                                      SI
               <p>- <span class="highlight">共享层</span>：多个镜像可以共享相同的基础层，节省存储空间</p>
               <p>- <span class="highlight">快速构建</span>：只重建变化的层，未变化层直接使用缓存</p>
               <p>- <span class="highlight">版本控制</span>：每层有唯一ID，便于追踪和管理</p>
+              <p>- <span class="highlight">增量更新</span>：只需传输变化的层，而非整个镜像</p>
             </div>
           </div>
         </div>
@@ -173,35 +228,163 @@ IMAGE          CREATED        CREATED BY                                      SI
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.3</span>
+          <span class="page-number">1.3</span>
           <h1 class="page-title">写时复制（CoW）</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
             <div class="definition-term">写时复制机制</div>
             <div class="definition-content">
-              写时复制（Copy-on-Write）是Docker镜像的核心技术。当容器启动时，Docker会在镜像的最上层添加一个<span class="highlight">可写层</span>（Container Layer）。所有对文件的修改都发生在这个可写层，而不会改变底层的只读镜像层。
+              写时复制（Copy-on-Write，简称CoW）是一种高效的共享和复制技术。当容器需要修改某个文件时，Docker不会直接修改镜像层的文件，而是<span class="highlight">将文件复制到容器的可写层</span>，然后在可写层进行修改。
             </div>
           </div>
+
+          <p class="paragraph">
+            这个机制就像图书馆的图书借阅：你可以先阅读公共区域的图书（只读层），但如果你想要在书上做笔记（写入），图书馆会先帮你复制一本（复制到可写层），你在这本复制本上做笔记，不会影响公共区域的原书。
+          </p>
 
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>读取文件</h3>
-              <p>容器首次读取文件时，如果文件在只读层，则从只读层读取</p>
+              <p>容器首次读取文件时，如果文件在只读层，则从只读层直接读取，无需复制</p>
             </div>
             <div class="card">
               <h3><span class="card-num">2</span>写入文件</h3>
-              <p>容器修改文件时，先将文件从只读层复制到可写层，然后修改</p>
+              <p>容器修改文件时，先将文件从只读层复制到可写层，然后在可写层修改原文件</p>
             </div>
             <div class="card">
               <h3><span class="card-num">3</span>删除文件</h3>
-              <p>容器删除文件时，在可写层创建删除标记，不影响只读层</p>
+              <p>容器删除文件时，在可写层创建删除标记（whiteout文件），不影响只读层</p>
             </div>
           </div>
 
           <div class="tip-box">
-            <div class="tip-title">优势</div>
-            <p>多个容器可以共享同一个镜像的可写层，实现资源高效利用</p>
+            <div class="tip-title">CoW机制的优势</div>
+            <p>多个容器可以共享同一个镜像的可写层，实现资源高效利用。这意味着即使有100个容器运行同一个镜像，实际上内存和存储中只保留了一份基础数据。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.0</span>
+          <h1 class="page-title">Dockerfile指令一览</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            下面是Dockerfile中所有指令的概览。本节后续内容将对每个指令进行详细讲解。
+          </p>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>指令</th>
+                <th>说明</th>
+                <th>示例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">FROM</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>指定基础镜像（必需）</td>
+                <td>FROM ubuntu:22.04</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">RUN</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>执行命令并创建新层（常用）</td>
+                <td>RUN apt-get update</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">COPY</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>复制文件（常用，推荐）</td>
+                <td>COPY ./app /app/</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">CMD</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>容器启动命令（常用）</td>
+                <td>CMD ["python", "app.py"]</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">EXPOSE</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>声明端口（常用，文档作用）</td>
+                <td>EXPOSE 80</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">ENV</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>设置环境变量（常用）</td>
+                <td>ENV NODE_ENV=production</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">WORKDIR</span> <strong style="color:#e74c3c;">★</strong></td>
+                <td>设置工作目录（常用）</td>
+                <td>WORKDIR /app</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">ARG</span></td>
+                <td>构建参数（仅构建时有效）</td>
+                <td>ARG VERSION=1.0</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">LABEL</span></td>
+                <td>添加元数据</td>
+                <td>LABEL version="1.0"</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">VOLUME</span></td>
+                <td>创建挂载点</td>
+                <td>VOLUME ["/data"]</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">ENTRYPOINT</span></td>
+                <td>容器启动命令（不可被覆盖）</td>
+                <td>ENTRYPOINT ["nginx"]</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">USER</span></td>
+                <td>设置运行用户</td>
+                <td>USER nginx</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">ADD</span></td>
+                <td>复制文件（支持URL和解压）</td>
+                <td>ADD app.tar.gz /app/</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">ONBUILD</span></td>
+                <td>为子镜像添加指令</td>
+                <td>ONBUILD RUN pip install</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">STOPSIGNAL</span></td>
+                <td>停止信号</td>
+                <td>STOPSIGNAL SIGTERM</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">HEALTHCHECK</span></td>
+                <td>健康检查</td>
+                <td>HEALTHCHECK CMD curl</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">SHELL</span></td>
+                <td>修改Shell默认程序</td>
+                <td>SHELL ["powershell"]</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="knowledge-point">
+            <div class="kp-title">指令分类</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">构建时指令</span>：FROM、RUN、ARG、LABEL等</p>
+              <p>- <span class="key-point">运行时指令</span>：CMD、ENTRYPOINT、USER、WORKDIR等</p>
+              <p>- <span class="key-point">文件复制指令</span>：COPY、ADD</p>
+              <p>- <span class="key-point">配置指令</span>：ENV、EXPOSE、VOLUME</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">常用指令</div>
+            <p>最常用的5个指令是：<span class="highlight">FROM</span>、<span class="highlight">RUN</span>、<span class="highlight">COPY</span>、<span class="highlight">CMD</span>、<span class="highlight">EXPOSE</span></p>
           </div>
         </div>
       </div>
@@ -216,17 +399,30 @@ IMAGE          CREATED        CREATED BY                                      SI
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.1</span>
-          <h1 class="page-title">FROM指令 - 指定基础镜像</h1>
+          <span class="page-number">2.1</span>
+          <h1 class="page-title">FROM - 指定基础镜像</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">FROM指令</div>
+            <div class="definition-term">FROM指令原理</div>
             <div class="definition-content">
-              FROM指令用于指定<span class="highlight">基础镜像</span>，是Dockerfile的第一条指令（除ARG外）。基础镜像是构建的起点，所有后续操作都在此基础上进行。
+              FROM指令是Dockerfile的<span class="highlight">起点</span>，用于指定构建镜像所依赖的基础镜像。所有后续指令都在这个基础镜像之上执行。FROM是唯一必须放在最前面的指令（ARG指令可以在FROM之前）。
             </div>
           </div>
-          
+
+          <p class="paragraph">
+            基础镜像的选择对最终镜像的大小、功能和安全性都有重要影响。就像建筑房屋的地基，地基选择不当，后面的工作都会受影响。
+          </p>
+
+          <div class="knowledge-point">
+            <div class="kp-title">基础镜像类型</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">操作系统镜像</span>：如ubuntu、debian、alpine，只包含操作系统</p>
+              <p>- <span class="key-point">语言运行时镜像</span>：如python、node、golang，已包含语言环境</p>
+              <p>- <span class="key-point">应用镜像</span>：如nginx、redis、mysql，已配置好应用</p>
+            </div>
+          </div>
+
           <div class="code-block">
             <div class="code-header">
               <span class="code-title">FROM指令语法</span>
@@ -237,76 +433,516 @@ IMAGE          CREATED        CREATED BY                                      SI
 # 基础用法
 FROM ubuntu:22.04
 
-# 使用特定平台
+# 使用特定平台（跨平台构建时）
 FROM --platform=linux/amd64 ubuntu:22.04
 
-# 多阶段构建命名
-FROM golang:1.19 AS builder
-FROM alpine:latest AS production</code></pre>
+# 多阶段构建命名（后续会详细介绍）
+FROM golang:1.19 AS builder</code></pre>
           </div>
-          
-          <div class="knowledge-point">
-            <div class="kp-title">基础镜像选择建议</div>
-            <div class="kp-content">
-              <p>1. <span class="key-point">alpine</span>：最小化，约5MB，适合简单应用</p>
-              <p>2. <span class="key-point">slim</span>：语言运行时精简版，平衡大小和功能</p>
-              <p>3. <span class="key-point">完整版</span>：如ubuntu:22.04，功能最全但体积大</p>
-            </div>
+
+          <div class="tip-box">
+            <div class="tip-title">最佳实践</div>
+            <p>- 优先使用<span class="highlight">官方镜像</span>，如ubuntu、alpine、python等</p>
+            <p>- 生产环境建议使用<span class="highlight">固定版本标签</span>，避免latest导致的不确定性</p>
+            <p>- 考虑使用<span class="highlight">Alpine</span>等轻量镜像减小镜像体积</p>
           </div>
         </div>
-      </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.2</span>
-          <h1 class="page-title">RUN指令 - 执行命令</h1>
+          <span class="page-number">2.2</span>
+          <h1 class="page-title">RUN - 执行命令</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">RUN指令</div>
+            <div class="definition-term">RUN指令原理</div>
             <div class="definition-content">
-              RUN指令用于在镜像构建过程中<span class="highlight">执行命令</span>，并将结果提交到新的镜像层。每个RUN指令都会创建一个新的镜像层。
+              RUN指令用于在镜像构建过程中<span class="highlight">执行命令</span>，并将执行结果<span class="highlight">提交为新的镜像层</span>。这是Dockerfile中最强大的指令，可以安装软件、配置环境、创建文件等。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            RUN指令执行时会启动一个临时容器，执行命令后，将结果提交为一个新的只读层。这就是为什么每次RUN都会增加镜像体积。
+          </p>
+
+          <div class="knowledge-point">
+            <div class="kp-title">两种执行形式</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Shell形式</span>：RUN command，使用/bin/sh -c执行，优点是方便，缺点是有shell解析开销</p>
+              <p>- <span class="key-point">Exec形式</span>：RUN ["executable", "param1", "param2"]，直接调用程序，避免shell解析问题</p>
             </div>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">简单的Dockerfile示例</span>
+              <span class="code-title">RUN指令语法</span>
               <span class="code-lang">Dockerfile</span>
             </div>
-            <pre><code># 基础镜像
+            <pre><code># Shell形式（默认使用 /bin/sh -c 执行）
+RUN echo "Hello Docker" > /tmp/test.txt
+RUN apt-get update && apt-get install -y nginx
+
+# Exec形式（直接执行，不会调用shell）
+RUN ["apt-get", "update"]
+RUN ["apt-get", "install", "-y", "nginx"]
+
+# 优化RUN指令：合并多个命令减少层数
+RUN apt-get update && \
+    apt-get install -y nginx curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">RUN指令最佳实践</div>
+            <p>- 使用<span class="highlight">换行符</span>提高可读性</p>
+            <p>- <span class="highlight">合并RUN指令</span>减少镜像层数，每层都占用空间</p>
+            <p>- <span class="highlight">清理缓存</span>：apt-get clean 和 rm -rf /var/lib/apt/lists/*</p>
+            <p>- <span class="highlight">按正确顺序</span>放置指令，充分利用缓存</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.3</span>
+          <h1 class="page-title">COPY与ADD - 复制文件</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">COPY指令原理</div>
+            <div class="definition-content">
+              COPY指令将文件或目录<span class="highlight">从构建上下文</span>复制到镜像中。每次执行COPY都会创建一个新的镜像层。如果目的路径不存在，Docker会自动创建。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            COPY的工作方式类似于cp命令，但复制的源路径是相对于构建上下文的（就是docker build命令指定的PATH）。这意味着COPY只能复制构建上下文内的文件。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">COPY指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 语法：COPY [--chown=&lt;user&gt;:&lt;group&gt;] &lt;src&gt;... &lt;dest&gt;
+
+# 复制单个文件到镜像
+COPY index.html /var/www/html/
+
+# 复制整个构建上下文到镜像
+COPY . /app
+
+# 带权限复制（指定文件所有者）
+COPY --chown=www-data:www-data index.html /var/www/html/
+
+# 复制多个文件到目录
+COPY package*.json /app/</code></pre>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">ADD指令原理</div>
+            <div class="definition-content">
+              ADD是COPY的增强版，除了基本的复制功能外，还支持<span class="highlight">从URL复制</span>和<span class="highlight">自动解压tar文件</span>。但正因为这些特性，ADD的行为不如COPY直观可预测。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">ADD指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># ADD功能类似COPY，但多了以下特性：
+
+# 从URL复制文件（不推荐，建议使用RUN wget或curl）
+ADD http://example.com/file.tar.gz /tmp/
+
+# 自动解压tar文件（但不会自动删除源文件）
+ADD app.tar.gz /app/
+
+# 从另一个构建阶段复制（多阶段构建特有）
+FROM golang:1.20 AS builder
+ADD . /src
+RUN go build -o app
+FROM alpine:latest
+COPY --from=builder /src/app /usr/local/bin/</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">选择建议</div>
+            <p>- 基本文件复制使用<span class="highlight">COPY</span>（更透明、可预测）</p>
+            <p>- 只有需要<span class="highlight">URL复制</span>或<span class="highlight">自动解压</span>时才使用ADD</p>
+            <p>- 从其他构建阶段复制使用<span class="highlight">COPY --from</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.4</span>
+          <h1 class="page-title">WORKDIR与ENV - 工作目录与环境变量</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">WORKDIR指令原理</div>
+            <div class="definition-content">
+              WORKDIR设置<span class="highlight">工作目录</span>，类似于Linux的cd命令。它会影响后续所有指令的工作路径。如果指定的目录不存在，WORKDIR会自动创建。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            WORKDIR不像RUN那样创建新的镜像层，它只是一个路径设置。可以多次使用WORKDIR切换目录，也可以在一条指令中使用绝对路径。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WORKDIR指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 语法：WORKDIR /path/to/workdir
+
+# 设置工作目录
+WORKDIR /app
+COPY . /app
+RUN npm install
+
+# 切换到子目录
+WORKDIR /app
+WORKDIR /app/src
+RUN make build
+
+# 如果目录不存在会自动创建
+WORKDIR /app/subdir</code></pre>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">ENV指令原理</div>
+            <div class="definition-content">
+              ENV用于设置<span class="highlight">环境变量</span>。这些变量会在镜像构建过程中生效，也会在容器运行时存在。环境变量是容器化应用配置的重要方式。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            环境变量的作用范围很广：可以在RUN指令中使用，可以在后续的ENV指令中引用，可以在容器运行时被覆盖，也会被应用程序读取。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">ENV指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 语法：ENV &lt;key&gt;=&lt;value&gt; ...
+
+# 设置单个环境变量
+ENV APP_HOME=/app
+ENV NODE_ENV=production
+
+# 设置多个环境变量（推荐写法）
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    NGINX_PORT=80
+
+# 使用环境变量
+RUN echo $APP_HOME
+COPY . $APP_HOME/
+
+# 运行时覆盖环境变量
+# docker run -e NODE_ENV=development myapp</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.5</span>
+          <h1 class="page-title">EXPOSE与CMD - 端口与启动命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">EXPOSE指令原理</div>
+            <div class="definition-content">
+              EXPOSE是<span class="highlight">文档性指令</span>，用于声明容器将监听的网络端口。这不会实际在容器启动时打开端口，而是告诉用户该镜像期望暴露的端口。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            EXPOSE就像商品说明书上的规格信息，告诉使用者"这个容器会监听80端口"。但真正打开端口的是docker run的-p参数。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">EXPOSE指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 语法：EXPOSE &lt;port&gt; [&lt;port&gt;/&lt;protocol&gt;...]
+
+# 声明容器监听端口（仅文档作用）
+EXPOSE 80
+EXPOSE 443
+EXPOSE 8080
+
+# 指定协议
+EXPOSE 53/udp
+
+# 注意：EXPOSE不会实际绑定端口，运行时需要用-p或-P</code></pre>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">CMD指令原理</div>
+            <div class="definition-content">
+              CMD指定<span class="highlight">容器启动时执行的命令</span>。如果docker run指定了命令，CMD的内容会被覆盖。Dockerfile中只能有一个CMD，多个CMD时只有最后一个生效。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            CMD就像是容器的"默认行为"。当你运行一个nginx镜像而没有指定任何命令时，它会执行CMD中定义的启动命令。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">CMD与ENTRYPOINT指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># CMD的三种形式：
+
+# 1. Exec形式（推荐）：直接执行命令
+CMD ["nginx", "-g", "daemon off;"]
+
+# 2. Shell形式：会被包装为 /bin/sh -c "command"
+CMD echo "Hello"
+
+# 3. 作为ENTRYPOINT的参数
+CMD ["--help"]
+ENTRYPOINT ["myapp"]
+
+# ENTRYPOINT：定义容器的主命令
+ENTRYPOINT ["python", "app.py"]
+CMD ["--help"]
+# 运行效果：python app.py --help</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">CMD与ENTRYPOINT区别</div>
+            <p><span class="key-point">CMD</span>：可以被docker run参数覆盖，常用于设置默认值</p>
+            <p><span class="key-point">ENTRYPOINT</span>：不可被覆盖，定义容器的固定行为</p>
+            <p>两者配合：ENTRYPOINT定义主命令，CMD提供默认参数</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.6</span>
+          <h1 class="page-title">ARG、LABEL与VOLUME - 其他重要指令</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">ARG指令原理</div>
+            <div class="definition-content">
+              ARG用于定义<span class="highlight">构建参数</span>，它只在镜像构建过程中生效，不会传递到容器运行时。与ENV不同，ARG的值在镜像构建完成后就不存在了。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            ARG就像构建时的"变量"，可以在docker build命令中传入不同的值，实现镜像的差异化构建。例如用同一个Dockerfile构建不同版本的镜像。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">ARG指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 语法：ARG &lt;name&gt;[=&lt;default value&gt;]
+
+# 定义构建参数（可设置默认值）
+ARG VERSION=latest
+ARG APP_ENV=production
+
+# 使用参数（在RUN指令中引用）
+RUN echo $VERSION
+RUN pip install myapp==$VERSION
+
+# docker build时传递参数
+# $ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">LABEL指令原理</div>
+            <div class="definition-content">
+              LABEL用于添加<span class="highlight">元数据</span>到镜像中，不会影响镜像的功能。元数据以键值对的形式存储，可以包含版本、作者、描述等信息。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">LABEL与VOLUME指令</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># LABEL：添加镜像元数据
+LABEL maintainer="email@example.com"
+LABEL version="1.0"
+LABEL description="My application"
+
+# 建议使用label组织元数据（符合OCI标准）
+LABEL org.opencontainers.image.title="My App"
+LABEL org.opencontainers.image.version="1.0"
+
+# VOLUME：定义数据卷挂载点
+# 创建容器时，Docker会在宿主机创建匿名卷
+# 容器运行时可以用 -v 覆盖
+VOLUME ["/data", "/logs"]
+VOLUME /var/www/html</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">VOLUME的重要性</div>
+            <div class="kp-content">
+              <p>VOLUME声明的目录会被<span class="key-point">持久化存储</span>，即使容器被删除，数据也不会丢失。这是Docker数据管理的核心机制。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">Dockerfile实践与优化</h1>
+          <p class="section-desc">从问题Dockerfile到优化实践</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.1</span>
+          <h1 class="page-title">未优化的Dockerfile示例</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            下面是一个常见的未优化Dockerfile，存在多个导致镜像体积过大的问题。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">未优化的Dockerfile</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 基础镜像（完整版Ubuntu，体积较大）
 FROM ubuntu:22.04
 
-# 维护者信息
-LABEL maintainer="your-email@example.com"
+# 安装多个软件，每个RUN一层
+RUN apt-get update
+RUN apt-get install -y nginx
+RUN apt-get install -y curl
+RUN apt-get install -y vim
+RUN apt-get install -y git
+
+# 复制整个项目（包含不需要的文件）
+COPY . /app
 
 # 设置环境变量
+ENV APP_ENV=production
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 更新包列表并安装nginx
+WORKDIR /app
+
+# 暴露端口
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">存在的问题</div>
+            <p>1. <span class="highlight">每个RUN一层</span>：产生多层镜像，体积大</p>
+            <p>2. <span class="highlight">未清理缓存</span>：apt-get缓存留在镜像中</p>
+            <p>3. <span class="highlight">COPY . /app</span>：复制了所有文件，包括不需要的</p>
+            <p>4. <span class="highlight">未使用--no-install-recommends</span>：安装了不必要的依赖</p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">构建并查看体积</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 构建未优化镜像
+$ docker build -t myapp:unoptimized .
+
+# 查看镜像体积（会比较大）
+$ docker images | grep myapp
+myapp    unoptimized    450MB</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.3</span>
+          <h1 class="page-title">镜像优化技巧</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">镜像优化原理</div>
+            <div class="definition-content">
+              每个RUN指令都会创建一个新的镜像层。通过<span class="highlight">合并RUN指令</span>、<span class="highlight">清理缓存</span>、<span class="highlight">使用轻量基础镜像</span>等技巧，可以显著减小镜像体积。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            apt-get安装软件时，会下载软件包到/var/lib/apt/lists/目录。如果不清理，这些缓存会被保存到镜像层中。
+          </p>
+
+          <div class="tip-box">
+            <div class="tip-title">四大优化技巧</div>
+            <p>1. <span class="highlight">合并RUN指令</span>：减少镜像层数，每层都占用空间</p>
+            <p>2. <span class="highlight">清理缓存</span>：apt-get clean 和 rm -rf /var/lib/apt/lists/*</p>
+            <p>3. <span class="highlight">删除临时文件</span>：/tmp/* 和 /var/tmp/*</p>
+            <p>4. <span class="highlight">使用--no-install-recommends</span>：只安装必需依赖</p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">优化技巧详解</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 技巧1：合并RUN指令
+# 合并前（多Layer）
+RUN apt-get update
+RUN apt-get install -y nginx
+RUN apt-get install -y curl
+
+# 合并后（单Layer）
+RUN apt-get update && \
+    apt-get install -y nginx curl
+
+# 技巧2：清理缓存
 RUN apt-get update && \
     apt-get install -y nginx && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 复制本地文件到镜像
-COPY index.html /var/www/html/
+# 技巧3：使用 --no-install-recommends
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nginx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# 暴露端口
-EXPOSE 80
-
-# 启动命令
-CMD ["nginx", "-g", "daemon off;"]</code></pre>
+# 技巧4：使用多行符提高可读性
+RUN apt-get update && \
+    apt-get install -y \
+        nginx \
+        curl \
+        vim && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*</code></pre>
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">Dockerfile特点</div>
+            <div class="kp-title">利用构建缓存</div>
             <div class="kp-content">
-              <p>1. <span class="key-point">自动化</span>：一次编写，多次构建，确保环境一致性</p>
-              <p>2. <span class="key-point">可维护</span>：文本文件，版本控制友好</p>
-              <p>3. <span class="key-point">可复用</span>：基于基础镜像，层层叠加</p>
-              <p>4. <span class="key-point">透明</span>：构建过程清晰可见</p>
+              <p>- <span class="key-point">依赖文件优先</span>：先复制依赖文件，再复制源代码</p>
+              <p>- <span class="key-point">不变内容在前</span>：系统包安装等不常变化的指令放前面</p>
+              <p>- <span class="key-point">变化内容在后</span>：源代码复制等经常变化的指令放后面</p>
             </div>
           </div>
         </div>
@@ -314,18 +950,120 @@ CMD ["nginx", "-g", "daemon off;"]</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.2</span>
-          <h1 class="page-title">docker build命令</h1>
+          <span class="page-number">3.4</span>
+          <h1 class="page-title">优化后的Dockerfile</h1>
         </div>
         <div class="page-body">
+          <p class="paragraph">
+            下面是针对之前未优化Dockerfile的改进版本，应用了所有优化技巧。
+          </p>
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker build - 构建镜像</span>
+              <span class="code-title">优化后的Dockerfile</span>
+              <span class="code-lang">Dockerfile</span>
+            </div>
+            <pre><code># 使用轻量基础镜像
+FROM ubuntu:22.04
+
+# 设置环境变量（避免交互式提示）
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 合并RUN指令 + 清理缓存 + 使用--no-install-recommends
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        nginx \
+        curl \
+        vim \
+        git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# 只复制需要的文件（利用.dockerignore）
+COPY ./app /app
+
+WORKDIR /app
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">.dockerignore文件</span>
+              <span class="code-lang">文本文件</span>
+            </div>
+            <pre><code># 排除版本控制目录
+.git
+.gitignore
+
+# 排除敏感文件
+*.pem
+*.key
+.env
+
+# 排除文档和测试文件
+README.md
+*.test
+coverage/
+
+# 排除临时文件
+*.log
+tmp/</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">对比镜像体积</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 构建优化镜像
+$ docker build -t myapp:optimized .
+
+# 查看镜像体积对比
+$ docker images | grep myapp
+myapp    optimized     180MB
+myapp    unoptimized   450MB
+
+# 查看镜像层信息
+$ docker history myapp:optimized</code></pre>
+          </div>
+
+          <div class="highlight-box">
+            <div class="highlight-title">优化效果</div>
+            <div class="highlight-content">
+              <p>镜像体积从 <span class="highlight">450MB 减小到 180MB</span>，减少约 <span class="highlight">60%</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.5</span>
+          <h1 class="page-title">docker build - 构建镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">docker build原理</div>
+            <div class="definition-content">
+              docker build命令读取Dockerfile，按照指令顺序执行每条命令，最终生成一个<span class="highlight">新的镜像</span>。构建过程中，Docker会为每条指令创建容器、执行命令、提交更改。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            docker build的工作流程：读取Dockerfile → 创建临时容器 → 执行指令 → 提交新镜像层 → 删除临时容器 → 继续下一条指令。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker build命令</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 语法：docker build [OPTIONS] PATH | URL | -
 
-# 基础用法 - 在当前目录构建（Dockerfile需在目录中）
+# 基础用法 - 在当前目录构建
 $ docker build -t myapp:1.0 .
 
 # 预期输出：
@@ -345,364 +1083,25 @@ $ docker build -t myapp:1.0 .
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># -t, --tag              指定镜像名称和标签（name:tag）
-# --file, -f            指定Dockerfile路径（默认是当前目录的Dockerfile）
+# --file, -f            指定Dockerfile路径
 # --no-cache            构建时不使用缓存
-# --build-arg           设置构建参数（ARG指令的值）
+# --build-arg           设置构建参数
 
-# 示例：指定Dockerfile路径
+# 指定Dockerfile路径和构建上下文
 $ docker build -t myapp:1.0 -f /path/to/Dockerfile /path/to/context
 
-# 示例：不使用缓存构建
+# 不使用缓存构建
 $ docker build --no-cache -t myapp:1.0 .
 
-# 示例：传递构建参数
+# 传递构建参数
 $ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
           </div>
-        </div>
-      </div>
-
-      <div class="page section-page">
-        <div class="section-content">
-          <span class="section-label">Part 3</span>
-          <h1 class="section-title">镜像构建实践</h1>
-          <p class="section-desc">实际构建应用镜像</p>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 4.1</span>
-          <h1 class="page-title">FROM - 指定基础镜像</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">FROM指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：FROM [--platform &lt;platform&gt;] &lt;image&gt;[:&lt;tag&gt;] [AS &lt;name&gt;]
-
-# 作用：指定构建镜像的基础镜像，必须是第一条指令（除ARG外）
-
-# 示例：使用官方Ubuntu
-FROM ubuntu:22.04
-
-# 示例：使用官方Python（带有平台指定）
-FROM --platform=linux/amd64 python:3.11
-
-# 示例：多阶段构建中为阶段命名
-FROM golang:1.20 AS builder
-# ... 构建过程 ...
-FROM alpine:latest
-COPY --from=builder /bin/myapp /bin/myapp</code></pre>
-          </div>
 
           <div class="tip-box">
-            <div class="tip-title">基础镜像选择建议</div>
-            <p>- 优先使用<span class="highlight">官方镜像</span>，如ubuntu、alpine、python等</p>
-            <p>- 生产环境建议使用<span class="highlight">固定版本标签</span>，避免latest导致的不确定性</p>
-            <p>- 考虑使用<span class="highlight">Alpine</span>等轻量镜像减小镜像体积</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 4.2</span>
-          <h1 class="page-title">RUN - 执行命令</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">RUN指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法1：RUN &lt;command&gt;  （shell形式，默认使用 /bin/sh -c）
-# 语法2：RUN ["executable", "param1", "param2"]  （exec形式，推荐）
-
-# shell形式
-RUN echo "Hello Docker" > /tmp/test.txt
-RUN apt-get update && apt-get install -y nginx
-
-# exec形式（不会调用shell，避免shell解析问题）
-RUN ["apt-get", "update"]
-RUN ["apt-get", "install", "-y", "nginx"]
-
-# 优化RUN指令：合并多个命令减少层数
-RUN apt-get update && \
-    apt-get install -y nginx curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">RUN指令最佳实践</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 技巧1：使用换行符提高可读性
-RUN apt-get update && \
-    apt-get install -y \
-        nginx \
-        curl \
-        vim
-
-# 技巧2：清理缓存减少镜像体积
-RUN apt-get update && \
-    apt-get install -y nginx && \
-    rm -rf /var/lib/apt/lists/*
-
-# 技巧3：按正确顺序放置指令，充分利用缓存
-# 先放置不常变化的指令
-FROM ubuntu:22.04
-RUN apt-get update
-COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
-COPY . /app
-# 修改代码时，前面的apt-get update会被缓存</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 4.3</span>
-          <h1 class="page-title">COPY与ADD - 复制文件</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">COPY指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：COPY [--chown=&lt;user&gt;:&lt;group&gt;] &lt;src&gt;... &lt;dest&gt;
-
-# 复制本地文件到镜像
-COPY index.html /var/www/html/
-COPY . /app  # 复制整个构建上下文到镜像
-
-# 带权限复制
-COPY --chown=www-data:www-data index.html /var/www/html/
-
-# 示例：复制应用代码
-COPY package*.json /app/
-COPY src /app/src</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">ADD指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：ADD [--chown=&lt;user&gt;:&lt;group&gt;] &lt;src&gt;... &lt;dest&gt;
-
-# ADD功能类似COPY，但多了以下特性：
-# 1. 可以从URL复制文件
-# 2. 可以解压tar文件到镜像
-
-# 从URL复制（不推荐，建议使用RUN wget或curl）
-ADD http://example.com/file.tar.gz /tmp/
-
-# 解压tar文件（自动识别压缩格式）
-ADD app.tar.gz /app/
-
-# 从另一个构建阶段复制（多阶段构建）
-FROM golang:1.20 AS builder
-ADD . /src
-RUN go build -o app
-FROM alpine:latest
-COPY --from=builder /src/app /usr/local/bin/</code></pre>
-          </div>
-
-          <div class="tip-box">
-            <div class="tip-title">选择建议</div>
-            <p>- 基本文件复制使用<span class="highlight">COPY</span>（更透明、可预测）</p>
-            <p>- 只有需要<span class="highlight">URL复制</span>或<span class="highlight">自动解压</span>时才使用ADD</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 4.4</span>
-          <h1 class="page-title">WORKDIR与ENV - 工作目录与环境变量</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">WORKDIR指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：WORKDIR /path/to/workdir
-
-# 设置工作目录（类似cd）
-WORKDIR /app
-COPY . /app
-RUN npm install
-
-# 可以切换已存在的工作目录
-WORKDIR /app
-WORKDIR /app/src
-RUN make build
-
-# 如果目录不存在会自动创建
-WORKDIR /app/subdir
-
-# 注意：WORKDIR会创建目录，如果创建失败会报错</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">ENV指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：ENV &lt;key&gt;=&lt;value&gt; ...
-
-# 设置环境变量
-ENV APP_HOME=/app
-ENV NODE_ENV=production
-
-# 设置多个环境变量
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    NGINX_PORT=80
-
-# 使用环境变量
-RUN echo $APP_HOME
-COPY . $APP_HOME/
-
-# docker run时覆盖环境变量
-# docker run -e NODE_ENV=development myapp</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 4.5</span>
-          <h1 class="page-title">EXPOSE与CMD - 端口与启动命令</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">EXPOSE指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：EXPOSE &lt;port&gt; [&lt;port&gt;/&lt;protocol&gt;...]
-
-# 声明容器监听的端口（仅文档作用，不实际绑定）
-EXPOSE 80
-EXPOSE 443
-EXPOSE 8080
-
-# 指定协议
-EXPOSE 80/tcp
-EXPOSE 53/udp
-
-# 注意：EXPOSE只是文档，运行时需要用-p或-P绑定端口</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">CMD指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：CMD ["executable", "param1", "param2"]  （exec形式，推荐）
-# 语法2：CMD command param1 param2  （shell形式）
-# 语法3：CMD ["param1", "param2"]  （作为ENTRYPOINT的参数）
-
-# exec形式（直接执行，可被docker run参数覆盖）
-CMD ["nginx", "-g", "daemon off;"]
-
-# shell形式（会被包装为 /bin/sh -c "command"）
-CMD echo "Hello"
-
-# 作为ENTRYPOINT的参数（常用于设置默认参数）
-CMD ["--version"]
-ENTRYPOINT ["myapp"]
-
-# Dockerfile中只能有一个CMD，多个时只有最后一个生效</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">ENTRYPOINT指令</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：ENTRYPOINT ["executable", "param1", "param2"]  （exec形式）
-# 语法2：ENTRYPOINT command param1 param2  （shell形式）
-
-# 与CMD配合：CMD提供默认参数，ENTRYPOINT提供可执行文件
-ENTRYPOINT ["python", "app.py"]
-CMD ["--help"]
-
-# docker run效果：
-# python app.py --help
-
-# 常见应用场景：配置启动命令
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["postgres"]</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 4.6</span>
-          <h1 class="page-title">其他重要指令</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">ARG指令 - 构建参数</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：ARG &lt;name&gt;[=&lt;default value&gt;]
-
-# 定义构建参数（类似变量）
-ARG VERSION=latest
-ARG APP_ENV=production
-
-# 使用参数
-RUN echo $VERSION
-RUN pip install myapp==$VERSION
-
-# docker build时传递参数
-# $ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">LABEL指令 - 元数据</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：LABEL &lt;key&gt;=&lt;value&gt; ...
-
-# 添加镜像元数据
-LABEL maintainer="email@example.com"
-LABEL version="1.0"
-LABEL description="My application"
-
-# 建议使用label组织元数据
-LABEL org.opencontainers.image.title="My App"
-LABEL org.opencontainers.image.version="1.0"
-LABEL org.opencontainers.image.authors="author"</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">VOLUME指令 - 数据卷</span>
-              <span class="code-lang">Dockerfile</span>
-            </div>
-            <pre><code># 语法：VOLUME ["path1", "path2", ...]
-
-# 定义挂载点（容器运行时可覆盖）
-VOLUME ["/data", "/logs"]
-VOLUME /var/www/html
-
-# 注意：
-# - 无法在Dockerfile中指定主机挂载点（运行时指定）
-# - 定义的卷会创建在宿主机 /var/lib/docker/volumes/ 下</code></pre>
+            <div class="tip-title">构建上下文说明</div>
+            <p>- <span class="highlight">PATH</span>是构建上下文，docker build会在该目录下查找Dockerfile和所需文件</p>
+            <p>- <span class="highlight">.</span>表示当前目录作为构建上下文</p>
+            <p>- COPY指令只能复制构建上下文内的文件，无法访问外部文件</p>
           </div>
         </div>
       </div>
@@ -710,20 +1109,24 @@ VOLUME /var/www/html
       <div class="page section-page">
         <div class="section-content">
           <span class="section-label">Part 4</span>
-          <h1 class="section-title">镜像仓库与分发</h1>
-          <p class="section-desc">镜像的存储和共享</p>
+          <h1 class="section-title">镜像构建实践</h1>
+          <p class="section-desc">实际构建应用镜像</p>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 5.1</span>
+          <span class="page-number">4.1</span>
           <h1 class="page-title">构建Web应用镜像</h1>
         </div>
         <div class="page-body">
+          <p class="paragraph">
+            Web应用是最常见的Docker镜像类型之一。这里我们以Nginx为基础镜像，构建一个静态网站镜像。
+          </p>
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Web应用 Dockerfile示例</span>
+              <span class="code-title">Web应用 Dockerfile</span>
               <span class="code-lang">Dockerfile</span>
             </div>
             <pre><code># 基础镜像
@@ -732,7 +1135,7 @@ FROM nginx:alpine
 # 维护者
 LABEL maintainer="your-email@example.com"
 
-# 复制网站文件
+# 复制网站文件到Nginx目录
 COPY ./html /usr/share/nginx/html
 
 # 复制nginx配置
@@ -764,13 +1167,17 @@ $ curl http://localhost:8080</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 5.2</span>
+          <span class="page-number">4.2</span>
           <h1 class="page-title">构建Python应用镜像</h1>
         </div>
         <div class="page-body">
+          <p class="paragraph">
+            Python应用需要先安装依赖，然后复制代码。使用python:3.11-slim作为基础镜像，可以得到一个相对轻量的镜像。
+          </p>
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Python应用 Dockerfile示例</span>
+              <span class="code-title">Python应用 Dockerfile</span>
               <span class="code-lang">Dockerfile</span>
             </div>
             <pre><code># 基础镜像
@@ -779,7 +1186,7 @@ FROM python:3.11-slim
 # 设置工作目录
 WORKDIR /app
 
-# 复制依赖文件
+# 复制依赖文件（利用构建缓存）
 COPY requirements.txt .
 
 # 安装依赖
@@ -812,12 +1219,19 @@ gunicorn==20.1.0</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 5.3</span>
+          <span class="page-number">4.3</span>
           <h1 class="page-title">多阶段构建</h1>
         </div>
         <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">多阶段构建原理</div>
+            <div class="definition-content">
+              多阶段构建允许在<span class="highlight">单个Dockerfile中使用多个FROM指令</span>，每个FROM开始一个新的构建阶段。最终镜像只包含最后一个FROM阶段的内容。
+            </div>
+          </div>
+
           <p class="paragraph">
-            多阶段构建允许在<span class="highlight">单个Dockerfile中使用多个FROM指令</span>，每个FROM开始一个新的构建阶段。这可以大大减小最终镜像的体积。
+            多阶段构建的核心思想是"分离构建环境和运行环境"。第一阶段安装所有构建工具、编译代码，第二阶段只复制运行所需的最小文件。
           </p>
 
           <div class="code-block">
@@ -825,7 +1239,7 @@ gunicorn==20.1.0</code></pre>
               <span class="code-title">多阶段构建示例</span>
               <span class="code-lang">Dockerfile</span>
             </div>
-            <pre><code># 阶段1：构建应用
+            <pre><code># 阶段1：构建应用（使用完整工具链）
 FROM golang:1.20 AS builder
 WORKDIR /src
 COPY . .
@@ -837,19 +1251,7 @@ WORKDIR /app
 COPY --from=builder /src/myapp /app/
 CMD ["/app/myapp"]
 
-# 最终镜像只包含运行所需的最小文件，不包含构建工具</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">构建并运行</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 构建多阶段镜像
-$ docker build -t my-python-app:multi -f Dockerfile.multi .
-
-# 对比镜像大小
-$ docker build -t my-python-app:single -f Dockerfile.single .</code></pre>
+# 最终镜像只包含运行所需的最小文件</code></pre>
           </div>
 
           <div class="highlight-box">
@@ -865,252 +1267,78 @@ $ docker build -t my-python-app:single -f Dockerfile.single .</code></pre>
 
       <div class="page section-page">
         <div class="section-content">
-          <span class="section-label">实验</span>
-          <h1 class="section-title">动手实验：Dockerfile实践</h1>
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">动手实验</h1>
           <p class="section-desc">综合练习Dockerfile编写</p>
         </div>
       </div>
-            </div>
-          </div>
-
-          <div class="tip-box">
-            <div class="tip-title">Docker Hub网址</div>
-            <p>访问 <span class="highlight">https://hub.docker.com</span> 注册账号、搜索镜像、管理仓库</p>
-          </div>
-        </div>
-      </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 6.1.1</span>
-          <h1 class="page-title">docker login - 登录Docker Hub</h1>
+          <span class="page-number">实验</span>
+          <h1 class="page-title">Dockerfile实践</h1>
         </div>
         <div class="page-body">
-          <p class="paragraph">
-            <span class="highlight">docker login</span>命令用于登录Docker Hub。登录后才能推送镜像到Docker Hub或从私有仓库拉取镜像。
-          </p>
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">编写Dockerfile构建Web应用镜像</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>掌握Dockerfile的编写方法，能够使用docker build构建自定义镜像，并运行容器验证</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建项目目录和网页文件</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">编写Dockerfile</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">构建镜像</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">运行容器并验证</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">清理环境</span></div>
+            </div>
+          </div>
 
-          <div class="code-block">
+          <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">docker login - 登录仓库</span>
+              <span class="code-title">实验命令</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 登录Docker Hub
-$ docker login
+            <pre><code># 步骤1：创建项目目录
+$ mkdir myweb && cd myweb
 
-# 预期输出：
-Username: your-username
-Password:
-Login Succeeded
+# 创建网页文件
+$ echo "&lt;h1&gt;Hello from Dockerfile!&lt;/h1&gt;" > index.html
 
-# 登录信息会保存在 ~/.docker/config.json</code></pre>
-          </div>
+# 步骤2：编写Dockerfile
+$ cat > Dockerfile << 'EOF'
+FROM nginx:alpine
+COPY ./index.html /usr/share/nginx/html/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+EOF
 
-          <div class="knowledge-point">
-            <div class="kp-title">参数说明</div>
-            <div class="kp-content">
-              <p>- <span class="key-point">无参数</span>：登录Docker Hub（默认）</p>
-              <p>- <span class="key-point">-u, --username</span>：指定用户名</p>
-              <p>- <span class="key-point">-p, --password</span>：指定密码（不建议在命令行使用）</p>
-            </div>
-          </div>
-        </div>
-      </div>
+# 步骤3：构建镜像
+$ docker build -t myweb:1.0 .
 
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 6.1.2</span>
-          <h1 class="page-title">docker tag 与 docker push - 推送镜像</h1>
-        </div>
-        <div class="page-body">
-          <p class="paragraph">
-            推送镜像到Docker Hub需要先<span class="highlight">打标签</span>，然后<span class="highlight">推送</span>。
-          </p>
+# 步骤4：运行容器
+$ docker run -d --name myweb-container -p 8080:80 myweb:1.0
 
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker tag - 给镜像打标签</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 标记本地镜像
-# 格式：docker tag 源镜像 目标仓库/用户名/镜像名:标签
-$ docker tag myapp:latest your-username/myapp:latest
+# 验证网页
+$ curl http://localhost:8080
 
-# 如果镜像没有tag，默认使用latest</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker push - 推送镜像到仓库</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 推送镜像到Docker Hub
-$ docker push your-username/myapp:latest
-
-# 预期输出：
-# The push refers to repository [docker.io/your-username/myapp]
-# latest: digest: sha256:abc123... size: 2048</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">推送流程</div>
-            <div class="kp-content">
-              <p>1. <span class="key-point">docker login</span> - 登录Docker Hub</p>
-              <p>2. <span class="key-point">docker tag</span> - 给镜像打上仓库标签</p>
-              <p>3. <span class="key-point">docker push</span> - 推送到仓库</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 6.1.3</span>
-          <h1 class="page-title">docker pull 与 docker logout</h1>
-        </div>
-        <div class="page-body">
-          <p class="paragraph">
-            <span class="highlight">docker pull</span>用于从仓库拉取镜像。<span class="highlight">docker logout</span>用于登出仓库。
-          </p>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker pull - 拉取镜像</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 拉取公开镜像（无需登录）
-$ docker pull your-username/myapp:latest
-
-# 拉取官方镜像
-$ docker pull ubuntu:22.04
-
-# 公开镜像无需登录即可拉取</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker logout - 登出仓库</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 登出Docker Hub
-$ docker logout
-
-# 登出后，凭证会从 ~/.docker/config.json 中移除</code></pre>
-          </div>
-
-          <div class="highlight-box">
-            <div class="highlight-title">Docker Hub操作完整流程</div>
-            <div class="highlight-content">
-              <p>1. <span class="highlight">docker login</span> - 登录仓库</p>
-              <p>2. <span class="highlight">docker tag</span> - 打标签</p>
-              <p>3. <span class="highlight">docker push</span> - 推送镜像</p>
-              <p>4. <span class="highlight">docker pull</span> - 拉取镜像</p>
-              <p>5. <span class="highlight">docker logout</span> - 登出仓库</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">Part 6.4</span>
-          <h1 class="page-title">私有镜像仓库</h1>
-        </div>
-        <div class="page-body">
-          <p class="paragraph">
-            除了公共仓库，企业通常使用<span class="highlight">私有镜像仓库</span>存储内部镜像。常见选择包括Docker Registry、Harbor、阿里云镜像仓库等。
-          </p>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">使用私有仓库</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 标记镜像为私有仓库地址
-$ docker tag myapp:latest registry.example.com/myapp:latest
-
-# 推送到私有仓库
-$ docker push registry.example.com/myapp:latest
-
-# 从私有仓库拉取
-$ docker pull registry.example.com/myapp:latest</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">总结</span>
-          <h1 class="page-title">Docker镜像管理小结</h1>
-        </div>
-        <div class="page-body">
-          <div class="summary-grid">
-            <div class="summary-item">
-              <span class="summary-icon">*</span>
-              <span class="summary-text"><span class="highlight">镜像概念</span>：只读模板，包含运行应用所需的所有内容</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-icon">*</span>
-              <span class="summary-text"><span class="highlight">分层存储</span>：UnionFS技术，每层只读，节省空间</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-icon">*</span>
-              <span class="summary-text"><span class="highlight">Dockerfile</span>：构建镜像的脚本，指令顺序影响构建效率和缓存利用</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-icon">*</span>
-              <span class="summary-text"><span class="highlight">核心指令</span>：FROM、RUN、COPY、CMD、EXPOSE、ENV、WORKDIR</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-icon">*</span>
-              <span class="summary-text"><span class="highlight">多阶段构建</span>：减小镜像体积，提高安全性</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-icon">*</span>
-              <span class="summary-text"><span class="highlight">镜像仓库</span>：分享和分发镜像的标准方式</span>
-            </div>
-          </div>
-
-          <div class="key-conclusion" style="margin-top: 1.5rem;">
-            <div class="conclusion-title">核心要点回顾</div>
-            <div class="conclusion-content">
-              <p>1. <span class="highlight">镜像分层</span>是Docker的核心机制，每层对应Dockerfile的一条指令</p>
-              <p>2. <span class="highlight">Dockerfile</span>是构建镜像的脚本，指令顺序影响构建效率和缓存利用</p>
-              <p>3. 掌握<span class="highlight">多阶段构建</span>可以显著减小镜像体积</p>
-              <p>4. <span class="highlight">镜像仓库</span>是分享和分发镜像的标准方式</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">预告</span>
-          <h1 class="page-title">下讲预告</h1>
-        </div>
-        <div class="page-body">
-          <div class="next-lecture">
-            <h3>第八讲：<span class="highlight">Docker镜像仓库</span></h3>
-            <ul>
-              <li>掌握<span class="key-point">Docker Hub</span>镜像仓库使用</li>
-              <li>学习<span class="key-point">私有仓库</span>搭建与配置</li>
-              <li>理解<span class="key-point">镜像分发</span>流程和技巧</li>
-              <li>掌握<span class="key-point">镜像安全</span>扫描和签名</li>
-            </ul>
+# 步骤5：清理环境
+$ docker stop myweb-container && docker rm myweb-container
+$ docker rmi myweb:1.0</code></pre>
           </div>
 
           <div class="knowledge-point" style="margin-top: 1.5rem;">
-            <div class="kp-title">预习建议</div>
+            <div class="kp-title">思考题</div>
             <div class="kp-content">
-              <p>1. 复习Docker镜像构建和优化技巧</p>
-              <p>2. 注册Docker Hub账号</p>
-              <p>3. 了解TLS证书配置</p>
+              <p>1. 如何修改Dockerfile使用多阶段构建减小镜像体积？</p>
+              <p>2. 如何添加环境变量和启动参数？</p>
+              <p>3. 如何使用.dockerignore文件优化构建？</p>
             </div>
           </div>
-        </div>
-        <div class="page-footer">
-          <span>虚拟化容器技术</span>
-          <span>感谢您的学习</span>
         </div>
       </div>
 
@@ -1121,7 +1349,7 @@ $ docker pull registry.example.com/myapp:latest</code></pre>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">40</span>
+        <span class="total" id="totalPages">16</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>

@@ -49,6 +49,10 @@
                 <span class="toc-num">04</span>
                 <span class="toc-text">第四部分：镜像分发与同步</span>
               </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：动手实验</span>
+              </li>
             </ul>
           </div>
 
@@ -110,19 +114,19 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.1</span>
+          <span class="page-number">1.1</span>
           <h1 class="page-title">什么是镜像仓库？</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">镜像仓库定义</div>
+            <div class="definition-term">镜像仓库概念</div>
             <div class="definition-content">
-              Docker镜像仓库（Registry）是<span class="highlight">存储和分发镜像</span>的服务系统，类似代码仓库（Git）存储代码，镜像仓库存储Docker镜像。
+              Docker镜像仓库（Registry）是<span class="highlight">存储和分发镜像</span>的服务系统，类似图书馆存储图书、出版社发行图书，镜像仓库存储和分发Docker镜像。
             </div>
           </div>
 
           <p class="paragraph">
-            镜像仓库是Docker生态系统的核心组件，实现了镜像的<span class="highlight">版本管理</span>、<span class="highlight">共享分发</span>和<span class="highlight">存储管理</span>。
+            镜像仓库的工作流程：开发者构建镜像 → 推送到仓库 → 其他机器从仓库拉取镜像。就像我们写完文章后存到云端，其他人可以下载查看一样。
           </p>
 
           <div class="card-grid">
@@ -148,7 +152,7 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.2</span>
+          <span class="page-number">1.2</span>
           <h1 class="page-title">镜像仓库类型</h1>
         </div>
         <div class="page-body">
@@ -194,7 +198,7 @@
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 1.3</span>
+          <span class="page-number">1.3</span>
           <h1 class="page-title">镜像命名与拉取</h1>
         </div>
         <div class="page-body">
@@ -255,19 +259,19 @@ $ docker pull nginx:1.25-alpine</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.1</span>
+          <span class="page-number">2.1</span>
           <h1 class="page-title">Docker Hub概述</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Docker Hub</div>
+            <div class="definition-term">Docker Hub定义</div>
             <div class="definition-content">
-              Docker Hub是Docker官方维护的<span class="highlight">公共镜像仓库</span>，提供超过100,000个镜像，是全球最大的Docker镜像社区。
+              Docker Hub是Docker官方维护的<span class="highlight">公共镜像仓库</span>，提供超过100,000个镜像，是全球最大的Docker镜像社区。类似于GitHub托管代码仓库，Docker Hub托管Docker镜像。
             </div>
           </div>
 
           <p class="paragraph">
-            Docker Hub地址：<code>https://hub.docker.com</code>
+            Docker Hub地址：<code>https://hub.docker.com</code>。任何人都可以免费拉取公开镜像，只有推送镜像才需要注册账号。
           </p>
 
           <div class="card-grid">
@@ -293,7 +297,7 @@ $ docker pull nginx:1.25-alpine</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.2</span>
+          <span class="page-number">2.2</span>
           <h1 class="page-title">Docker Hub账号与登录</h1>
         </div>
         <div class="page-body">
@@ -344,7 +348,7 @@ $ docker logout registry.example.com:5000</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.3</span>
+          <span class="page-number">2.3</span>
           <h1 class="page-title">搜索与拉取镜像</h1>
         </div>
         <div class="page-body">
@@ -389,7 +393,7 @@ $ docker pull --force nginx:latest</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 2.4</span>
+          <span class="page-number">2.4</span>
           <h1 class="page-title">推送镜像到Docker Hub</h1>
         </div>
         <div class="page-body">
@@ -433,25 +437,22 @@ $ docker push your_username/myapp:v1
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">完整操作流程（WSL）</span>
+              <span class="code-title">完整操作流程</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 1. 在当前目录构建镜像
-#    -t myapp:v1    指定镜像名和标签
-#    .              使用当前目录的Dockerfile
 $ docker build -t myapp:v1 .
 
 # 2. 登录Docker Hub（按提示输入用户名和密码）
 $ docker login
 
 # 3. 为镜像打标签（格式：用户名/镜像名:标签）
-#    注意：用户名必须与登录的Docker Hub账号一致
 $ docker tag myapp:v1 your_username/myapp:v1
 
 # 4. 推送镜像到Docker Hub
 $ docker push your_username/myapp:v1
 
-# 5. 在其他机器或WSL中拉取镜像
+# 5. 在其他机器中拉取镜像
 $ docker pull your_username/myapp:v1</code></pre>
           </div>
         </div>
@@ -467,20 +468,24 @@ $ docker pull your_username/myapp:v1</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.1</span>
+          <span class="page-number">3.1</span>
           <h1 class="page-title">Docker Registry部署</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Docker Registry</div>
+            <div class="definition-term">Docker Registry原理</div>
             <div class="definition-content">
-              Docker官方开源的<span class="highlight">轻量级镜像仓库</span>，可部署在企业内部存储镜像。
+              Docker Registry是Docker官方开源的<span class="highlight">轻量级镜像仓库</span>，可部署在企业内部存储镜像。它是一个无状态的服务器，遵循REST API规范存储和分发Docker镜像。
             </div>
           </div>
 
+          <p class="paragraph">
+            Registry的工作原理：客户端通过HTTPS与Registry通信，上传或下载镜像层数据。Registry将镜像层存储在文件系统中，并维护一个数据库记录镜像的元数据。
+          </p>
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">快速部署Registry（WSL）</span>
+              <span class="code-title">快速部署Registry</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 启动Registry容器
@@ -493,16 +498,14 @@ $ docker run -d \
   registry:2
 
 # 参数详细说明：
-# -d                          后台运行模式，不占用终端
-# --name registry             指定容器名称为registry
-# --hostname registry         设置容器内部主机名为registry
-# -p 5000:5000               将宿主机的5000端口映射到容器的5000端口
-#                             Registry默认监听5000端口
-# --restart=always           容器退出后自动重启（开机自启）
+# -d                          后台运行模式
+# --name registry             容器名称
+# --hostname registry         容器内部主机名
+# -p 5000:5000               端口映射
+# --restart=always           开机自启
 # -v registry-data:/var/lib/registry \
-#                             使用Docker数据卷registry-data持久化存储
-#                             镜像数据保存在/var/lib/registry目录
-# registry:2                 使用Registry 2版本镜像</code></pre>
+#                             数据卷持久化
+# registry:2                 Registry 2版本</code></pre>
           </div>
 
           <div class="code-block">
@@ -527,13 +530,13 @@ $ curl http://localhost:5000/v2/_catalog
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.2</span>
+          <span class="page-number">3.2</span>
           <h1 class="page-title">推送镜像到私有仓库</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">配置 insecure-registries</span>
+              <span class="code-title">配置insecure-registries</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 由于使用HTTP，需要在/etc/docker/daemon.json添加：
@@ -572,9 +575,6 @@ $ curl http://192.168.1.100:5000/v2/_catalog
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 拉取私有仓库镜像
-$ docker pull 192.168.1.100:5000/my-ubuntu:v1
-
-# 在其他机器上也可以这样拉取
 $ docker pull 192.168.1.100:5000/my-ubuntu:v1</code></pre>
           </div>
         </div>
@@ -582,16 +582,20 @@ $ docker pull 192.168.1.100:5000/my-ubuntu:v1</code></pre>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 3.3</span>
+          <span class="page-number">3.3</span>
           <h1 class="page-title">Harbor企业级仓库</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Harbor</div>
+            <div class="definition-term">Harbor原理</div>
             <div class="definition-content">
-              Harbor是VMware开源的<span class="highlight">企业级Docker Registry</span>，提供图形界面、权限管理、镜像复制、漏洞扫描等企业功能。
+              Harbor是VMware开源的<span class="highlight">企业级Docker Registry</span>，在官方Registry基础上增加了企业急需的功能，如图形界面、权限管理、镜像复制、漏洞扫描等。
             </div>
           </div>
+
+          <p class="paragraph">
+            Harbor可以理解为一个"镜像医院"，不仅存储镜像，还提供诊断（漏洞扫描）、排队管理（权限控制）、多站点服务（镜像复制）等高级功能。
+          </p>
 
           <div class="code-block">
             <div class="code-header">
@@ -599,24 +603,19 @@ $ docker pull 192.168.1.100:5000/my-ubuntu:v1</code></pre>
               <span class="code-lang">特性说明</span>
             </div>
             <pre><code># 1. 基于角色的访问控制（RBAC）
-#    - 项目级别权限管理
-#    - 用户角色：管理员、开发者、访客
+#    项目级别权限管理
 
 # 2. 镜像复制
-#    - 支持跨数据中心同步
-#    - 自动同步策略
+#    支持跨数据中心同步
 
 # 3. 漏洞扫描
-#    - 集成Clair扫描器
-#    - 安全报告生成
+#    集成Clair扫描器
 
 # 4. 图形界面
-#    - Web UI管理
-#    - 镜像浏览和搜索
+#    Web UI管理
 
 # 5. RESTful API
-#    - 完整的API支持
-#    - 便于集成CI/CD</code></pre>
+#    便于集成CI/CD</code></pre>
           </div>
 
           <div class="code-block">
@@ -660,51 +659,38 @@ $ ./install.sh
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.1</span>
+          <span class="page-number">4.1</span>
           <h1 class="page-title">镜像导出与导入</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker save - 导出镜像（WSL）</span>
+              <span class="code-title">docker save - 导出镜像</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 导出单个镜像为tar文件
 $ docker save nginx:latest -o nginx.tar
 
-# 参数说明：
-# nginx:latest    要导出的镜像名和标签
-# -o nginx.tar    指定输出文件名（.tar格式）
-
 # 导出多个镜像到同一个tar文件
 $ docker save nginx:latest redis:alpine mysql:8.0 -o images.tar
 
-# 查看tar文件内容（不实际导入）
-$ docker load -i nginx.tar --list
-
-# 重要：导出的tar文件包含镜像的所有层，建议压缩后传输</code></pre>
+# 查看tar文件内容
+$ docker load -i nginx.tar --list</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker load - 导入镜像（WSL）</span>
+              <span class="code-title">docker load - 导入镜像</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 从tar文件导入镜像
 $ docker load -i nginx.tar
 
-# 参数说明：
-# -i nginx.tar    指定要导入的tar文件（-i等于--input）
-
 # 导入并查看结果
 $ docker load -i nginx.tar | grep "Loaded image"
 
 # 查看导入的镜像
-$ docker images | grep nginx
-
-# 预期输出：
-# REPOSITORY   TAG      IMAGE ID       CREATED        SIZE
-# nginx        latest   abc123...     5 minutes ago  150MB</code></pre>
+$ docker images | grep nginx</code></pre>
           </div>
 
           <div class="tip-box">
@@ -718,7 +704,7 @@ $ docker images | grep nginx
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.2</span>
+          <span class="page-number">4.2</span>
           <h1 class="page-title">镜像压缩与传输</h1>
         </div>
         <div class="page-body">
@@ -756,13 +742,13 @@ $ rsync -avz nginx.tar user@remote:/path/
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.3</span>
-          <h1 class="page-title">镜像镜像复制</h1>
+          <span class="page-number">4.3</span>
+          <h1 class="page-title">镜像复制工具</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker tag 重命名镜像</span>
+              <span class="code-title">docker tag重命名镜像</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 将镜像复制到不同仓库（通过tag）
@@ -776,8 +762,7 @@ $ docker push new-registry.com/project/image:tag</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 安装skopeo
-$ apt install skopeo  # Debian/Ubuntu
-$ yum install skopeo  # CentOS
+$ apt install skopeo
 
 # 复制镜像（不依赖Docker daemon）
 $ skopeo copy \
@@ -794,24 +779,20 @@ $ skopeo inspect docker://my-registry.com:5000/nginx:latest</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 1. 登录阿里云镜像服务
-$ sudo apt install -y docker-scan-plugin
 $ docker login --username=your_username registry.cn-hangzhou.aliyuncs.com
 
 # 2. 打标签
 $ docker tag myapp:v1 registry.cn-hangzhou.aliyuncs.com/your_namespace/myapp:v1
 
 # 3. 推送
-$ docker push registry.cn-hangzhou.aliyuncs.com/your_namespace/myapp:v1
-
-# 4. 其他机器拉取
-$ docker pull registry.cn-hangzhou.aliyuncs.com/your_namespace/myapp:v1</code></pre>
+$ docker push registry.cn-hangzhou.aliyuncs.com/your_namespace/myapp:v1</code></pre>
           </div>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">Part 4.4</span>
+          <span class="page-number">4.4</span>
           <h1 class="page-title">镜像安全最佳实践</h1>
         </div>
         <div class="page-body">
@@ -835,17 +816,14 @@ $ docker pull your_username/myapp:v1</code></pre>
               <span class="code-title">镜像扫描</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># Docker Scout扫描（Docker Desktop内置）
+            <pre><code># Docker Scout扫描
 $ docker scout cves nginx:latest
 
 # Trivy扫描
-$ trivy image nginx:latest
-
-# Clair扫描（Harbor集成）
-# Harbor Web界面可直接扫描</code></pre>
+$ trivy image nginx:latest</code></pre>
           </div>
 
-          <div name="knowledge-point">
+          <div class="knowledge-point">
             <div class="kp-title">安全建议</div>
             <div class="kp-content">
               <p>- 使用<span class="key-point">官方认证</span>镜像</p>
@@ -859,9 +837,9 @@ $ trivy image nginx:latest
 
       <div class="page section-page">
         <div class="section-content">
-          <span class="section-label">实验</span>
+          <span class="section-label">Part 5</span>
           <h1 class="section-title">动手实验</h1>
-          <p class="section-desc">私有镜像仓库搭建</p>
+          <p class="section-desc">综合练习镜像仓库使用</p>
         </div>
       </div>
 
@@ -882,27 +860,28 @@ $ trivy image nginx:latest
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <span class="step-text">部署Docker Registry容器</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <span class="step-text">配置insecure-regries</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">3</span>
-                <span class="step-text">推送镜像到私有仓库</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">4</span>
-                <span class="step-text">从私有仓库拉取镜像</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text">使用docker save/load导出导入镜像</span>
-              </div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">部署Docker Registry容器</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">配置insecure-registries</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">推送镜像到私有仓库</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">从私有仓库拉取镜像</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">使用docker save/load导出导入镜像</span></div>
             </div>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">关键命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动Registry
+$ docker run -d --name registry -p 5000:5000 -v registry-data:/var/lib/registry registry:2
+
+# 推送镜像
+$ docker tag myapp:v1 localhost:5000/myapp:v1
+$ docker push localhost:5000/myapp:v1
+
+# 拉取镜像
+$ docker pull localhost:5000/myapp:v1</code></pre>
           </div>
         </div>
       </div>
@@ -924,30 +903,15 @@ $ trivy image nginx:latest
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <span class="step-text">访问Docker Hub官网注册账号</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <span class="step-text">在WSL中登录Docker Hub</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">3</span>
-                <span class="step-text">构建一个简单镜像（如hello-world）</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">4</span>
-                <span class="step-text">为镜像打标签并推送到Docker Hub</span>
-              </div>
-              <div class="step-item">
-                <span class="step-num">5</span>
-                <span class="step-text">在其他机器上拉取镜像验证</span>
-              </div>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">访问Docker Hub官网注册账号</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">在终端中登录Docker Hub</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">构建一个简单镜像</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">为镜像打标签并推送到Docker Hub</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">在其他机器上拉取镜像验证</span></div>
             </div>
           </div>
 
-          <div class="code-block">
+          <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
               <span class="code-title">关键命令</span>
               <span class="code-lang">Bash</span>
@@ -955,7 +919,7 @@ $ trivy image nginx:latest
             <pre><code># 登录Docker Hub
 $ docker login
 
-# 构建镜像（示例）
+# 构建镜像
 $ docker build -t myapp:v1 .
 
 # 打标签
@@ -967,115 +931,20 @@ $ docker push your_username/myapp:v1</code></pre>
         </div>
       </div>
 
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">预告</span>
-          <h1 class="page-title">下讲预告</h1>
-        </div>
-        <div class="page-body">
-          <div class="next-lecture">
-            <h3>第九讲：<span class="highlight">Docker网络</span></h3>
-            <ul>
-              <li>掌握<span class="key-point">网络模型</span>和网络类型</li>
-              <li>学习<span class="key-point">容器间通信</span>原理</li>
-              <li>理解<span class="key-point">网络配置</span>和管理命令</li>
-              <li>掌握<span class="key-point">自定义网络</span>创建</li>
-            </ul>
-          </div>
-
-          <div class="knowledge-point" style="margin-top: 1.5rem;">
-            <div class="kp-title">预习建议</div>
-            <div class="kp-content">
-              <p>1. 复习Docker基础网络概念</p>
-              <p>2. 了解Linux网络命名空间</p>
-              <p>3. 理解NAT和网桥原理</p>
-            </div>
-          </div>
-        </div>
-        <div class="page-footer">
-          <span>虚拟化容器技术</span>
-          <span>感谢您的学习</span>
-        </div>
-      </div>
-
     </div>
 
-    <!-- 页面导航控制 -->
     <div class="page-navigation">
       <button class="nav-btn prev" id="prevBtn">上一页</button>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">20</span>
+        <span class="total" id="totalPages">18</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
 
   </div>
 
-  <script>
-    // 页面导航逻辑
-    const pages = document.querySelectorAll('.page');
-    let currentPage = 0;
-
-    function updateNavigation() {
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const pageIndicator = document.getElementById('pageIndicator');
-
-      if (prevBtn) prevBtn.disabled = currentPage === 0;
-      if (nextBtn) nextBtn.disabled = currentPage === pages.length - 1;
-      if (pageIndicator) {
-        const current = pageIndicator.querySelector('.current');
-        const total = pageIndicator.querySelector('.total');
-        if (current) current.textContent = currentPage + 1;
-        if (total) total.textContent = pages.length;
-      }
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft' && currentPage > 0) {
-        currentPage--;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      } else if (e.key === 'ArrowRight' && currentPage < pages.length - 1) {
-        currentPage++;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      }
-    });
-
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const windowHeight = window.innerHeight;
-
-      pages.forEach((page, index) => {
-        const rect = page.getBoundingClientRect();
-        if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
-          currentPage = index;
-          updateNavigation();
-        }
-      });
-    });
-
-    // 按钮点击事件
-    document.getElementById('prevBtn').addEventListener('click', () => {
-      if (currentPage > 0) {
-        currentPage--;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      }
-    });
-
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      if (currentPage < pages.length - 1) {
-        currentPage++;
-        pages[currentPage].scrollIntoView({ behavior: 'smooth' });
-        updateNavigation();
-      }
-    });
-
-    updateNavigation();
-  </script>
+  <script src="../template/lecture-template.js"></script>
 </body>
 </html>
