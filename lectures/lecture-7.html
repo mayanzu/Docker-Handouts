@@ -833,73 +833,6 @@ WORKDIR /app
 
 CMD ["vim", "--version"]</code></pre>
           </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">3.2</span>
-          <h1 class="page-title">docker build - 构建镜像</h1>
-            </div>
-            <div class="page-body">
-              <div class="definition-box">
-                <div class="definition-term">docker build原理</div>
-                <div class="definition-content">
-                  docker build命令读取Dockerfile，按照指令顺序执行每条命令，最终生成一个<span class="highlight">新的镜像</span>。构建过程中，Docker会为每条指令创建容器、执行命令、提交更改。
-                </div>
-              </div>
-
-              <p class="paragraph">
-                docker build的工作流程：读取Dockerfile → 创建临时容器 → 执行指令 → 提交新镜像层 → 删除临时容器 → 继续下一条指令。
-              </p>
-
-              <div class="code-block">
-                <div class="code-header">
-                  <span class="code-title">docker build命令</span>
-                  <span class="code-lang">Bash</span>
-                </div>
-                <pre><code># 语法：docker build [OPTIONS] PATH | URL | -
-
-# 基础用法 - 在当前目录构建
-$ docker build -t myapp:1.0 .
-
-# 预期输出：
-[+] Building 15.3s (8/8) FINISHED
- => [internal] load build definition from Dockerfile
- => [internal] load .dockerignore
- => [1/4] FROM ubuntu:22.04
- => [2/4] RUN apt-get update && apt-get install -y vim
- => naming to docker.io/library/myapp:1.0</code></pre>
-              </div>
-
-              <div class="code-block">
-                <div class="code-header">
-                  <span class="code-title">常用参数说明</span>
-                  <span class="code-lang">Bash</span>
-                </div>
-                <pre><code># -t, --tag              指定镜像名称和标签（name:tag）
-# --file, -f            指定Dockerfile路径
-# --no-cache            构建时不使用缓存
-# --build-arg           设置构建参数
-
-# 指定Dockerfile路径和构建上下文
-$ docker build -t myapp:1.0 -f /path/to/Dockerfile /path/to/context
-
-# 不使用缓存构建
-$ docker build --no-cache -t myapp:1.0 .
-
-# 传递构建参数
-$ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
-              </div>
-
-              <div class="tip-box">
-                <div class="tip-title">构建上下文说明</div>
-                <p>- <span class="highlight">PATH</span>是构建上下文，docker build会在该目录下查找Dockerfile和所需文件</p>
-                <p>- <span class="highlight">.</span>表示当前目录作为构建上下文</p>
-                <p>- COPY指令只能复制构建上下文内的文件，无法访问外部文件</p>
-              </div>
-            </div>
-          </div>
 
           <div class="tip-box">
             <div class="tip-title">存在的问题</div>
@@ -919,6 +852,71 @@ $ docker build -t myapp:unoptimized .
 # 查看镜像体积（会比较大）
 $ docker images | grep myapp
 myapp    unoptimized    450MB</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.2</span>
+          <h1 class="page-title">docker build - 构建镜像</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">docker build原理</div>
+            <div class="definition-content">
+              docker build命令读取Dockerfile，按照指令顺序执行每条命令，最终生成一个<span class="highlight">新的镜像</span>。构建过程中，Docker会为每条指令创建容器、执行命令、提交更改。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            docker build的工作流程：读取Dockerfile → 创建临时容器 → 执行指令 → 提交新镜像层 → 删除临时容器 → 继续下一条指令。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">docker build命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 语法：docker build [OPTIONS] PATH | URL | -
+
+# 基础用法 - 在当前目录构建
+$ docker build -t myapp:1.0 .
+
+# 预期输出：
+[+] Building 15.3s (8/8) FINISHED
+ => [internal] load build definition from Dockerfile
+ => [internal] load .dockerignore
+ => [1/4] FROM ubuntu:22.04
+ => [2/4] RUN apt-get update && apt-get install -y vim
+ => naming to docker.io/library/myapp:1.0</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用参数说明</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># -t, --tag              指定镜像名称和标签（name:tag）
+# --file, -f            指定Dockerfile路径
+# --no-cache            构建时不使用缓存
+# --build-arg           设置构建参数
+
+# 指定Dockerfile路径和构建上下文
+$ docker build -t myapp:1.0 -f /path/to/Dockerfile /path/to/context
+
+# 不使用缓存构建
+$ docker build --no-cache -t myapp:1.0 .
+
+# 传递构建参数
+$ docker build --build-arg VERSION=1.0 -t myapp:1.0 .</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">构建上下文说明</div>
+            <p>- <span class="highlight">PATH</span>是构建上下文，docker build会在该目录下查找Dockerfile和所需文件</p>
+            <p>- <span class="highlight">.</span>表示当前目录作为构建上下文</p>
+            <p>- COPY指令只能复制构建上下文内的文件，无法访问外部文件</p>
           </div>
         </div>
       </div>
