@@ -248,15 +248,18 @@
               <span class="code-title">Bridge网络示例</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动Ubuntu容器（默认使用bridge网络）
-$ docker run -d --name ubuntu-bridge ubuntu:22.04 sleep infinity
+            <pre><code># 启动Nginx容器（默认使用bridge网络）
+$ docker run -d --name nginx-bridge -p 8080:80 nginx:alpine
 
 # 查看容器IP地址
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' ubuntu-bridge
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' nginx-bridge
 172.17.0.2
 
 # 从容器内测试网络连接
-$ docker exec ubuntu-bridge ping -c 3 baidu.com</code></pre>
+$ docker exec nginx-bridge ping -c 3 baidu.com
+
+# 在宿主机访问Nginx（验证网络连通）
+$ curl http://localhost:8080</code></pre>
           </div>
 
           <div class="code-block">
@@ -297,14 +300,19 @@ $ docker exec ubuntu-bridge ping -c 3 baidu.com</code></pre>
               <span class="code-title">Host网络示例</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动容器使用host网络
+            <pre><code># 启动Nginx容器使用host网络（无需端口映射）
 $ docker run -d --name nginx-host --network host nginx:alpine
 
-# 验证网络（容器与宿主机共享网络）
+# 验证网络（容器与宿主机共享网络，IP地址相同）
 $ docker exec nginx-host ip addr
 
-# 访问服务（直接使用宿主机端口，无需映射）
-# Nginx默认监听80端口，在宿主机直接访问http://localhost即可</code></pre>
+# 访问服务（直接使用宿主机80端口，无需-p映射）
+# 在宿主机直接访问：curl http://localhost
+# 或浏览器访问：http://localhost
+
+# 对比：host模式性能更好，但端口可能冲突
+$ docker run -d --name nginx-host2 --network host nginx:alpine
+# 第二个容器会启动失败，因为80端口已被占用</code></pre>
           </div>
 
           <div class="code-block">
@@ -347,16 +355,25 @@ $ docker exec nginx-host ip addr
               <span class="code-title">None网络示例</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动无网络Ubuntu容器
-$ docker run -d --name ubuntu-none --network none ubuntu:22.04 sleep infinity
+            <pre><code># 启动无网络Nginx容器（完全隔离）
+$ docker run -d --name nginx-none --network none nginx:alpine
 
 # 查看容器网络
-$ docker inspect --format '{{.NetworkSettings.Networks}}' ubuntu-none
+$ docker inspect --format '{{.NetworkSettings.Networks}}' nginx-none
 # 输出：map[]（空网络）
 
-# 在容器内查看网络接口
-$ docker exec ubuntu-none ip addr
-# 注意：没有eth0，只有loopback</code></pre>
+# 在容器内查看网络接口（只有loopback，没有eth0）
+$ docker exec nginx-none ip addr
+# 1: lo: <LOOPBACK,UP> mtu 65536 ...
+# 没有eth0网卡
+
+# 测试：无法访问外部网络
+$ docker exec nginx-none ping -c 3 baidu.com
+# 报错：ping: bad address 'baidu.com'
+
+# 也无法从外部访问（没有网络接口）
+$ curl http://localhost
+# 连接失败</code></pre>
           </div>
 
           <div class="code-block">
@@ -391,23 +408,26 @@ $ docker exec ubuntu-none ip addr
               <span class="code-title">Container网络示例</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动第一个容器（作为网络基础）
-$ docker run -d --name ubuntu-base ubuntu:22.04 sleep infinity
+            <pre><code># 启动主Nginx容器（作为网络基础）
+$ docker run -d --name nginx-main -p 8080:80 nginx:alpine
 
-# 查看基础容器的IP
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' ubuntu-base
+# 查看主容器IP
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' nginx-main
 172.17.0.2
 
-# 启动新容器，共享基础容器的网络
-$ docker run -d --name ubuntu-share --network container:ubuntu-base ubuntu:22.04 sleep infinity
+# 启动辅助容器，共享主容器的网络（Sidecar模式）
+$ docker run -d --name nginx-sidecar --network container:nginx-main alpine:latest top
 
-# 验证：两个容器IP相同
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' ubuntu-share
+# 验证：两个容器共享同一网络命名空间
+$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' nginx-sidecar
 172.17.0.2
 
-# 在新容器内测试
-$ docker exec ubuntu-share ping -c 3 ubuntu-base
-# 可以通信（因为共享网络命名空间）</code></pre>
+# 在Sidecar容器中可以直接访问主容器的localhost
+$ docker exec nginx-sidecar wget -qO- http://localhost
+# 返回Nginx欢迎页面（共享网络栈）
+
+# 查看主容器的80端口（在Sidecar中可见）
+$ docker exec nginx-sidecar netstat -tlnp</code></pre>
           </div>
 
           <div class="tip-box">
@@ -451,21 +471,26 @@ $ docker exec ubuntu-share ping -c 3 ubuntu-base
             <pre><code># 创建自定义bridge网络
 $ docker network create --driver bridge my-network
 
-# 启动容器并连接到自定义网络
+# 启动Nginx前端容器
 $ docker run -d \
-  --name ubuntu-web \
+  --name nginx-web \
   --network my-network \
-  ubuntu:22.04 sleep infinity
+  -p 8080:80 \
+  nginx:alpine
 
-# 启动另一个容器
+# 启动另一个Nginx作为API服务
 $ docker run -d \
-  --name ubuntu-db \
+  --name nginx-api \
   --network my-network \
-  ubuntu:22.04 sleep infinity
+  nginx:alpine
 
-# 容器间通过名称通信（DNS解析）
-$ docker exec ubuntu-web ping -c 3 ubuntu-db
-# PING ubuntu-db (192.168.100.2) 56(84) bytes of data.</code></pre>
+# 容器间通过名称通信（DNS自动解析）
+$ docker exec nginx-web ping -c 3 nginx-api
+# PING nginx-api (172.18.0.3) 56(84) bytes of data.
+
+# 在nginx-web中直接访问nginx-api
+$ docker exec nginx-web wget -qO- http://nginx-api
+# 返回nginx-api的欢迎页面</code></pre>
           </div>
 
           <div class="code-block">
@@ -794,14 +819,17 @@ $ docker network inspect bridge
 # 创建自定义网络
 $ docker network create --driver bridge my-network
 
-# 启动容器到指定网络
-$ docker run -d --name container1 --network my-network ubuntu:22.04 sleep infinity
+# 启动Nginx容器到指定网络
+$ docker run -d --name nginx1 --network my-network nginx:alpine
+$ docker run -d --name nginx2 --network my-network nginx:alpine
 
-# 测试通信
-$ docker exec container1 ping -c 3 container2
+# 测试容器间通信（通过容器名DNS解析）
+$ docker exec nginx1 ping -c 3 nginx2
+$ docker exec nginx1 wget -qO- http://nginx2
 
-# 端口映射
-$ docker run -d --name nginx -p 8080:80 nginx</code></pre>
+# 端口映射（外部访问）
+$ docker run -d --name nginx-web -p 8080:80 --network my-network nginx:alpine
+$ curl http://localhost:8080</code></pre>
           </div>
         </div>
       </div>
