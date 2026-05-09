@@ -126,26 +126,7 @@
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>IP地址是什么</h3>
-              <p>就像身份证号是人的唯一标识，<span class="highlight">IP地址是计算机在网络中的唯一标识</span>。目前广泛使用的 IPv4 由 4 个数字组成，每个数字范围 0~255，之间用点分隔，如 <code>192.168.1.1</code>。</p>
-
-              <div style="margin-top:0.8rem; padding: 0.8rem; background: #f5f5f5; border-radius: 8px;">
-                <p style="margin: 0 0 0.5rem 0;"><strong>IP地址的构成：网络号 + 主机号</strong></p>
-                <p style="margin: 0;">例：<code>192.168.1.100</code> 中，<code>192.168.1</code> 是网络号（相当于小区地址），<code>100</code> 是主机号（相当于门牌号）。同一个网络号的电脑可以直接互通，就像同一个小区里的住户。</p>
-              </div>
-
-              <div style="margin-top:0.8rem;">
-                <p style="margin: 0 0 0.3rem 0;"><strong>CIDR 记法：子网掩码</strong></p>
-                <p style="margin: 0; font-size: 0.95rem;">IP 地址后面的 <code>/24</code> 叫 CIDR 记法，表示子网掩码。<code>/24</code> = <code>255.255.255.0</code>，意思是前 24 位是网络号，后 8 位是主机号。所以 <code>10.0.2.0/24</code> 表示所有 <code>10.0.2.xxx</code> 的地址在同一个网段。</p>
-              </div>
-
-              <div style="margin-top:0.8rem;">
-                <p style="margin: 0 0 0.3rem 0;"><strong>私网IP vs 公网IP</strong></p>
-                <p style="margin: 0 0 0.2rem 0;"><strong>私网IP</strong>：家庭/公司内部使用，无法被外网直接访问</p>
-                <p style="margin: 0 0 0.2rem 0;"><code style="font-size:0.9rem;">172.17.0.2</code> — Docker 容器常用的网段（Docker 自动分配）</p>
-                <p style="margin: 0 0 0.2rem 0;"><code style="font-size:0.9rem;">192.168.x.x</code> — 家庭路由器常用网段</p>
-                <p style="margin: 0 0 0.2rem 0;"><code style="font-size:0.9rem;">10.x.x.x</code> — 大型内网/云服务器常用网段</p>
-                <p style="margin: 0;"><strong>公网IP</strong>：互联网上的唯一地址（如 <code>8.8.8.8</code>），全球任何地方都能访问。</p>
-              </div>
+              <p>就像身份证号是人的唯一标识，<span class="highlight">IP地址是计算机在网络中的唯一标识</span>。IPv4 由 4 个数字组成，如 <code>192.168.1.1</code>。详见下一页。</p>
             </div>
             <div class="card">
               <h3><span class="card-num">2</span>端口是什么</h3>
@@ -155,6 +136,65 @@
             <div class="card">
               <h3><span class="card-num">3</span>宿主机是什么</h3>
               <p><span class="highlight">宿主机就是运行Docker的那台电脑</span>。容器运行在宿主机上，就像租客住在一栋公寓里。外部访问容器服务时，实际上是先访问宿主机，再由宿主机转发给容器。</p>
+            </div>
+          </div>
+
+          <div class="page content-page">
+            <div class="page-header">
+              <span class="page-number">预备</span>
+              <h1 class="page-title">IP地址详解</h1>
+            </div>
+            <div class="page-body">
+
+              <div class="definition-box">
+                <div class="definition-term">什么是 IP 地址？</div>
+                <div class="definition-content">
+                  IP 地址是计算机在网络中的唯一标识，就像身份证号是人的唯一标识。目前广泛使用的 <span class="highlight">IPv4</span> 由 4 个数字组成，每个数字范围 0~255，之间用点分隔，例如 <code>192.168.1.1</code>。
+                </div>
+              </div>
+
+              <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="card">
+                  <h3>网络号 + 主机号</h3>
+                  <p>IP 地址分为两部分：</p>
+                  <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                    <li><strong>网络号</strong>：相当于小区地址，相同网络号的电脑可以直接互通</li>
+                    <li><strong>主机号</strong>：相当于门牌号，区分同一网络中的不同电脑</li>
+                  </ul>
+                  <p style="margin-top:0.5rem;">例：<code>192.168.1.100</code> 中，<code>192.168.1</code> 是网络号，<code>100</code> 是主机号。</p>
+                </div>
+                <div class="card">
+                  <h3>CIDR 记法（子网掩码）</h3>
+                  <p>IP 后面的 <code>/24</code> 叫 CIDR 记法，表示子网掩码：</p>
+                  <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                    <li><code>/24</code> = <code>255.255.255.0</code></li>
+                    <li>前 24 位是网络号，后 8 位是主机号</li>
+                    <li><code>10.0.2.0/24</code> = 所有 <code>10.0.2.xxx</code> 在同一网段</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-title">常见的私网 IP 网段</span>
+                  <span class="code-lang">表格</span>
+                </div>
+                <pre><code>  网段              常见用途                  示例
+  --------------  ----------------------  ------------------
+  172.17.x.x      Docker 容器网段          172.17.0.2
+  192.168.x.x     家庭/办公室网络          192.168.1.1（路由器）
+  10.x.x.x        大型内网/云服务器        10.0.0.1（云主机内网）
+
+  私网 IP 无法被外网直接访问，必须通过 NAT（地址转换）才能上网。
+
+  公网 IP 是互联网上的唯一地址，全球任何地方都能访问，如 8.8.8.8。</code></pre>
+              </div>
+
+              <div class="tip-box">
+                <div class="tip-title">为什么 Docker 容器用 172.17.x.x？</div>
+                <p>Docker 安装后会自动创建一个叫 <code>docker0</code> 的虚拟网桥，分配 <code>172.17.0.0/16</code> 网段给容器。所有未指定网络的容器都会自动连接到这个网桥，获得一个 172.17.x.x 的 IP。</p>
+              </div>
+
             </div>
           </div>
 
