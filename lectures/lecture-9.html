@@ -1450,25 +1450,27 @@ ghi789...      none      null      local
                   <span class="code-title">Linux 网络命名空间清理</span>
                   <span class="code-lang">Bash</span>
                 </div>
-                <pre><code># 删除命名空间（会同时删除其中的 veth 接口和 peer 接口）
-# ns-4 删除时，veth-4-peer 自动被删除；peer 端 veth-4 也消失
-# ns-5 删除时同理
+                <pre><code># ===== Linux 命名空间与网桥清理 =====
+
+# 1. 显式删除（推荐，最安全）
  sudo ip netns del ns-4 2>/dev/null
  sudo ip netns del ns-5 2>/dev/null
-
-# 删除网桥
  sudo ip link del br-2 2>/dev/null
 
-# 一键清理所有残留（兜底操作）
- sudo ip netns list 2>/dev/null | awk '{print 1}' | xargs -I {} sudo ip netns del {} 2>/dev/null
- ip link show type bridge | awk '{print 2}' | grep -v '^' | xargs -I {} sudo ip link del {} 2>/dev/null
+# 2. 一键暴力清理（处理命名空间）
+ sudo ip netns list 2>/dev/null | awk '{print $1}' | xargs -I {} sudo ip netns del {} 2>/dev/null
+
+# 3. 一键暴力清理（处理所有网桥，修复了冒号问题）
+ ip link show type bridge | awk -F': ' '{print $2}' | xargs -I {} sudo ip link del {} 2>/dev/null
+
+# 4. 清理防火墙残留（关键！否则 iptables 规则会堆积）
+ sudo iptables -t nat -F POSTROUTING 2>/dev/null
 
 # 验证清理完成
  sudo ip netns list
  ip link show type bridge
  ip addr show
- iptables -L FORWARD -n -v
-# 如果 br-2、veth-4、veth-5 都不再出现，说明环境已完全清理</code></pre>
+ iptables -t nat -L POSTROUTING -n -v</code></pre>
               </div>
 
               <div class="code-block">
@@ -1476,28 +1478,22 @@ ghi789...      none      null      local
                   <span class="code-title">Docker 资源清理</span>
                   <span class="code-lang">Bash</span>
                 </div>
-                <pre><code># 停止并删除本讲创建的所有容器
- docker stop nginx-1 nginx-2 my-nginx \
+                <pre><code># ===== Docker 资源清理 =====
+
+# 强力清除所有容器（-f 强制停止并删除）
+ docker rm -f nginx-1 nginx-2 my-nginx \
   nginx-web nginx-api \
   nginx-host nginx-host2 \
   nginx-none nginx-main nginx-monitor \
   nginx-proxy \
   nginx-p1 nginx-p2 dns-test nginx-local nginx-all nginx-random \
-  nginx-isolated 2>/dev/null
+  nginx-isolated redis-server redis1 redis2 2>/dev/null
 
- docker rm nginx-1 nginx-2 my-nginx \
-  nginx-web nginx-api \
-  nginx-host nginx-host2 \
-  nginx-none nginx-main nginx-monitor \
-  nginx-proxy \
-  nginx-p1 nginx-p2 dns-test nginx-local nginx-all nginx-random \
-  nginx-isolated 2>/dev/null
-
-# 删除本讲创建的自定义网络
+# 删除自定义网络
  docker network rm my-net frontend-network 2>/dev/null
 
-# 一键清理（删除所有已停止的容器和未被使用的网络）
- docker system prune -f
+# 清理残留的虚悬网络
+ docker network prune -f
 
 # 验证清理完成
  docker ps -a
