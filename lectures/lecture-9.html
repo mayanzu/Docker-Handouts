@@ -126,9 +126,26 @@
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>IP地址是什么</h3>
-              <p>就像身份证号是人的唯一标识，<span class="highlight">IP地址是计算机在网络中的唯一标识</span>。例如 <code>192.168.1.1</code> 是一个常见的内网IP。</p>
-              <p style="margin-top:0.5rem;"><strong>私网IP</strong>：家庭/公司内部使用的IP（如 <code>192.168.x.x</code>、<code>172.17.x.x</code>），外部网络无法直接访问。</p>
-              <p style="margin-top:0.5rem;"><strong>公网IP</strong>：互联网上的唯一地址，能被全球访问。</p>
+              <p>就像身份证号是人的唯一标识，<span class="highlight">IP地址是计算机在网络中的唯一标识</span>。目前广泛使用的 IPv4 由 4 个数字组成，每个数字范围 0~255，之间用点分隔，如 <code>192.168.1.1</code>。</p>
+
+              <div style="margin-top:0.8rem; padding: 0.8rem; background: #f5f5f5; border-radius: 8px;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>IP地址的构成：网络号 + 主机号</strong></p>
+                <p style="margin: 0;">例：<code>192.168.1.100</code> 中，<code>192.168.1</code> 是网络号（相当于小区地址），<code>100</code> 是主机号（相当于门牌号）。同一个网络号的电脑可以直接互通，就像同一个小区里的住户。</p>
+              </div>
+
+              <div style="margin-top:0.8rem;">
+                <p style="margin: 0 0 0.3rem 0;"><strong>CIDR 记法：子网掩码</strong></p>
+                <p style="margin: 0; font-size: 0.95rem;">IP 地址后面的 <code>/24</code> 叫 CIDR 记法，表示子网掩码。<code>/24</code> = <code>255.255.255.0</code>，意思是前 24 位是网络号，后 8 位是主机号。所以 <code>10.0.2.0/24</code> 表示所有 <code>10.0.2.xxx</code> 的地址在同一个网段。</p>
+              </div>
+
+              <div style="margin-top:0.8rem;">
+                <p style="margin: 0 0 0.3rem 0;"><strong>私网IP vs 公网IP</strong></p>
+                <p style="margin: 0 0 0.2rem 0;"><strong>私网IP</strong>：家庭/公司内部使用，无法被外网直接访问</p>
+                <p style="margin: 0 0 0.2rem 0;"><code style="font-size:0.9rem;">172.17.0.2</code> — Docker 容器常用的网段（Docker 自动分配）</p>
+                <p style="margin: 0 0 0.2rem 0;"><code style="font-size:0.9rem;">192.168.x.x</code> — 家庭路由器常用网段</p>
+                <p style="margin: 0 0 0.2rem 0;"><code style="font-size:0.9rem;">10.x.x.x</code> — 大型内网/云服务器常用网段</p>
+                <p style="margin: 0;"><strong>公网IP</strong>：互联网上的唯一地址（如 <code>8.8.8.8</code>），全球任何地方都能访问。</p>
+              </div>
             </div>
             <div class="card">
               <h3><span class="card-num">2</span>端口是什么</h3>
