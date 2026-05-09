@@ -94,6 +94,8 @@ body {
   background: var(--color-bg);
   transition: var(--transition-base);
   overflow-x: hidden;
+  /* 确保数字宽度一致，避免数字字体跳动 */
+  font-variant-numeric: tabular-nums;
 }
 
 /* ============================================
