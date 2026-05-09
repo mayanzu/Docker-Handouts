@@ -10,12 +10,13 @@
   <div class="lecture-page">
     <div class="page-container" id="pageContainer">
 
+      <!-- 封面 -->
       <div class="page cover-page">
         <div class="cover-content">
           <div class="course-badge">虚拟化容器技术</div>
           <h1 class="main-title">第九讲</h1>
           <h2 class="sub-title">Docker网络</h2>
-          <p class="tagline">掌握Docker网络模型，实现容器间通信</p>
+          <p class="tagline">从Linux网络原理到Docker容器通信，以Nginx为例打通网络任督二脉</p>
           <div class="meta-info">
             <span>40学时 / 2.5学分</span>
             <span>数据科学与大数据技术</span>
@@ -24,6 +25,7 @@
         </div>
       </div>
 
+      <!-- 目录 -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">目录</span>
@@ -35,36 +37,45 @@
             <ul class="toc-list">
               <li>
                 <span class="toc-num">01</span>
-                <span class="toc-text">第一部分：Docker网络概述</span>
+                <span class="toc-text">第一部分：容器网络的本质——Linux网络原理</span>
               </li>
               <li>
                 <span class="toc-num">02</span>
-                <span class="toc-text">第二部分：网络模式详解</span>
+                <span class="toc-text">第二部分：Bridge网络模式（默认与自定义）</span>
               </li>
               <li>
                 <span class="toc-num">03</span>
-                <span class="toc-text">第三部分：容器间通信</span>
+                <span class="toc-text">第三部分：Host、None、Container网络模式</span>
               </li>
               <li>
                 <span class="toc-num">04</span>
-                <span class="toc-text">第四部分：网络管理命令</span>
+                <span class="toc-text">第四部分：端口映射——外部如何访问容器</span>
               </li>
               <li>
                 <span class="toc-num">05</span>
-                <span class="toc-text">第五部分：动手实验</span>
+                <span class="toc-text">第五部分：网络管理与故障排查</span>
+              </li>
+              <li>
+                <span class="toc-num">06</span>
+                <span class="toc-text">第六部分：动手实验——Nginx网络拓扑实战</span>
               </li>
             </ul>
+          </div>
+
+          <div class="note-box" style="margin-top: 1rem;">
+            <p><strong>本讲特色</strong>：第一部分（1.1~1.4）提供完整的 <span class="highlight">WSL手动实验</span>，通过 <code>ip netns</code>、<code>veth</code>、<code>bridge</code>、<code>iptables</code> 命令，从零搭建容器网络，深入理解Docker网络底层原理。</p>
           </div>
 
           <div class="knowledge-point">
             <div class="kp-title">学习建议</div>
             <div class="kp-content">
-              <p>本讲是<span class="highlight">网络配置</span>的核心内容，建议结合实验理解各种网络模式的工作原理。</p>
+              <p>本讲以<span class="highlight">Nginx容器</span>为统一案例，从Linux网络底层原理出发，逐步理解Docker网络的工作机制。建议跟随每个演示在本地操作，对比不同网络模式下Nginx的访问差异。</p>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- 课程目标 -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">01</span>
@@ -75,483 +86,1073 @@
             <div class="objective-item">
               <div class="objective-num">01</div>
               <div class="objective-content">
-                <h3>理解Docker网络架构</h3>
-                <p>掌握Docker<span class="key-point">网络驱动</span>和原理</p>
+                <h3>理解容器网络底层原理</h3>
+                <p>掌握<span class="key-point">网络命名空间、veth、网桥、NAT</span>四大核心机制</p>
               </div>
             </div>
             <div class="objective-item">
               <div class="objective-num">02</div>
               <div class="objective-content">
-                <h3>掌握网络模式</h3>
-                <p>熟练配置<span class="highlight">bridge、host、none</span>等网络模式</p>
+                <h3>掌握Bridge网络模式</h3>
+                <p>理解<span class="highlight">默认bridge与自定义bridge</span>的区别，以及DNS服务发现机制</p>
               </div>
             </div>
             <div class="objective-item">
               <div class="objective-num">03</div>
               <div class="objective-content">
-                <h3>实现容器通信</h3>
-                <p>掌握<span class="key-point">容器间通信</span>和DNS解析</p>
+                <h3>对比四种网络模式</h3>
+                <p>通过Nginx案例对比<span class="key-point">bridge、host、none、container</span>四种模式的适用场景</p>
               </div>
             </div>
             <div class="objective-item">
               <div class="objective-num">04</div>
               <div class="objective-content">
-                <h3>管理网络</h3>
-                <p>使用<span class="highlight">docker network</span>命令管理网络</p>
+                <h3>理解端口映射原理</h3>
+                <p>理解<span class="highlight">DNAT/SNAT</span>机制，灵活配置容器端口暴露</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- 预备知识页 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预备</span>
+          <h1 class="page-title">本讲需要的预备知识</h1>
+        </div>
+        <div class="page-body">
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>IP地址是什么</h3>
+              <p>就像身份证号是人的唯一标识，<span class="highlight">IP地址是计算机在网络中的唯一标识</span>。例如 <code>192.168.1.1</code> 是一个常见的内网IP。</p>
+              <p style="margin-top:0.5rem;"><strong>私网IP</strong>：家庭/公司内部使用的IP（如 <code>192.168.x.x</code>、<code>172.17.x.x</code>），外部网络无法直接访问。</p>
+              <p style="margin-top:0.5rem;"><strong>公网IP</strong>：互联网上的唯一地址，能被全球访问。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>端口是什么</h3>
+              <p>一台电脑可能有多个程序同时上网。<span class="highlight">端口就像大楼的房间号</span>，帮操作系统把网络流量分配给正确的程序。</p>
+              <p style="margin-top:0.5rem;">例如：Nginx通常占用<code>80</code>端口，MySQL占用<code>3306</code>端口。你访问网页时，实际上是在访问服务器的<code>80</code>端口。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>宿主机是什么</h3>
+              <p><span class="highlight">宿主机就是运行Docker的那台电脑</span>。容器运行在宿主机上，就像租客住在一栋公寓里。外部访问容器服务时，实际上是先访问宿主机，再由宿主机转发给容器。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">本讲常用的几个命令（先混个脸熟）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># ping：测试两台电脑是否能连通（像敲门的"咚咚咚"）
+ ping 172.17.0.2
+
+# curl：像浏览器一样访问网页，返回HTML内容
+ curl http://localhost:8080
+
+# docker ps：查看正在运行的容器
+ docker ps
+
+# docker exec：在容器内部执行命令
+ docker exec nginx-1 ping -c 3 nginx-api</code></pre>
+          </div>
+
+          <div class="note-box" style="margin-top: 1rem;">
+            <p><strong>环境说明</strong>：本讲的 Part 1 提供 WSL2 和 Linux 原生两套命令。WSL2 因 Hyper-V 虚拟网络架构限制，部分实验无法完整复现；Linux 原生环境可 100% 完美复现所有步骤。请根据自己的环境选择对应命令执行。</p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">实验环境初始化（必做）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># ===== WSL 环境 =====
+# WSL 默认精简了部分网络工具，需额外安装
+ sudo apt update
+ sudo apt install -y iproute2 bridge-utils iptables
+
+# ===== Linux 原生环境 =====
+# 大多数发行版已内置以上工具，如缺失使用相同命令安装
+ sudo apt update
+ sudo apt install -y iproute2 bridge-utils iptables
+# 或 yum install iproute2 iptables（RHEL/CentOS）</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快速 Hook 演示页 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">热身</span>
+          <h1 class="page-title">3 分钟快速演示：揭开容器网络的谜底</h1>
+        </div>
+        <div class="page-body">
+
+          <p class="paragraph">先来看一个<strong>黑盒现象</strong>，带着问题进入今天的核心内容：</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Step 1：启动一个 Nginx 容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># -d：后台运行  -p 8080:80：把容器的80端口映射到宿主机的8080
+ docker run -d -p 8080:80 nginx:alpine
+
+# 等待 3 秒让容器完全启动
+ sleep 3
+
+# 查看容器 IP（通常是 172.17.0.x 开头）
+ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q)</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Step 2：访问它</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 浏览器打开 http://localhost:8080
+# 或者用 curl 测试
+ curl http://localhost:8080
+
+# 会看到 Nginx 的默认欢迎页（&lt;title&gt;Welcome to nginx!&lt;/title&gt;）</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">等等！这里有个问题</div>
+            <p>容器的 IP 是 <code>172.17.0.2</code>（私网 IP），外部根本<strong>无法直接访问</strong>。</p>
+            <p>但我们访问宿主机的 <code>8080</code> 端口，就能看到容器里的网页。</p>
+            <p><strong>数据包的路线是什么？Docker 是怎么做到的？</strong></p>
+            <p style="margin-top:1rem;">带着这个问题，我们进入 Part 1，去<strong>手动复现</strong>这个过程！</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Part 1 章节页 -->
       <div class="page section-page">
         <div class="section-content">
           <span class="section-label">Part 1</span>
-          <h1 class="section-title">Docker网络概述</h1>
-          <p class="section-desc">理解Docker网络基础架构</p>
+          <h1 class="section-title">容器网络的本质</h1>
+          <p class="section-desc">在WSL中手动搭建容器网络，理解Docker底层原理</p>
         </div>
       </div>
 
+      <!-- 0. Nginx前置介绍 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预备</span>
+          <h1 class="page-title">本讲案例：Nginx是什么</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Nginx</div>
+            <div class="definition-content">
+              Nginx（发音"engine-x"）是一款高性能的<span class="highlight">Web服务器</span>和<span class="highlight">反向代理服务器</span>。简单来说，它就像餐厅的前台接待员：顾客（浏览器）向它点菜（请求网页），它负责把订单送到后厨（后端服务），再把做好的菜（网页内容）端给顾客。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            在本讲中，我们用Nginx作为统一案例，因为它安装简单、启动即提供一个可访问的网页服务，非常适合用来验证网络是否通、端口是否映射正确。你不需要会配置Nginx，只需要知道：启动Nginx容器后，用浏览器或 <code>curl</code> 访问它，如果能看到"Welcome to nginx!"页面，就说明网络是通的。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">快速体验：启动第一个Nginx容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动Nginx容器，并把容器的80端口映射到宿主机的8080端口
+ docker run -d --name my-nginx -p 8080:80 nginx:alpine
+
+# 测试访问（如果看到HTML代码，说明成功了）
+ curl http://localhost:8080
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Welcome to nginx!&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+# 停止并删除这个体验容器
+ docker stop my-nginx &amp;&amp; docker rm my-nginx</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">为什么选Nginx作为本讲案例</div>
+            <p>1. <span class="highlight">开箱即用</span>：一行命令启动，自带默认网页</p>
+            <p>2. <span class="highlight">验证直观</span>：网络通了就能curl到HTML，不通就连接失败</p>
+            <p>3. <span class="highlight">贴近实际</span>：Nginx是生产环境最常用的Web服务器，学会它的容器网络配置有实际价值</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.1 网络命名空间与veth -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">1.1</span>
-          <h1 class="page-title">Docker网络组成</h1>
+          <h1 class="page-title">网络命名空间——容器的独立网络世界</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Docker网络概念</div>
+            <div class="definition-term">网络命名空间（Network Namespace）</div>
             <div class="definition-content">
-              Docker网络是容器与外部网络通信的通道。每个容器都有自己的网络命名空间，就像每户人家有自己的门牌号（IP地址），Docker网络就是连接这些"住户"的"道路系统"。
+              Linux内核提供的一种资源隔离机制。每个网络命名空间拥有独立的网络设备、IP地址、路由表和防火墙规则。就像每栋写字楼有独立的水电系统，互不干扰。
             </div>
           </div>
 
           <p class="paragraph">
-            Docker使用<span class="highlight">Linux网络命名空间</span>实现容器网络隔离，通过<span class="highlight">veth设备对</span>（虚拟以太网对）连接容器和网络驱动。就像两栋楼之间架设的专用光缆，将不同楼层的房间连接起来。
+            当你启动一个Docker容器时，Docker会为其创建一个新的网络命名空间。容器内的 <code>eth0</code> 网卡，只在这个命名空间内可见，宿主机默认看不到它。我们可以通过WSL中的 <code>ip netns</code> 命令手动体验这个过程。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Docker网络架构</span>
-              <span class="code-lang">架构图</span>
+              <span class="code-title">WSL演示：创建独立的网络命名空间</span>
+              <span class="code-lang">Bash</span>
             </div>
-            <pre><code>+----------------------------------------------------------+
-|                      宿主机                              |
-|                                                        |
-|  +------------------------------------------------+   |
-|  |                 docker0 网桥                     |   |
-|  |              IP: 172.17.0.1/16                 |   |
-|  +-----------------------+------------------------+   |
-|                          |                              |
-|           +--------------+--------------+              |
-|           |              |              |              |
-|     +-----v----+   +-----v----+   +-----v----+         |
-|     | veth xxx |   | veth yyy |   | veth zzz |         |
-|     +-----+----+   +-----+----+   +-----+----+         |
-|           |              |              |              |
-|     +-----+----+   +-----+----+   +-----+----+         |
-|     | Container|   | Container|   | Container|         |
-|     | eth0    |   | eth0     |   | eth0     |         |
-|     |172.17.0.2|   |172.17.0.3|   |172.17.0.4|         |
-|     +----------+   +----------+   +----------+         |
-+----------------------------------------------------------+
-                         |
-                   +-----+-----+
-                   |  NAT转换  |
-                   +-----+-----+
-                         |
-                   外部网络</code></pre>
+            <pre><code># 查看当前的网络接口（默认在"根命名空间"里）
+# lo = loopback（本地回环），自己访问自己用的
+# eth0 = 以太网卡，连接外部网络用的
+ ip addr
+1: lo: ... inet 127.0.0.1         # 本地回环地址，127.0.0.1永远代表"本机"
+2: eth0: ... inet 172.21.176.1    # WSL的网卡，有自己的IP
+
+# sudo = 以管理员身份运行（需要权限）
+# ip netns = 操作网络命名空间的命令
+# add ns-1 = 创建一个叫 ns-1 的新命名空间
+ sudo ip netns add ns-1
+
+# ip netns exec ns-1 xxx = 在 ns-1 这个命名空间里执行 xxx 命令
+# 在 ns-1 里查看——竟然只有 lo，没有 eth0！
+ sudo ip netns exec ns-1 ip addr
+1: lo: &lt;LOOPBACK&gt; state DOWN ...   # ns-1 自己的回环接口
+
+# 结论：ns-1 是一个完全独立的网络世界
+# 它有自己的 lo，但没有任何网卡，所以无法访问任何其他电脑
+# 这就是容器的网络隔离本质——每个容器都是"另起一张网"</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">关键理解</div>
+            <p>容器的网络隔离不是"没有网络"，而是<strong>拥有一张完全独立的网络</strong>。Docker做的第一件事，就是像 <code>ip netns add ns-1</code> 一样，为每个容器创建一个独立的网络命名空间。容器内的 <code>eth0</code> 只在容器内部可见，宿主机和其他容器都看不到。</p>
+          </div>
+
+          <div class="highlight-box info">
+            <div class="highlight-title">小知识：为什么需要 sudo</div>
+            <div class="highlight-content">
+              <p>创建网络命名空间需要Linux内核权限，就像安装软件需要管理员权限一样。在WSL中用 <code>sudo</code> 可以临时获取管理员权限。</p>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- 1.2 veth pair -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">1.2</span>
-          <h1 class="page-title">Docker网络驱动</h1>
+          <h1 class="page-title">veth pair——连接两个命名空间的虚拟网线</h1>
         </div>
         <div class="page-body">
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th>驱动类型</th>
-                <th>说明</th>
-                <th>适用场景</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><span class="highlight">bridge</span></td>
-                <td>默认模式，容器连接到虚拟网桥</td>
-                <td>独立应用容器</td>
-              </tr>
-              <tr>
-                <td><span class="highlight">host</span></td>
-                <td>容器直接使用宿主机网络</td>
-                <td>高性能场景</td>
-              </tr>
-              <tr>
-                <td><span class="highlight">overlay</span></td>
-                <td>跨主机容器通信（Swarm）</td>
-                <td>集群环境</td>
-              </tr>
-              <tr>
-                <td><span class="highlight">macvlan</span></td>
-                <td>为容器分配MAC地址</td>
-                <td>需要直接暴露</td>
-              </tr>
-              <tr>
-                <td><span class="highlight">none</span></td>
-                <td>禁用容器网络</td>
-                <td>离线计算</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="definition-box">
+            <div class="definition-term">veth pair（虚拟以太网对）</div>
+            <div class="definition-content">
+              veth pair 是一对虚拟网卡，像一根网线的两端：数据从一端进入，必定从另一端出来。Docker用它连接容器的网络命名空间和宿主机，就像用网线把电脑连到交换机。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WSL演示：手动创建veth pair连接命名空间</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建一对虚拟网卡（就像拉一根网线，两头各插一台电脑）
+# veth-1    = 插在宿主机这头
+# veth-1-peer = 插在 ns-1 容器那头
+# 数据从一头进去，必然从另一头出来
+ sudo ip link add veth-1 type veth peer name veth-1-peer && \
+sudo ip link set veth-1-peer netns ns-1 && \
+sudo ip addr add 10.0.0.1/24 dev veth-1 && \
+sudo ip link set veth-1 up && \
+sudo ip netns exec ns-1 ip addr add 10.0.0.2/24 dev veth-1-peer && \
+sudo ip netns exec ns-1 ip link set veth-1-peer up
+
+# 测试连通性！从宿主机 ping ns-1 的 IP
+# ping = 发一个"数据包"过去，看有没有回应（像敲门看有没有人）
+# -c 3 = 只发3次就停下
+ ping -c 3 10.0.0.2
+64 bytes from 10.0.0.2: time=0.042 ms   # 通了！延迟0.042毫秒</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">WSL手动创建 vs Docker自动创建</span>
+              <span class="code-lang">对照表</span>
+            </div>
+            <pre><code>  我们手动做的：              Docker自动做的：
+  ----------------            ------------------
+  ip netns add ns-1    ===&gt;   创建容器的网络命名空间
+  ip link add veth...  ===&gt;   创建veth pair（一对虚拟网卡）
+  ip link set ... netns ===&gt;  将一端放入容器命名空间
+  ip addr add ...      ===&gt;   分配IP地址给容器</code></pre>
+          </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">查看Docker网络</div>
+            <div class="kp-title">核心结论</div>
             <div class="kp-content">
-              <p>1. 查看所有网络：<code>docker network ls</code></p>
-              <p>2. 查看网络详情：<code>docker network inspect bridge</code></p>
-              <p>3. 查看容器网络：<code>docker inspect --format '{{.NetworkSettings.Networks}}' &lt;container&gt;</code></p>
+              <p>Docker容器的网络，本质上就是我们在WSL中手动演示的这套流程的<span class="highlight">自动化封装</span>。</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="page section-page">
-        <div class="section-content">
-          <span class="section-label">Part 2</span>
-          <h1 class="section-title">网络模式详解</h1>
-          <p class="section-desc">各种网络模式配置和使用</p>
-        </div>
-      </div>
-
+      <!-- 1.3 网桥 -->
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">2.1</span>
-          <h1 class="page-title">Bridge网络模式</h1>
+          <span class="page-number">1.3</span>
+          <h1 class="page-title">网桥——让多个容器互联互通</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Bridge网络原理</div>
+            <div class="definition-term">网桥（Bridge）</div>
             <div class="definition-content">
-              Bridge（网桥）是Docker的<span class="highlight">默认网络模式</span>。就像小区里的交换机连接各家各户，docker0网桥连接各个容器，让它们可以互相通信，并通过NAT访问外部网络。
+              功能类似于交换机。Docker默认创建的 <code>docker0</code> 网桥将所有 veth 的一端连接在一起，使容器之间可以像同一个局域网内的电脑一样直接通信。
             </div>
           </div>
 
           <p class="paragraph">
-            当容器启动时未指定网络模式，Docker会创建虚拟网桥（docker0），容器通过veth设备对连接到这个网桥。网桥工作在数据链路层，根据MAC地址转发数据包。
+            如果有三个、五个容器怎么办？不可能每两个之间都拉一根veth pair。网桥就是解决方案：所有veth的一端都插到网桥上，网桥负责转发数据包。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Bridge网络示例</span>
+              <span class="code-title">WSL演示：创建网桥连接多个命名空间</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动Nginx容器（默认使用bridge网络）
-$ docker run -d --name nginx-bridge -p 8080:80 nginx:alpine
+            <pre><code># 创建第一个命名空间 ns-2（模拟第一个容器）
+ sudo ip netns add ns-2
 
-# 查看容器IP地址
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' nginx-bridge
-172.17.0.2
+# 创建第二个命名空间 ns-3（模拟第二个容器）
+ sudo ip netns add ns-3
 
-# 从容器内测试网络连接
-$ docker exec nginx-bridge ping -c 3 baidu.com
+# 创建网桥 br-1（相当于一台交换机，可以插很多网线）
+ sudo ip link add br-1 type bridge
+ sudo ip addr add 10.0.1.1/24 dev br-1   # 给网桥分配IP（作为网关）
+ sudo ip link set br-1 up                 # 开启网桥
 
-# 在宿主机访问Nginx（验证网络连通）
-$ curl http://localhost:8080</code></pre>
+# 创建第一根 veth 网线，一端连 ns-2，一端连网桥
+ sudo ip link add veth-2 type veth peer name veth-2-peer && \
+sudo ip link set veth-2 master br-1 && \
+sudo ip link set veth-2 up && \
+sudo ip link set veth-2-peer netns ns-2 && \
+sudo ip netns exec ns-2 ip addr add 10.0.1.2/24 dev veth-2-peer && \
+sudo ip netns exec ns-2 ip link set veth-2-peer up
+
+# 创建第二根 veth 网线，一端连 ns-3，一端连网桥
+ sudo ip link add veth-3 type veth peer name veth-3-peer && \
+sudo ip link set veth-3 master br-1 && \
+sudo ip link set veth-3 up && \
+sudo ip link set veth-3-peer netns ns-3 && \
+sudo ip netns exec ns-3 ip addr add 10.0.1.3/24 dev veth-3-peer && \
+sudo ip netns exec ns-3 ip link set veth-3-peer up
+
+# 测试：ns-2 和 ns-3 通过网桥互通！
+ sudo ip netns exec ns-2 ping -c 3 10.0.1.3
+64 bytes from 10.0.1.3: time=0.051 ms   # 通了！两个容器可以互相通信
+
+# 查看网桥上连着哪些"网线"（veth）
+ bridge link
+2: veth-2 state UP : master br-1  # veth-2 连着 br-1
+4: veth-3 state UP : master br-1  # veth-3 也连着 br-1</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Bridge网络特点</span>
-              <span class="code-lang">说明</span>
+              <span class="code-title">网桥拓扑示意</span>
+              <span class="code-lang">架构图</span>
             </div>
-            <pre><code># 特点：
-# - 每个容器有独立的IP地址
-# - 容器可以访问外部网络（通过NAT）
-# - 外部访问容器需要端口映射
-# - 同一bridge网络的容器可通过IP通信
-# - 默认bridge网络不支持DNS解析（容器名不通）</code></pre>
+            <pre><code>         +------------------+
+         |     br-1 网桥     |  &lt;-- 相当于交换机，可以插很多网线
+         |   10.0.1.1（网关） |
+         +--+------+------+-+
+            |      |
+       veth-2    veth-3       &lt;-- 两根"网线"插在网桥上
+            |      |
+         +--+---+--+---+
+         | ns-2 | ns-3 |       &lt;-- 两个独立的"电脑"（命名空间）
+         |10.0.1|10.0.1|
+         |.2    |.3    |
+         +------+------+</code></pre>
           </div>
 
           <div class="tip-box">
-            <div class="tip-title">Bridge网络限制</div>
-            <p>默认bridge网络不支持通过容器名通信，需要使用<span class="highlight">自定义bridge网络</span>才能实现DNS解析</p>
+            <div class="tip-title">为什么需要网桥</div>
+            <p>如果没有网桥，每两个容器之间都要拉一根专属的veth线——3个容器要3根线，10个容器要45根线。有了网桥，就像装了一台交换机，所有容器都插到交换机上，随便哪两个都能互通。</p>
           </div>
         </div>
       </div>
 
+      <!-- 1.4 NAT -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.4</span>
+          <h1 class="page-title">NAT——容器如何访问外网</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">NAT（网络地址转换）</div>
+            <div class="definition-content">
+              容器的IP（如 <code>172.17.0.2</code>）是私网地址，外网无法直接访问。NAT负责在私网IP与宿主机公网IP之间做地址转换。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            ns-4 和 ns-5 可以互相通信，但还<strong>不能访问外网</strong>。因为 <code>10.0.2.0/24</code> 是私网地址——外网路由器不认识这个地址，就像寄信时写了"某小区3号楼"但没有写城市名，快递员不知道往哪送。
+          </p>
+
+          <p class="paragraph">
+            解决方案是<strong>NAT（网络地址转换）</strong>：把容器发出的数据包的"发件人地址"从私网IP改成宿主机的公网IP，外网的服务器就能把响应送回来。这就像快递员帮你把"某小区3号楼"改成"北京市朝阳区某小区3号楼"。
+          </p>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">WSL2 环境说明</div>
+            <div class="highlight-content">
+              <p><strong>WSL2 的根本限制</strong>：WSL2 使用 Hyper-V 虚拟网络，Hyper-V NAT 无法转发带有"伪装源 IP"的数据包。因此即配置了 iptables MASQUERADE，从自定义 namespace 发起的流量也无法真正出海。这是 WSL2 架构限制，非命令错误。</p>
+              <p><strong>WSL2 替代测试</strong>：可验证数据包是否到达 WSL 宿主机 eth0（内网互通），但无法 ping 通外部公网 IP。</p>
+              <p><strong>Linux 原生环境</strong>：所有命令均可完整复现，可直接 ping 通 8.8.8.8。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">【WSL】完整演示：创建网络 + 配置 NAT</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># ===== 第一步：创建网络拓扑（使用独立网段 10.0.2.x） =====
+
+# 创建两个命名空间
+ sudo ip netns add ns-4
+ sudo ip netns add ns-5
+
+# 创建网桥 br-2
+ sudo ip link add br-2 type bridge
+ sudo ip addr add 10.0.2.1/24 dev br-2
+ sudo ip link set br-2 up
+
+# 创建第一根 veth 网线，连 ns-4
+ sudo ip link add veth-4 type veth peer name veth-4-peer && \
+sudo ip link set veth-4 master br-2 && \
+sudo ip link set veth-4 up && \
+sudo ip link set veth-4-peer netns ns-4 && \
+sudo ip netns exec ns-4 ip addr add 10.0.2.2/24 dev veth-4-peer && \
+sudo ip netns exec ns-4 ip link set veth-4-peer up
+
+# 创建第二根 veth 网线，连 ns-5
+ sudo ip link add veth-5 type veth peer name veth-5-peer && \
+sudo ip link set veth-5 master br-2 && \
+sudo ip link set veth-5 up && \
+sudo ip link set veth-5-peer netns ns-5 && \
+sudo ip netns exec ns-5 ip addr add 10.0.2.3/24 dev veth-5-peer && \
+sudo ip netns exec ns-5 ip link set veth-5-peer up
+
+# 验证：ns-4 和 ns-5 互通
+ sudo ip netns exec ns-4 ping -c 1 10.0.2.3
+
+# ===== 第二步：配置 NAT，让容器能访问外网 =====
+
+# 开启 IP 转发
+ sudo sysctl -w net.ipv4.ip_forward=1
+
+# 配置 SNAT 规则（MASQUERADE 自动把源 IP 替换成 eth0 的 IP）
+ sudo iptables -t nat -A POSTROUTING \
+  -s 10.0.2.0/24 -o eth0 -j MASQUERADE
+
+# 配置默认网关
+ sudo ip netns exec ns-4 ip route add default via 10.0.2.1
+ sudo ip netns exec ns-5 ip route add default via 10.0.2.1
+
+# ===== 第三步：测试（WSL 专用） =====
+# 查看 WSL 宿主机 eth0 的 IP
+ ip addr show eth0
+# inet 172.x.x.x   ← 替换为你的实际 IP
+
+# 验证数据包是否到达宿主机
+ sudo ip netns exec ns-4 ping -c 3 172.x.x.x
+# 如果能通 → SNAT 生效，数据包到达宿主机</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">【Linux 原生】完整演示：创建网络 + 配置 NAT（可真正出海）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># ===== 第一步：创建网络拓扑（使用独立网段 10.0.2.x） =====
+
+# 创建两个命名空间
+ sudo ip netns add ns-4
+ sudo ip netns add ns-5
+
+# 创建网桥 br-2
+ sudo ip link add br-2 type bridge
+ sudo ip addr add 10.0.2.1/24 dev br-2
+ sudo ip link set br-2 up
+
+# 创建第一根 veth 网线，连 ns-4
+ sudo ip link add veth-4 type veth peer name veth-4-peer && \
+sudo ip link set veth-4 master br-2 && \
+sudo ip link set veth-4 up && \
+sudo ip link set veth-4-peer netns ns-4 && \
+sudo ip netns exec ns-4 ip addr add 10.0.2.2/24 dev veth-4-peer && \
+sudo ip netns exec ns-4 ip link set veth-4-peer up
+
+# 创建第二根 veth 网线，连 ns-5
+ sudo ip link add veth-5 type veth peer name veth-5-peer && \
+sudo ip link set veth-5 master br-2 && \
+sudo ip link set veth-5 up && \
+sudo ip link set veth-5-peer netns ns-5 && \
+sudo ip netns exec ns-5 ip addr add 10.0.2.3/24 dev veth-5-peer && \
+sudo ip netns exec ns-5 ip link set veth-5-peer up
+
+# 验证：ns-4 和 ns-5 互通
+ sudo ip netns exec ns-4 ping -c 1 10.0.2.3
+
+# ===== 第二步：配置 NAT，让容器能访问外网 =====
+
+# 开启 IP 转发
+ sudo sysctl -w net.ipv4.ip_forward=1
+
+# 允许 FORWARD 转发（NAT 必备）
+ sudo iptables -P FORWARD ACCEPT
+
+# 配置 SNAT 规则
+ sudo iptables -t nat -A POSTROUTING \
+  -s 10.0.2.0/24 -o eth0 -j MASQUERADE
+
+# 配置默认网关
+ sudo ip netns exec ns-4 ip route add default via 10.0.2.1
+ sudo ip netns exec ns-5 ip route add default via 10.0.2.1
+
+# ===== 第三步：测试（Linux 原生可直接出海） =====
+ sudo ip netns exec ns-4 ping -c 3 8.8.8.8
+64 bytes from 8.8.8.8: time=15.2 ms   # 成功！可以真正访问公网</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">数据包旅程：容器如何访问公网</span>
+              <span class="code-lang">分步流程</span>
+            </div>
+            <pre><code>  场景：ns-4（IP: 10.0.2.2）想 ping 通公网 IP（8.8.8.8）
+
+  第一层：容器 → 宿主机（第一次 SNAT）
+    ns-4 发出的数据包：来源IP 10.0.2.2，目标IP 8.8.8.8
+    到达宿主机虚拟网桥后，内核做第一次 SNAT
+    把来源IP从 10.0.2.2 替换成 宿主机的内网IP（172.21.176.1）
+    此时数据包进入"宿主机所在的网络"（云VPC或局域网）
+
+  第二层：宿主机 → 公网（第二次 SNAT）
+    带着源IP 172.21.176.1 的数据包，来到了出口路由器（VPC网关）
+    网关发现这是私网地址，外网不认，于是做第二次 SNAT
+    把源IP替换成服务器的真实公网IP（如 47.100.x.x）
+    数据包这才真正"出海"进入互联网
+
+  第三层：到达目标服务器
+    8.8.8.8 收到的请求，来自 IP 47.100.x.x（公网IP）
+    它根本不知道底下还藏着 172.21.176.1 的宿主机
+    更不知道最底层还有个 10.0.2.2 的容器
+
+  响应沿原路返回：公网IP → VPC网关NAT回172.21.176.1 → 宿主机NAT回10.0.2.2</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">SNAT vs DNAT 的区别</span>
+              <span class="code-lang">对比</span>
+            </div>
+            <pre><code>  SNAT（Source NAT）——改源头
+    场景：容器访问外网
+    作用：把"发件人"从容器IP改成宿主机IP
+    目的：让外网的响应能够送回来（外网不认识私网IP）
+
+  DNAT（Destination NAT）——改目标
+    场景：外网访问容器
+    作用：把"收件人"从宿主机IP改成容器IP
+    目的：让外部请求能够送达正确的容器
+
+  生活中的类比：
+  SNAT = 你寄信时，快递员把你的家庭地址改成公司地址，
+         这样回信能寄到公司再转给你
+  DNAT = 别人寄信到公司，前台根据门牌号转发给你</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">Docker网络全景</div>
+            <div class="kp-content">
+              <p><span class="key-point">网络命名空间</span>提供隔离（每个容器有独立网络）</p>
+              <p>&rarr; <span class="key-point">veth pair</span>提供连接（虚拟网线连接容器和宿主机）</p>
+              <p>&rarr; <span class="key-point">网桥</span>提供交换（多容器互联互通）</p>
+              <p>&rarr; <span class="key-point">NAT</span>提供内外互通（让容器能访问外网，也让外网能访问容器）</p>
+              <p style="margin-top:0.5rem;">这四层机制共同构成了Docker容器网络的基础。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">Bridge网络模式</h1>
+          <p class="section-desc">默认bridge与自定义bridge网络</p>
+        </div>
+      </div>
+
+      <!-- 2.1 默认Bridge -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.1</span>
+          <h1 class="page-title">默认Bridge网络</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">默认Bridge网络</div>
+            <div class="definition-content">
+              Docker安装后自动创建的 <code>bridge</code> 网络，网桥名为 <code>docker0</code>，网段通常为 <code>172.17.0.0/16</code>。所有未指定网络的容器都会自动连接到这个网桥。它是Docker的<span class="highlight">默认网络模式</span>。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            假设我们要运行一个Nginx容器对外提供Web服务。不指定网络时，Docker会自动将其接入默认bridge网络。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">演示：启动两个Nginx容器（默认bridge）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动第一个Nginx容器
+ docker run -d --name nginx-1 nginx:alpine
+
+# 启动第二个Nginx容器
+ docker run -d --name nginx-2 nginx:alpine
+
+# 查看容器分配的IP地址
+ docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx-1
+172.17.0.2
+ docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx-2
+172.17.0.3
+
+# 从 nginx-1 通过 IP 访问 nginx-2
+ docker exec nginx-1 ping -c 3 172.17.0.3
+PING 172.17.0.3 (172.17.0.3): 56 data bytes
+64 bytes from 172.17.0.3: seq=0 ttl=64 time=0.1 ms
+
+# 但通过容器名无法访问（默认bridge无DNS）
+ docker exec nginx-1 ping -c 3 nginx-2
+ping: bad address 'nginx-2'</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">默认bridge的核心局限</div>
+            <p>默认bridge网络中的容器只能通过<span class="highlight">IP地址</span>互相访问，不能通过<span class="highlight">容器名</span>访问。因为默认bridge没有内置DNS服务发现机制。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.2 自定义Bridge -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">2.2</span>
-          <h1 class="page-title">Host网络模式</h1>
+          <h1 class="page-title">自定义Bridge与DNS服务发现</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Host网络</div>
+            <div class="definition-term">自定义Bridge网络</div>
             <div class="definition-content">
-              Host模式<span class="highlight">移除容器与宿主机之间的网络隔离</span>，容器直接使用宿主机的网络命名空间。
+              用户手动创建的bridge网络。与默认bridge最大的区别是：自定义bridge内置了<span class="highlight">DNS服务发现</span>。同一自定义网络中的容器可以通过<span class="highlight">容器名</span>互相解析和访问，就像同一个公司的同事可以通过姓名找到对方，而不需要记住对方的手机号（IP地址）。
             </div>
           </div>
 
+          <p class="paragraph">
+            在实际项目中，我们通常会创建自定义网络来部署应用。比如一个Web前端和一个API后端，它们需要频繁通信，通过名字访问远比硬编码IP更可靠。
+          </p>
+
+          <p class="paragraph">
+            <code>docker network create</code> 用于创建一个自定义bridge网络。与默认bridge不同，自定义bridge内置DNS服务，同一网络中的容器可以通过容器名互相解析。
+          </p>
+
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Host网络示例</span>
+              <span class="code-title">演示：自定义网络中的Nginx互相访问</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动Nginx容器使用host网络（无需端口映射）
-$ docker run -d --name nginx-host --network host nginx:alpine
+            <pre><code># 创建自定义bridge网络（网络名可自定义，这里用 my-net）
+ docker network create my-net
 
-# 验证网络（容器与宿主机共享网络，IP地址相同）
-$ docker exec nginx-host ip addr
+# --network 参数：指定容器加入哪个网络
 
-# 访问服务（直接使用宿主机80端口，无需-p映射）
-# 在宿主机直接访问：curl http://localhost
-# 或浏览器访问：http://localhost
+# 启动前端Nginx，接入自定义网络
+ docker run -d --name nginx-web --network my-net nginx:alpine
 
-# 对比：host模式性能更好，但端口可能冲突
-$ docker run -d --name nginx-host2 --network host nginx:alpine
-# 第二个容器会启动失败，因为80端口已被占用</code></pre>
+# 启动API服务Nginx，接入同一网络
+ docker run -d --name nginx-api --network my-net nginx:alpine
+
+# 通过容器名直接访问！DNS自动解析
+ docker exec nginx-web ping -c 3 nginx-api
+PING nginx-api (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.1 ms
+
+# 直接wget测试HTTP访问
+ docker exec nginx-web wget -qO- http://nginx-api
+&lt;!DOCTYPE html&gt;...（返回nginx-api的欢迎页）
+
+# 查看Docker内置的DNS服务器地址
+ docker exec nginx-web cat /etc/resolv.conf
+nameserver 127.0.0.11</code></pre>
           </div>
 
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">Host网络特点</span>
-              <span class="code-lang">说明</span>
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心结论</div>
+            <div class="conclusion-content">
+              <p><span class="highlight">默认bridge</span>：只能IP通信，无DNS，适合单机简单测试。</p>
+              <p><span class="highlight">自定义bridge</span>：支持容器名DNS解析，适合多容器应用部署，是生产环境的首选。</p>
             </div>
-            <pre><code># 优点：
-# - 性能最佳（无NAT转换）
-# - 网络配置简单
-
-# 缺点：
-# - 端口冲突风险（多容器不能绑定同一端口）
-# - 网络隔离性差
-# - 安全性降低</code></pre>
-          </div>
-
-          <div class="tip-box">
-            <div class="tip-title">使用建议</div>
-            <p>适用于对<span class="highlight">网络性能要求高</span>且<span class="highlight">端口不冲突</span>的场景</p>
           </div>
         </div>
       </div>
 
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">2.3</span>
-          <h1 class="page-title">None网络模式</h1>
-        </div>
-        <div class="page-body">
-          <div class="definition-box">
-            <div class="definition-term">None网络</div>
-            <div class="definition-content">
-              None模式<span class="highlight">完全禁用容器的网络功能</span>。容器拥有独立的网络命名空间，但不配置任何网络接口（除loopback外）。
-            </div>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">None网络示例</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 启动无网络Nginx容器（完全隔离）
-$ docker run -d --name nginx-none --network none nginx:alpine
-
-# 查看容器网络
-$ docker inspect --format '{{.NetworkSettings.Networks}}' nginx-none
-# 输出：map[]（空网络）
-
-# 在容器内查看网络接口（只有loopback，没有eth0）
-$ docker exec nginx-none ip addr
-# 1: lo: <LOOPBACK,UP> mtu 65536 ...
-# 没有eth0网卡
-
-# 测试：无法访问外部网络
-$ docker exec nginx-none ping -c 3 baidu.com
-# 报错：ping: bad address 'baidu.com'
-
-# 也无法从外部访问（没有网络接口）
-$ curl http://localhost
-# 连接失败</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">None网络特点</span>
-              <span class="code-lang">说明</span>
-            </div>
-            <pre><code># 适用场景：
-# - 批处理任务
-# - 离线计算
-# - 安全隔离场景
-# - 不需要网络的后台任务</code></pre>
-          </div>
+      <!-- Part 3 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">其他网络模式</h1>
+          <p class="section-desc">Host、None、Container模式对比</p>
         </div>
       </div>
 
+      <!-- 3.1 Host模式 -->
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">2.4</span>
-          <h1 class="page-title">Container网络模式</h1>
+          <span class="page-number">3.1</span>
+          <h1 class="page-title">Host模式——与宿主机共享网络</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">Container网络</div>
+            <div class="definition-term">Host网络模式</div>
             <div class="definition-content">
-              Container模式<span class="highlight">与其他容器共享网络命名空间</span>。新容器不会创建自己的网络接口，而是与指定容器共享同一网络栈。
+              容器<span class="highlight">不再拥有独立的网络命名空间</span>，而是直接使用宿主机的网络栈。容器看到的网卡、IP地址、端口与宿主机完全一致。性能最好（无NAT开销），但隔离性最差。
             </div>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Container网络示例</span>
+              <span class="code-title">演示：Host模式下的Nginx</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动主Nginx容器（作为网络基础）
-$ docker run -d --name nginx-main -p 8080:80 nginx:alpine
+            <pre><code># 启动Nginx使用host网络（无需-p端口映射！）
+ docker run -d --name nginx-host --network host nginx:alpine
 
-# 查看主容器IP
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' nginx-main
-172.17.0.2
+# 查看容器IP——和宿主机完全一样
+ docker exec nginx-host ip addr
+# 看到的 eth0 IP 就是宿主机的IP
 
-# 启动辅助容器，共享主容器的网络（Sidecar模式）
-$ docker run -d --name nginx-sidecar --network container:nginx-main alpine:latest top
+# 直接访问宿主机的80端口即可访问Nginx
+ curl http://localhost
+&lt;!DOCTYPE html&gt;...（Nginx欢迎页）
 
-# 验证：两个容器共享同一网络命名空间
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' nginx-sidecar
-172.17.0.2
+# 注意：host模式下 -p 端口映射无效！
+# 因为容器直接使用宿主机的端口
+ docker run -d --name nginx-host2 --network host nginx:alpine
+# 第二个容器会启动失败：80端口已被占用</code></pre>
+          </div>
 
-# 在Sidecar容器中可以直接访问主容器的localhost
-$ docker exec nginx-sidecar wget -qO- http://localhost
-# 返回Nginx欢迎页面（共享网络栈）
+          <div class="highlight-box warning">
+            <div class="highlight-title">Docker Desktop / WSL 特别提醒</div>
+            <div class="highlight-content">
+              <p>在 Docker Desktop 或 WSL 环境中，<code>--network host</code> 的"宿主机"是 Linux 虚拟机，而非 Windows/macOS 系统本身。因此在 Windows/macOS 浏览器中访问 <code>localhost</code> 不会生效。</p>
+              <p>Linux 原生环境无此限制，可直接在浏览器访问 <code>localhost</code>。</p>
+            </div>
+          </div>
 
-# 查看主容器的80端口（在Sidecar中可见）
-$ docker exec nginx-sidecar netstat -tlnp</code></pre>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">【WSL / Docker Desktop】验证 Host 模式</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在 WSL/Docker Desktop 中，通过临时容器验证 host 模式是否生效：
+ docker run --rm --network host alpine wget -qO- http://localhost
+# 如果能看到 HTML 代码，说明 Nginx 成功占用了"底层虚拟机"的 80 端口
+# --rm 表示容器退出后自动删除</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">【Linux 原生】验证 Host 模式</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Linux 原生环境：直接在宿主机浏览器访问 localhost 即可
+# 在宿主机浏览器打开 http://localhost
+# 或在宿主机本地 curl 验证：
+ curl http://localhost
+&lt;!DOCTYPE html&gt;...
+# 注意：host 模式下 -p 端口映射无效！</code></pre>
           </div>
 
           <div class="tip-box">
             <div class="tip-title">适用场景</div>
-            <p><span class="highlight">Sidecar模式</span>：多容器共享网络，如Sidecar代理</p>
-            <p><span class="highlight">紧密耦合应用</span>：如主应用和日志收集器共享网络</p>
+            <p>对<span class="highlight">网络性能要求极高</span>的场景（如高吞吐量的代理、负载均衡），且端口不会冲突时使用。</p>
           </div>
         </div>
       </div>
 
-      <div class="page section-page">
-        <div class="section-content">
-          <span class="section-label">Part 3</span>
-          <h1 class="section-title">容器间通信</h1>
-          <p class="section-desc">实现容器网络互联</p>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">3.1</span>
-          <h1 class="page-title">自定义Bridge网络</h1>
-        </div>
-        <div class="page-body">
-          <div class="definition-box">
-            <div class="definition-term">自定义Bridge网络原理</div>
-            <div class="definition-content">
-              自定义Bridge网络与默认Bridge的区别是支持<span class="highlight">DNS服务发现</span>。在同一自定义网络中，容器可以通过容器名相互访问，就像同一个公司的同事可以通过姓名互相找到对方，而不需要知道对方的手机号（IP地址）。
-            </div>
-          </div>
-
-          <p class="paragraph">
-            默认bridge网络之所以不支持DNS解析，是因为它没有内置的服务发现机制。自定义bridge网络则内置了Docker DNS，当容器需要解析另一个容器名时，Docker会自动返回对应的IP地址。
-          </p>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">创建和使用自定义网络</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 创建自定义bridge网络
-$ docker network create --driver bridge my-network
-
-# 启动Nginx前端容器
-$ docker run -d \
-  --name nginx-web \
-  --network my-network \
-  -p 8080:80 \
-  nginx:alpine
-
-# 启动另一个Nginx作为API服务
-$ docker run -d \
-  --name nginx-api \
-  --network my-network \
-  nginx:alpine
-
-# 容器间通过名称通信（DNS自动解析）
-$ docker exec nginx-web ping -c 3 nginx-api
-# PING nginx-api (172.18.0.3) 56(84) bytes of data.
-
-# 在nginx-web中直接访问nginx-api
-$ docker exec nginx-web wget -qO- http://nginx-api
-# 返回nginx-api的欢迎页面</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">指定子网和网关</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 创建时指定子网和网关
-$ docker network create \
-  --driver bridge \
-  --subnet 192.168.100.0/24 \
-  --gateway 192.168.100.1 \
-  my-subnet
-
-# 参数说明：
-# --driver bridge      使用bridge驱动（默认）
-# --subnet            指定子网地址和掩码
-# --gateway           指定网关地址</code></pre>
-          </div>
-        </div>
-      </div>
-
+      <!-- 3.2 None模式 -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">3.2</span>
-          <h1 class="page-title">端口映射</h1>
+          <h1 class="page-title">None模式——完全断网</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
-            <div class="definition-term">端口映射原理</div>
+            <div class="definition-term">None网络模式</div>
             <div class="definition-content">
-              端口映射是将<span class="highlight">宿主机的端口</span>与<span class="highlight">容器的端口</span>进行关联。就像酒店的前台总机（宿主机），外部客人先联系前台，再被转接到具体的房间（容器）。
+              容器拥有独立的网络命名空间，但<span class="highlight">不配置任何网络接口</span>（除本地回环 <code>lo</code> 外）。容器完全无法联网，也无法被外部访问。就像一个被拔掉网线的电脑。
             </div>
           </div>
 
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">演示：None模式下的Nginx</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动无网络的Nginx容器
+ docker run -d --name nginx-none --network none nginx:alpine
+
+# 查看网络接口——只有lo，没有eth0
+ docker exec nginx-none ip addr
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 ...
+    inet 127.0.0.1/8 scope host lo
+# 没有 eth0 网卡
+
+# 无法访问外网
+ docker exec nginx-none ping -c 3 baidu.com
+ping: bad address 'baidu.com'
+
+# 也无法从外部访问（没有网络接口）
+ curl http://localhost
+# 连接失败——因为没有端口映射，也没有eth0
+
+# Nginx进程虽然运行着，但没人能访问到它
+ docker exec nginx-none ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g ...</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">适用场景</div>
+            <p><span class="highlight">离线批处理</span>、<span class="highlight">安全隔离计算</span>、不需要网络的后台数据处理任务。完全断网可以最大限度降低攻击面。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.3 Container模式 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.3</span>
+          <h1 class="page-title">Container模式——共享网络栈</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Container网络模式</div>
+            <div class="definition-content">
+              新容器<span class="highlight">与指定容器共享同一个网络命名空间</span>。两个容器拥有完全相同的IP地址、网卡配置和端口空间，就像两台电脑共用一根网线和同一个网卡。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">演示：Container模式——Redis + redis-cli</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动 Redis 容器作为"网络基础"
+ docker run -d --name redis-server redis:alpine
+
+# 启动 redis-cli 容器，共享 redis-server 的网络
+# 这个容器没有自己的网卡，用的是 redis-server 的
+ docker run -it --rm --network container:redis-server \
+  redis:alpine redis-cli -h 127.0.0.1
+
+# 现在你在 redis-cli 里，直接连到 redis-server 的 localhost
+127.0.0.1:6379&gt; PING
+PONG                    # 成功！不需要指定 IP，因为共享网络栈
+
+# 退出：Ctrl+P 然后 Ctrl+Q</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口冲突实验</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在 Container 模式下，两个容器共享同一个端口空间
+# 如果两个容器都想用同一个端口，会冲突
+
+# 先启动一个 Redis（占用 6379 端口）
+ docker run -d --name redis1 redis:alpine
+
+# 尝试让另一个容器也用 6379 端口（会失败）
+ docker run -d --name redis2 \
+  --network container:redis1 \
+  redis:alpine redis-server --port 6379
+
+# 报错：Failed to bind to port ...
+# 因为 redis1 已经占用了 6379，redis2 没法再用</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">适用场景</div>
+            <p><span class="highlight">Sidecar模式</span>：主容器运行服务，Sidecar容器做日志收集或监控，共享网络使得 Sidecar 可以直接通过 <code>localhost</code> 访问主容器，无需额外网络配置。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 4 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">端口映射</h1>
+          <p class="section-desc">外部网络如何访问容器服务</p>
+        </div>
+      </div>
+
+      <!-- 4.1 端口映射原理 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.1</span>
+          <h1 class="page-title">端口映射原理——DNAT</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">为什么需要端口映射？</div>
+            <div class="definition-content">
+              容器使用的是私网IP（如 <code>172.17.0.2</code>），外部网络无法直接访问。端口映射通过 <code>-p 宿主机端口:容器端口</code> 将宿主机的某个端口转发到容器的端口，本质上是<span class="highlight">DNAT（目标地址转换）</span>。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口映射工作原理——分步解析</span>
+              <span class="code-lang">原理图</span>
+            </div>
+            <pre><code>  场景：你在浏览器访问 http://宿主机IP:8080
+
+  第1步：浏览器发出请求
+    目标：宿主机IP:8080
+
+  第2步：宿主机收到请求（网卡 eth0）
+    发现目标是端口8080，匹配到DNAT规则
+
+  第3步：DNAT转换——改目标地址
+    把目标从"宿主机:8080"改成"172.17.0.2:80"
+    就像前台把"找公司前台"改成"找3楼301房间"
+
+  第4步：数据包发送到 docker0 网桥
+    网桥查表，发现172.17.0.2在哪，提前路由
+
+  第5步：通过 veth 送达 Nginx 容器（端口80）
+
+  第6步：Nginx处理请求，返回网页内容</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">命令与原理对照</span>
+              <span class="code-lang">对照表</span>
+            </div>
+            <pre><code>  docker run -p 8080:80 nginx
+
+  -p            = port，暴露端口
+  8080（左边）   = 宿主机的端口，外部访问这个端口
+  80（右边）     = 容器内部的端口，Nginx监听在这个端口
+  nginx         = 镜像名
+
+  简单理解：把容器的80端口"映射"到宿主机的8080端口，
+            访问宿主机8080就等于访问容器80</code></pre>
+          </div>
+
           <p class="paragraph">
-            当外部请求到达宿主机的某个端口时，Docker的NAT机制会将请求转发到对应容器的指定端口。这使得容器内的服务可以被外部网络访问。
+            当你执行 <code>docker run -p 8080:80 nginx</code> 时，Docker在宿主机上配置了一条iptables DNAT规则：所有发往宿主机8080端口的流量，都被转发到容器的80端口。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">端口映射语法与示例</span>
+              <span class="code-title">动手验证：查看 iptables DNAT 规则</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 语法：-p &lt;host-port&gt;:&lt;container-port&gt;[:&lt;protocol&gt;]
+            <pre><code># 启动一个带端口映射的容器
+ docker run -d -p 8080:80 --name test-nginx nginx:alpine
 
-# 基本端口映射
-$ docker run -d --name nginx-web -p 8080:80 nginx
-# 访问：http://localhost:8080
+# 查看 NAT 表中的 DNAT 规则（端口映射的底层实现）
+ iptables -t nat -L -n -v
+
+# 你会看到类似这样的规则：
+# DNAT  tcp  --  anywhere  anywhere  tcp dpt:8080 to:172.17.0.2:80
+# 这就是 Part 1 讲的 DNAT——把目标地址从宿主机 8080 改成容器 172.17.0.2:80
+
+# 清理
+ docker stop test-nginx && docker rm test-nginx</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">为什么要映射端口</div>
+            <p>容器的IP是私网IP（如172.17.0.2），外部网络根本无法直接送达。而宿主机通常有公网IP或被局域网访问，所以通过端口映射，外部只需要访问"宿主机:8080"，宿主机再帮忙转发到容器的80端口。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">与Host模式的区别</div>
+            <div class="kp-content">
+              <p><span class="key-point">端口映射（-p）</span>：容器仍有独立IP，通过NAT转发，有少量性能损耗，但隔离性好，多个容器可以映射相同端口（因为是映射到不同宿主机端口）。</p>
+              <p><span class="key-point">Host模式（--network host）</span>：容器无独立IP，直接占用宿主机端口，性能最好，但端口容易冲突（两个容器不能同时用80）。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.2 端口映射演示 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.2</span>
+          <h1 class="page-title">端口映射演示</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            以Nginx为例，演示多种端口映射写法。每种写法对应不同的访问方式和权限控制。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">端口映射的多种写法</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 基础映射：宿主机8080 -&gt; 容器80
+ docker run -d --name nginx-p1 -p 8080:80 nginx:alpine
+# 访问：curl http://localhost:8080
 
 # 映射多个端口
-$ docker run -d --name nginx-multi -p 8080:80 -p 8443:443 nginx
+ docker run -d --name nginx-p2 -p 8080:80 -p 8443:443 nginx:alpine
 
-# 指定协议（tcp/udp）
-$ docker run -d --name dns-server -p 53:53/udp redis:alpine
+# 指定协议（UDP）
+ docker run -d --name dns-test -p 53:53/udp nginx:alpine
 
-# 绑定到特定IP（仅本地访问）
-$ docker run -d --name nginx-local -p 127.0.0.1:8080:80 nginx
+# 绑定到特定IP（仅允许本地访问，局域网其他机器无法访问）
+ docker run -d --name nginx-local -p 127.0.0.1:8080:80 nginx:alpine
 
-# 映射到所有IP（默认行为）
-$ docker run -d --name nginx-all -p 0.0.0.0:8080:80 nginx</code></pre>
+# 映射到所有网络接口（默认行为，0.0.0.0可省略）
+ docker run -d --name nginx-all -p 0.0.0.0:8080:80 nginx:alpine
+
+# -P（大写）：暴露Dockerfile中EXPOSE声明的所有端口到随机高位端口
+ docker run -d --name nginx-random -P nginx:alpine
+ docker port nginx-random
+80/tcp -&gt; 0.0.0.0:32768   # 自动分配的随机端口</code></pre>
           </div>
 
           <div class="code-block">
@@ -559,182 +1160,112 @@ $ docker run -d --name nginx-all -p 0.0.0.0:8080:80 nginx</code></pre>
               <span class="code-title">查看端口映射</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 查看端口映射
-$ docker port nginx-web
-80/tcp -> 0.0.0.0:8080
+            <pre><code># 查看单个容器的端口映射
+ docker port nginx-p1
+80/tcp -&gt; 0.0.0.0:8080
 
-# 查看所有映射端口
-$ docker ps --format "table {{.Names}}\t{{.Ports}}"</code></pre>
+# 查看所有运行容器的端口映射
+ docker ps --format "table {{.Names}}\t{{.Ports}}"
+NAMES       PORTS
+nginx-p1    0.0.0.0:8080-&gt;80/tcp
+nginx-p2    0.0.0.0:8080-&gt;80/tcp, 0.0.0.0:8443-&gt;443/tcp</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">安全建议</div>
+            <p>生产环境中，建议显式绑定到需要的IP地址（如 <code>-p 127.0.0.1:8080:80</code> 或 <code>-p 192.168.1.10:80:80</code>），避免不必要地将服务暴露到公网。</p>
           </div>
         </div>
       </div>
 
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">3.3</span>
-          <h1 class="page-title">容器多网络连接</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker network connect</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 创建两个隔离的网络
-$ docker network create frontend-network
-$ docker network create backend-network
-
-# 启动应用服务器，连接前端网络
-$ docker run -d \
-  --name app-server \
-  --network frontend-network \
-  ubuntu:22.04 sleep infinity
-
-# 将运行中的容器连接到后端网络
-$ docker network connect backend-network app-server
-
-# 验证网络连接
-$ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
-[backend-network frontend-network]</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">断开网络连接</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 断开网络连接
-$ docker network disconnect backend-network app-server
-
-# 查看当前网络
-$ docker inspect --format '{{keys .NetworkSettings.Networks}}' app-server
-[frontend-network]</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">说明</div>
-            <div class="kp-content">
-              <p>一个容器可以同时连接<span class="key-point">多个网络</span>，每个网络分配独立的IP地址</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <!-- Part 5 章节页 -->
       <div class="page section-page">
         <div class="section-content">
-          <span class="section-label">Part 4</span>
-          <h1 class="section-title">网络管理命令</h1>
-          <p class="section-desc">docker network命令详解</p>
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">网络管理与故障排查</h1>
+          <p class="section-desc">docker network命令与常见问题定位</p>
         </div>
       </div>
 
+      <!-- 5.1 网络管理命令 -->
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">4.1</span>
-          <h1 class="page-title">网络查看命令</h1>
+          <span class="page-number">5.1</span>
+          <h1 class="page-title">网络管理命令速查</h1>
         </div>
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker network ls - 列出网络</span>
+              <span class="code-title">docker network 核心命令</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 查看所有网络
-$ docker network ls
+ docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+abc123...      bridge    bridge    local
+def456...      host      host      local
+ghi789...      none      null      local
 
-# 预期输出：
-# NETWORK ID     NAME        DRIVER      SCOPE
-# abc123...      bridge      bridge      local
-# def456...      host        host        local
-# ghi789...      none        null        local
-# jkl012...      my-network  bridge      local</code></pre>
-          </div>
+# 查看网络详情（包含连接的容器、子网、网关）
+ docker network inspect bridge
+ docker network inspect my-net
 
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker network inspect - 查看详情</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 查看bridge网络详情
-$ docker network inspect bridge
+# 创建自定义bridge网络
+ docker network create my-net
 
-# 查看自定义网络详情
-$ docker network inspect my-network</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="page content-page">
-        <div class="page-header">
-          <span class="page-number">4.2</span>
-          <h1 class="page-title">网络创建与删除</h1>
-        </div>
-        <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker network create - 创建网络</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 创建bridge网络（使用默认配置）
-$ docker network create my-network
-
-# 创建带配置的bridge网络
-$ docker network create \
+# 创建带指定子网和网关的网络
+ docker network create \
   --driver bridge \
   --subnet 192.168.100.0/24 \
   --gateway 192.168.100.1 \
-  --attachable \
-  my-network
+  my-subnet
 
-# 参数说明：
-# --driver bridge          网络驱动类型
-# --subnet                指定子网地址和CIDR掩码
-# --gateway               指定网关地址
-# --attachable            允许容器手动连接到此网络</code></pre>
+# 将运行中的容器连接到另一个网络
+ docker network connect my-net nginx-1
+
+# 断开容器的某个网络
+ docker network disconnect my-net nginx-1
+
+# 删除网络
+ docker network rm my-net
+
+# 清理所有未被使用的网络
+ docker network prune</code></pre>
           </div>
 
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">docker network rm/prune - 删除网络</span>
-              <span class="code-lang">Bash</span>
+          <div class="knowledge-point">
+            <div class="kp-title">一个容器连接多个网络</div>
+            <div class="kp-content">
+              <p>一个容器可以同时属于多个网络，每个网络分配独立的IP地址。例如：Nginx容器同时连接 <code>frontend-network</code>（对外提供Web服务）和 <code>backend-network</code>（连接数据库），实现网络层的安全隔离。</p>
             </div>
-            <pre><code># 删除网络
-$ docker network rm my-network
-
-# 清理未使用的网络
-$ docker network prune
-
-# 强制删除（如果网络在使用中）
-$ docker network rm -f my-network</code></pre>
           </div>
         </div>
       </div>
 
+      <!-- 5.2 故障排查 -->
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">4.3</span>
-          <h1 class="page-title">网络故障排查</h1>
+          <span class="page-number">5.2</span>
+          <h1 class="page-title">网络故障排查流程</h1>
         </div>
         <div class="page-body">
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">常用排查命令</span>
-              <span class="code-lang">Bash</span>
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>确认网络模式</h3>
+              <p>容器使用的是 bridge / host / none / container 哪种模式？不同模式排查方向完全不同。</p>
             </div>
-            <pre><code># 1. 查看容器网络配置
-$ docker inspect --format '{{json .NetworkSettings}}' &lt;container&gt; | jq
-
-# 2. 查看容器IP地址
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' &lt;container&gt;
-
-# 3. 查看端口映射
-$ docker port &lt;container&gt;
-
-# 4. 查看网络列表
-$ docker network ls
-
-# 5. 在容器内测试网络
-$ docker exec &lt;container&gt; ping -c 3 8.8.8.8</code></pre>
+            <div class="card">
+              <h3><span class="card-num">2</span>检查IP配置</h3>
+              <p><code>docker inspect &lt;容器&gt;</code> 查看IP地址、网关、DNS配置是否正确。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>测试连通性</h3>
+              <p>先 <code>ping IP</code> 测试三层连通，再 <code>ping 域名</code> 测试DNS解析。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>检查端口映射</h3>
+              <p><code>docker port &lt;容器&gt;</code> 确认 -p 参数是否正确，宿主机防火墙是否放行。</p>
+            </div>
           </div>
 
           <div class="code-block">
@@ -743,142 +1274,245 @@ $ docker exec &lt;container&gt; ping -c 3 8.8.8.8</code></pre>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 问题1：容器无法访问外网
-# 解决：检查Docker服务状态
-$ systemctl status docker
+ docker exec &lt;容器&gt; ping -c 3 8.8.8.8   # 先ping公网IP
+ docker exec &lt;容器&gt; ping -c 3 baidu.com # 再ping域名
+# 如果IP通但域名不通 -> DNS问题，检查 /etc/resolv.conf
+# 如果都不通 -> 检查宿主机Docker服务和防火墙
 
-# 问题2：无法通过端口访问容器
-# 解决：检查端口映射和防火墙
-$ docker port &lt;container&gt;
-$ curl http://localhost:&lt;port&gt;
+# 问题2：外部无法通过端口访问容器
+ docker port &lt;容器&gt;              # 检查端口映射
+ curl http://localhost:&lt;port&gt;    # 本机测试
+ ss -tlnp | grep &lt;port&gt;          # 检查宿主机是否监听该端口
+# 如果宿主机没监听 -> 检查 -p 参数或容器是否运行
+# 如果本机通但外部不通 -> 检查防火墙/安全组
 
-# 问题3：容器间无法通信
-# 解决：确保容器在同一网络中
-$ docker network inspect &lt;network&gt;
-
-# 问题4：容器名无法解析
-# 解决：使用自定义网络
-$ docker network create my-network
-$ docker run --network my-network ...</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">调试流程</div>
-            <div class="kp-content">
-              <p>1. <span class="key-point">确认网络模式</span>：bridge/host/custom</p>
-              <p>2. <span class="key-point">检查IP配置</span>：确认容器IP正确</p>
-              <p>3. <span class="key-point">测试连通性</span>：先ping IP，再ping域名</p>
-              <p>4. <span class="key-point">检查端口映射</span>：确认-p参数正确</p>
-            </div>
+# 问题3：容器间无法通过名字通信
+ docker network inspect &lt;网络&gt;   # 确认容器是否在同一个网络
+# 如果不在同一网络 -> docker network connect
+# 如果在默认bridge -> 切换到自定义bridge网络</code></pre>
           </div>
         </div>
       </div>
 
+      <!-- Part 6 章节页 -->
       <div class="page section-page">
         <div class="section-content">
-          <span class="section-label">Part 5</span>
+          <span class="section-label">Part 6</span>
           <h1 class="section-title">动手实验</h1>
-          <p class="section-desc">Docker网络配置综合练习</p>
+          <p class="section-desc">Nginx三层网络拓扑实战</p>
         </div>
       </div>
 
+      <!-- 6.1 综合实验 -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验</span>
-          <h1 class="page-title">Docker网络实验</h1>
+          <h1 class="page-title">综合实验：Nginx网络拓扑</h1>
         </div>
         <div class="page-body">
           <div class="experiment-section">
             <div class="experiment-header">
               <span class="experiment-badge">实验</span>
-              <span class="experiment-title">Docker网络配置综合实践</span>
+              <span class="experiment-title">构建Nginx三层网络拓扑</span>
             </div>
             <div class="experiment-purpose">
               <h4>实验目的</h4>
-              <p>通过配置Docker网络，掌握各种网络模式的使用和容器间通信配置</p>
-            </div>
-            <div class="experiment-steps">
-              <h4>实验步骤</h4>
-              <div class="step-item"><span class="step-num">1</span><span class="step-text">查看默认bridge网络信息</span></div>
-              <div class="step-item"><span class="step-num">2</span><span class="step-text">创建自定义bridge网络</span></div>
-              <div class="step-item"><span class="step-num">3</span><span class="step-text">启动两个容器连接自定义网络并测试通信</span></div>
-              <div class="step-item"><span class="step-num">4</span><span class="step-text">配置Nginx端口映射并验证外部访问</span></div>
-              <div class="step-item"><span class="step-num">5</span><span class="step-text">使用docker network connect为容器添加网络</span></div>
-              <div class="step-item"><span class="step-num">6</span><span class="step-text">测试不同网络间容器隔离</span></div>
+              <p>综合运用本讲所学知识，构建一个包含反向代理、Web服务、API服务的Nginx网络拓扑，体验不同网络模式的应用场景。</p>
             </div>
           </div>
 
-          <div class="code-block" style="margin-top: 1.5rem;">
+          <div class="code-block">
             <div class="code-header">
-              <span class="code-title">关键命令</span>
-              <span class="code-lang">Bash</span>
+              <span class="code-title">网络拓扑架构</span>
+              <span class="code-lang">架构图</span>
             </div>
-            <pre><code># 查看网络
-$ docker network ls
-$ docker network inspect bridge
+            <pre><code>  【外部用户】
+       |
+       | http://宿主机IP:8080
+       v
+  +-----------------------+     frontend-network
+  |  nginx-proxy          |&lt;----------------------------+
+  |  反向代理层            |                             |
+  |  -p 8080:80           |                             |
+  +-----------------------+                             |
+       | proxy_pass                                      |
+       | http://nginx-web:80                             |
+       v                                                 |
+  +-----------------------+                             |
+  |   nginx-web           |                             |
+  |   Web前端层           |                             |
+  +-----------------------+                             |
+       | API请求                                         |
+       | http://nginx-api:80                             |
+       v                                                 |
+  +-----------------------+                             |
+  |   nginx-api           |                             |
+  |   API服务层           |                             |
+  +-----------------------+-----------------------------+</code></pre>
+          </div>
 
-# 创建自定义网络
-$ docker network create --driver bridge my-network
-
-# 启动Nginx容器到指定网络
-$ docker run -d --name nginx1 --network my-network nginx:alpine
-$ docker run -d --name nginx2 --network my-network nginx:alpine
-
-# 测试容器间通信（通过容器名DNS解析）
-$ docker exec nginx1 ping -c 3 nginx2
-$ docker exec nginx1 wget -qO- http://nginx2
-
-# 端口映射（外部访问）
-$ docker run -d --name nginx-web -p 8080:80 --network my-network nginx:alpine
-$ curl http://localhost:8080</code></pre>
+          <div class="experiment-section" style="margin-top: 1rem;">
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">创建自定义网络 <code>frontend-network</code></span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">启动 <code>nginx-web</code> 和 <code>nginx-api</code>，接入自定义网络</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">验证两个容器可通过容器名互相访问</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">启动 <code>nginx-proxy</code>，映射8080端口，接入同一网络</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">配置反向代理将请求转发到 <code>nginx-web</code></span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">验证整个链路连通性</span></div>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- 6.2 实验命令 -->
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">实验</span>
-          <h1 class="page-title">网络故障排查实践</h1>
+          <h1 class="page-title">实验命令清单</h1>
         </div>
         <div class="page-body">
-          <div class="experiment-section">
-            <div class="experiment-header">
-              <span class="experiment-badge">实验</span>
-              <span class="experiment-title">Docker网络故障排查与修复</span>
-            </div>
-            <div class="experiment-purpose">
-              <h4>实验目的</h4>
-              <p>掌握Docker网络常见问题的排查方法和解决技巧</p>
-            </div>
-            <div class="experiment-steps">
-              <h4>实验步骤</h4>
-              <div class="step-item"><span class="step-num">1</span><span class="step-text">模拟容器无法访问外网的问题</span></div>
-              <div class="step-item"><span class="step-num">2</span><span class="step-text">使用docker inspect检查容器网络配置</span></div>
-              <div class="step-item"><span class="step-num">3</span><span class="step-text">在容器内测试ping和curl连通性</span></div>
-              <div class="step-item"><span class="step-num">4</span><span class="step-text">检查宿主机防火墙规则</span></div>
-              <div class="step-item"><span class="step-num">5</span><span class="step-text">模拟端口映射失败问题并排查</span></div>
-              <div class="step-item"><span class="step-num">6</span><span class="step-text">总结常见网络问题的解决方案</span></div>
-            </div>
-          </div>
-
-          <div class="code-block" style="margin-top: 1.5rem;">
+          <div class="code-block">
             <div class="code-header">
-              <span class="code-title">排查命令清单</span>
+              <span class="code-title">关键命令参考</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 查看容器IP
-$ docker inspect --format '{{.NetworkSettings.Networks.bridge.IPAddress}}' &lt;container&gt;
+            <pre><code># 步骤1：创建自定义网络
+ docker network create frontend-network
 
-# 查看端口映射
-$ docker port &lt;container&gt;
+# 步骤2：启动Web层和API层
+ docker run -d --name nginx-web \
+  --network frontend-network \
+  nginx:alpine
 
-# 测试容器网络
-$ docker exec &lt;container&gt; ping -c 3 8.8.8.8
-$ docker exec &lt;container&gt; curl http://example.com
+ docker run -d --name nginx-api \
+  --network frontend-network \
+  nginx:alpine
 
-# 查看网络详情
-$ docker network inspect bridge</code></pre>
+# 步骤3：验证容器间通信（DNS解析）
+ docker exec nginx-web ping -c 3 nginx-api
+ docker exec nginx-web wget -qO- http://nginx-api
+
+# 步骤4：启动反向代理，映射8080端口
+ docker run -d --name nginx-proxy \
+  --network frontend-network \
+  -p 8080:80 \
+  nginx:alpine
+
+# 步骤5：进入代理容器修改配置（简单演示）
+ docker exec -it nginx-proxy sh -c \
+  "echo 'server { listen 80; location / { proxy_pass http://nginx-web; } }' \
+   &gt; /etc/nginx/conf.d/default.conf &amp;&amp; nginx -s reload"
+
+# 步骤6：验证访问
+ curl http://localhost:8080
+
+# 扩展：验证网络隔离
+# 启动一个不在 frontend-network 中的容器
+ docker run -d --name nginx-isolated nginx:alpine
+# 这个容器无法通过名字访问 nginx-web 和 nginx-api</code></pre>
+          </div>
+
+          <div class="key-conclusion">
+            <div class="conclusion-title">本讲核心回顾</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">网络命名空间 + veth + 网桥 + NAT</span> 是Docker网络的四大基石</p>
+              <p>2. <span class="highlight">默认bridge</span>适合简单测试，<span class="highlight">自定义bridge</span>支持DNS，适合生产部署</p>
+              <p>3. <span class="highlight">Host模式</span>性能最高但无隔离，<span class="highlight">None模式</span>完全断网，<span class="highlight">Container模式</span>适合Sidecar</p>
+              <p>4. <span class="highlight">端口映射</span>本质是DNAT，让外部可以访问容器内的服务</p>
+            </div>
+          </div>
+
+          <div class="highlight-box info">
+            <div class="highlight-title">课外扩展：体验原生的 Docker 网络</div>
+            <div class="highlight-content">
+              <p>本讲义的 Part 1 已为 WSL2 和 Linux 原生环境分别提供了对应命令。WSL2 因 Hyper-V 虚拟网络架构的限制，部分实验（尤其是 Part 1.4 的 NAT 出海测试）无法完整复现。</p>
+              <p>如果你想体验 100% 完整的 Docker 网络，建议：</p>
+              <p>1. 在云服务器（如阿里云、腾讯云的 Ubuntu 系统）上部署纯净的 Linux 环境</p>
+              <p>2. 使用 VMware/VirtualBox 本地安装 Linux 虚拟机</p>
+              <p>在这些原生环境中，Part 1 的所有命令均可端到端完整复现，网络流转效果与讲义完全一致。</p>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- 环境清理页 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">附</span>
+          <h1 class="page-title">实验环境清理命令</h1>
+        </div>
+        <div class="page-body">
+              <p class="paragraph">下次上课重新演示前，请先执行以下命令清理环境，避免名称冲突。</p>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-title">Linux 网络命名空间清理</span>
+                  <span class="code-lang">Bash</span>
+                </div>
+                <pre><code># 删除命名空间（会同时删除其中的 veth 接口和 peer 接口）
+# ns-4 删除时，veth-4-peer 自动被删除；peer 端 veth-4 也消失
+# ns-5 删除时同理
+ sudo ip netns del ns-4 2>/dev/null
+ sudo ip netns del ns-5 2>/dev/null
+
+# 删除网桥
+ sudo ip link del br-2 2>/dev/null
+
+# 一键清理所有残留（兜底操作）
+ sudo ip netns list 2>/dev/null | awk '{print 1}' | xargs -I {} sudo ip netns del {} 2>/dev/null
+ ip link show type bridge | awk '{print 2}' | grep -v '^' | xargs -I {} sudo ip link del {} 2>/dev/null
+
+# 验证清理完成
+ sudo ip netns list
+ ip link show type bridge
+ ip addr show
+ iptables -L FORWARD -n -v
+# 如果 br-2、veth-4、veth-5 都不再出现，说明环境已完全清理</code></pre>
+              </div>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-title">Docker 资源清理</span>
+                  <span class="code-lang">Bash</span>
+                </div>
+                <pre><code># 停止并删除本讲创建的所有容器
+ docker stop nginx-1 nginx-2 my-nginx \
+  nginx-web nginx-api \
+  nginx-host nginx-host2 \
+  nginx-none nginx-main nginx-monitor \
+  nginx-proxy \
+  nginx-p1 nginx-p2 dns-test nginx-local nginx-all nginx-random \
+  nginx-isolated 2>/dev/null
+
+ docker rm nginx-1 nginx-2 my-nginx \
+  nginx-web nginx-api \
+  nginx-host nginx-host2 \
+  nginx-none nginx-main nginx-monitor \
+  nginx-proxy \
+  nginx-p1 nginx-p2 dns-test nginx-local nginx-all nginx-random \
+  nginx-isolated 2>/dev/null
+
+# 删除本讲创建的自定义网络
+ docker network rm my-net frontend-network 2>/dev/null
+
+# 一键清理（删除所有已停止的容器和未被使用的网络）
+ docker system prune -f
+
+# 验证清理完成
+ docker ps -a
+ docker network ls</code></pre>
+              </div>
+        </div>
+      </div>
+
+      <div class="next-lecture">
+            <h3>下节预告：第十讲 Docker Compose</h3>
+            <ul>
+              <li>使用docker-compose.yml一键定义多容器应用的网络关系</li>
+              <li>Compose自动创建自定义网络，实现服务发现</li>
+              <li>不再需要手动docker network create和docker run</li>
+            </ul>
       </div>
 
     </div>
@@ -888,7 +1522,7 @@ $ docker network inspect bridge</code></pre>
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">16</span>
+        <span class="total" id="totalPages">20</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
