@@ -39,7 +39,7 @@
               </li>
               <li>
                 <span class="toc-num">02</span>
-                <span class="toc-text">第二部分：Compose文件语法</span>
+                <span class="toc-text">第二部分：YAML基础与Compose文件语法</span>
               </li>
               <li>
                 <span class="toc-num">03</span>
@@ -51,7 +51,7 @@
               </li>
               <li>
                 <span class="toc-num">05</span>
-                <span class="toc-text">第五部分：动手实验</span>
+                <span class="toc-text">第五部分：动手实验与故障排查</span>
               </li>
             </ul>
           </div>
@@ -82,22 +82,36 @@
             <div class="objective-item">
               <div class="objective-num">02</div>
               <div class="objective-content">
+                <h3>掌握YAML基础</h3>
+                <p>从零开始学习<span class="highlight">YAML语法</span>，为编写Compose文件打基础</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
                 <h3>掌握文件语法</h3>
                 <p>熟练编写<span class="highlight">docker-compose.yml</span>配置文件</p>
               </div>
             </div>
             <div class="objective-item">
-              <div class="objective-num">03</div>
+              <div class="objective-num">04</div>
               <div class="objective-content">
                 <h3>实现多容器编排</h3>
                 <p>能够使用Compose<span class="key-point">一键启动</span>多容器应用</p>
               </div>
             </div>
             <div class="objective-item">
-              <div class="objective-num">04</div>
+              <div class="objective-num">05</div>
               <div class="objective-content">
                 <h3>管理服务生命周期</h3>
                 <p>掌握服务的<span class="highlight">启动、停止、扩展</span>操作</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">06</div>
+              <div class="objective-content">
+                <h3>排查常见问题</h3>
+                <p>能够独立解决Compose使用中的<span class="key-point">常见故障</span></p>
               </div>
             </div>
           </div>
@@ -153,6 +167,233 @@
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">1.2</span>
+          <h1 class="page-title">为什么需要Docker Compose？</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">多容器管理的痛点</div>
+            <div class="definition-content">
+              在实际开发和生产环境中，一个完整的应用通常由<span class="highlight">多个容器</span>组成。手动管理这些容器会带来诸多问题：命令冗长、容易出错、难以复现、协作困难。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            假设你要手动启动一个包含Web服务器、数据库和缓存的应用，你需要执行以下步骤：
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">手动启动多个容器的繁琐过程</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 第一步：创建网络（让容器可以互相通信）
+$ docker network create my-app-network
+
+# 第二步：启动数据库容器
+$ docker run -d \
+  --name my-db \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  -v db-data:/var/lib/mysql \
+  --network my-app-network \
+  mysql:8.0
+
+# 第三步：启动Redis缓存容器
+$ docker run -d \
+  --name my-redis \
+  --network my-app-network \
+  redis:alpine
+
+# 第四步：启动后端应用容器
+$ docker run -d \
+  --name my-api \
+  -e DB_HOST=my-db \
+  -e REDIS_HOST=my-redis \
+  --network my-app-network \
+  my-api-image
+
+# 第五步：启动前端Nginx容器
+$ docker run -d \
+  --name my-web \
+  -p 80:80 \
+  --network my-app-network \
+  nginx:alpine</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">思考</div>
+            <p>上面的命令有什么问题？首先，命令非常长，容易打错；其次，启动顺序很重要，如果先启动应用再启动数据库，应用会连接失败；最后，如果要停止或重启，需要逐个操作。Docker Compose正是为了解决这些问题而诞生的。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">手动管理 vs Compose管理对比</div>
+            <div class="kp-content">
+              <p><strong>停止服务</strong>：手动需要逐个执行 <code>docker stop</code> 和 <code>docker rm</code>；Compose只需 <code>docker compose down</code></p>
+              <p><strong>查看日志</strong>：手动需要 <code>docker logs 容器名</code> 逐个查看；Compose只需 <code>docker compose logs</code> 查看所有服务</p>
+              <p><strong>团队协作</strong>：手动需要口头或文档说明启动步骤；Compose只需分享一个 <code>docker-compose.yml</code> 文件</p>
+              <p><strong>环境复现</strong>：手动在新机器上容易遗漏步骤；Compose在任何装有Docker的机器上都能一键复现</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.3</span>
+          <h1 class="page-title">手动编排 vs Compose编排实战对比</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">实战场景</div>
+            <div class="definition-content">
+              假设我们要部署一个<span class="highlight">电商网站</span>，包含：Nginx（前端）、Node.js（后端API）、MySQL（数据库）、Redis（缓存）。下面分别展示手动编排和Compose编排的完整过程。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">手动编排：启动命令（共需执行10+条命令）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 创建专用网络
+$ docker network create ecommerce-network
+
+# 2. 启动MySQL数据库（必须先启动，因为其他服务依赖它）
+$ docker run -d \
+  --name ecommerce-mysql \
+  -e MYSQL_ROOT_PASSWORD=admin123 \
+  -e MYSQL_DATABASE=shop \
+  -v mysql-data:/var/lib/mysql \
+  --network ecommerce-network \
+  mysql:8.0
+
+# 3. 启动Redis缓存
+$ docker run -d \
+  --name ecommerce-redis \
+  --network ecommerce-network \
+  redis:alpine
+
+# 4. 启动Node.js后端（依赖MySQL和Redis）
+$ docker run -d \
+  --name ecommerce-api \
+  -e DB_HOST=ecommerce-mysql \
+  -e DB_PASSWORD=admin123 \
+  -e REDIS_HOST=ecommerce-redis \
+  -p 3000:3000 \
+  --network ecommerce-network \
+  my-node-app:latest
+
+# 5. 启动Nginx前端（依赖后端API）
+$ docker run -d \
+  --name ecommerce-web \
+  -p 80:80 \
+  -v ./nginx.conf:/etc/nginx/nginx.conf:ro \
+  --network ecommerce-network \
+  nginx:alpine
+
+# 6. 查看所有容器状态（需要逐个确认）
+$ docker ps
+
+# 7. 如果某个容器启动失败，查看日志
+$ docker logs ecommerce-api
+$ docker logs ecommerce-mysql
+
+# 8. 停止所有服务（需要逐个停止）
+$ docker stop ecommerce-web ecommerce-api ecommerce-redis ecommerce-mysql
+$ docker rm ecommerce-web ecommerce-api ecommerce-redis ecommerce-mysql
+
+# 9. 删除网络
+$ docker network rm ecommerce-network</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Compose编排：只需一个docker-compose.yml文件</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>version: "3.8"
+
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - ecommerce-net
+
+  api:
+    image: my-node-app:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PASSWORD=admin123
+      - REDIS_HOST=redis
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - ecommerce-net
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: shop
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - ecommerce-net
+
+  redis:
+    image: redis:alpine
+    networks:
+      - ecommerce-net
+
+networks:
+  ecommerce-net:
+
+volumes:
+  mysql-data:</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Compose操作：一条命令完成所有操作</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动所有服务（自动创建网络、按依赖顺序启动）
+$ docker compose up -d
+
+# 查看所有服务状态（一目了然）
+$ docker compose ps
+
+# 查看所有服务日志（统一输出）
+$ docker compose logs -f
+
+# 停止并删除所有服务（一键清理）
+$ docker compose down</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">对比总结</div>
+            <div class="kp-content">
+              <p><strong>命令数量</strong>：手动需要10+条命令，Compose只需1条</p>
+              <p><strong>出错概率</strong>：手动容易打错容器名、漏掉参数；Compose配置一次，多次复用</p>
+              <p><strong>启动顺序</strong>：手动需要人工控制顺序；Compose自动按depends_on启动</p>
+              <p><strong>团队协作</strong>：手动需要写文档说明；Compose直接分享配置文件</p>
+              <p><strong>可维护性</strong>：手动修改需要重新输入命令；Compose修改文件后重新up即可</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.4</span>
           <h1 class="page-title">Compose安装与基本用法</h1>
         </div>
         <div class="page-body">
@@ -165,10 +406,38 @@
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">验证安装</span>
+              <span class="code-title">Linux系统安装Compose（详细步骤）</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 检查Docker Compose版本
+            <pre><code># 步骤1：下载Docker Compose二进制文件
+# 从GitHub官方仓库下载最新版本（WSL2中curl通常已预装）
+$ sudo curl -L \
+  "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+  -o /usr/local/bin/docker-compose
+
+# 如果curl不可用，可以使用wget替代：
+# $ sudo wget -O /usr/local/bin/docker-compose \
+#   "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
+
+# 步骤2：赋予可执行权限
+# 让系统可以运行这个程序
+$ sudo chmod +x /usr/local/bin/docker-compose
+
+# 步骤3：创建软链接（可选，但推荐）
+# 这样可以在任何目录直接使用docker-compose命令
+$ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# 步骤4：验证安装是否成功
+$ docker-compose --version
+# 预期输出类似：docker-compose version 2.20.0, build xxx</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">验证安装（所有系统通用）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 检查Docker Compose版本（新版命令）
 $ docker compose version
 
 # 预期输出：
@@ -180,31 +449,38 @@ $ docker-compose version</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">基本命令</span>
+              <span class="code-title">基本命令速查表</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动所有服务（后台运行）
+            <pre><code># 启动所有服务（后台运行，推荐）
+# -d 表示 detached（分离模式），即在后台运行
 $ docker compose up -d
 
-# 启动并实时查看日志
+# 启动并实时查看日志（前台运行，调试用）
 $ docker compose up
 
-# 停止所有服务
+# 停止所有服务（保留容器和数据）
+$ docker compose stop
+
+# 停止并删除所有容器（数据卷保留）
 $ docker compose down
 
 # 查看服务状态
 $ docker compose ps
 
-# 查看日志
-$ docker compose logs [service-name]
+# 查看某个服务的日志
+$ docker compose logs [服务名称]
 
-# 进入容器调试
-$ docker compose exec [service-name] bash</code></pre>
+# 实时跟踪日志（类似 tail -f）
+$ docker compose logs -f [服务名称]
+
+# 进入容器内部调试（类似docker exec）
+$ docker compose exec [服务名称] bash</code></pre>
           </div>
 
           <div class="tip-box">
             <div class="tip-title">注意</div>
-            <p>新版本使用<code>docker compose</code>（空格），旧版本使用<code>docker-compose</code>（连字符）。两者功能相同。</p>
+            <p>新版本使用<code>docker compose</code>（空格，作为Docker的子命令），旧版本使用<code>docker-compose</code>（连字符，独立命令）。两者功能相同，建议优先使用新版命令。</p>
           </div>
         </div>
       </div>
@@ -212,7 +488,7 @@ $ docker compose exec [service-name] bash</code></pre>
       <div class="page section-page">
         <div class="section-content">
           <span class="section-label">Part 2</span>
-          <h1 class="section-title">Compose文件语法</h1>
+          <h1 class="section-title">YAML基础与Compose文件语法</h1>
           <p class="section-desc">掌握docker-compose.yml配置</p>
         </div>
       </div>
@@ -220,7 +496,173 @@ $ docker compose exec [service-name] bash</code></pre>
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">2.1</span>
-          <h1 class="page-title">docker-compose.yml基础结构</h1>
+          <h1 class="page-title">YAML是什么？从零开始学</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">YAML定义</div>
+            <div class="definition-content">
+              YAML（YAML Ain't Markup Language）是一种<span class="highlight">人类可读的数据序列化格式</span>。它的设计目标是让人们更容易读写配置文件。YAML使用缩进来表示层级关系，类似于Python的语法风格。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            可以把YAML理解为一种"有格式的文本"，用来描述数据的结构。就像填写表格一样，YAML通过简单的规则让计算机理解你想要表达的信息。Docker Compose使用YAML格式来定义多容器应用的配置。
+          </p>
+
+          <div class="knowledge-point">
+            <div class="kp-title">YAML与JSON的关系</div>
+            <div class="kp-content">
+              <p>如果你听说过JSON，可以把YAML理解为JSON的"简化版"。YAML更易于人类阅读和编写，而JSON更易于机器解析。两者可以互相转换。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">YAML vs JSON 同一份数据的两种写法</span>
+              <span class="code-lang">YAML / JSON</span>
+            </div>
+            <pre><code># YAML 写法（人类友好，缩进表示层级）
+person:
+  name: 张三
+  age: 25
+  is_student: false
+  hobbies:
+    - 编程
+    - 阅读
+    - 游泳
+  address:
+    city: 北京
+    zipcode: "100000"
+
+# 对应的 JSON 写法（机器友好，大括号表示层级）
+{
+  "person": {
+    "name": "张三",
+    "age": 25,
+    "is_student": false,
+    "hobbies": ["编程", "阅读", "游泳"],
+    "address": {
+      "city": "北京",
+      "zipcode": "100000"
+    }
+  }
+}</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">YAML的其他使用场景</div>
+            <div class="kp-content">
+              <p>YAML不仅用于Docker Compose，还广泛应用于各种配置场景：</p>
+              <p>- <strong>CI/CD流水线</strong>：GitHub Actions、GitLab CI、Travis CI的配置文件都是YAML格式</p>
+              <p>- <strong>Kubernetes</strong>：K8s的部署文件（Deployment、Service等）使用YAML定义</p>
+              <p>- <strong>Ansible</strong>：自动化运维工具Ansible的Playbook使用YAML编写</p>
+              <p>- <strong>Helm</strong>：Kubernetes包管理工具Helm的Chart配置文件</p>
+              <p>- <strong>Spring Boot</strong>：Java框架Spring Boot支持application.yml作为配置文件</p>
+              <p>- <strong>静态网站生成器</strong>：Jekyll、Hugo等工具的文章 front matter 使用YAML</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">YAML vs JSON 对比总结</span>
+              <span class="code-lang">对比表</span>
+            </div>
+            <pre><code>特性              YAML                      JSON
+─────────────────────────────────────────────────────────────
+可读性            高（无括号，纯缩进）         中（括号多，较紧凑）
+注释支持          支持（# 开头）              不支持
+字符串引号        通常不需要                 必须双引号
+数据冗余          低（更简洁）               高（键名需重复引号）
+解析难度          稍复杂（缩进敏感）          简单（语法严格）
+适用场景          配置文件、人类编辑          数据交换、API接口
+文件扩展名        .yml / .yaml              .json
+─────────────────────────────────────────────────────────────
+
+# 结论：
+# - 如果是人类编写和阅读的配置文件 → 优先选择 YAML
+# - 如果是程序之间的数据交换 → 优先选择 JSON
+# - Docker Compose 选择 YAML 正是因为配置文件需要人类频繁编辑</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">YAML基本语法规则</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code># 规则1：使用缩进表示层级关系
+# 缩进必须使用空格（不能用Tab键），通常使用2个空格
+parent:
+  child1: value1
+  child2: value2
+
+# 规则2：键值对用冒号+空格分隔
+name: 张三
+age: 25
+
+# 规则3：列表用短横线表示
+fruits:
+  - apple
+  - banana
+  - orange
+
+# 规则4：注释用井号开头
+# 这是一行注释，不会被程序读取
+
+# 规则5：字符串可以不用引号
+# 但如果包含特殊字符，需要用引号包裹
+description: 这是一个普通字符串
+special: "包含:冒号的字符串"</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">YAML数据类型示例</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code># 字符串（String）
+name: Alice
+
+# 整数（Integer）
+age: 25
+
+# 浮点数（Float）
+price: 19.99
+
+# 布尔值（Boolean）
+is_active: true
+
+# 空值（Null）
+empty_value: null
+
+# 列表/数组（List）
+colors:
+  - red
+  - green
+  - blue
+
+# 对象/字典（Dictionary）
+person:
+  name: Bob
+  age: 30
+  email: bob@example.com
+
+# 嵌套结构
+company:
+  name: Tech Corp
+  employees:
+    - name: Alice
+      role: Developer
+    - name: Bob
+      role: Designer</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.2</span>
+          <h1 class="page-title">YAML在Compose中的应用</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
@@ -231,42 +673,52 @@ $ docker compose exec [service-name] bash</code></pre>
           </div>
 
           <p class="paragraph">
-            YAML是一种人类可读的数据序列化格式，结构通过缩进来表示。Compose文件定义了"服务"（运行的容器）、"网络"（容器间通信）、"数据卷"（持久化存储）。
+            在Docker Compose中，YAML文件描述了"要运行哪些容器"、"每个容器用什么镜像"、"容器之间如何通信"、"数据存储在哪里"等关键信息。理解YAML语法是编写Compose文件的基础。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker-compose.yml基本结构</span>
+              <span class="code-title">docker-compose.yml基本结构详解</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code># 版本声明（可选，但建议指定）
+# 不同版本支持不同的功能特性
 version: "3.8"
 
-# 服务定义
+# 服务定义（核心部分）
+# services是一个字典，每个键对应一个服务
 services:
-  # 服务名称（自定义）
+  # 服务名称：web（自定义，用于标识服务）
   web:
+    # 使用哪个镜像来创建容器
     image: nginx:alpine
+    # 端口映射：将容器的80端口映射到宿主机的8080端口
     ports:
       - "8080:80"
+    # 连接的网络
     networks:
       - frontend
 
+  # 服务名称：db（数据库服务）
   db:
     image: mysql:8.0
+    # 环境变量：设置MySQL的root密码
     environment:
       MYSQL_ROOT_PASSWORD: secret
+    # 数据卷挂载：持久化存储数据库数据
     volumes:
       - db-data:/var/lib/mysql
     networks:
       - backend
 
 # 网络定义
+# 自定义网络，用于容器间通信
 networks:
   frontend:
   backend:
 
 # 数据卷定义
+# 命名数据卷，用于持久化存储
 volumes:
   db-data:</code></pre>
           </div>
@@ -274,9 +726,9 @@ volumes:
           <div class="knowledge-point">
             <div class="kp-title">核心概念</div>
             <div class="kp-content">
-              <p>- <span class="key-point">services</span>：定义要运行的容器，每个服务对应一个容器</p>
-              <p>- <span class="key-point">networks</span>：定义容器间通信的网络</p>
-              <p>- <span class="key-point">volumes</span>：定义持久化存储</p>
+              <p>- <span class="key-point">services</span>：定义要运行的容器，每个服务对应一个容器。这是Compose文件的核心部分。</p>
+              <p>- <span class="key-point">networks</span>：定义容器间通信的网络。同一网络中的容器可以通过服务名互相访问。</p>
+              <p>- <span class="key-point">volumes</span>：定义持久化存储。即使容器被删除，数据卷中的数据仍然存在。</p>
             </div>
           </div>
         </div>
@@ -284,7 +736,7 @@ volumes:
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">2.2</span>
+          <span class="page-number">2.3</span>
           <h1 class="page-title">服务定义详解</h1>
         </div>
         <div class="page-body">
@@ -296,53 +748,69 @@ volumes:
           </div>
 
           <p class="paragraph">
-            服务定义中包含：使用哪个镜像、暴露哪些端口、挂载哪些数据卷、设置哪些环境变量等。这些配置与docker run命令的参数一一对应。
+            服务定义中包含：使用哪个镜像、暴露哪些端口、挂载哪些数据卷、设置哪些环境变量等。这些配置与docker run命令的参数一一对应。可以把服务定义理解为"给docker run命令写一份配置文件"。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">服务定义示例</span>
+              <span class="code-title">服务定义完整示例（逐行解释）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
   web:
-    # 镜像（可以使用已有的镜像）
+    # 镜像：指定容器基于哪个镜像创建
+    # 格式：仓库名/镜像名:标签（标签省略时默认latest）
     image: nginx:alpine
 
-    # 容器名称（可选）
-    container_name: my-web
+    # 容器名称：自定义容器的名字（可选）
+    # 如果不指定，Compose会自动生成：目录名_服务名_序号
+    container_name: my-web-server
 
-    # 端口映射
+    # 端口映射：将容器端口暴露到宿主机
+    # 格式："宿主机端口:容器端口"
+    # 这样外部用户可以通过宿主机IP+端口访问容器服务
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "8080:80"    # 访问宿主机的8080端口，会转发到容器的80端口
+      - "8443:443"   # HTTPS端口映射
 
-    # 环境变量
+    # 环境变量：向容器内部传递配置信息
+    # 容器内的应用程序可以读取这些变量来改变行为
     environment:
-      - NODE_ENV=production
-      - DB_HOST=db
+      - NODE_ENV=production    # 告诉Node.js运行在生成环境
+      - DB_HOST=db             # 告诉应用数据库地址是"db"（服务名）
 
-    # 数据卷挂载
+    # 数据卷挂载：将宿主机目录或数据卷映射到容器内部
+    # 用于持久化数据或共享代码
     volumes:
+      # 宿主机目录挂载（开发时常用，代码修改立即生效）
       - ./html:/usr/share/nginx/html
+      # 命名数据卷挂载（生产环境推荐，数据持久化）
       - nginx-logs:/var/log/nginx
 
-    # 依赖服务（启动顺序）
+    # 依赖服务：控制启动顺序
+    # Compose会先启动api和db，再启动web
     depends_on:
       - api
       - db
 
-    # 网络连接
+    # 网络连接：指定服务加入哪些网络
+    # 同一网络中的服务可以互相访问
     networks:
-      - frontend
-      - backend
+      - frontend    # 连接前端网络（面向用户）
+      - backend     # 连接后端网络（内部通信）
 
-    # 重启策略
+    # 重启策略：容器退出时如何处理
+    # unless-stopped：除非手动停止，否则总是重启
+    # always：总是重启
+    # on-failure：仅在非零退出码时重启
     restart: unless-stopped
 
   api:
     image: python:3.11-slim
+    # 覆盖默认启动命令
+    # 容器启动时执行这个命令，而不是镜像的默认命令
     command: python app.py
+    # 工作目录：容器内命令执行的默认目录
     working_dir: /app
     volumes:
       - ./app:/app
@@ -352,12 +820,167 @@ volumes:
     networks:
       - backend</code></pre>
           </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常见服务配置举例（Web应用栈）</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>services:
+  # 前端Nginx服务（静态网站服务器）
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  # 后端API服务（Node.js应用）
+  backend:
+    image: node:18-alpine
+    working_dir: /app
+    command: npm start
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=database
+      - REDIS_HOST=cache
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - database
+      - cache
+
+  # 数据库服务（PostgreSQL）
+  database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: secret123
+      POSTGRES_DB: myapp
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # 缓存服务（Redis）
+  cache:
+    image: redis:alpine
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  redis-data:</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">服务配置常用参数速查</div>
+            <div class="kp-content">
+              <p>- <code>image</code>：指定镜像，如 <code>nginx:alpine</code></p>
+              <p>- <code>build</code>：从Dockerfile构建，如 <code>build: ./app</code></p>
+              <p>- <code>ports</code>：端口映射，如 <code>- "8080:80"</code></p>
+              <p>- <code>volumes</code>：数据卷挂载，如 <code>- ./data:/app/data</code></p>
+              <p>- <code>environment</code>：环境变量，如 <code>KEY: value</code></p>
+              <p>- <code>depends_on</code>：依赖服务，控制启动顺序</p>
+              <p>- <code>networks</code>：连接的网络</p>
+              <p>- <code>restart</code>：重启策略，如 <code>unless-stopped</code></p>
+              <p>- <code>command</code>：覆盖默认启动命令</p>
+              <p>- <code>working_dir</code>：设置工作目录</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">2.3</span>
+          <span class="page-number">2.4</span>
+          <h1 class="page-title">环境变量与配置管理</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">环境变量的作用</div>
+            <div class="definition-content">
+              环境变量是<span class="highlight">向容器内部传递配置信息</span>的一种方式。通过环境变量，可以在不修改镜像的情况下改变容器的行为，例如数据库连接地址、密码、调试模式等。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            在实际项目中，开发环境、测试环境和生产环境的配置往往不同。使用环境变量可以将配置与代码分离，实现"一份代码，多处部署"。Docker Compose提供了多种设置环境变量的方式。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">环境变量的三种设置方式</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>services:
+  web:
+    image: myapp:latest
+    
+    # 方式1：直接在docker-compose.yml中定义（适合简单场景）
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=3306
+
+  api:
+    image: myapi:latest
+    
+    # 方式2：键值对形式（更简洁）
+    environment:
+      API_KEY: "123456789"
+      DEBUG_MODE: "false"
+
+  db:
+    image: mysql:8.0
+    
+    # 方式3：从.env文件加载（推荐，适合敏感信息）
+    # 在docker-compose.yml同级目录创建.env文件
+    # .env文件内容示例：
+    # MYSQL_ROOT_PASSWORD=mysecretpassword
+    # MYSQL_DATABASE=myapp
+    env_file:
+      - .env
+    # 这样密码不会直接写在配置文件中，更安全</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">.env文件示例</span>
+              <span class="code-lang">文本</span>
+            </div>
+            <pre><code># .env 文件
+# 这个文件存储环境变量，不会被提交到版本控制（应加入.gitignore）
+
+# 数据库配置
+MYSQL_ROOT_PASSWORD=my_secret_password_123
+MYSQL_DATABASE=production_db
+MYSQL_USER=app_user
+MYSQL_PASSWORD=app_password_456
+
+# 应用配置
+APP_PORT=8080
+APP_DEBUG=false
+LOG_LEVEL=info
+
+# 第三方服务配置
+REDIS_HOST=redis
+REDIS_PORT=6379</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">安全提示</div>
+            <p>密码等敏感信息不要直接写在docker-compose.yml中，应该使用.env文件，并将.env加入.gitignore，避免泄露到代码仓库。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.5</span>
           <h1 class="page-title">构建镜像与Dockerfile</h1>
         </div>
         <div class="page-body">
@@ -369,45 +992,50 @@ volumes:
           </div>
 
           <p class="paragraph">
-            使用build时，Compose会先执行docker build，然后用构建好的镜像启动容器。这对于需要根据代码变化重新构建的场景非常有用。
+            使用build时，Compose会先执行docker build，然后用构建好的镜像启动容器。这对于需要根据代码变化重新构建的场景非常有用。在开发过程中，当你的代码发生变化时，只需要重新执行docker compose up --build即可重新构建并启动服务。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">使用Dockerfile构建</span>
+              <span class="code-title">使用Dockerfile构建（详细配置）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
   web:
-    # 指定构建上下文（包含Dockerfile的目录）
+    # 完整build配置
     build:
+      # context：构建上下文，指定包含Dockerfile的目录
+      # Docker会将这个目录下的所有文件发送给Docker守护进程
       context: ./webapp
+      
+      # dockerfile：指定Dockerfile的文件名（默认就是Dockerfile）
       dockerfile: Dockerfile
-
-    # 也可以指定Dockerfile文件名
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-
-    # 构建参数（对应ARG）
-    build:
-      context: .
+      
+      # args：构建参数，对应Dockerfile中的ARG指令
+      # 可以在构建时传递变量值
       args:
         VERSION: 1.0
         NODE_ENV: production
+    
+    # 镜像名称：构建完成后给镜像打标签
+    # 如果不指定，镜像名会是：目录名_服务名
+    image: my-webapp:1.0
 
-    # 镜像名称（构建后打标签）
-    image: my-webapp:1.0</code></pre>
+  # 简写形式（如果Dockerfile在当前目录且就叫Dockerfile）
+  api:
+    build: ./api
+    ports:
+      - "5000:5000"</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">完整的Web应用示例</span>
+              <span class="code-title">完整的Web应用示例（含构建配置）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
   web:
-    build: ./web
+    build: ./web          # 从./web目录构建
     ports:
       - "8080:80"
     depends_on:
@@ -416,7 +1044,7 @@ volumes:
       - app-net
 
   api:
-    build: ./api
+    build: ./api          # 从./api目录构建
     environment:
       - DB_HOST=db
       - REDIS_HOST=redis
@@ -427,7 +1055,7 @@ volumes:
       - app-net
 
   db:
-    image: mysql:8.0
+    image: mysql:8.0      # 直接使用官方镜像
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: myapp
@@ -437,7 +1065,7 @@ volumes:
       - app-net
 
   redis:
-    image: redis:alpine
+    image: redis:alpine   # 直接使用官方镜像
     networks:
       - app-net
 
@@ -446,6 +1074,16 @@ networks:
 
 volumes:
   db-data:</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">什么时候使用build？</div>
+            <div class="kp-content">
+              <p>- 当你需要运行自己编写的代码时（如Python、Node.js应用）</p>
+              <p>- 当官方镜像不能满足需求，需要安装额外软件包时</p>
+              <p>- 当需要在镜像中嵌入配置文件或静态资源时</p>
+              <p>- 开发环境中代码频繁变化，需要频繁重新构建时</p>
+            </div>
           </div>
         </div>
       </div>
@@ -464,78 +1102,131 @@ volumes:
           <h1 class="page-title">LEMP栈部署实践</h1>
         </div>
         <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">LEMP栈介绍</div>
+            <div class="definition-content">
+              LEMP栈是指<span class="highlight">Linux + Nginx + MySQL + PHP</span>的Web运行环境。这是目前最流行的Web开发环境之一，广泛应用于PHP网站和应用的部署。使用Compose可以一键部署完整的LEMP环境。
+            </div>
+          </div>
+
           <p class="paragraph">
-            LEMP栈是指Linux + Nginx + MySQL + PHP的Web运行环境。使用Compose可以一键部署完整的LEMP环境。
+            LEMP栈的各个组件分工如下：Nginx作为Web服务器处理HTTP请求；PHP-FPM处理PHP代码执行；MySQL存储网站数据；phpMyAdmin提供数据库管理界面。通过Compose，我们可以将这些组件编排在一起，实现一键部署。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">LEMP栈 docker-compose.yml</span>
+              <span class="code-title">LEMP栈 docker-compose.yml（完整注释版）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
 
 services:
+  # Nginx Web服务器
+  # 作用：接收用户请求，转发给PHP处理，返回结果
   nginx:
     image: nginx:alpine
     ports:
+      # 将宿主机的80端口映射到容器的80端口
+      # 用户访问 http://localhost 即可访问网站
       - "80:80"
     volumes:
+      # 挂载Nginx配置文件（ro表示只读）
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # 挂载网站代码目录
       - ./html:/var/www/html
     depends_on:
+      # Nginx依赖PHP服务，确保PHP先启动
       - php
     networks:
       - app-net
 
+  # PHP-FPM 服务
+  # 作用：执行PHP代码，将结果返回给Nginx
   php:
     image: php:8-fpm-alpine
     volumes:
+      # 共享网站代码目录
+      # Nginx和PHP都需要访问相同的代码文件
       - ./html:/var/www/html
     networks:
       - app-net
 
+  # MySQL 数据库
+  # 作用：存储网站的数据（用户信息、文章内容等）
   mysql:
     image: mysql:8.0
     environment:
+      # 设置数据库root密码（最高权限账户）
       MYSQL_ROOT_PASSWORD: rootsecret
+      # 自动创建数据库
       MYSQL_DATABASE: myapp
+      # 自动创建普通用户
       MYSQL_USER: appuser
       MYSQL_PASSWORD: appsecret
     volumes:
+      # 持久化数据库数据
+      # 即使容器删除，数据也不会丢失
       - mysql-data:/var/lib/mysql
     networks:
       - app-net
 
+  # phpMyAdmin 数据库管理工具
+  # 作用：通过Web界面管理MySQL数据库
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
+      # 通过 http://localhost:8080 访问phpMyAdmin
       - "8080:80"
     environment:
+      # 告诉phpMyAdmin MySQL服务的位置
       PMA_HOST: mysql
     depends_on:
+      # 依赖MySQL服务
       - mysql
     networks:
       - app-net
 
+# 定义网络
 networks:
   app-net:
+    # 使用bridge驱动（默认）
+    driver: bridge
 
+# 定义数据卷
 volumes:
-  mysql-data:</code></pre>
+  mysql-data:
+    # 使用local驱动（默认，存储在宿主机本地）
+    driver: local</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">启动和访问</span>
+              <span class="code-title">启动和访问（操作步骤）</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 启动所有服务
+            <pre><code># 步骤1：进入项目目录
+$ cd lemp-project
+
+# 步骤2：创建必要的目录和文件
+$ mkdir -p html
+$ echo "<?php phpinfo(); ?>" > html/index.php
+
+# 步骤3：启动所有服务（后台运行）
 $ docker compose up -d
 
-# 访问服务
-# Web应用：http://localhost:80
-# phpMyAdmin：http://localhost:8080</code></pre>
+# 步骤4：查看服务状态，确认所有容器都在运行
+$ docker compose ps
+
+# 步骤5：访问服务验证
+# Web应用：打开浏览器访问 http://localhost
+# 应该看到PHP信息页面
+
+# phpMyAdmin：打开浏览器访问 http://localhost:8080
+# 用户名：root，密码：rootsecret
+
+# 步骤6：查看日志（如果出现问题）
+$ docker compose logs -f nginx
+$ docker compose logs -f mysql</code></pre>
           </div>
         </div>
       </div>
@@ -546,63 +1237,85 @@ $ docker compose up -d
           <h1 class="page-title">Python Flask应用编排</h1>
         </div>
         <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Flask应用架构</div>
+            <div class="definition-content">
+              Flask是一个轻量级的Python Web框架。一个典型的Flask应用通常包含：Flask应用服务器、Redis缓存、Nginx反向代理。我们将演示如何使用Compose编排这三个服务。
+            </div>
+          </div>
+
           <p class="paragraph">
-            接下来演示一个完整的Python Flask应用，使用Redis作为缓存，Nginx作为反向代理。
+            在这个示例中，Nginx作为反向代理接收外部请求，转发给Flask应用处理；Flask应用使用Redis存储会话数据和缓存；Redis作为内存数据库提供高速读写。这种架构在实际生产环境中非常常见。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">项目结构</span>
+              <span class="code-title">项目结构（文件组织方式）</span>
               <span class="code-lang">文本</span>
             </div>
-            <pre><code>flask-app/
-├── docker-compose.yml
-├── app/
-│   ├── app.py
-│   ├── requirements.txt
-│   └── Dockerfile
-├── nginx/
-│   └── nginx.conf
-└── redis/
-    └── redis.conf</code></pre>
+            <pre><code>flask-app/                    # 项目根目录
+├── docker-compose.yml        # Compose配置文件
+├── app/                      # Flask应用目录
+│   ├── app.py               # Flask主程序
+│   ├── requirements.txt     # Python依赖包列表
+│   └── Dockerfile           # 构建Flask应用的Dockerfile
+├── nginx/                    # Nginx配置目录
+│   └── nginx.conf           # Nginx配置文件
+└── redis/                    # Redis配置目录
+    └── redis.conf           # Redis配置文件</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker-compose.yml</span>
+              <span class="code-title">docker-compose.yml（Flask应用）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
 
 services:
+  # Flask Web应用
   web:
-    build: ./app
+    build: ./app            # 从app目录构建镜像
     ports:
+      # 开发调试时可以直接访问Flask
       - "5000:5000"
     environment:
+      # 告诉Flask Redis的位置（使用服务名）
       - REDIS_HOST=redis
       - FLASK_ENV=production
     depends_on:
+      # 确保Redis先启动
       - redis
     networks:
       - app-net
 
+  # Nginx 反向代理
+  # 作用：接收外部请求，转发给Flask应用
+  # 优点：可以负载均衡、静态文件服务、SSL终止
   nginx:
     image: nginx:alpine
     ports:
+      # 用户通过80端口访问网站
       - "80:80"
     volumes:
+      # 挂载Nginx配置
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
+      # Nginx依赖web服务
       - web
     networks:
       - app-net
 
+  # Redis 缓存服务
+  # 作用：存储会话、缓存数据、计数器等
   redis:
     image: redis:alpine
+    # 使用自定义配置文件启动
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
+      # 挂载配置文件
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      # 持久化Redis数据
       - redis-data:/data
     networks:
       - app-net
@@ -612,6 +1325,254 @@ networks:
 
 volumes:
   redis-data:</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Flask应用代码示例（app/app.py）</span>
+              <span class="code-lang">Python</span>
+            </div>
+            <pre><code>from flask import Flask
+import redis
+import os
+
+app = Flask(__name__)
+
+# 从环境变量读取Redis连接信息
+# 在docker-compose.yml中设置了REDIS_HOST=redis
+redis_host = os.environ.get('REDIS_HOST', 'localhost')
+redis_client = redis.Redis(host=redis_host, port=6379)
+
+@app.route('/')
+def hello():
+    # 使用Redis计数器记录访问次数
+    count = redis_client.incr('visit_count')
+    return f'Hello! 这是第 {count} 次访问。'
+
+@app.route('/health')
+def health():
+    # 健康检查接口
+    return {'status': 'healthy'}
+
+if __name__ == '__main__':
+    # 监听所有网络接口，端口5000
+    app.run(host='0.0.0.0', port=5000)</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">更多多容器编排场景举例</div>
+            <div class="kp-content">
+              <p><strong>场景1：微服务架构</strong></p>
+              <p>用户服务、订单服务、支付服务各自独立部署，通过Compose统一管理，每个服务独立扩展。</p>
+              <p><strong>场景2：数据分析平台</strong></p>
+              <p>Jupyter Notebook + Spark + Hadoop，数据科学家可以快速搭建分析环境。</p>
+              <p><strong>场景3：消息队列系统</strong></p>
+              <p>RabbitMQ + 生产者应用 + 消费者应用，演示消息的发送和接收流程。</p>
+              <p><strong>场景4：监控系统</strong></p>
+              <p>Prometheus + Grafana + Node Exporter，收集和可视化系统指标。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">微服务架构 docker-compose.yml 示例</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>version: "3.8"
+
+services:
+  # API网关（统一入口）
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./gateway.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - user-service
+      - order-service
+    networks:
+      - micro-net
+
+  # 用户服务
+  user-service:
+    build: ./user-service
+    environment:
+      - DB_HOST=user-db
+      - SERVICE_NAME=user
+    depends_on:
+      - user-db
+    networks:
+      - micro-net
+
+  # 订单服务
+  order-service:
+    build: ./order-service
+    environment:
+      - DB_HOST=order-db
+      - USER_SERVICE_URL=http://user-service:8080
+    depends_on:
+      - order-db
+      - user-service
+    networks:
+      - micro-net
+
+  # 用户数据库
+  user-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - micro-net
+
+  # 订单数据库
+  order-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+    networks:
+      - micro-net
+
+networks:
+  micro-net:
+
+volumes:
+  user-db-data:
+  order-db-data:</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.3</span>
+          <h1 class="page-title">操作步骤演示：从零开始部署</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">部署流程</div>
+            <div class="definition-content">
+              使用Docker Compose部署应用的完整流程包括：<span class="highlight">准备环境、编写配置、构建镜像、启动服务、验证测试</span>五个阶段。下面以Flask应用为例，演示完整的操作步骤。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤1：创建项目目录结构</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建项目根目录
+$ mkdir flask-app
+$ cd flask-app
+
+# 创建子目录
+$ mkdir app nginx redis
+
+# 查看目录结构（如未安装tree，可使用 ls -R）
+$ tree
+# 输出：
+# flask-app/
+# ├── app/
+# ├── nginx/
+# └── redis/
+
+# 备选方案（无需安装tree）
+$ ls -R
+# 输出：
+# .:
+# app  nginx  redis
+#
+# ./app:
+#
+# ./nginx:
+#
+# ./redis:</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤2：编写应用代码和配置</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建Flask应用代码
+$ cat > app/app.py << 'EOF'
+from flask import Flask
+import redis
+import os
+
+app = Flask(__name__)
+redis_host = os.environ.get('REDIS_HOST', 'localhost')
+redis_client = redis.Redis(host=redis_host, port=6379)
+
+@app.route('/')
+def hello():
+    count = redis_client.incr('visit_count')
+    return f'Hello! Visit count: {count}'
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+EOF
+
+# 创建Python依赖文件
+$ cat > app/requirements.txt << 'EOF'
+flask==2.3.0
+redis==4.5.0
+EOF
+
+# 创建Dockerfile
+$ cat > app/Dockerfile << 'EOF'
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY app.py .
+CMD ["python", "app.py"]
+EOF</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤3：启动服务并验证</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 构建镜像并启动所有服务
+$ docker compose up -d --build
+
+# --build 参数：强制重新构建镜像
+# -d 参数：后台运行
+
+# 查看服务状态
+$ docker compose ps
+# 输出示例：
+# NAME                IMAGE               STATUS
+# flask-app-web-1     flask-app-web       Up 10 seconds
+# flask-app-redis-1   redis:alpine        Up 10 seconds
+
+# 测试访问
+$ curl http://localhost:5000
+# 输出：Hello! Visit count: 1
+
+$ curl http://localhost:5000
+# 输出：Hello! Visit count: 2
+
+# 查看日志
+$ docker compose logs -f web
+
+# 停止服务
+$ docker compose down</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">常见问题</div>
+            <p>如果启动失败，首先检查端口是否被占用（使用<code>sudo lsof -i :5000</code>或<code>sudo ss -tlnp | grep 5000</code>查看），然后查看日志定位问题（<code>docker compose logs</code>）。</p>
           </div>
         </div>
       </div>
@@ -638,55 +1599,47 @@ volumes:
           </div>
 
           <p class="paragraph">
-            depends_on解决的问题是启动顺序，但不会等待数据库完全就绪（接受连接）才启动应用。对于需要等待服务真正就绪的场景，需要配合健康检查（healthcheck）使用。
+            depends_on解决的问题是启动顺序，但不会等待数据库完全就绪（接受连接）才启动应用。对于需要等待服务真正就绪的场景，需要配合健康检查（healthcheck）使用。可以把depends_on理解为"告诉Compose哪个服务应该先启动"，而不是"等待服务完全准备好"。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">服务依赖示例</span>
+              <span class="code-title">服务依赖示例（启动顺序）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
   web:
+    image: nginx:alpine
     depends_on:
       - api
       - db
-    # api和db会先于web启动
+    # 启动顺序：api和db先启动，web后启动
+    # 但web不会等待api和db"就绪"，只是等待它们"启动"
 
   api:
+    image: myapi:latest
     depends_on:
       - db
       - redis
-    # redis和db先于api启动
+    # 启动顺序：db和redis最先启动，api第二启动
 
   db:
     image: mysql:8.0
-    # db最先启动
+    # db最先启动（没有依赖其他服务）
 
   redis:
     image: redis:alpine
-    # redis第二启动</code></pre>
+    # redis第二启动（没有依赖其他服务）</code></pre>
           </div>
 
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">带健康检查的依赖</span>
-              <span class="code-lang">YAML</span>
+          <div class="knowledge-point">
+            <div class="kp-title">depends_on的局限性</div>
+            <div class="kp-content">
+              <p>- depends_on只控制启动顺序，不等待服务就绪</p>
+              <p>- 例如数据库容器启动了，但数据库服务可能还在初始化</p>
+              <p>- 应用容器可能会因为连接不上数据库而报错退出</p>
+              <p>- 解决方案：使用健康检查（healthcheck）或重试机制</p>
             </div>
-            <pre><code>services:
-  db:
-    image: mysql:8.0
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 3s
-      retries: 3
-
-  web:
-    depends_on:
-      db:
-        condition: service_healthy
-    # 只有当db健康检查通过后，web才会启动</code></pre>
           </div>
         </div>
       </div>
@@ -694,18 +1647,127 @@ volumes:
       <div class="page content-page">
         <div class="page-header">
           <span class="page-number">4.2</span>
+          <h1 class="page-title">健康检查专题讲解</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">健康检查（Healthcheck）</div>
+            <div class="definition-content">
+              健康检查是Docker提供的一种机制，用于<span class="highlight">检测容器内的服务是否正常运行</span>。通过定期执行检查命令，Docker可以判断容器是"健康"、"不健康"还是"正在启动"。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            健康检查解决了depends_on的局限性问题。当配置了健康检查后，其他服务可以等待依赖服务真正"健康"后再启动，而不是仅仅等待容器启动。这对于数据库等需要初始化时间的服务非常重要。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">健康检查配置详解</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+    # 健康检查配置
+    healthcheck:
+      # test：执行的检查命令
+      # 这里使用mysqladmin ping检查MySQL是否响应
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      
+      # interval：检查间隔时间（多久检查一次）
+      interval: 5s
+      
+      # timeout：单次检查的超时时间
+      # 如果命令在3秒内没有返回，认为检查失败
+      timeout: 3s
+      
+      # retries：失败重试次数
+      # 连续失败3次后，认为容器不健康
+      retries: 3
+      
+      # start_period：启动宽限期
+      # 容器启动后10秒内，检查失败不计入重试次数
+      # 给服务足够的初始化时间
+      start_period: 10s
+
+  web:
+    image: myapp:latest
+    depends_on:
+      db:
+        # 只有当db健康检查通过后，web才会启动
+        condition: service_healthy
+    # 这样web服务会等待MySQL完全就绪后才启动</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常见服务的健康检查命令</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>services:
+  # MySQL/MariaDB 健康检查
+  mysql:
+    image: mysql:8.0
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # PostgreSQL 健康检查
+  postgres:
+    image: postgres:15
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Redis 健康检查
+  redis:
+    image: redis:alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Web应用健康检查（HTTP接口）
+  web:
+    image: myweb:latest
+    healthcheck:
+      # 使用curl检查HTTP接口是否响应
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">查看健康状态</div>
+            <p>使用<code>docker compose ps</code>可以查看容器的健康状态。状态包括：starting（启动中）、healthy（健康）、unhealthy（不健康）。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.3</span>
           <h1 class="page-title">服务扩展与副本</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
             <div class="definition-term">服务扩展原理</div>
             <div class="definition-content">
-              Compose支持<span class="highlight">水平扩展</span>，即为一个服务启动多个容器副本（replicas）。这可以实现负载均衡和高可用。
+              Compose支持<span class="highlight">水平扩展</span>，即为一个服务启动多个容器副本（replicas）。这可以实现负载均衡和高可用。当访问量增加时，可以通过扩展服务来提高处理能力。
             </div>
           </div>
 
           <p class="paragraph">
-            当扩展服务时，Compose会启动多个容器，它们共享同一个网络和数据卷（如果是挂载的宿主机目录，则共享同一份数据）。副本数由--scale参数指定。
+            当扩展服务时，Compose会启动多个容器，它们共享同一个网络和数据卷（如果是挂载的宿主机目录，则共享同一份数据）。副本数由--scale参数指定。需要注意的是，如果多个容器绑定同一端口，需要使用负载均衡器（如Nginx）来分发请求。
           </p>
 
           <div class="code-block">
@@ -716,108 +1778,227 @@ volumes:
             <pre><code># 扩展web服务到3个副本
 $ docker compose up -d --scale web=3
 
-# 注意：如果多个容器绑定同一端口，需要使用ports配置中的随机端口
-# 或者使用nginx作为负载均衡器
-
 # 查看扩展后的服务状态
-$ docker compose ps</code></pre>
+$ docker compose ps
+# 会看到web服务有3个容器在运行
+
+# 同时扩展多个服务
+$ docker compose up -d --scale web=3 --scale api=2
+
+# 注意：如果多个容器绑定同一端口，需要使用负载均衡器
+# 或者使用ports配置中的随机端口（不推荐用于生产）</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">负载均衡配置</span>
+              <span class="code-title">负载均衡配置（Nginx + 多副本）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
+  # Nginx作为负载均衡器
   nginx:
     image: nginx:alpine
     ports:
+      # 只有Nginx暴露端口给用户访问
       - "80:80"
     volumes:
+      # 挂载Nginx配置文件
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
 
+  # Web应用服务（3个副本）
   web:
     image: myweb:latest
-    # 扩展到3个副本
+    # 不暴露端口（通过Nginx反向代理访问）
+    # 每个副本会自动分配不同的内部端口
     deploy:
       replicas: 3
     # 或者使用命令行：--scale web=3
 
-# nginx.conf中配置负载均衡
+# nginx.conf配置示例：
 # upstream backend {
-#     server web:5000;  # Compose会自动解析到所有副本
+#     # Compose会自动将web服务名解析到所有副本
+#     server web:5000;
+# }
+# 
+# server {
+#     listen 80;
+#     location / {
+#         proxy_pass http://backend;
+#     }
 # }</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">扩展的注意事项</div>
+            <div class="kp-content">
+              <p>- 扩展适用于无状态服务（如Web应用），不适用于有状态服务（如数据库）</p>
+              <p>- 多个副本共享数据卷时，要考虑并发写入的问题</p>
+              <p>- 生产环境中建议使用Kubernetes等更强大的编排工具</p>
+              <p>- 扩展后需要使用负载均衡器分发请求</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">服务扩展实战举例：电商网站高峰期扩容</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 场景：电商网站双十一期间流量激增
+# 平时2个Web容器足够，高峰期需要扩展到6个
+
+# 平时配置（docker-compose.yml中）
+services:
+  web:
+    image: myshop-web:latest
+    deploy:
+      replicas: 2  # 平时2个副本
+
+# 高峰期临时扩容（不修改配置文件）
+$ docker compose up -d --scale web=6
+
+# 查看扩容后的状态
+$ docker compose ps
+# NAME                STATUS
+# shop-web-1          Up
+# shop-web-2          Up
+# shop-web-3          Up
+# shop-web-4          Up
+# shop-web-5          Up
+# shop-web-6          Up
+
+# 高峰期过后缩容回2个
+$ docker compose up -d --scale web=2
+
+# 注意：缩容时会自动停止多余的容器，保留数据卷</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">depends_on 更多使用场景举例</div>
+            <div class="kp-content">
+              <p><strong>场景1：数据初始化</strong></p>
+              <p>数据库服务启动后，需要执行一个数据迁移服务来创建表结构，然后应用服务才能启动。</p>
+              <p><strong>场景2：消息队列消费者</strong></p>
+              <p>RabbitMQ必须先启动，消费者服务才能连接并消费消息。</p>
+              <p><strong>场景3：配置中心</strong></p>
+              <p>Consul或Etcd配置中心必须先启动，其他服务才能从中读取配置。</p>
+              <p><strong>场景4：日志收集</strong></p>
+              <p>Logstash或Fluentd日志收集器先启动，应用服务才能发送日志。</p>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="page content-page">
         <div class="page-header">
-          <span class="page-number">4.3</span>
+          <span class="page-number">4.4</span>
           <h1 class="page-title">网络与数据卷管理</h1>
         </div>
         <div class="page-body">
           <div class="definition-box">
             <div class="definition-term">网络隔离原理</div>
             <div class="definition-content">
-              Compose会自动为项目创建一个<span class="highlight">默认网络</span>，所有服务通过服务名相互访问。通过自定义网络，可以实现服务间的隔离。
+              Compose会自动为项目创建一个<span class="highlight">默认网络</span>，所有服务通过服务名相互访问。通过自定义网络，可以实现服务间的隔离，提高安全性。
             </div>
           </div>
 
           <p class="paragraph">
-            在同一网络中的容器可以通过容器名互相访问（DNS解析）。不同网络的容器不能直接通信，必须通过网关或端口映射。
+            在同一网络中的容器可以通过容器名互相访问（DNS解析）。不同网络的容器不能直接通信，必须通过网关或端口映射。这种网络隔离机制可以保护敏感服务（如数据库）不被外部直接访问。
           </p>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">自定义网络配置</span>
+              <span class="code-title">自定义网络配置（网络隔离示例）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
+  # 前端服务（面向用户）
   frontend:
+    image: nginx:alpine
+    ports:
+      - "80:80"
     networks:
+      # 只连接web网络
       - web-net
     # frontend只能访问web-net中的服务
 
+  # 后端API服务
   backend:
+    image: myapi:latest
     networks:
-      - web-net
-      - db-net
-    # backend可以同时访问两个网络
+      # 同时连接两个网络
+      - web-net    # 接收前端请求
+      - db-net     # 访问数据库
+    # backend是桥梁，连接前端和数据库
 
+  # 数据库服务（敏感服务）
   database:
+    image: mysql:8.0
     networks:
+      # 只连接db网络
       - db-net
     # database只能被db-net中的服务访问
+    # 外部无法直接访问数据库，提高了安全性
 
 networks:
   web-net:
     driver: bridge
+    # 默认bridge网络，允许外部访问
+  
   db-net:
     driver: bridge
-    internal: true  # 完全隔离，不允许外部访问</code></pre>
+    internal: true
+    # internal: true 表示完全隔离
+    # 不允许外部访问，只允许同一网络内的容器通信</code></pre>
           </div>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">数据卷配置</span>
+              <span class="code-title">数据卷配置详解</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>services:
   db:
     image: mysql:8.0
     volumes:
-      # 命名数据卷（推荐）
+      # 类型1：命名数据卷（推荐用于生产环境）
+      # 由Docker管理，存储在宿主机特定位置
+      # 优点：易于备份、迁移，可以跨容器共享
       - mysql-data:/var/lib/mysql
-      # 宿主机目录挂载
+      
+      # 类型2：宿主机目录挂载（推荐用于开发环境）
+      # 将宿主机的./data目录映射到容器的/var/lib/mysql
+      # 优点：可以直接在宿主机查看和修改文件
       - ./data:/var/lib/mysql
-      # 只读挂载
+      
+      # 类型3：只读挂载（适合配置文件）
+      # ro = read only，容器只能读取不能修改
+      # 防止容器意外修改配置
       - ./config:/etc/mysql/conf.d:ro
+      
+      # 类型4：临时卷（容器删除后数据丢失）
+      # 适合临时文件、缓存等不需要持久化的数据
+      - /tmp
 
 volumes:
   mysql-data:
     # 可以指定驱动和选项
-    driver: local</code></pre>
+    driver: local
+    # driver_opts:
+    #   type: nfs
+    #   o: addr=192.168.1.100,rw
+    #   device: ":/path/to/dir"</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">数据卷类型对比</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">命名数据卷</span>：Docker管理，适合生产环境，易于备份</p>
+              <p>- <span class="key-point">宿主机挂载</span>：直接映射目录，适合开发环境，方便查看</p>
+              <p>- <span class="key-point">只读挂载</span>：保护配置文件不被修改</p>
+              <p>- <span class="key-point">临时卷</span>：容器删除即丢失，适合缓存数据</p>
+            </div>
           </div>
         </div>
       </div>
@@ -825,7 +2006,7 @@ volumes:
       <div class="page section-page">
         <div class="section-content">
           <span class="section-label">Part 5</span>
-          <h1 class="section-title">动手实验</h1>
+          <h1 class="section-title">动手实验与故障排查</h1>
           <p class="section-desc">综合练习Compose编排</p>
         </div>
       </div>
@@ -858,7 +2039,7 @@ volumes:
 
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">docker-compose.yml</span>
+              <span class="code-title">docker-compose.yml（实验用）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -901,7 +2082,7 @@ volumes:
 
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">关键命令</span>
+              <span class="code-title">关键命令（实验操作）</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 启动所有服务
@@ -910,18 +2091,24 @@ $ docker compose up -d
 # 查看服务状态
 $ docker compose ps
 
-# 查看日志
+# 查看日志（实时跟踪）
 $ docker compose logs -f
 
 # 进入容器调试
 $ docker compose exec nginx sh
 $ docker compose exec php sh
 
-# 停止所有服务
+# 停止所有服务（保留数据）
+$ docker compose stop
+
+# 停止并删除容器（保留数据卷）
 $ docker compose down
 
-# 停止并删除数据卷
-$ docker compose down -v</code></pre>
+# 停止并删除容器和数据卷（彻底清理）
+$ docker compose down -v
+
+# 重新构建镜像并启动（代码更新后使用）
+$ docker compose up -d --build</code></pre>
           </div>
         </div>
       </div>
@@ -988,6 +2175,242 @@ volumes:
   wordpress-data:
   db-data:</code></pre>
           </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">数据持久化测试步骤</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：启动服务
+$ docker compose up -d
+
+# 步骤2：访问WordPress并完成安装
+# 打开浏览器访问 http://localhost:8080
+# 按照向导完成WordPress安装
+# 发布几篇文章作为测试数据
+
+# 步骤3：验证数据已持久化
+# 查看数据卷
+$ docker volume ls
+# 应该看到 wordpress_db-data 和 wordpress_wordpress-data
+
+# 步骤4：停止并删除容器（但不删除数据卷）
+$ docker compose down
+
+# 步骤5：重新启动服务
+$ docker compose up -d
+
+# 步骤6：再次访问 http://localhost:8080
+# 验证之前发布的文章是否还在
+# 如果数据持久化成功，文章应该仍然存在
+
+# 步骤7：彻底清理（包括数据卷）
+$ docker compose down -v</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">5.1</span>
+          <h1 class="page-title">常见问题排查指南</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">故障排查思路</div>
+            <div class="definition-content">
+              在使用Docker Compose时，遇到问题不要慌张。按照<span class="highlight">"查看日志→检查配置→验证网络→检查端口"</span>的顺序排查，大多数问题都能快速定位。
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题1：服务启动后立即退出</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：执行docker compose up -d后，容器状态显示Exited</p>
+              <p><strong>原因</strong>：通常是应用启动失败（如配置错误、依赖服务未就绪）</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 查看日志：<code>docker compose logs [服务名]</code></p>
+              <p>2. 检查环境变量是否正确设置</p>
+              <p>3. 确认依赖服务是否已启动</p>
+              <p>4. 使用<code>docker compose run --rm [服务名] sh</code>手动调试</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题2：端口冲突</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：报错"bind: address already in use"</p>
+              <p><strong>原因</strong>：宿主机上该端口已被其他程序占用</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 查看端口占用：<code>sudo lsof -i :80</code> 或 <code>sudo ss -tlnp | grep :80</code></p>
+              <p>2. 停止占用端口的程序，或修改docker-compose.yml中的端口映射</p>
+              <p>3. 例如将<code>"80:80"</code>改为<code>"8080:80"</code></p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题3：容器间无法通信</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：应用无法连接到数据库或其他服务</p>
+              <p><strong>原因</strong>：可能是网络配置错误、服务名拼写错误、或者服务未加入同一网络</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 确认所有服务都加入了同一个网络</p>
+              <p>2. 检查连接地址是否使用了正确的服务名（不是localhost或127.0.0.1）</p>
+              <p>3. 使用<code>docker compose exec [服务名] ping -c 3 [目标服务名]</code>测试网络连通性（-c 3表示发送3个包后停止）</p>
+              <p>4. 检查防火墙设置是否阻止了容器间通信</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题4：数据卷挂载失败</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：容器启动后，挂载的目录为空或权限不足</p>
+              <p><strong>原因</strong>：可能是宿主机目录不存在、路径错误、或SELinux限制</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 确认宿主机目录存在：<code>ls -la ./data</code></p>
+              <p>2. 检查路径是否正确（相对路径从docker-compose.yml所在目录开始）</p>
+              <p>3. 在WSL2中，确保文件在WSL文件系统内（<code>/home/username/project</code>），而非Windows挂载路径（<code>/mnt/c/</code>）</p>
+              <p>4. 如果是权限问题，添加 <code>:Z</code> 或 <code>:z</code> 标签（SELinux环境）</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题5：镜像拉取失败</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：报错 "pull access denied" 或 "manifest unknown"</p>
+              <p><strong>原因</strong>：镜像名称错误、镜像不存在、或需要登录Docker Hub</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 检查镜像名称拼写是否正确</p>
+              <p>2. 确认镜像标签存在：<code>docker pull nginx:alpine</code> 测试</p>
+              <p>3. 如果是私有镜像，先登录：<code>docker login</code></p>
+              <p>4. 配置国内镜像加速器（如阿里云、DaoCloud）加速拉取</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题6：环境变量未生效</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：容器内读取不到设置的环境变量</p>
+              <p><strong>原因</strong>：可能是.env文件位置错误、格式问题、或被覆盖</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 确认.env文件与docker-compose.yml在同一目录</p>
+              <p>2. 检查.env文件格式（KEY=VALUE，不能有空格）</p>
+              <p>3. 在容器内验证：<code>docker compose exec [服务名] env | grep KEY</code></p>
+              <p>4. 检查docker-compose.yml中是否同时设置了environment覆盖了.env</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">常用排查命令</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看所有服务状态
+$ docker compose ps
+
+# 查看某个服务的详细日志
+$ docker compose logs -f [服务名]
+
+# 进入运行中的容器内部
+$ docker compose exec [服务名] sh
+# 或如果有bash
+$ docker compose exec [服务名] bash
+
+# 在容器内测试网络连通性（-c 3 表示发送3个包后停止，避免无限ping）
+$ docker compose exec web ping -c 3 db
+
+# 查看容器详细信息（包括网络、挂载等）
+$ docker inspect [容器名]
+
+# 查看网络中的容器
+$ docker network ls
+$ docker network inspect [网络名]
+
+# 查看数据卷
+$ docker volume ls
+$ docker volume inspect [卷名]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">5.2</span>
+          <h1 class="page-title">最佳实践与注意事项</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">生产环境建议</div>
+            <div class="definition-content">
+              Docker Compose非常适合<span class="highlight">开发环境、测试环境和小型生产环境</span>。对于大型生产环境，建议使用Kubernetes等更强大的编排工具。但掌握Compose是学习容器编排的基础。
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">最佳实践清单</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">使用.env文件管理敏感信息</span>：密码、密钥等不要硬编码在docker-compose.yml中</p>
+              <p>2. <span class="key-point">指定镜像版本</span>：使用nginx:1.24而不是nginx:latest，避免版本升级导致意外问题</p>
+              <p>3. <span class="key-point">配置健康检查</span>：为关键服务配置healthcheck，确保服务真正就绪</p>
+              <p>4. <span class="key-point">使用命名数据卷</span>：便于备份和管理，避免数据丢失</p>
+              <p>5. <span class="key-point">设置重启策略</span>：使用restart: unless-stopped，确保服务意外退出后自动重启</p>
+              <p>6. <span class="key-point">限制资源使用</span>：为服务设置内存和CPU限制，防止单个服务耗尽系统资源</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">生产环境配置示例</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>version: "3.8"
+
+services:
+  web:
+    image: nginx:1.24-alpine  # 指定具体版本
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    networks:
+      - app-net
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'        # 最多使用50% CPU
+          memory: 512M       # 最多使用512MB内存
+        reservations:
+          cpus: '0.25'       # 预留25% CPU
+          memory: 256M       # 预留256MB内存
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # 重启策略
+    restart: unless-stopped
+    # 日志限制
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  app-data:
+    driver: local</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">学习建议</div>
+            <p>掌握Docker Compose后，建议继续学习Docker Swarm或Kubernetes，了解更强大的容器编排能力。Compose是入门容器编排的最佳起点，它的概念和语法与Kubernetes有很多相似之处。</p>
+          </div>
         </div>
       </div>
 
@@ -998,7 +2421,7 @@ volumes:
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">16</span>
+        <span class="total" id="totalPages">28</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>

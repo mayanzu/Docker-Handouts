@@ -406,6 +406,29 @@
             <p>容器的网络隔离不是"没有网络"，而是<strong>拥有一张完全独立的网络</strong>。Docker做的第一件事，就是像 <code>ip netns add ns-1</code> 一样，为每个容器创建一个独立的网络命名空间。容器内的 <code>eth0</code> 只在容器内部可见，宿主机和其他容器都看不到。</p>
           </div>
 
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：网络命名空间就像独立办公室</div>
+            <div class="kp-content">
+              <p>想象一栋写字楼（宿主机），每个公司租一间办公室（网络命名空间）。</p>
+              <p>- A公司在301室，有自己的电话系统（网络接口），电话号码是 <code>10.0.1.2</code></p>
+              <p>- B公司在302室，也有自己的电话系统，电话号码是 <code>10.0.1.3</code></p>
+              <p>- 两间办公室的电话系统完全独立，A公司拨打自己的分机号不会打到B公司</p>
+              <p>- 这就是网络命名空间的本质：<strong>每个容器有独立的"电话号码簿"和"电话线路"</strong></p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">更多网络命名空间使用场景</div>
+            <div class="kp-content">
+              <p><strong>场景1：网络测试环境</strong></p>
+              <p>开发网络应用时，可以在一个命名空间中模拟客户端，另一个命名空间中模拟服务器，测试它们之间的通信，而不需要两台物理机。</p>
+              <p><strong>场景2：VPN隔离</strong></p>
+              <p>某些程序需要走VPN，其他程序走正常网络。把走VPN的程序放在一个命名空间中，其他程序放在另一个命名空间，实现流量隔离。</p>
+              <p><strong>场景3：安全沙箱</strong></p>
+              <p>运行不可信程序时，将其放入独立的网络命名空间，即使程序尝试网络攻击，也影响不到宿主机和其他程序。</p>
+            </div>
+          </div>
+
           <div class="highlight-box info">
             <div class="highlight-title">小知识：为什么需要 sudo</div>
             <div class="highlight-content">
@@ -469,6 +492,29 @@ sudo ip netns exec ns-1 ip link set veth-1-peer up
             <div class="kp-title">核心结论</div>
             <div class="kp-content">
               <p>Docker容器的网络，本质上就是我们在WSL中手动演示的这套流程的<span class="highlight">自动化封装</span>。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">veth pair 生活类比：对讲机</div>
+            <div class="kp-content">
+              <p>veth pair 就像一对<strong>对讲机</strong>：A说"收到请回答"，B一定能听到；B回复"收到"，A也一定能听到。</p>
+              <p>- 对讲机A（veth-1）放在宿主机的手上</p>
+              <p>- 对讲机B（veth-1-peer）放在容器 ns-1 的手上</p>
+              <p>- 数据从一头进去，必然从另一头出来，不可能丢失</p>
+              <p>- 这对对讲机是"专线"，只有它们两个能互相通话</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">veth pair 更多使用场景</div>
+            <div class="kp-content">
+              <p><strong>场景1：容器与宿主机通信</strong></p>
+              <p>容器需要访问宿主机的服务（如宿主机的MySQL），通过veth pair建立连接。</p>
+              <p><strong>场景2：容器间直接通信</strong></p>
+              <p>两个容器需要高频通信，直接建立veth pair比通过网桥转发效率更高（虽然Docker默认用网桥）。</p>
+              <p><strong>场景3：网络监控</strong></p>
+              <p>将veth的一端接入监控工具，可以捕获和分析经过该链路的所有流量。</p>
             </div>
           </div>
         </div>
@@ -556,6 +602,31 @@ sudo ip netns exec ns-3 ip link set veth-3-peer up
           <div class="tip-box">
             <div class="tip-title">为什么需要网桥</div>
             <p>如果没有网桥，每两个容器之间都要拉一根专属的veth线——3个容器要3根线，10个容器要45根线。有了网桥，就像装了一台交换机，所有容器都插到交换机上，随便哪两个都能互通。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">网桥生活类比：公司前台总机</div>
+            <div class="kp-content">
+              <p>想象网桥就是公司的<strong>前台总机系统</strong>：</p>
+              <p>- 每个员工（容器）都有一个分机号（IP地址）</p>
+              <p>- 前台总机（网桥）记住所有分机号对应的座位</p>
+              <p>- A员工拨打B员工的分机号，总机自动转接到B的座位</p>
+              <p>- 不需要A和B之间拉一根专属电话线</p>
+              <p>- 新员工入职（新容器启动），总机自动记录他的分机号</p>
+              <p>- 员工离职（容器删除），总机自动删除他的分机号</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">网桥更多使用场景</div>
+            <div class="kp-content">
+              <p><strong>场景1：多容器应用部署</strong></p>
+              <p>一个Web应用包含前端、后端、数据库、缓存，所有容器连接到同一个网桥，互相通过IP或容器名通信。</p>
+              <p><strong>场景2：网络隔离</strong></p>
+              <p>创建多个网桥，将不同应用的容器隔离在不同网桥中。例如：开发环境容器连dev网桥，测试环境容器连test网桥，两者互不干扰。</p>
+              <p><strong>场景3：微服务通信</strong></p>
+              <p>微服务架构中，每个服务一个容器，所有服务连接到同一个网桥，服务间通过服务名（DNS）发现和通信。</p>
+            </div>
           </div>
         </div>
       </div>
@@ -754,6 +825,36 @@ sudo ip netns exec ns-5 ip link set veth-5-peer up
           </div>
 
           <div class="knowledge-point">
+            <div class="kp-title">NAT 生活类比：公司前台代收发快递</div>
+            <div class="kp-content">
+              <p>想象NAT就是公司的<strong>前台代收发快递服务</strong>：</p>
+              <p><strong>SNAT（发快递）</strong>：</p>
+              <p>- 员工A（容器，内部地址10.0.2.2）要寄快递给外部客户</p>
+              <p>- 但快递单上写"10.0.2.2"，快递公司不认识这个地址</p>
+              <p>- 前台（NAT）把发件人地址改成"XX公司前台"（宿主机公网IP）</p>
+              <p>- 客户收到快递，看到发件人是"XX公司前台"，回信也寄回前台</p>
+              <p>- 前台收到回信，根据记录转交给员工A</p>
+              <p><strong>DNAT（收快递）</strong>：</p>
+              <p>- 客户要寄快递给员工B（容器，内部地址10.0.2.3）</p>
+              <p>- 但客户不知道员工B的内部地址，只能寄到"XX公司前台"</p>
+              <p>- 前台（NAT）查看登记簿，发现"找80号窗口"对应员工B</p>
+              <p>- 前台把快递转交给员工B</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">NAT 更多使用场景</div>
+            <div class="kp-content">
+              <p><strong>场景1：家庭路由器</strong></p>
+              <p>家里多台手机、电脑共享一个公网IP上网，路由器就是做NAT，把私网IP转换成公网IP。</p>
+              <p><strong>场景2：端口转发</strong></p>
+              <p>外网用户访问家里的监控摄像头，路由器把外网请求转发到内网摄像头的IP和端口。</p>
+              <p><strong>场景3：负载均衡</strong></p>
+              <p>多个Web服务器 behind 一个公网IP，负载均衡器通过NAT把请求分发到不同的服务器。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
             <div class="kp-title">Docker网络全景</div>
             <div class="kp-content">
               <p><span class="key-point">网络命名空间</span>提供隔离（每个容器有独立网络）</p>
@@ -886,6 +987,50 @@ nameserver 127.0.0.11</code></pre>
               <p><span class="highlight">自定义bridge</span>：支持容器名DNS解析，适合多容器应用部署，是生产环境的首选。</p>
             </div>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">自定义Bridge的实际应用场景举例</div>
+            <div class="kp-content">
+              <p><strong>场景1：Web应用全栈部署</strong></p>
+              <p>前端Nginx + 后端Node.js + 数据库MySQL + 缓存Redis，全部接入同一个自定义网络。前端通过 <code>http://api:3000</code> 访问后端，后端通过 <code>mysql:3306</code> 连接数据库，无需硬编码IP。</p>
+              <p><strong>场景2：多环境隔离</strong></p>
+              <p>开发团队创建 <code>dev-network</code>，测试团队创建 <code>test-network</code>。两个环境的容器互不干扰，即使容器名相同也不会冲突。</p>
+              <p><strong>场景3：前后端分离项目</strong></p>
+              <p>前端容器和后端容器在同一个自定义网络中，前端通过服务名直接调用后端API。部署到新机器时，不需要修改任何配置。</p>
+              <p><strong>场景4：数据库安全访问</strong></p>
+              <p>数据库容器只接入后端网络，不接入前端网络。外部用户即使知道数据库容器名，也无法从前端网络访问到数据库。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">自定义网络创建高级选项</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建指定子网的网络（适合有IP规划需求的环境）
+$ docker network create \
+  --driver bridge \
+  --subnet 192.168.10.0/24 \
+  --gateway 192.168.10.1 \
+  --ip-range 192.168.10.128/25 \
+  prod-network
+
+# 创建禁用容器间通信的网络（提高安全性）
+$ docker network create \
+  --driver bridge \
+  --opt "com.docker.network.bridge.enable_icc=false" \
+  isolated-network
+
+# 创建内部网络（不允许外部访问）
+$ docker network create \
+  --driver bridge \
+  --internal \
+  backend-network
+
+# 查看网络中所有容器的IP分配
+$ docker network inspect prod-network \
+  --format '{{json .Containers}}' | python3 -m json.tool</code></pre>
+          </div>
         </div>
       </div>
 
@@ -895,6 +1040,69 @@ nameserver 127.0.0.11</code></pre>
           <span class="section-label">Part 3</span>
           <h1 class="section-title">其他网络模式</h1>
           <p class="section-desc">Host、None、Container模式对比</p>
+        </div>
+      </div>
+
+      <!-- 3.0 四种网络模式总览 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.0</span>
+          <h1 class="page-title">四种网络模式总览</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker网络模式</div>
+            <div class="definition-content">
+              Docker提供了四种网络模式，每种模式对应不同的网络隔离程度和性能特征。选择合适的网络模式，是容器化部署的重要决策。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">四种网络模式对比表</span>
+              <span class="code-lang">对比表</span>
+            </div>
+            <pre><code>模式          独立网络命名空间    与宿主机关系        性能      隔离性    适用场景
+─────────────────────────────────────────────────────────────────────────────────
+bridge        有                 通过NAT访问        中        高        大多数应用
+host          无                 直接使用宿主机      最高      无        高性能网络应用
+none          有（但无网卡）      完全隔离           无        最高      离线计算、安全沙箱
+container     与目标容器共享      依赖目标容器        高        低        Sidecar模式
+─────────────────────────────────────────────────────────────────────────────────
+
+bridge模式详解：
+  - 容器有独立的IP地址（如172.17.0.2）
+  - 通过docker0网桥与宿主机通信
+  - 外网访问需要端口映射（-p参数）
+  - 默认模式，适合绝大多数场景
+
+host模式详解：
+  - 容器没有独立IP，直接使用宿主机的网络栈
+  - 容器看到的网卡、IP与宿主机完全一致
+  - 无需端口映射，直接占用宿主机端口
+  - 性能最好（无NAT开销），但隔离性最差
+
+none模式详解：
+  - 容器有独立的网络命名空间，但只有lo（本地回环）
+  - 没有任何网络接口，完全无法联网
+  - 无法被外部访问，也无法访问外部
+  - 适合不需要网络的后台任务
+
+container模式详解：
+  - 新容器与指定容器共享同一个网络命名空间
+  - 两个容器拥有完全相同的IP地址和端口空间
+  - 适合Sidecar模式（如日志收集、监控代理）</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">如何选择网络模式？</div>
+            <div class="kp-content">
+              <p><strong>默认选择 bridge</strong>：除非有特殊需求，否则始终使用bridge模式。它提供了良好的隔离性和足够的性能。</p>
+              <p><strong>选择 host 的情况</strong>：网络性能是瓶颈（如高频交易、视频流），且端口不会冲突。</p>
+              <p><strong>选择 none 的情况</strong>：处理敏感数据，需要完全断网；或纯计算任务不需要网络。</p>
+              <p><strong>选择 container 的情况</strong>：需要与另一个容器共享网络栈，如日志收集Sidecar。</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1243,6 +1451,36 @@ nginx-p2    0.0.0.0:8080-&gt;80/tcp, 0.0.0.0:8443-&gt;443/tcp</code></pre>
             <div class="tip-title">安全建议</div>
             <p>生产环境中，建议显式绑定到需要的IP地址（如 <code>-p 127.0.0.1:8080:80</code> 或 <code>-p 192.168.1.10:80:80</code>），避免不必要地将服务暴露到公网。</p>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">常见服务的端口映射举例</div>
+            <div class="kp-content">
+              <p><strong>MySQL 数据库</strong>：</p>
+              <p><code>docker run -d -p 3306:3306 mysql:8.0</code></p>
+              <p>外部应用可以通过宿主机的 3306 端口连接容器内的 MySQL。</p>
+              <p><strong>Redis 缓存</strong>：</p>
+              <p><code>docker run -d -p 6379:6379 redis:alpine</code></p>
+              <p>外部应用可以通过宿主机的 6379 端口连接容器内的 Redis。</p>
+              <p><strong>MongoDB 数据库</strong>：</p>
+              <p><code>docker run -d -p 27017:27017 mongo:latest</code></p>
+              <p>外部应用可以通过宿主机的 27017 端口连接容器内的 MongoDB。</p>
+              <p><strong>PostgreSQL 数据库</strong>：</p>
+              <p><code>docker run -d -p 5432:5432 postgres:15</code></p>
+              <p>外部应用可以通过宿主机的 5432 端口连接容器内的 PostgreSQL。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">端口映射的常见问题</div>
+            <div class="kp-content">
+              <p><strong>问题1：端口被占用</strong></p>
+              <p>如果宿主机的 8080 端口已被其他程序占用，Docker 会报错。解决：更换宿主机端口，如 <code>-p 8081:80</code>。</p>
+              <p><strong>问题2：绑定到特定IP不生效</strong></p>
+              <p>在 WSL2 中，绑定到 127.0.0.1 可能无法从 Windows 浏览器访问。解决：使用 <code>-p 0.0.0.0:8080:80</code> 或查找 WSL2 的实际 IP。</p>
+              <p><strong>问题3：端口映射了但无法访问</strong></p>
+              <p>检查防火墙规则、安全组设置，以及容器内的服务是否真正监听了该端口。</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1359,6 +1597,42 @@ ghi789...      none      null      local
 # 如果不在同一网络 -> docker network connect
 # 如果在默认bridge -> 切换到自定义bridge网络</code></pre>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题4：WSL2 中无法从 Windows 浏览器访问容器</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：在 WSL2 中启动了带端口映射的容器，Windows 浏览器访问 <code>localhost:8080</code> 失败。</p>
+              <p><strong>原因</strong>：WSL2 是虚拟机，有自己的 IP 地址，Windows 的 localhost 不等于 WSL2 的 localhost。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 查找 WSL2 的 IP 地址：<code>ip addr show eth0 | grep 'inet '</code></p>
+              <p>2. 使用 WSL2 的 IP 地址访问，如 <code>http://172.21.176.1:8080</code></p>
+              <p>3. 或者使用 <code>-p 0.0.0.0:8080:80</code> 绑定到所有接口</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题5：容器启动后立即退出</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：容器启动后状态显示 Exited。</p>
+              <p><strong>原因</strong>：可能是端口冲突、配置错误或依赖服务未启动。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 查看容器日志：<code>docker logs &lt;容器名&gt;</code></p>
+              <p>2. 检查端口是否被占用：<code>sudo lsof -i :&lt;端口&gt;</code></p>
+              <p>3. 检查容器配置是否正确：<code>docker inspect &lt;容器名&gt;</code></p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题6：DNS 解析失败</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：容器内可以 ping 通 IP，但 ping 域名失败。</p>
+              <p><strong>原因</strong>：容器的 DNS 配置不正确，或自定义网络未启用 DNS。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 检查容器的 DNS 配置：<code>docker exec &lt;容器&gt; cat /etc/resolv.conf</code></p>
+              <p>2. 确认是否使用了自定义网络（默认 bridge 不支持 DNS）</p>
+              <p>3. 手动指定 DNS：<code>docker run --dns 8.8.8.8 ...</code></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1428,6 +1702,18 @@ ghi789...      none      null      local
               <div class="step-item"><span class="step-num">4</span><span class="step-text">启动 <code>nginx-proxy</code>，映射8080端口，接入同一网络</span></div>
               <div class="step-item"><span class="step-num">5</span><span class="step-text">配置反向代理将请求转发到 <code>nginx-web</code></span></div>
               <div class="step-item"><span class="step-num">6</span><span class="step-text">验证整个链路连通性</span></div>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">实验预期结果</div>
+            <div class="kp-content">
+              <p><strong>步骤1预期</strong>：<code>docker network ls</code> 能看到 <code>frontend-network</code> 网络。</p>
+              <p><strong>步骤2预期</strong>：<code>docker ps</code> 能看到 <code>nginx-web</code> 和 <code>nginx-api</code> 两个容器在运行。</p>
+              <p><strong>步骤3预期</strong>：<code>docker exec nginx-web ping -c 3 nginx-api</code> 能成功ping通，证明DNS服务发现生效。</p>
+              <p><strong>步骤4预期</strong>：<code>docker ps</code> 能看到 <code>nginx-proxy</code> 容器，且端口映射显示 <code>0.0.0.0:8080-&gt;80/tcp</code>。</p>
+              <p><strong>步骤5预期</strong>：反向代理配置生效，访问 <code>http://localhost:8080</code> 能看到 <code>nginx-web</code> 的欢迎页。</p>
+              <p><strong>步骤6预期</strong>：整个链路 <code>外部用户 -&gt; nginx-proxy:8080 -&gt; nginx-web:80</code> 完全连通。</p>
             </div>
           </div>
         </div>
@@ -1586,7 +1872,7 @@ ghi789...      none      null      local
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">20</span>
+        <span class="total" id="totalPages">27</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
