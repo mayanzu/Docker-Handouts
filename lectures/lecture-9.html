@@ -268,9 +268,6 @@
             <pre><code># -d：后台运行  -p 8080:80：把容器的80端口映射到宿主机的8080
  docker run -d -p 8080:80 nginx:alpine
 
-# 等待 3 秒让容器完全启动
- sleep 3
-
 # 查看容器 IP（通常是 172.17.0.x 开头）
  docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q)</code></pre>
           </div>
