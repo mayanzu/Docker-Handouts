@@ -353,6 +353,83 @@
             <p>2. <span class="highlight">验证直观</span>：网络通了就能curl到HTML，不通就连接失败</p>
             <p>3. <span class="highlight">贴近实际</span>：Nginx是生产环境最常用的Web服务器，学会它的容器网络配置有实际价值</p>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">拓展知识：Nginx是什么？</div>
+            <div class="kp-content">
+              <p>Nginx（发音"engine-x"）是一款高性能的开源Web服务器和反向代理服务器。它以高性能、高并发、低内存消耗著称，是全球最流行的Web服务器之一。</p>
+              <p><strong>Nginx的主要特点：</strong></p>
+              <ul>
+                <li><span class="key-point">高性能</span>：采用事件驱动架构，能同时处理数万级并发连接</li>
+                <li><span class="key-point">低内存消耗</span>：相比Apache，内存占用更低</li>
+                <li><span class="key-point">反向代理</span>：可以作为负载均衡器，分发请求到多个后端服务器</li>
+                <li><span class="key-point">静态文件服务</span>：高效处理HTML、CSS、JavaScript等静态资源</li>
+                <li><span class="key-point">SSL/TLS支持</span>：内置HTTPS支持，可配置SSL证书</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">拓展知识：Nginx的核心功能</div>
+            <div class="kp-content">
+              <p><strong>1. Web服务器</strong></p>
+              <p>直接提供静态文件服务，如HTML页面、图片、CSS、JavaScript文件。</p>
+              <p><strong>2. 反向代理</strong></p>
+              <p>接收客户端请求，转发给后端应用服务器（如Node.js、Python应用），然后将响应返回给客户端。</p>
+              <p><strong>3. 负载均衡</strong></p>
+              <p>将请求分发到多个后端服务器，提高系统的可用性和性能。</p>
+              <p><strong>4. 缓存</strong></p>
+              <p>缓存静态资源或动态内容，减少后端服务器压力，提高响应速度。</p>
+              <p><strong>5. SSL/TLS终止</strong></p>
+              <p>处理HTTPS请求，解密后转发给后端，简化后端配置。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">简单的Nginx配置示例</span>
+              <span class="code-lang">Nginx配置</span>
+            </div>
+            <pre><code># 配置静态网站服务器
+server {
+    listen 80;
+    server_name example.com;
+    
+    # 静态文件根目录
+    root /usr/share/nginx/html;
+    index index.html;
+    
+    # 访问日志
+    access_log /var/log/nginx/access.log;
+}
+
+# 配置反向代理
+server {
+    listen 80;
+    server_name api.example.com;
+    
+    location / {
+        # 转发到后端服务器
+        proxy_pass http://backend-server:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+# 配置负载均衡
+upstream backend {
+    server server1.example.com;
+    server server2.example.com;
+    server server3.example.com;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://backend;
+    }
+}</code></pre>
+          </div>
         </div>
       </div>
 
