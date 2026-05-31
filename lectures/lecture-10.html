@@ -367,7 +367,11 @@ $ cd ecommerce-project</code></pre>
 $ mkdir html
 
 # 创建测试页面
-$ echo "&lt;h1&gt;电商系统运行成功！&lt;/h1&gt;&lt;p&gt;Nginx: 8085 | httpd: 8084&lt;/p&gt;" &gt; html/index.html</code></pre>
+$ echo "&lt;h1&gt;电商系统运行成功！&lt;/h1&gt;&lt;p&gt;Nginx: 8085 | httpd: 8084&lt;/p&gt;" &gt; html/index.html
+
+# 修改权限，让Nginx容器可以读取（重要！）
+$ chmod 644 html/index.html
+$ chmod 755 html</code></pre>
           </div>
 
           <div class="code-block">
@@ -1482,7 +1486,11 @@ $ cat > html/index.php << 'EOF'
 <p>Web Server: Nginx</p>
 <p>Database: MySQL 8.0</p>
 <p>phpMyAdmin: <a href="http://localhost:8080">http://localhost:8080</a></p>
-EOF</code></pre>
+EOF
+
+# 修改权限，让Nginx和PHP容器可以读取
+$ chmod 644 html/index.php
+$ chmod 755 html</code></pre>
           </div>
 
           <div class="code-block">
@@ -2586,7 +2594,11 @@ volumes:
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建测试页面
-$ echo "<h1>LNMP实验环境部署成功！</h1><p>Nginx + PHP + MySQL</p>" > html/index.html</code></pre>
+$ echo "<h1>LNMP实验环境部署成功！</h1><p>Nginx + PHP + MySQL</p>" > html/index.html
+
+# 修改权限，让Nginx容器可以读取
+$ chmod 644 html/index.html
+$ chmod 755 html</code></pre>
           </div>
 
           <div class="code-block" style="margin-top: 1.5rem;">
@@ -2751,7 +2763,21 @@ $ docker compose down -v</code></pre>
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">问题1：服务启动后立即退出</div>
+            <div class="kp-title">问题1：Nginx返回403 Forbidden</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：访问网站时显示"403 Forbidden"错误</p>
+              <p><strong>原因</strong>：Nginx容器无法读取挂载的html文件，通常是文件权限问题</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 检查文件是否存在：<code>ls -la html/</code></p>
+              <p>2. 修改文件权限：<code>chmod 644 html/index.html</code></p>
+              <p>3. 修改目录权限：<code>chmod 755 html</code></p>
+              <p>4. 重启Nginx服务：<code>docker compose restart web</code></p>
+              <p><strong>原理</strong>：nginx:alpine容器以nginx用户（UID 101）运行，需要读取权限（644）才能访问文件</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题2：服务启动后立即退出</div>
             <div class="kp-content">
               <p><strong>现象</strong>：执行docker compose up -d后，容器状态显示Exited</p>
               <p><strong>原因</strong>：通常是应用启动失败（如配置错误、依赖服务未就绪）</p>
@@ -2764,7 +2790,7 @@ $ docker compose down -v</code></pre>
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">问题2：端口冲突</div>
+            <div class="kp-title">问题3：端口冲突</div>
             <div class="kp-content">
               <p><strong>现象</strong>：报错"bind: address already in use"</p>
               <p><strong>原因</strong>：宿主机上该端口已被其他程序占用</p>
@@ -2776,7 +2802,7 @@ $ docker compose down -v</code></pre>
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">问题3：容器间无法通信</div>
+            <div class="kp-title">问题4：容器间无法通信</div>
             <div class="kp-content">
               <p><strong>现象</strong>：应用无法连接到数据库或其他服务</p>
               <p><strong>原因</strong>：可能是网络配置错误、服务名拼写错误、或者服务未加入同一网络</p>
