@@ -352,7 +352,37 @@ $ docker network rm ecommerce-network</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Compose编排：只需一个docker-compose.yml文件</span>
+              <span class="code-title">步骤1：创建项目目录</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建电商项目目录
+$ mkdir ecommerce-project
+$ cd ecommerce-project</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤2：创建docker-compose.yml文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 使用文本编辑器创建配置文件（以下三种方式任选其一）
+
+# 方式1：使用vim编辑器
+$ vim docker-compose.yml
+
+# 方式2：使用nano编辑器（更适合新手）
+$ nano docker-compose.yml
+
+# 方式3：使用cat命令直接写入（适合复制粘贴）
+$ cat > docker-compose.yml << 'EOF'
+# 在这里粘贴下面的配置内容
+# 输入完成后按 Ctrl+D 保存
+EOF</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤3：编写docker-compose.yml配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -758,7 +788,21 @@ company:
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker-compose.yml基本结构详解</span>
+              <span class="code-title">步骤1：创建项目并准备配置文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建项目目录
+$ mkdir my-compose-project
+$ cd my-compose-project
+
+# 创建docker-compose.yml配置文件
+$ vim docker-compose.yml
+# 输入以下配置内容</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤2：docker-compose.yml基本结构详解</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code># 版本声明（可选，但建议指定）
@@ -1304,7 +1348,30 @@ volumes:
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">LEMP栈 docker-compose.yml（完整注释版）</span>
+              <span class="code-title">步骤1：创建LEMP项目目录</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建项目目录
+$ mkdir lemp-project
+$ cd lemp-project
+
+# 创建必要的子目录
+$ mkdir html</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤2：创建docker-compose.yml文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 使用编辑器创建配置文件
+$ vim docker-compose.yml
+# 然后输入以下内容</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤3：编写LEMP栈配置内容（完整注释版）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -1315,9 +1382,9 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      # 将宿主机的80端口映射到容器的80端口
-      # 用户访问 http://localhost 即可访问网站
-      - "80:80"
+      # 将宿主机的8081端口映射到容器的80端口
+      # 用户访问 http://localhost:8081 即可访问网站
+      - "8081:80"
     volumes:
       # 挂载Nginx配置文件（ro表示只读）
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -1390,30 +1457,40 @@ volumes:
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">启动和访问（操作步骤）</span>
+              <span class="code-title">步骤4：创建测试文件</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 步骤1：进入项目目录
-$ cd lemp-project
-
-# 步骤2：创建必要的目录和文件
-$ mkdir -p html
+            <pre><code># 创建PHP测试文件
 $ echo "<?php phpinfo(); ?>" > html/index.php
 
-# 步骤3：启动所有服务（后台运行）
+# 或者创建一个更复杂的测试页面
+$ cat > html/index.php << 'EOF'
+<?php
+echo "<h1>LEMP Stack is Working!</h1>";
+echo "<p>PHP Version: " . phpversion() . "</p>";
+?>
+EOF</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤5：启动和访问服务</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 启动所有服务（后台运行）
 $ docker compose up -d
 
-# 步骤4：查看服务状态，确认所有容器都在运行
+# 查看服务状态，确认所有容器都在运行
 $ docker compose ps
 
-# 步骤5：访问服务验证
-# Web应用：打开浏览器访问 http://localhost
+# 访问服务验证
+# Web应用：打开浏览器访问 http://localhost:8081
 # 应该看到PHP信息页面
 
 # phpMyAdmin：打开浏览器访问 http://localhost:8080
 # 用户名：root，密码：rootsecret
 
-# 步骤6：查看日志（如果出现问题）
+# 查看日志（如果出现问题）
 $ docker compose logs -f nginx
 $ docker compose logs -f mysql</code></pre>
           </div>
@@ -1439,7 +1516,17 @@ $ docker compose logs -f mysql</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">项目结构（文件组织方式）</span>
+              <span class="code-title">步骤1：创建Flask项目目录结构</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建项目根目录和子目录
+$ mkdir -p flask-app/app flask-app/nginx flask-app/redis
+$ cd flask-app</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤2：查看项目结构（文件组织方式）</span>
               <span class="code-lang">文本</span>
             </div>
             <pre><code>flask-app/                    # 项目根目录
@@ -1456,7 +1543,17 @@ $ docker compose logs -f mysql</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">docker-compose.yml（Flask应用）</span>
+              <span class="code-title">步骤3：创建docker-compose.yml文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 在项目根目录创建配置文件
+$ vim docker-compose.yml
+# 输入以下配置内容</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤4：编写docker-compose.yml配置（Flask应用）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -1564,7 +1661,23 @@ if __name__ == '__main__':
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">微服务架构 docker-compose.yml 示例</span>
+              <span class="code-title">创建微服务项目并编写配置文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建微服务项目目录
+$ mkdir microservices-demo
+$ cd microservices-demo
+
+# 创建各服务的子目录
+$ mkdir user-service order-service
+
+# 创建docker-compose.yml文件
+$ vim docker-compose.yml</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">微服务架构 docker-compose.yml 配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -2391,7 +2504,24 @@ volumes:
 
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">docker-compose.yml（实验用）</span>
+              <span class="code-title">实验准备：创建项目目录和配置文件</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建实验项目目录
+$ mkdir lnmp-experiment
+$ cd lnmp-experiment
+
+# 创建必要的子目录
+$ mkdir html
+
+# 创建docker-compose.yml配置文件
+$ vim docker-compose.yml
+# 输入以下配置内容</code></pre>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">docker-compose.yml配置内容（实验用）</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -2400,7 +2530,7 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "8082:80"
     volumes:
       - ./html:/usr/share/nginx/html
     depends_on:
@@ -2442,6 +2572,9 @@ $ docker compose up -d
 
 # 查看服务状态
 $ docker compose ps
+
+# 访问服务验证
+# 打开浏览器访问 http://localhost:8082
 
 # 查看日志（实时跟踪）
 $ docker compose logs -f
@@ -2491,7 +2624,21 @@ $ docker compose up -d --build</code></pre>
 
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
-              <span class="code-title">WordPress docker-compose.yml</span>
+              <span class="code-title">实验准备：创建WordPress项目</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建WordPress项目目录
+$ mkdir wordpress-app
+$ cd wordpress-app
+
+# 创建docker-compose.yml配置文件
+$ vim docker-compose.yml
+# 输入以下配置内容</code></pre>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
+              <span class="code-title">WordPress docker-compose.yml配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -2500,7 +2647,7 @@ services:
   wordpress:
     image: wordpress:latest
     ports:
-      - "8080:80"
+      - "8083:80"
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: wordpress
@@ -2537,7 +2684,7 @@ volumes:
 $ docker compose up -d
 
 # 步骤2：访问WordPress并完成安装
-# 打开浏览器访问 http://localhost:8080
+# 打开浏览器访问 http://localhost:8083
 # 按照向导完成WordPress安装
 # 发布几篇文章作为测试数据
 
@@ -2552,7 +2699,7 @@ $ docker compose down
 # 步骤5：重新启动服务
 $ docker compose up -d
 
-# 步骤6：再次访问 http://localhost:8080
+# 步骤6：再次访问 http://localhost:8083
 # 验证之前发布的文章是否还在
 # 如果数据持久化成功，文章应该仍然存在
 
@@ -2871,6 +3018,27 @@ volumes:
             </div>
           </div>
 
+          <div class="knowledge-point">
+            <div class="kp-title">本讲实验环境端口分配表</div>
+            <div class="kp-content">
+              <p>为避免端口冲突，各实验使用不同的端口：</p>
+              <p><strong>LEMP栈示例（3.1节）</strong>：</p>
+              <p>- Web服务：http://localhost:8081</p>
+              <p>- phpMyAdmin：http://localhost:8080</p>
+              <p>- 项目目录：lemp-project</p>
+              <p><strong>Flask应用示例（3.2节）</strong>：</p>
+              <p>- Flask应用：http://localhost:5000</p>
+              <p>- 项目目录：flask-app</p>
+              <p><strong>实验1：LNMP环境部署</strong>：</p>
+              <p>- Web服务：http://localhost:8082</p>
+              <p>- 项目目录：lnmp-experiment</p>
+              <p><strong>实验2：WordPress部署</strong>：</p>
+              <p>- WordPress：http://localhost:8083</p>
+              <p>- 项目目录：wordpress-app</p>
+              <p><strong>提示</strong>：所有实验可以同时运行，互不干扰！</p>
+            </div>
+          </div>
+
           <div class="code-block">
             <div class="code-header">
               <span class="code-title">清理单个项目的实验环境</span>
@@ -2948,28 +3116,56 @@ echo "=========================================="
 echo "清理Docker Compose实验环境"
 echo "=========================================="
 
-# 如果你按照讲义创建了多个实验项目，逐个清理
-cd ~/lemp-project 2>/dev/null && docker compose down -v
-cd ~/flask-app 2>/dev/null && docker compose down -v
-cd ~/wordpress-app 2>/dev/null && docker compose down -v
+# 定义所有实验项目目录
+PROJECTS=(
+  "lemp-project"           # LEMP栈示例（端口8081）
+  "flask-app"              # Flask应用示例（端口5000）
+  "microservices-demo"     # 微服务架构示例
+  "lnmp-experiment"        # 实验1：LNMP环境（端口8082）
+  "wordpress-app"          # 实验2：WordPress（端口8083）
+  "ecommerce-project"      # 电商示例项目
+  "my-compose-project"     # 基础示例项目
+)
 
-# 清理所有实验容器（假设容器名包含exp或test）
-docker ps -a | grep -E "exp|test" | awk '{print $1}' | xargs -r docker rm -f
+# 逐个清理项目
+for project in "${PROJECTS[@]}"; do
+  if [ -d ~/"$project" ]; then
+    echo "正在清理: $project"
+    cd ~/"$project" && docker compose down -v 2>/dev/null
+    echo "✓ $project 清理完成"
+  fi
+done
+
+# 返回原目录
+cd ~
+
+# 清理所有实验容器（容器名包含实验相关关键词）
+echo ""
+echo "清理实验容器..."
+docker ps -a | grep -E "lemp|flask|wordpress|experiment|ecommerce|microservices" | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null
 
 # 清理所有实验网络
-docker network ls | grep -E "exp|test" | awk '{print $1}' | xargs -r docker network rm
+echo "清理实验网络..."
+docker network ls | grep -E "lemp|flask|wordpress|experiment|ecommerce|microservices|app-net|ecommerce-net|micro-net" | awk '{print $1}' | xargs -r docker network rm 2>/dev/null
 
 # 清理未使用的资源
+echo "清理未使用的资源..."
 docker container prune -f
 docker network prune -f
 
-echo "✅ 清理完成！"
+echo ""
+echo "=========================================="
+echo "✅ 所有实验环境清理完成！"
+echo "=========================================="
 echo ""
 echo "查看剩余容器："
 docker ps -a
 echo ""
 echo "查看剩余网络："
-docker network ls</code></pre>
+docker network ls
+echo ""
+echo "查看磁盘使用情况："
+docker system df</code></pre>
           </div>
 
           <div class="knowledge-point">
