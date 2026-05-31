@@ -317,21 +317,19 @@ $ docker run -d \
   --network ecommerce-network \
   redis:alpine
 
-# 4. 启动Node.js后端（依赖MySQL和Redis）
+# 4. 启动后端API服务（使用httpd作为示例）
 $ docker run -d \
   --name ecommerce-api \
   -e DB_HOST=ecommerce-mysql \
-  -e DB_PASSWORD=admin123 \
   -e REDIS_HOST=ecommerce-redis \
-  -p 3000:3000 \
+  -p 8084:80 \
   --network ecommerce-network \
-  my-node-app:latest
+  httpd:alpine
 
 # 5. 启动Nginx前端（依赖后端API）
 $ docker run -d \
   --name ecommerce-web \
-  -p 80:80 \
-  -v ./nginx.conf:/etc/nginx/nginx.conf:ro \
+  -p 8085:80 \
   --network ecommerce-network \
   nginx:alpine
 
@@ -391,21 +389,18 @@ services:
   web:
     image: nginx:alpine
     ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - "8085:80"
     depends_on:
       - api
     networks:
       - ecommerce-net
 
   api:
-    image: my-node-app:latest
+    image: httpd:alpine
     ports:
-      - "3000:3000"
+      - "8084:80"
     environment:
       - DB_HOST=mysql
-      - DB_PASSWORD=admin123
       - REDIS_HOST=redis
     depends_on:
       - mysql
@@ -3022,6 +3017,10 @@ volumes:
             <div class="kp-title">本讲实验环境端口分配表</div>
             <div class="kp-content">
               <p>为避免端口冲突，各实验使用不同的端口：</p>
+              <p><strong>手动编排 vs Compose编排对比（1.3节）</strong>：</p>
+              <p>- Nginx前端：http://localhost:8085</p>
+              <p>- httpd后端：http://localhost:8084</p>
+              <p>- 项目目录：ecommerce-project</p>
               <p><strong>LEMP栈示例（3.1节）</strong>：</p>
               <p>- Web服务：http://localhost:8081</p>
               <p>- phpMyAdmin：http://localhost:8080</p>
