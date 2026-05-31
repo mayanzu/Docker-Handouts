@@ -143,6 +143,26 @@
             想象一个典型的Web应用：前端Nginx、后端Python/Node.js、数据库MySQL、缓存Redis。如果分别启动4个容器，需要4条docker run命令，而且还要处理它们之间的依赖关系。Compose就是来解决这个问题的。
           </p>
 
+          <p class="paragraph">
+            在前面的课程中，我们学习了如何使用 <code>docker run</code> 命令启动单个容器。但在实际开发中，一个完整的应用往往由多个容器组成。每次启动应用时，都要逐个输入冗长的命令，不仅效率低下，还容易出错。Docker Compose的出现，就是为了让多容器应用的管理变得简单高效。
+          </p>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：Compose就像餐厅的套餐菜单</div>
+            <div class="kp-content">
+              <p>想象你去餐厅吃饭，有两种点餐方式：</p>
+              <p><strong>方式1：单点</strong>（类似docker run）</p>
+              <p>- "我要一份宫保鸡丁"</p>
+              <p>- "我要一碗米饭"</p>
+              <p>- "我要一份青菜"</p>
+              <p>- "我要一碗汤"</p>
+              <p>每道菜都要单独点，容易遗漏，而且服务员要记录多次。</p>
+              <p><strong>方式2：套餐</strong>（类似Docker Compose）</p>
+              <p>- "我要A套餐"</p>
+              <p>套餐已经定义好了包含哪些菜品，一句话就能点完，不会遗漏，服务员也更容易记录。Docker Compose就是为你的应用定义一份"套餐菜单"，一条命令就能启动所有需要的容器。</p>
+            </div>
+          </div>
+
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>一键启动</h3>
@@ -159,6 +179,17 @@
             <div class="card">
               <h3><span class="card-num">4</span>资源管理</h3>
               <p>统一管理网络、数据卷等资源</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">Compose的核心价值</div>
+            <div class="kp-content">
+              <p>Docker Compose不仅仅是简化命令输入，它的核心价值在于：</p>
+              <p>1. <span class="key-point">声明式配置</span>：用配置文件描述"想要什么"，而不是"怎么做"</p>
+              <p>2. <span class="key-point">环境一致性</span>：开发、测试、生产环境使用同一份配置，减少"在我机器上能跑"的问题</p>
+              <p>3. <span class="key-point">版本控制</span>：配置文件可以提交到Git，团队成员共享同一份环境定义</p>
+              <p>4. <span class="key-point">快速复现</span>：新成员加入团队，只需一条命令就能搭建完整的开发环境</p>
             </div>
           </div>
         </div>
@@ -222,6 +253,20 @@ $ docker run -d \
           <div class="tip-box">
             <div class="tip-title">思考</div>
             <p>上面的命令有什么问题？首先，命令非常长，容易打错；其次，启动顺序很重要，如果先启动应用再启动数据库，应用会连接失败；最后，如果要停止或重启，需要逐个操作。Docker Compose正是为了解决这些问题而诞生的。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">手动管理的痛点详解</div>
+            <div class="kp-content">
+              <p><strong>痛点1：命令冗长易错</strong></p>
+              <p>每个容器的启动命令可能有十几个参数，一个字母打错就会导致启动失败。而且这些命令很难记忆，通常需要保存在文档中，每次启动都要复制粘贴。</p>
+              <p><strong>痛点2：启动顺序依赖</strong></p>
+              <p>数据库必须先启动，应用才能连接；如果顺序错了，应用会报错退出。手动管理时，你需要记住哪个服务依赖哪个服务，这在服务数量增多时变得非常困难。</p>
+              <p><strong>痛点3：环境不一致</strong></p>
+              <p>开发人员A在自己电脑上启动了5个容器，开发人员B可能只启动了4个，导致环境不一致。这种差异会引发"在我机器上能跑"的经典问题。</p>
+              <p><strong>痛点4：难以维护</strong></p>
+              <p>当需要修改某个容器的配置（如端口、环境变量）时，需要重新输入整条命令。如果有10个容器，就要修改10次，容易遗漏。</p>
+            </div>
           </div>
 
           <div class="knowledge-point">
@@ -388,6 +433,22 @@ $ docker compose down</code></pre>
               <p><strong>可维护性</strong>：手动修改需要重新输入命令；Compose修改文件后重新up即可</p>
             </div>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：手动编排 vs Compose编排</div>
+            <div class="kp-content">
+              <p><strong>手动编排</strong>就像组织一场音乐会，你需要：</p>
+              <p>- 逐个打电话通知每位乐手到场时间</p>
+              <p>- 记住谁先到、谁后到（小提琴手必须在指挥之前到）</p>
+              <p>- 每次演出都要重复这个过程</p>
+              <p>- 如果有新乐手加入，需要重新协调所有人</p>
+              <p><strong>Compose编排</strong>就像有一份演出计划表：</p>
+              <p>- 计划表上写明了所有乐手的到场时间和顺序</p>
+              <p>- 只需要发布一次计划表，所有人按表行动</p>
+              <p>- 每次演出都按同一份计划表执行，不会出错</p>
+              <p>- 修改计划表后，所有人自动按新计划行动</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -481,6 +542,25 @@ $ docker compose exec [服务名称] bash</code></pre>
           <div class="tip-box">
             <div class="tip-title">注意</div>
             <p>新版本使用<code>docker compose</code>（空格，作为Docker的子命令），旧版本使用<code>docker-compose</code>（连字符，独立命令）。两者功能相同，建议优先使用新版命令。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">Compose版本演进历史</div>
+            <div class="kp-content">
+              <p><strong>V1版本（docker-compose）</strong>：</p>
+              <p>- 独立的Python程序，需要单独安装</p>
+              <p>- 命令格式：<code>docker-compose up</code>（连字符）</p>
+              <p>- 配置文件版本：1.x、2.x、3.x</p>
+              <p><strong>V2版本（docker compose）</strong>：</p>
+              <p>- 集成到Docker CLI中，作为子命令</p>
+              <p>- 命令格式：<code>docker compose up</code>（空格）</p>
+              <p>- 使用Go语言重写，性能更好</p>
+              <p>- 向后兼容旧版配置文件</p>
+              <p><strong>如何选择</strong>：</p>
+              <p>- Docker Desktop用户：已内置V2版本，直接使用<code>docker compose</code></p>
+              <p>- Linux用户：Docker Engine 20.10+已包含V2，优先使用<code>docker compose</code></p>
+              <p>- 旧系统：如果只有V1版本，使用<code>docker-compose</code>也可以</p>
+            </div>
           </div>
         </div>
       </div>
@@ -731,6 +811,36 @@ volumes:
               <p>- <span class="key-point">volumes</span>：定义持久化存储。即使容器被删除，数据卷中的数据仍然存在。</p>
             </div>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：Compose文件就像建筑施工图</div>
+            <div class="kp-content">
+              <p>想象你要建造一栋房子，需要一份完整的施工图：</p>
+              <p><strong>services（服务）</strong> = 房间</p>
+              <p>- 客厅（web服务）：接待访客</p>
+              <p>- 厨房（api服务）：处理业务逻辑</p>
+              <p>- 储藏室（db服务）：存储数据</p>
+              <p>每个房间有自己的功能，但都是房子的一部分。</p>
+              <p><strong>networks（网络）</strong> = 走廊和门</p>
+              <p>- 走廊连接各个房间，让人可以在房间之间移动</p>
+              <p>- 有些房间之间有门（同一网络），可以直接互通</p>
+              <p>- 有些房间之间没有门（不同网络），需要绕路</p>
+              <p><strong>volumes（数据卷）</strong> = 保险柜</p>
+              <p>- 即使房子拆了重建（容器删除重建），保险柜里的贵重物品（数据）依然保留</p>
+              <p>- 保险柜可以从旧房子搬到新房子（数据卷可以挂载到新容器）</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">为什么使用YAML格式？</div>
+            <div class="kp-content">
+              <p>Docker Compose选择YAML格式而不是JSON或XML，主要原因是：</p>
+              <p>1. <span class="key-point">人类可读性强</span>：没有大量的括号和引号，结构清晰</p>
+              <p>2. <span class="key-point">支持注释</span>：可以在配置文件中添加说明，方便团队理解</p>
+              <p>3. <span class="key-point">简洁</span>：相同的配置，YAML比JSON少30%的字符</p>
+              <p>4. <span class="key-point">广泛应用</span>：Kubernetes、CI/CD工具都使用YAML，学习一次多处受益</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -891,6 +1001,20 @@ volumes:
               <p>- <code>working_dir</code>：设置工作目录</p>
             </div>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">服务定义与docker run命令的对应关系</div>
+            <div class="kp-content">
+              <p>Compose的服务定义本质上是docker run命令的配置化。下面是对应关系：</p>
+              <p><code>image: nginx:alpine</code> ↔ <code>docker run nginx:alpine</code></p>
+              <p><code>ports: - "8080:80"</code> ↔ <code>docker run -p 8080:80</code></p>
+              <p><code>volumes: - ./data:/app</code> ↔ <code>docker run -v ./data:/app</code></p>
+              <p><code>environment: - KEY=value</code> ↔ <code>docker run -e KEY=value</code></p>
+              <p><code>networks: - mynet</code> ↔ <code>docker run --network mynet</code></p>
+              <p><code>restart: unless-stopped</code> ↔ <code>docker run --restart unless-stopped</code></p>
+              <p>可以看到，Compose只是把命令行参数转换成了配置文件格式，更易于管理和维护。</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -974,6 +1098,42 @@ REDIS_PORT=6379</code></pre>
           <div class="tip-box">
             <div class="tip-title">安全提示</div>
             <p>密码等敏感信息不要直接写在docker-compose.yml中，应该使用.env文件，并将.env加入.gitignore，避免泄露到代码仓库。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">环境变量的优先级</div>
+            <div class="kp-content">
+              <p>当多个地方都定义了同一个环境变量时，优先级从高到低为：</p>
+              <p>1. <span class="key-point">docker-compose.yml中的environment</span>：直接写在配置文件中的变量</p>
+              <p>2. <span class="key-point">.env文件</span>：通过env_file加载的变量</p>
+              <p>3. <span class="key-point">宿主机环境变量</span>：运行docker compose命令时的shell环境变量</p>
+              <p>例如，如果docker-compose.yml中设置了<code>DB_HOST=mysql</code>，即使.env文件中设置了<code>DB_HOST=postgres</code>，最终容器内的DB_HOST也是mysql。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：环境变量就像遥控器的频道设置</div>
+            <div class="kp-content">
+              <p>想象你有一台电视机（容器），它可以接收不同的频道（配置）：</p>
+              <p><strong>硬编码配置</strong>（不使用环境变量）：</p>
+              <p>- 电视机出厂时就固定了只能看CCTV-1</p>
+              <p>- 如果想看其他频道，必须拆开电视机重新焊接电路板</p>
+              <p><strong>环境变量配置</strong>：</p>
+              <p>- 电视机出厂时预留了遥控器接口</p>
+              <p>- 通过遥控器（环境变量）可以随时切换频道</p>
+              <p>- 同一台电视机，在家里看新闻（开发环境），在办公室看财经（生产环境）</p>
+              <p>- 不需要修改电视机本身（不需要重新构建镜像）</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">.env文件的最佳实践</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">创建.env.example模板</span>：提交到Git，包含所有需要的变量名，但值为空或示例值</p>
+              <p>2. <span class="key-point">.env加入.gitignore</span>：真实的.env文件不提交，避免泄露密码</p>
+              <p>3. <span class="key-point">团队成员各自创建.env</span>：根据.env.example创建自己的.env文件</p>
+              <p>4. <span class="key-point">生产环境使用密钥管理</span>：不要在服务器上直接存储.env，使用AWS Secrets Manager等工具</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1083,6 +1243,35 @@ volumes:
               <p>- 当官方镜像不能满足需求，需要安装额外软件包时</p>
               <p>- 当需要在镜像中嵌入配置文件或静态资源时</p>
               <p>- 开发环境中代码频繁变化，需要频繁重新构建时</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">image vs build 的选择策略</div>
+            <div class="kp-content">
+              <p><strong>使用image的场景</strong>：</p>
+              <p>- 标准服务：MySQL、Redis、Nginx等成熟的开源软件</p>
+              <p>- 不需要定制：官方镜像已经满足需求</p>
+              <p>- 快速启动：直接拉取镜像比构建快得多</p>
+              <p><strong>使用build的场景</strong>：</p>
+              <p>- 自研应用：公司内部开发的业务系统</p>
+              <p>- 需要定制：需要安装特定版本的依赖包</p>
+              <p>- 开发调试：代码频繁修改，需要快速重新构建</p>
+              <p><strong>混合使用</strong>：</p>
+              <p>- 数据库、缓存等基础服务使用image</p>
+              <p>- 业务应用使用build</p>
+              <p>- 这是最常见的组合方式</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">构建缓存优化技巧</div>
+            <div class="kp-content">
+              <p>Docker构建镜像时会使用缓存，合理利用缓存可以大幅提升构建速度：</p>
+              <p>1. <span class="key-point">依赖文件先复制</span>：先COPY requirements.txt，再RUN pip install，最后COPY代码</p>
+              <p>2. <span class="key-point">不变的层放前面</span>：系统包安装放在前面，代码复制放在后面</p>
+              <p>3. <span class="key-point">使用.dockerignore</span>：排除node_modules、.git等不需要的文件</p>
+              <p>4. <span class="key-point">多阶段构建</span>：编译阶段和运行阶段分离，减小最终镜像体积</p>
             </div>
           </div>
         </div>
@@ -1641,6 +1830,34 @@ $ docker compose down</code></pre>
               <p>- 解决方案：使用健康检查（healthcheck）或重试机制</p>
             </div>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：depends_on就像排队等号</div>
+            <div class="kp-content">
+              <p>想象你去银行办业务，需要先取号，再等叫号：</p>
+              <p><strong>depends_on的行为</strong>（只管排队顺序）：</p>
+              <p>- 系统确保你在A先生之后取号</p>
+              <p>- 但不保证A先生已经办完业务</p>
+              <p>- 你可能取到号了，但A先生还在柜台办理</p>
+              <p>- 如果你的业务依赖A先生办完（比如A是你的担保人），你还是要等</p>
+              <p><strong>healthcheck的行为</strong>（等待真正就绪）：</p>
+              <p>- 不仅确保A先生先取号</p>
+              <p>- 还会等待A先生办完业务、拿到回执</p>
+              <p>- 确认A先生完全办好了，你才开始办理</p>
+              <p>- 这样你的业务就不会因为依赖未满足而失败</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">为什么depends_on不等待服务就绪？</div>
+            <div class="kp-content">
+              <p>这是Docker Compose的设计哲学：</p>
+              <p>1. <span class="key-point">解耦关注点</span>：启动顺序是编排层的责任，服务就绪是应用层的责任</p>
+              <p>2. <span class="key-point">避免假设</span>：Compose不知道"就绪"的定义（数据库可能需要初始化，Web服务可能需要预热）</p>
+              <p>3. <span class="key-point">灵活性</span>：应用可以自己实现重试逻辑，或使用healthcheck精确控制</p>
+              <p>4. <span class="key-point">快速失败</span>：如果依赖服务真的有问题，应用快速失败比无限等待更好</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1750,6 +1967,52 @@ $ docker compose down</code></pre>
             <div class="tip-title">查看健康状态</div>
             <p>使用<code>docker compose ps</code>可以查看容器的健康状态。状态包括：starting（启动中）、healthy（健康）、unhealthy（不健康）。</p>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">健康检查的工作原理</div>
+            <div class="kp-content">
+              <p>健康检查是一个定时执行的命令，Docker根据命令的退出码判断容器健康状态：</p>
+              <p>- <span class="key-point">退出码0</span>：健康（healthy）</p>
+              <p>- <span class="key-point">退出码1</span>：不健康（unhealthy）</p>
+              <p>- <span class="key-point">退出码2</span>：保留，不使用</p>
+              <p><strong>状态转换流程</strong>：</p>
+              <p>1. 容器启动 → starting状态</p>
+              <p>2. 在start_period内，检查失败不计入重试次数</p>
+              <p>3. start_period后，开始正式检查</p>
+              <p>4. 连续成功1次 → healthy状态</p>
+              <p>5. 连续失败retries次 → unhealthy状态</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：健康检查就像体检</div>
+            <div class="kp-content">
+              <p>想象容器是一个员工，健康检查就是定期体检：</p>
+              <p><strong>interval（检查间隔）</strong> = 体检频率</p>
+              <p>- 每5秒检查一次，就像每5秒量一次体温</p>
+              <p>- 频率太高浪费资源，频率太低发现问题太晚</p>
+              <p><strong>timeout（超时时间）</strong> = 体检时限</p>
+              <p>- 如果3秒内没有完成检查，认为检查失败</p>
+              <p>- 就像体检时如果医生3秒内没有得到回应，认为员工昏迷了</p>
+              <p><strong>retries（重试次数）</strong> = 确诊标准</p>
+              <p>- 连续3次体检不合格，才认定员工真的生病了</p>
+              <p>- 避免偶然的网络抖动导致误判</p>
+              <p><strong>start_period（启动宽限期）</strong> = 新员工适应期</p>
+              <p>- 新员工刚入职10秒内，体检不合格不算数</p>
+              <p>- 给服务足够的初始化时间</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">健康检查的最佳实践</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">检查命令要轻量</span>：不要执行复杂的业务逻辑，只检查服务是否响应</p>
+              <p>2. <span class="key-point">设置合理的超时</span>：timeout应该比正常响应时间长2-3倍</p>
+              <p>3. <span class="key-point">避免过于频繁</span>：interval不要太短，5-10秒是合理的范围</p>
+              <p>4. <span class="key-point">给足启动时间</span>：start_period要覆盖服务的最长初始化时间</p>
+              <p>5. <span class="key-point">记录检查日志</span>：健康检查失败时，应该有日志可查</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1837,6 +2100,37 @@ $ docker compose up -d --scale web=3 --scale api=2
               <p>- 多个副本共享数据卷时，要考虑并发写入的问题</p>
               <p>- 生产环境中建议使用Kubernetes等更强大的编排工具</p>
               <p>- 扩展后需要使用负载均衡器分发请求</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">什么是无状态服务？</div>
+            <div class="kp-content">
+              <p><strong>无状态服务</strong>：每次请求都是独立的，不依赖之前的请求</p>
+              <p>- 例子：Web服务器、API服务器</p>
+              <p>- 特点：可以随意增加或减少副本数量</p>
+              <p>- 扩展方式：水平扩展（增加更多相同的容器）</p>
+              <p><strong>有状态服务</strong>：需要保存状态，请求之间有关联</p>
+              <p>- 例子：数据库、消息队列</p>
+              <p>- 特点：不能简单地增加副本（会导致数据不一致）</p>
+              <p>- 扩展方式：垂直扩展（增加单个容器的资源）或使用集群模式</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：扩展服务就像增加收银台</div>
+            <div class="kp-content">
+              <p>想象一个超市，顾客排队结账：</p>
+              <p><strong>无状态服务扩展</strong>（收银台）：</p>
+              <p>- 平时2个收银台够用</p>
+              <p>- 周末人多，开放6个收银台</p>
+              <p>- 每个收银台功能完全相同，顾客去哪个都一样</p>
+              <p>- 这就是Web服务的水平扩展</p>
+              <p><strong>有状态服务扩展</strong>（银行柜台）：</p>
+              <p>- 你在1号柜台办理业务，办到一半</p>
+              <p>- 不能随便切换到2号柜台继续办理</p>
+              <p>- 因为1号柜台的工作人员记录了你的办理进度</p>
+              <p>- 这就是数据库等有状态服务，不能简单扩展</p>
             </div>
           </div>
 
@@ -1998,6 +2292,64 @@ volumes:
               <p>- <span class="key-point">宿主机挂载</span>：直接映射目录，适合开发环境，方便查看</p>
               <p>- <span class="key-point">只读挂载</span>：保护配置文件不被修改</p>
               <p>- <span class="key-point">临时卷</span>：容器删除即丢失，适合缓存数据</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：网络隔离就像公司的门禁系统</div>
+            <div class="kp-content">
+              <p>想象一栋办公楼，有不同的安全区域：</p>
+              <p><strong>web-net（前台网络）</strong> = 公共区域</p>
+              <p>- 访客可以进入前台（frontend服务）</p>
+              <p>- 前台可以联系办公区（backend服务）</p>
+              <p>- 但访客不能直接进入办公区</p>
+              <p><strong>db-net（后台网络）</strong> = 机密区域</p>
+              <p>- 只有持有特殊门卡的员工（backend服务）才能进入</p>
+              <p>- 数据库（database服务）在机密区域内</p>
+              <p>- 访客和前台人员都无法进入</p>
+              <p><strong>backend服务</strong> = 持有两张门卡的员工</p>
+              <p>- 可以在前台接待访客（连接web-net）</p>
+              <p>- 也可以进入机密区域查询数据（连接db-net）</p>
+              <p>- 起到桥梁作用，但不会让访客直接接触机密信息</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">网络隔离的实际应用场景</div>
+            <div class="kp-content">
+              <p><strong>场景1：多租户系统</strong></p>
+              <p>- 租户A的服务在network-a中</p>
+              <p>- 租户B的服务在network-b中</p>
+              <p>- 两个租户的数据完全隔离，互不干扰</p>
+              <p><strong>场景2：开发测试环境隔离</strong></p>
+              <p>- 开发环境的服务在dev-network中</p>
+              <p>- 测试环境的服务在test-network中</p>
+              <p>- 避免开发环境的错误影响测试环境</p>
+              <p><strong>场景3：微服务安全分层</strong></p>
+              <p>- 公开API在public-network中</p>
+              <p>- 内部服务在internal-network中</p>
+              <p>- 数据库在db-network中</p>
+              <p>- 层层隔离，提高安全性</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：数据卷就像不同类型的存储柜</div>
+            <div class="kp-content">
+              <p><strong>命名数据卷</strong> = 银行保险柜</p>
+              <p>- 银行（Docker）帮你管理，你只需要记住柜号（卷名）</p>
+              <p>- 即使你搬家（容器删除），保险柜里的东西还在</p>
+              <p>- 需要时可以重新打开（挂载到新容器）</p>
+              <p><strong>宿主机挂载</strong> = 家里的书架</p>
+              <p>- 你可以随时查看和修改书架上的书（文件）</p>
+              <p>- 书架在你家（宿主机），位置固定</p>
+              <p>- 适合经常需要查看和修改的东西</p>
+              <p><strong>只读挂载</strong> = 博物馆展柜</p>
+              <p>- 可以看，但不能碰（只读）</p>
+              <p>- 保护重要文物（配置文件）不被破坏</p>
+              <p><strong>临时卷</strong> = 购物车</p>
+              <p>- 购物时临时存放商品（临时数据）</p>
+              <p>- 结账后（容器删除）购物车就清空了</p>
             </div>
           </div>
         </div>
@@ -2411,6 +2763,275 @@ volumes:
             <div class="tip-title">学习建议</div>
             <p>掌握Docker Compose后，建议继续学习Docker Swarm或Kubernetes，了解更强大的容器编排能力。Compose是入门容器编排的最佳起点，它的概念和语法与Kubernetes有很多相似之处。</p>
           </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">Compose vs Kubernetes 对比</div>
+            <div class="kp-content">
+              <p><strong>Docker Compose</strong>：</p>
+              <p>- 适用场景：单机部署、开发测试环境、小型生产环境</p>
+              <p>- 学习曲线：平缓，几小时即可上手</p>
+              <p>- 配置复杂度：简单，一个YAML文件</p>
+              <p>- 功能：基础的多容器编排</p>
+              <p><strong>Kubernetes</strong>：</p>
+              <p>- 适用场景：大规模集群、高可用生产环境、跨主机部署</p>
+              <p>- 学习曲线：陡峭，需要数周甚至数月</p>
+              <p>- 配置复杂度：复杂，多个YAML文件（Deployment、Service、Ingress等）</p>
+              <p>- 功能：自动扩缩容、自愈、滚动更新、服务发现、负载均衡等</p>
+              <p><strong>学习路径建议</strong>：</p>
+              <p>1. 先掌握Docker基础（镜像、容器、网络、数据卷）</p>
+              <p>2. 学习Docker Compose（多容器编排）</p>
+              <p>3. 了解Docker Swarm（Docker原生集群方案，可选）</p>
+              <p>4. 深入学习Kubernetes（生产级容器编排）</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生产环境部署建议</div>
+            <div class="kp-content">
+              <p><strong>小型项目（1-3台服务器）</strong>：</p>
+              <p>- 使用Docker Compose完全够用</p>
+              <p>- 配合Docker Swarm可以实现简单的高可用</p>
+              <p>- 成本低，维护简单</p>
+              <p><strong>中型项目（3-10台服务器）</strong>：</p>
+              <p>- 可以考虑Kubernetes，但要评估学习成本</p>
+              <p>- 或者使用托管的Kubernetes服务（如AWS EKS、阿里云ACK）</p>
+              <p>- 降低运维复杂度</p>
+              <p><strong>大型项目（10+台服务器）</strong>：</p>
+              <p>- 强烈建议使用Kubernetes</p>
+              <p>- 自动化运维能力是必需的</p>
+              <p>- 投入学习成本是值得的</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本讲核心要点回顾</h1>
+        </div>
+        <div class="page-body">
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心知识点</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">Docker Compose</span>是多容器应用的编排工具，通过YAML文件定义服务</p>
+              <p>2. <span class="highlight">docker-compose.yml</span>包含services、networks、volumes三大核心部分</p>
+              <p>3. <span class="highlight">depends_on</span>控制启动顺序，<span class="highlight">healthcheck</span>确保服务就绪</p>
+              <p>4. <span class="highlight">环境变量</span>实现配置与代码分离，.env文件管理敏感信息</p>
+              <p>5. <span class="highlight">网络隔离</span>提高安全性，<span class="highlight">数据卷</span>实现数据持久化</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">实践建议</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">从简单开始</span>：先用Compose部署单个应用，熟悉基本命令</p>
+              <p>2. <span class="key-point">逐步复杂化</span>：添加数据库、缓存等依赖服务</p>
+              <p>3. <span class="key-point">配置版本化</span>：将docker-compose.yml提交到Git</p>
+              <p>4. <span class="key-point">环境分离</span>：使用不同的.env文件区分开发、测试、生产环境</p>
+              <p>5. <span class="key-point">监控日志</span>：养成查看日志的习惯，快速定位问题</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">常用命令速查</div>
+            <div class="kp-content">
+              <p><code>docker compose up -d</code> - 启动所有服务（后台运行）</p>
+              <p><code>docker compose down</code> - 停止并删除所有容器</p>
+              <p><code>docker compose ps</code> - 查看服务状态</p>
+              <p><code>docker compose logs -f [服务名]</code> - 查看日志</p>
+              <p><code>docker compose exec [服务名] bash</code> - 进入容器</p>
+              <p><code>docker compose restart [服务名]</code> - 重启服务</p>
+              <p><code>docker compose up -d --build</code> - 重新构建并启动</p>
+              <p><code>docker compose down -v</code> - 删除容器和数据卷</p>
+            </div>
+          </div>
+
+          <div class="next-lecture">
+            <h3>下节预告：第十一讲 Docker实战项目</h3>
+            <ul>
+              <li>综合运用Docker和Compose部署完整的Web应用</li>
+              <li>实现CI/CD自动化部署流程</li>
+              <li>生产环境的最佳实践和性能优化</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">清理</span>
+          <h1 class="page-title">实验环境清理</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">为什么需要清理实验环境？</div>
+            <div class="definition-content">
+              完成实验后，及时清理环境可以<span class="highlight">释放系统资源</span>、<span class="highlight">避免端口冲突</span>、<span class="highlight">保持系统整洁</span>。Docker容器和网络会占用内存、磁盘空间和网络端口，定期清理是良好的实践习惯。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">清理单个项目的实验环境</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 进入项目目录
+$ cd ~/my-compose-project
+
+# 停止并删除所有容器（保留数据卷）
+$ docker compose down
+
+# 停止并删除所有容器和数据卷（完全清理）
+$ docker compose down -v
+
+# 停止并删除所有容器、数据卷和镜像
+$ docker compose down -v --rmi all</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">清理所有实验容器和网络</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 停止所有运行中的容器
+$ docker stop $(docker ps -q)
+
+# 删除所有已停止的容器
+$ docker container prune -f
+
+# 删除所有未使用的网络
+$ docker network prune -f
+
+# 删除所有未使用的数据卷
+$ docker volume prune -f
+
+# 删除所有未使用的镜像
+$ docker image prune -a -f</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">一键清理所有Docker资源（谨慎使用）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 清理所有未使用的资源（容器、网络、镜像、构建缓存）
+$ docker system prune -a -f
+
+# 清理所有资源包括数据卷（会删除所有数据！）
+$ docker system prune -a -f --volumes
+
+# 查看Docker占用的磁盘空间
+$ docker system df
+
+# 查看详细的磁盘使用情况
+$ docker system df -v</code></pre>
+          </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">⚠️ 重要提示</div>
+            <div class="highlight-content">
+              <p><code>docker system prune -a -f --volumes</code> 会删除所有未使用的容器、网络、镜像和数据卷，包括你可能还需要的数据。</p>
+              <p>在生产环境或重要项目中，请谨慎使用此命令。建议先使用 <code>docker system df</code> 查看资源占用情况，再决定是否清理。</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">清理本讲实验环境的完整脚本</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code>#!/bin/bash
+# 清理第十讲所有实验环境
+
+echo "=========================================="
+echo "清理Docker Compose实验环境"
+echo "=========================================="
+
+# 如果你按照讲义创建了多个实验项目，逐个清理
+cd ~/lemp-project 2>/dev/null && docker compose down -v
+cd ~/flask-app 2>/dev/null && docker compose down -v
+cd ~/wordpress-app 2>/dev/null && docker compose down -v
+
+# 清理所有实验容器（假设容器名包含exp或test）
+docker ps -a | grep -E "exp|test" | awk '{print $1}' | xargs -r docker rm -f
+
+# 清理所有实验网络
+docker network ls | grep -E "exp|test" | awk '{print $1}' | xargs -r docker network rm
+
+# 清理未使用的资源
+docker container prune -f
+docker network prune -f
+
+echo "✅ 清理完成！"
+echo ""
+echo "查看剩余容器："
+docker ps -a
+echo ""
+echo "查看剩余网络："
+docker network ls</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">清理命令对比</div>
+            <div class="kp-content">
+              <p><code>docker compose down</code> - 只删除当前项目的容器和网络，保留数据卷和镜像</p>
+              <p><code>docker compose down -v</code> - 删除容器、网络和数据卷，保留镜像</p>
+              <p><code>docker compose down -v --rmi all</code> - 删除所有资源包括镜像</p>
+              <p><code>docker container prune</code> - 删除所有已停止的容器</p>
+              <p><code>docker system prune</code> - 删除所有未使用的容器、网络、镜像</p>
+              <p><code>docker system prune --volumes</code> - 删除所有未使用的资源包括数据卷</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">清理的最佳实践</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">实验后立即清理</span>：完成实验后立即执行 <code>docker compose down -v</code></p>
+              <p>2. <span class="key-point">定期检查资源</span>：每周执行 <code>docker system df</code> 查看磁盘占用</p>
+              <p>3. <span class="key-point">保留重要数据</span>：清理前确认数据卷中没有重要数据</p>
+              <p>4. <span class="key-point">分步清理</span>：先清理容器，再清理网络，最后清理数据卷和镜像</p>
+              <p>5. <span class="key-point">使用标签</span>：为实验容器添加标签，方便批量清理</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">生产环境注意事项</div>
+            <p>在生产环境中，<strong>永远不要</strong>使用 <code>docker system prune -a -f --volumes</code>。这会删除所有未运行的容器和数据，可能导致数据丢失。生产环境应该有明确的清理策略和备份机制。</p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看清理效果</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看所有容器（包括已停止的）
+$ docker ps -a
+
+# 查看所有网络
+$ docker network ls
+
+# 查看所有数据卷
+$ docker volume ls
+
+# 查看所有镜像
+$ docker images
+
+# 查看Docker磁盘使用情况
+$ docker system df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          10        5         2.5GB     1.2GB (48%)
+Containers      8         3         100MB     50MB (50%)
+Local Volumes   5         2         500MB     300MB (60%)
+Build Cache     0         0         0B        0B</code></pre>
+          </div>
+
+          <div class="key-conclusion">
+            <div class="conclusion-title">清理环境的重要性</div>
+            <div class="conclusion-content">
+              <p>定期清理Docker环境不仅可以释放磁盘空间，还能避免端口冲突、网络混乱等问题。养成良好的清理习惯，是成为优秀Docker使用者的重要一步。</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2421,7 +3042,7 @@ volumes:
       <div class="page-indicator">
         <span class="current" id="currentPage">1</span>
         <span class="separator">/</span>
-        <span class="total" id="totalPages">28</span>
+        <span class="total" id="totalPages">30</span>
       </div>
       <button class="nav-btn next" id="nextBtn">下一页</button>
     </div>
