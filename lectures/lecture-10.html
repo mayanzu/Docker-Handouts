@@ -360,7 +360,19 @@ $ cd ecommerce-project</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">步骤2：创建docker-compose.yml文件</span>
+              <span class="code-title">步骤2：创建测试页面</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建html目录
+$ mkdir html
+
+# 创建测试页面
+$ echo "&lt;h1&gt;电商系统运行成功！&lt;/h1&gt;&lt;p&gt;Nginx: 8085 | httpd: 8084&lt;/p&gt;" &gt; html/index.html</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤3：创建docker-compose.yml文件</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 使用文本编辑器创建配置文件（以下三种方式任选其一）
@@ -380,7 +392,7 @@ EOF</code></pre>
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">步骤3：编写docker-compose.yml配置内容</span>
+              <span class="code-title">步骤4：编写docker-compose.yml配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
             <pre><code>version: "3.8"
@@ -390,6 +402,8 @@ services:
     image: nginx:alpine
     ports:
       - "8085:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
     depends_on:
       - api
     networks:
@@ -432,38 +446,7 @@ volumes:
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">步骤4：创建简单的测试页面</span>
-              <span class="code-lang">Bash</span>
-            </div>
-            <pre><code># 创建html目录
-$ mkdir html
-
-# 创建测试页面
-$ echo "&lt;h1&gt;电商系统运行成功！&lt;/h1&gt;&lt;p&gt;Nginx: 8085 | httpd: 8084&lt;/p&gt;" &gt; html/index.html</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">步骤5：修改docker-compose.yml添加volumes</span>
-              <span class="code-lang">YAML</span>
-            </div>
-            <pre><code># 在web服务中添加volumes配置
-services:
-  web:
-    image: nginx:alpine
-    ports:
-      - "8085:80"
-    volumes:
-      - ./html:/usr/share/nginx/html
-    depends_on:
-      - api
-    networks:
-      - ecommerce-net</code></pre>
-          </div>
-
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-title">步骤6：启动服务并验证</span>
+              <span class="code-title">步骤5：启动服务并验证</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 启动所有服务（自动创建网络、按依赖顺序启动）
