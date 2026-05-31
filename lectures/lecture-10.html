@@ -432,7 +432,38 @@ volumes:
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">Compose操作：一条命令完成所有操作</span>
+              <span class="code-title">步骤4：创建简单的测试页面</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建html目录
+$ mkdir html
+
+# 创建测试页面
+$ echo "&lt;h1&gt;电商系统运行成功！&lt;/h1&gt;&lt;p&gt;Nginx: 8085 | httpd: 8084&lt;/p&gt;" &gt; html/index.html</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤5：修改docker-compose.yml添加volumes</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code># 在web服务中添加volumes配置
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8085:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    depends_on:
+      - api
+    networks:
+      - ecommerce-net</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤6：启动服务并验证</span>
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 启动所有服务（自动创建网络、按依赖顺序启动）
@@ -440,6 +471,12 @@ $ docker compose up -d
 
 # 查看所有服务状态（一目了然）
 $ docker compose ps
+
+# 验证服务
+$ curl http://localhost:8085
+# 应该看到：电商系统运行成功！
+
+# 在浏览器访问：http://localhost:8085
 
 # 查看所有服务日志（统一输出）
 $ docker compose logs -f
@@ -1456,14 +1493,12 @@ volumes:
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建PHP测试文件
-$ echo "<?php phpinfo(); ?>" > html/index.php
-
-# 或者创建一个更复杂的测试页面
 $ cat > html/index.php << 'EOF'
-<?php
-echo "<h1>LEMP Stack is Working!</h1>";
-echo "<p>PHP Version: " . phpversion() . "</p>";
-?>
+<?php echo "<h1>LEMP Stack is Working!</h1>"; ?>
+<p>PHP Version: <?php echo phpversion(); ?></p>
+<p>Web Server: Nginx</p>
+<p>Database: MySQL 8.0</p>
+<p>phpMyAdmin: <a href="http://localhost:8080">http://localhost:8080</a></p>
 EOF</code></pre>
           </div>
 
@@ -1628,7 +1663,12 @@ redis_client = redis.Redis(host=redis_host, port=6379)
 def hello():
     # 使用Redis计数器记录访问次数
     count = redis_client.incr('visit_count')
-    return f'Hello! 这是第 {count} 次访问。'
+    return f'''
+    <h1>Flask应用运行成功！</h1>
+    <p>访问计数: {count} 次</p>
+    <p>Redis缓存: 正常</p>
+    <p>访问地址: http://localhost:5000</p>
+    '''
 
 @app.route('/health')
 def health():
@@ -2559,6 +2599,15 @@ volumes:
 
           <div class="code-block" style="margin-top: 1.5rem;">
             <div class="code-header">
+              <span class="code-title">创建测试页面</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 创建测试页面
+$ echo "<h1>LNMP实验环境部署成功！</h1><p>Nginx + PHP + MySQL</p>" > html/index.html</code></pre>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.5rem;">
+            <div class="code-header">
               <span class="code-title">关键命令（实验操作）</span>
               <span class="code-lang">Bash</span>
             </div>
@@ -2570,6 +2619,7 @@ $ docker compose ps
 
 # 访问服务验证
 # 打开浏览器访问 http://localhost:8082
+# 应该看到"LNMP实验环境部署成功！"
 
 # 查看日志（实时跟踪）
 $ docker compose logs -f
