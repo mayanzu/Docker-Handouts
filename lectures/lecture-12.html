@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第十二讲 Kubernetes核心概念 - 虚拟化容器技术</title>
+  <link rel="stylesheet" href="../template/lecture-template.css">
+</head>
+<body>
+  <div class="lecture-page">
+    <div class="page-container" id="pageContainer">
+
+      <!-- 封面 -->
+      <div class="page cover-page">
+        <div class="cover-content">
+          <div class="course-badge">虚拟化容器技术</div>
+          <h1 class="main-title">第十二讲</h1>
+          <h2 class="sub-title">Kubernetes核心概念</h2>
+          <p class="tagline">从单机Docker到集群编排，理解K8s的架构、组件与kubectl，迈入云原生世界</p>
+          <div class="meta-info">
+            <span>40学时 / 2.5学分</span>
+            <span>数据科学与大数据技术</span>
+            <span>考查</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 目录 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">目录</span>
+          <h1 class="page-title">本讲内容导航</h1>
+        </div>
+        <div class="page-body">
+          <div class="toc-section">
+            <div class="toc-title">课程大纲</div>
+            <ul class="toc-list">
+              <li>
+                <span class="toc-num">01</span>
+                <span class="toc-text">第一部分：为什么需要Kubernetes——从Compose到集群编排</span>
+              </li>
+              <li>
+                <span class="toc-num">02</span>
+                <span class="toc-text">第二部分：Kubernetes整体架构与核心组件</span>
+              </li>
+              <li>
+                <span class="toc-num">03</span>
+                <span class="toc-text">第三部分：核心对象——Pod、Node、Namespace</span>
+              </li>
+              <li>
+                <span class="toc-num">04</span>
+                <span class="toc-text">第四部分：搭建本地集群与kubectl命令</span>
+              </li>
+              <li>
+                <span class="toc-num">05</span>
+                <span class="toc-text">第五部分：动手实验、故障排查与环境清理</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="note-box" style="margin-top: 1rem;">
+            <p><strong>本讲定位</strong>：这是从 <span class="highlight">Docker 迈向 Kubernetes</span> 的第一讲。前十一讲我们掌握了单机上的容器构建、编排（Compose）与监控；本讲开始进入<span class="highlight">多机集群编排</span>。重点是理解 K8s 的"声明式 + 期望状态"思想和整体架构，<strong>概念优先于命令</strong>，后续第13~15讲再逐一深入。</p>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">学习建议</div>
+            <div class="kp-content">
+              <p>Kubernetes 概念多、组件多，初学最容易"被名词淹没"。建议抓住一条主线：<span class="key-point">你只负责声明"我想要什么"，K8s 负责让现实不断逼近你的期望</span>。本讲所有架构和组件，都是为这一句话服务的。请务必动手用 minikube 搭一个本地集群，跟着每个 kubectl 命令敲一遍。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 课程目标 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">01</span>
+          <h1 class="page-title">课程目标</h1>
+        </div>
+        <div class="page-body">
+          <div class="objective-list">
+            <div class="objective-item">
+              <div class="objective-num">01</div>
+              <div class="objective-content">
+                <h3>理解为什么需要K8s</h3>
+                <p>理解Docker Compose的<span class="key-point">单机局限</span>，以及集群编排要解决的问题</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">02</div>
+              <div class="objective-content">
+                <h3>掌握声明式思想</h3>
+                <p>区分<span class="highlight">命令式与声明式</span>，理解"期望状态"与"控制循环"</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">03</div>
+              <div class="objective-content">
+                <h3>理解整体架构</h3>
+                <p>说清<span class="key-point">控制平面与工作节点</span>的分工及各核心组件的职责</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">04</div>
+              <div class="objective-content">
+                <h3>理解核心对象</h3>
+                <p>理解<span class="highlight">Pod、Node、Namespace</span>等最基础的K8s对象</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">05</div>
+              <div class="objective-content">
+                <h3>搭建本地集群</h3>
+                <p>能用<span class="key-point">minikube</span>搭建本地集群并验证可用</p>
+              </div>
+            </div>
+            <div class="objective-item">
+              <div class="objective-num">06</div>
+              <div class="objective-content">
+                <h3>使用kubectl</h3>
+                <p>掌握<span class="highlight">kubectl</span>常用命令，部署并访问第一个应用</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 预备知识 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预备</span>
+          <h1 class="page-title">本讲需要的预备知识</h1>
+        </div>
+        <div class="page-body">
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>集群是什么</h3>
+              <p>集群（Cluster）就是<span class="highlight">把多台机器联合起来，当成一台"超级电脑"使用</span>。你不再关心"应用跑在哪台机器上"，而是把任务交给集群，由它统一调度。Kubernetes就是管理这个集群的"大脑"。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>声明式是什么</h3>
+              <p><span class="highlight">命令式</span>是"一步步告诉怎么做"（先启动A，再启动B）；<span class="highlight">声明式</span>是"只说要什么结果"（我要3个副本一直运行）。K8s是声明式的：你写下期望，它负责实现并持续维持。</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>控制器是什么</h3>
+              <p>控制器（Controller）是一个<span class="highlight">不停循环检查的"管家"</span>：它对比"你想要的"和"现在实际的"，发现不一致就动手纠正。容器挂了它自动重启，这就是K8s"自愈"的来源。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">本讲涉及的工具，先混个脸熟</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Kubernetes（K8s）</span>：容器集群编排系统，本讲主角。"K8s"是把"K"和"s"之间的8个字母缩写的写法。</p>
+              <p>- <span class="key-point">kubectl</span>：和K8s集群对话的命令行工具，发音"cube-control"。你的所有指令都通过它发给集群。</p>
+              <p>- <span class="key-point">minikube</span>：在你自己电脑上跑一个"单节点K8s集群"的工具，专为学习和开发设计。</p>
+              <p>- <span class="key-point">Pod</span>：K8s里最小的部署单位，可以理解为"一个或一组紧密协作的容器"。</p>
+              <p style="margin-top:0.5rem;">一句话串起来：用 <strong>kubectl</strong> 把"期望"发给 <strong>minikube</strong> 搭的 <strong>K8s</strong> 集群，集群帮你把应用跑成 <strong>Pod</strong>。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 常用命令与环境 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">预备</span>
+          <h1 class="page-title">本讲常用的几个命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">先混个脸熟</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># minikube start：在本机启动一个单节点K8s集群
+$ minikube start
+
+# kubectl get nodes：查看集群里有哪些机器（节点）
+$ kubectl get nodes
+
+# kubectl get pods：查看正在运行的Pod
+$ kubectl get pods
+
+# kubectl apply -f xxx.yaml：把YAML里声明的期望状态交给集群
+$ kubectl apply -f deployment.yaml</code></pre>
+          </div>
+
+          <div class="note-box" style="margin-top: 1rem;">
+            <p><strong>环境说明</strong>：本讲实验依赖 <code>minikube</code> + <code>kubectl</code>。minikube 需要一个"驱动"来跑虚拟节点，最省心的是直接用 <span class="highlight">Docker 驱动</span>（复用前面装好的 Docker）。在 Windows/WSL2、macOS、Linux 上都可用 Docker 驱动。若机器内存紧张（建议至少 4GB 可用），可在 <code>minikube start</code> 时用 <code>--memory</code> 限制。</p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">安装检查（建议先做）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 检查Docker（minikube用它作为驱动）
+$ docker version
+
+# 检查kubectl是否安装
+$ kubectl version --client
+
+# 检查minikube是否安装
+$ minikube version
+
+# 若未安装，参考官方文档：
+# kubectl:  https://kubernetes.io/docs/tasks/tools/
+# minikube: https://minikube.sigs.k8s.io/docs/start/</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热身演示 -->
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">热身</span>
+          <h1 class="page-title">3 分钟快速演示：你的第一个Pod</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">先不管原理，跑一遍感受 K8s 和 <code>docker run</code> 的差别。假设你已经 <code>minikube start</code> 成功。</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Step 1：让集群跑一个Nginx</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 注意：这里不是docker run，而是把"我要一个nginx"告诉集群
+$ kubectl create deployment my-nginx --image=nginx:alpine
+
+# 查看Pod——集群已经帮你把nginx跑起来了
+$ kubectl get pods
+# NAME                        READY   STATUS    RESTARTS   AGE
+# my-nginx-xxxxxxxxx-yyyyy     1/1     Running   0          20s</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Step 2：见证"自愈"——删掉它试试</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 手动删除这个Pod
+$ kubectl delete pod my-nginx-xxxxxxxxx-yyyyy
+
+# 立刻再查，会发现——又冒出来一个新的Pod！
+$ kubectl get pods
+# my-nginx-xxxxxxxxx-zzzzz     1/1     Running   0          5s</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">等等！删掉的Pod为什么自己回来了？</div>
+            <p>用 <code>docker rm</code> 删掉容器，它就永远没了。但在 K8s 里，你之前声明的期望是"<strong>要有一个my-nginx一直运行</strong>"。</p>
+            <p>你删掉一个，集群发现"实际只有0个，期望是1个"，于是<strong>自动补上一个新的</strong>。这就是 K8s 的核心——<strong>声明式 + 自愈</strong>。</p>
+            <p style="margin-top:1rem;">它不像 Docker 那样"执行一次命令"，而是<strong>持续努力维持你声明的状态</strong>。带着"它凭什么能做到"这个问题，进入 Part 1。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 1 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 1</span>
+          <h1 class="section-title">为什么需要Kubernetes</h1>
+          <p class="section-desc">从单机Compose到集群编排</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.1</span>
+          <h1 class="page-title">Docker Compose的天花板</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">单机编排的局限</div>
+            <div class="definition-content">
+              第十讲的 Docker Compose 解决了"<span class="highlight">在一台机器上编排多个容器</span>"的问题。但它有一个根本前提：<span class="highlight">所有容器都跑在同一台机器上</span>。一旦业务增长，单机就会触及天花板。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            想象你用 Compose 部署了一个电商网站，运行得很好。但随着用户增多，新的问题接踵而至——这些问题，Compose 都无能为力，而它们正是 Kubernetes 要解决的。
+          </p>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>场景</th>
+                <th>Docker Compose（单机）</th>
+                <th>Kubernetes（集群）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">机器扛不住</span></td>
+                <td>只能升级这一台机器（纵向扩展，有上限）</td>
+                <td>加机器进集群，横向扩展，几乎无上限</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">机器宕机</span></td>
+                <td>整台机器挂了，服务全停</td>
+                <td>自动把容器调度到其他健康机器上</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">容器崩溃</span></td>
+                <td>靠restart策略重启，能力有限</td>
+                <td>控制器持续监控，自动重建并维持副本数</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">流量高峰</span></td>
+                <td>手动改配置、手动扩容</td>
+                <td>支持自动扩缩容（HPA），按负载增减副本</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">滚动更新</span></td>
+                <td>需手动停旧启新，易中断</td>
+                <td>内置滚动更新与回滚，不中断服务</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：Compose是"个体户"，K8s是"连锁集团"</div>
+            <div class="kp-content">
+              <p><strong>Docker Compose = 一家小餐馆</strong>：老板（你）亲自安排后厨、前台、收银，一切都在这一间店里。店面就这么大，客人多了挤不下，老板病了店就关门。</p>
+              <p><strong>Kubernetes = 连锁餐饮集团</strong>：总部（控制平面）只下达"全国要有100家在营业的门店"的目标，各地分店（节点）自动开张。某家店着火了，总部立刻在别处补开一家，始终维持100家。你只管定目标，总部负责落地和兜底。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.2</span>
+          <h1 class="page-title">Kubernetes是什么</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Kubernetes定义</div>
+            <div class="definition-content">
+              Kubernetes是一个<span class="highlight">开源的容器编排平台</span>，用于自动化容器化应用的<span class="highlight">部署、扩缩容和管理</span>。它最初由Google基于内部Borg系统的经验开发，2014年开源，现由CNCF（云原生计算基金会）托管，是云原生时代<span class="highlight">事实上的标准</span>。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            "Kubernetes"源自希腊语，意为"舵手"或"领航员"——它就像一艘巨型货轮（装满集装箱/容器）的船长，负责指挥成千上万个容器在集群中有序地装载、运输、调度。常缩写为 <code>K8s</code>（K和s之间有8个字母）。
+          </p>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3><span class="card-num">1</span>自动调度</h3>
+              <p>根据资源情况，自动决定容器跑在哪台机器上</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">2</span>自愈能力</h3>
+              <p>容器/节点故障时自动重建、迁移，维持期望状态</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">3</span>弹性伸缩</h3>
+              <p>按负载自动增减副本数，应对流量波动</p>
+            </div>
+            <div class="card">
+              <h3><span class="card-num">4</span>服务发现</h3>
+              <p>内置DNS与负载均衡，容器间通过名字互相访问</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">K8s不是要取代Docker</div>
+            <div class="kp-content">
+              <p>初学者常误以为"学了K8s就不用Docker了"。其实两者是<strong>不同层次</strong>的工具：</p>
+              <p>- <span class="key-point">Docker</span>：负责"造容器"——打镜像、跑单个容器，是<strong>容器运行时</strong>层面。</p>
+              <p>- <span class="key-point">Kubernetes</span>：负责"管一大堆容器"——在多台机器上调度、编排，是<strong>编排</strong>层面。</p>
+              <p>K8s 底层仍然需要一个容器运行时来真正跑容器（如 containerd）。你用 Docker 构建的镜像，照样能在 K8s 里运行。可以说：<strong>Docker 管"一个"，K8s 管"一群"</strong>。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">K8s适合什么场景？</div>
+            <div class="kp-content">
+              <p><strong>适合</strong>：微服务架构、需要高可用、需要弹性伸缩、多团队多环境、跨多台服务器的中大型系统。</p>
+              <p><strong>不一定需要</strong>：个人项目、单机小应用、几个容器就能搞定的场景——这时 Docker Compose 反而更简单。<strong>不要为了用K8s而用K8s</strong>，它的复杂度是有成本的。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">1.3</span>
+          <h1 class="page-title">声明式与期望状态</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">命令式 vs 声明式</div>
+            <div class="definition-content">
+              <span class="highlight">命令式（Imperative）</span>：你下达一条条具体指令，告诉系统"怎么做"。<span class="highlight">声明式（Declarative）</span>：你描述"想要的最终状态"，系统自己想办法达成并维持。Kubernetes 是<span class="highlight">声明式</span>的，这是理解它一切行为的钥匙。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">两种风格的对比</span>
+              <span class="code-lang">对比</span>
+            </div>
+            <pre><code>  命令式（像Docker）：一步步指挥
+    docker run nginx        # 启动第1个
+    docker run nginx        # 启动第2个
+    docker run nginx        # 启动第3个
+    # 如果挂了一个，你得自己发现并再run一次
+
+  声明式（像K8s）：只声明结果
+    "我要3个nginx副本一直运行"   （写在YAML里）
+    # 挂了一个？K8s自动补到3个
+    # 想要5个？把数字改成5，它自动多起2个
+    # 你永远只描述"要什么"，不关心"怎么做"</code></pre>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">期望状态与控制循环</div>
+            <div class="definition-content">
+              你声明的目标叫<span class="highlight">期望状态（Desired State）</span>，集群当前的真实情况叫<span class="highlight">实际状态（Current State）</span>。K8s内部的控制器不停运行一个<span class="highlight">控制循环（Control Loop）</span>：对比两者，发现差异就采取行动，让实际状态不断向期望状态靠拢。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">控制循环：K8s永不停歇的"找茬-纠正"</span>
+              <span class="code-lang">流程</span>
+            </div>
+            <pre><code>        ┌─────────────────────────────┐
+        │   期望状态：3个nginx副本      │
+        └──────────────┬──────────────┘
+                       │ 对比
+                       v
+        ┌─────────────────────────────┐
+        │   实际状态：现在只有2个       │   ← 有一个崩溃了
+        └──────────────┬──────────────┘
+                       │ 发现差异（少1个）
+                       v
+        ┌─────────────────────────────┐
+        │   采取行动：再创建1个         │
+        └──────────────┬──────────────┘
+                       │ 循环往复（每时每刻）
+                       └──────► 回到对比
+
+  这个循环一刻不停，所以K8s能"自愈"——
+  这正是热身演示里"删掉Pod又自己回来"的原因。</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：声明式就像家里的恒温空调</div>
+            <div class="kp-content">
+              <p><strong>命令式</strong>：像老式空调，你手动按"制冷"按钮一段时间，热了再按一次，全靠你盯着。</p>
+              <p><strong>声明式（K8s）</strong>：像设定了26℃的恒温空调。你只声明"我要26℃"（期望状态），空调自己不停测温（实际状态），高了就制冷、低了就停，<strong>持续维持</strong>你要的温度，无需你干预。</p>
+              <p>K8s 就是你整个集群的"恒温器"：你设定期望，它永远努力维持。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 2</span>
+          <h1 class="section-title">Kubernetes整体架构</h1>
+          <p class="section-desc">控制平面、工作节点与核心组件</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.0</span>
+          <h1 class="page-title">架构总览：大脑与四肢</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">两类节点</div>
+            <div class="definition-content">
+              一个K8s集群由两类机器组成：<span class="highlight">控制平面节点（Control Plane / Master）</span>负责"决策与管理"，是集群的大脑；<span class="highlight">工作节点（Worker Node）</span>负责"真正跑容器"，是集群的四肢。你的应用容器都运行在工作节点上。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Kubernetes集群架构图</span>
+              <span class="code-lang">架构图</span>
+            </div>
+            <pre><code>            你（管理员）
+               │ kubectl 发送"期望状态"
+               v
+  ┌───────────────────────────────────────────┐
+  │        控制平面 Control Plane（大脑）        │
+  │  ┌──────────────┐   ┌──────────────────┐   │
+  │  │  API Server   │   │      etcd         │   │
+  │  │ (统一入口/前台)│◄─►│ (集群数据库/账本) │   │
+  │  └──────┬───────┘   └──────────────────┘   │
+  │  ┌──────┴───────┐   ┌──────────────────┐   │
+  │  │  Scheduler    │   │ Controller Manager│   │
+  │  │ (调度器/派活)  │   │ (控制器/管家)     │   │
+  │  └──────────────┘   └──────────────────┘   │
+  └───────────────────────┬───────────────────┘
+                          │ 下发指令
+        ┌─────────────────┼─────────────────┐
+        v                 v                 v
+  ┌───────────┐    ┌───────────┐    ┌───────────┐
+  │ Worker节点1│    │ Worker节点2│    │ Worker节点3│
+  │ ┌───────┐ │    │ ┌───────┐ │    │ ┌───────┐ │
+  │ │kubelet│ │    │ │kubelet│ │    │ │kubelet│ │
+  │ └───────┘ │    │ └───────┘ │    │ └───────┘ │
+  │ [Pod][Pod]│    │ [Pod][Pod]│    │ [Pod][Pod]│ ← 你的应用
+  └───────────┘    └───────────┘    └───────────┘
+       四肢：真正运行容器的地方</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：架构就像一家物流公司</div>
+            <div class="kp-content">
+              <p>- <strong>API Server（调度中心前台）</strong>：所有指令的唯一入口，对外接单，对内协调</p>
+              <p>- <strong>etcd（公司总账本）</strong>：记录"现在有哪些货、在哪、状态如何"的唯一权威账本</p>
+              <p>- <strong>Scheduler（派单员）</strong>：决定每个新订单（Pod）派给哪个司机（节点）</p>
+              <p>- <strong>Controller Manager（车队主管）</strong>：盯着"该有10辆车在路上"，少了就再派一辆</p>
+              <p>- <strong>Worker节点（司机+货车）</strong>：真正拉货跑运输的人，对应运行容器的机器</p>
+              <p>- <strong>kubelet（司机本人）</strong>：在每辆车上，听总部指挥，负责把货装好运到位</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">学习集群时，minikube是"麻雀虽小五脏俱全"</div>
+            <p>用 minikube 搭的本地集群，通常把控制平面和工作节点<strong>合并在一个节点</strong>上（单节点集群）。组件一个不少，只是没有"多台机器"的物理隔离。理解了架构，再上多节点集群就水到渠成。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.1</span>
+          <h1 class="page-title">控制平面组件</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">控制平面（Control Plane）</div>
+            <div class="definition-content">
+              控制平面是集群的"大脑"，由四个核心组件组成，负责<span class="highlight">接收请求、存储状态、调度决策、维持期望</span>。它本身不跑业务容器，只做管理。
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">① API Server——集群的唯一入口</div>
+            <div class="kp-content">
+              <p>所有组件、所有 <code>kubectl</code> 命令，都必须经过 API Server。它就像公司的<strong>前台总机</strong>：对外接收请求、做认证鉴权，对内是其他组件交流的中转站。</p>
+              <p><span class="key-point">关键</span>：其他组件之间<strong>不直接对话</strong>，全部通过 API Server。这种"中心化"设计让集群清晰可控。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">② etcd——集群的数据库</div>
+            <div class="kp-content">
+              <p>etcd 是一个<strong>分布式键值数据库</strong>，保存集群的<strong>全部状态</strong>：有哪些Pod、跑在哪、配置是什么……它是集群的"<strong>唯一事实来源</strong>"。</p>
+              <p><span class="key-point">关键</span>：etcd 里存的是"期望状态"。API Server 把你的声明写进 etcd，其他组件读 etcd 来干活。<strong>etcd 数据丢了，集群就失忆了</strong>，所以生产环境必须定期备份。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">③ Scheduler——调度器</div>
+            <div class="kp-content">
+              <p>当一个新 Pod 需要运行，Scheduler 负责决定它<strong>该放到哪个工作节点</strong>。它会综合考虑：哪个节点资源够（CPU/内存）、有没有特殊要求（标签、亲和性）等，挑出最合适的节点。</p>
+              <p><span class="key-point">类比</span>：像派单员，手里一堆订单（待调度Pod）和一队司机（节点），把每单派给最合适的司机。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">④ Controller Manager——控制器管理器</div>
+            <div class="kp-content">
+              <p>它运行着各种<strong>控制器</strong>，每个控制器盯着一类资源跑"控制循环"。比如 Deployment 控制器盯着"副本数对不对"，节点控制器盯着"节点还活着吗"。</p>
+              <p><span class="key-point">这就是Part 1.3控制循环的执行者</span>：发现实际≠期望，就动手纠正。K8s的"自愈"能力，主要由这里实现。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.2</span>
+          <h1 class="page-title">工作节点组件</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">工作节点（Worker Node）</div>
+            <div class="definition-content">
+              工作节点是真正<span class="highlight">运行业务容器</span>的机器。每个工作节点上都有三个关键角色：<span class="highlight">kubelet</span>（节点代理）、<span class="highlight">kube-proxy</span>（网络代理）、<span class="highlight">容器运行时</span>（真正跑容器）。
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">① kubelet——节点上的"工头"</div>
+            <div class="kp-content">
+              <p>kubelet 是每个工作节点上的代理，<strong>听 API Server 指挥</strong>。它负责：接收"在本节点运行某Pod"的指令、调用容器运行时把容器拉起来、持续向控制平面汇报本节点和Pod的健康状况。</p>
+              <p><span class="key-point">类比</span>：工地上的工头，听总部安排，指挥工人（容器运行时）干活，并定时上报进度。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">② kube-proxy——节点上的"网络交警"</div>
+            <div class="kp-content">
+              <p>kube-proxy 负责本节点的<strong>网络规则</strong>，实现 Service 的负载均衡和转发。当你访问一个 Service，它确保请求被正确转发到后端某个 Pod。</p>
+              <p><span class="key-point">铺垫</span>：Service 的细节是第十四讲的内容，这里只需知道"容器间通信、负载均衡靠它落地"。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">③ 容器运行时（Container Runtime）</div>
+            <div class="kp-content">
+              <p>真正"跑容器"的底层程序，常见的是 <strong>containerd</strong>。kubelet 通过标准接口（CRI）调用它来创建、启动、停止容器。</p>
+              <p><span class="key-point">历史小知识</span>：早期 K8s 直接用 Docker 作为运行时，1.24 版本起移除了内置的 Docker 支持（dockershim），改用更轻量的 containerd。但<strong>你用 Docker 构建的镜像完全不受影响</strong>，因为镜像格式是统一的（OCI标准）。</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">控制平面 vs 工作节点，一句话区分</div>
+            <p><strong>控制平面"动脑"</strong>（决策、存储、调度），<strong>工作节点"动手"</strong>（真正跑容器）。kubectl 把命令发给控制平面的 API Server，API Server 协调各组件，最终由工作节点的 kubelet 把容器跑起来。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">2.3</span>
+          <h1 class="page-title">一个Pod的诞生全过程</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            把前面的组件串起来，看一个最经典的问题：当你执行 <code>kubectl apply</code> 要部署一个应用，集群内部到底发生了什么？理解这条链路，整个架构就活了。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">从"声明"到"运行"的完整旅程</span>
+              <span class="code-lang">分步流程</span>
+            </div>
+            <pre><code>  场景：你执行 kubectl apply -f deployment.yaml（要3个nginx）
+
+  第1步：kubectl → API Server
+    kubectl 把YAML（期望状态）发给 API Server
+    API Server 认证、校验后，把它写入 etcd
+
+  第2步：Controller Manager 发现新任务
+    Deployment控制器从 API Server 得知"要3个nginx"
+    当前实际是0个，于是创建3个Pod对象（仅登记，还没真正运行）
+    这3个Pod此时状态是 Pending（待调度）
+
+  第3步：Scheduler 派活
+    Scheduler 发现有3个Pending的Pod没着落
+    根据各节点资源，决定每个Pod放到哪个节点
+    把"Pod→节点"的绑定结果写回 API Server（存入etcd）
+
+  第4步：kubelet 真正干活
+    目标节点上的 kubelet 从 API Server 得知"你要跑这个Pod"
+    调用容器运行时（containerd）拉取nginx镜像、启动容器
+    Pod 状态变为 Running
+
+  第5步：持续汇报与维持
+    kubelet 不断把Pod健康状况报回 API Server
+    控制器持续对比：少了就补，多了就删，永远维持3个</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">这条链路揭示的三个设计精髓</div>
+            <div class="kp-content">
+              <p>1. <span class="key-point">一切围绕API Server</span>：所有组件只和它对话，通过读写 etcd 间接协作，互不直接依赖。</p>
+              <p>2. <span class="key-point">状态驱动，而非命令驱动</span>：没有谁"命令"kubelet干活，而是各组件不断观察状态、响应变化。</p>
+              <p>3. <span class="key-point">职责分离</span>：登记（控制器）、决策放哪（调度器）、落地执行（kubelet）各司其职，清晰解耦。</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">为什么Pod会卡在Pending？</div>
+            <p>看懂上面的流程就明白：Pod 长期 <code>Pending</code>，通常是<strong>第3步调度失败</strong>——没有节点满足它的资源要求（如内存不够），Scheduler 找不到合适的节点放它。这是后面故障排查的高频问题。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 3</span>
+          <h1 class="section-title">核心对象概念</h1>
+          <p class="section-desc">Pod、Node、Namespace</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.1</span>
+          <h1 class="page-title">Pod——最小调度单位</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Pod定义</div>
+            <div class="definition-content">
+              Pod是Kubernetes中<span class="highlight">最小的部署和调度单位</span>。它是<span class="highlight">一个或多个容器的组合</span>，这些容器共享同一个网络（同一个IP）和存储卷，总是被<span class="highlight">一起调度到同一个节点</span>、一起创建、一起销毁。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            这是初学者的第一个关键认知转变：在 Docker 里，最小单位是"容器"；在 K8s 里，最小单位是"Pod"。<strong>K8s 不直接管理容器，而是管理 Pod</strong>。大多数情况下，一个 Pod 里就一个容器，但 Pod 这层抽象给了 K8s 更大的灵活性。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Pod内部结构示意</span>
+              <span class="code-lang">示意图</span>
+            </div>
+            <pre><code>  ┌─────────── Pod（共享同一个IP：10.244.0.5）───────────┐
+  │                                                      │
+  │   ┌────────────┐      ┌────────────┐                 │
+  │   │  容器A      │      │  容器B(可选)│                 │
+  │   │  主应用     │      │  辅助/Sidecar│                │
+  │   └────────────┘      └────────────┘                 │
+  │         │                    │                       │
+  │         └──── 共享网络 lo ────┘  ← 彼此用localhost互访 │
+  │         └──── 共享存储卷 ──────┘                       │
+  └──────────────────────────────────────────────────────┘
+
+  同一Pod内的容器：用 localhost 就能互相通信
+  不同Pod之间：用各自的Pod IP 通信</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：Pod就像一个豌豆荚</div>
+            <div class="kp-content">
+              <p>"Pod"本意就是"豆荚"。把容器想象成豆荚里的<strong>豌豆</strong>：</p>
+              <p>- 一个豆荚（Pod）里可以有一颗或几颗豌豆（容器）</p>
+              <p>- 同一豆荚里的豌豆<strong>挨得最近</strong>（共享网络和存储，localhost互通）</p>
+              <p>- 摘豆荚是整个摘下来（Pod整体调度、整体销毁），不会只摘半个豆荚</p>
+              <p>这呼应了第九讲学过的 Container 网络模式——同Pod容器共享网络栈，正是那个原理在K8s里的体现。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">什么时候一个Pod放多个容器？</div>
+            <div class="kp-content">
+              <p>多数 Pod 只有一个容器。但当两个容器<strong>紧密耦合、必须同生共死</strong>时，会放进同一个Pod，典型是 <span class="key-point">Sidecar（边车）模式</span>：</p>
+              <p>- <strong>日志收集</strong>：主容器跑应用，边车容器收集它的日志并外发</p>
+              <p>- <strong>代理</strong>：主容器跑业务，边车容器做网络代理（如服务网格的 Envoy）</p>
+              <p>- <strong>内容同步</strong>：主容器是Web服务器，边车定时从Git拉取最新网页内容</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">重要：一般不直接创建Pod</div>
+            <p>虽然能用 <code>kubectl run</code> 直接创建一个裸 Pod，但生产中<strong>几乎从不这么做</strong>。因为裸 Pod 没有"自愈"——节点挂了它就没了，不会自动重建。我们总是通过 <strong>Deployment</strong> 等控制器来间接管理 Pod，由控制器保证副本数。这是第十三讲的核心内容。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.2</span>
+          <h1 class="page-title">Node与Namespace</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Node（节点）</div>
+            <div class="definition-content">
+              Node 是集群中的<span class="highlight">一台机器</span>（物理机或虚拟机），是 Pod 真正运行的地方。每个 Node 上都装有 kubelet、kube-proxy 和容器运行时。Node 是 K8s 的"资源池"——所有 Pod 都从 Node 提供的 CPU、内存里分配资源。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看集群节点</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看集群有哪些节点
+$ kubectl get nodes
+# NAME       STATUS   ROLES           AGE   VERSION
+# minikube   Ready    control-plane   5m    v1.30.0
+# （minikube是单节点，既是控制平面又是工作节点）
+
+# 查看节点详情（资源、状态、上面跑了哪些Pod）
+$ kubectl describe node minikube</code></pre>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">Namespace（命名空间）</div>
+            <div class="definition-content">
+              Namespace 是集群内部的<span class="highlight">逻辑隔离分区</span>，用来把一个物理集群"切分"成多个互不干扰的虚拟空间。不同 Namespace 里可以有同名资源，便于多团队、多环境共用一个集群。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Namespace常用操作</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看所有命名空间
+$ kubectl get namespaces
+# NAME              STATUS   AGE
+# default           Active   10m   ← 你不指定时默认用这个
+# kube-system       Active   10m   ← K8s自身组件运行在这里
+# kube-public       Active   10m
+
+# 创建一个命名空间
+$ kubectl create namespace dev
+
+# 在指定命名空间里查看Pod（-n 指定命名空间）
+$ kubectl get pods -n kube-system
+# 能看到 coredns、etcd、kube-apiserver 等系统组件</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：Node是楼，Namespace是楼里的分区</div>
+            <div class="kp-content">
+              <p><strong>Node（节点）</strong> = 一栋办公楼，提供真实的水电空间（CPU/内存）。集群有几个Node，就是有几栋楼。</p>
+              <p><strong>Namespace（命名空间）</strong> = 楼里按部门划分的区域。研发部（dev）、测试部（test）、财务部各占一片，互不打扰。即使两个部门都有个叫"打印机"的东西（同名资源），也不会冲突，因为分属不同区域。</p>
+              <p>注意：Namespace 是<strong>逻辑</strong>隔离（划区域），不是<strong>物理</strong>隔离（不是分到不同楼）。同一个Node上可以跑着不同Namespace的Pod。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">kube-system：千万别乱动</div>
+            <div class="kp-content">
+              <p><code>kube-system</code> 命名空间里跑着 K8s 自己的核心组件（API Server、etcd、CoreDNS等）。<strong>初学者不要在这里创建或删除东西</strong>，误删系统组件会导致集群瘫痪。你的应用应该放在 <code>default</code> 或自建的命名空间里。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">3.3</span>
+          <h1 class="page-title">控制器与Service概览</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            Pod、Node、Namespace 是地基。在它们之上，K8s 还有一组更高层的对象，本讲先建立印象，第十三、十四讲再深入。理解它们"是干什么的"，比记住细节更重要。
+          </p>
+
+          <div class="definition-box">
+            <div class="definition-term">Deployment（部署）——下一讲主角</div>
+            <div class="definition-content">
+              Deployment 是最常用的<span class="highlight">工作负载控制器</span>，负责管理一组相同的 Pod 副本。你声明"我要3个nginx"，Deployment 就保证始终有3个在运行，并支持<span class="highlight">滚动更新、回滚、扩缩容</span>。前面热身演示里"删掉Pod又回来"，正是 Deployment 在背后兜底。
+            </div>
+          </div>
+
+          <div class="definition-box">
+            <div class="definition-term">Service（服务）——第十四讲主角</div>
+            <div class="definition-content">
+              Pod 是"短命"的——会被销毁重建，IP 随时变化。Service 给一组 Pod 提供一个<span class="highlight">固定的访问入口（稳定IP和DNS名）</span>，并自动负载均衡到后端健康的 Pod，解决了"Pod IP 总变、没法稳定访问"的问题。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">核心对象的层次关系</span>
+              <span class="code-lang">层次图</span>
+            </div>
+            <pre><code>  Deployment（我要3个nginx，并保证它们一直在）
+       │ 管理
+       v
+  ReplicaSet（具体维持3个副本的控制器，由Deployment创建）
+       │ 管理
+       v
+  Pod、Pod、Pod（3个真正运行的最小单位）
+       │ 运行在
+       v
+  Node（机器）
+       ▲
+       │ 对外暴露访问入口
+  Service（给这3个Pod一个固定入口 + 负载均衡）</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">生活类比：把这些对象串成一个外卖店</div>
+            <div class="kp-content">
+              <p>- <strong>Pod</strong> = 一个外卖小哥，能干活但可能随时离职（被销毁）</p>
+              <p>- <strong>Deployment</strong> = 站长，规定"必须始终有3个小哥在岗"，有人离职马上招新人</p>
+              <p>- <strong>Service</strong> = 对外的统一客服电话，顾客打这个号就行，由它自动转给某个在岗小哥，不用记每个小哥的私人号码（Pod IP）</p>
+              <p>- <strong>Namespace</strong> = 这家店所在的商圈分区</p>
+              <p>- <strong>Node</strong> = 承载这一切的物理门面</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">本讲到此为"概念建立"，命令在Part 4</div>
+            <p>Part 3 的目标是让你脑海里有一张"K8s对象地图"。不必纠结于如何写 Deployment/Service 的YAML（那是13、14讲的事）。接下来 Part 4 我们搭好集群，亲手用 kubectl 操作这些对象，把概念落到实处。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 4 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 4</span>
+          <h1 class="section-title">集群搭建与kubectl</h1>
+          <p class="section-desc">用minikube或Docker Desktop搭集群，用kubectl操作</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.1</span>
+          <h1 class="page-title">用minikube搭建本地集群</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">minikube定义</div>
+            <div class="definition-content">
+              minikube 是官方推荐的<span class="highlight">本地K8s学习工具</span>，它在你电脑上启动一个"单节点集群"——把控制平面和工作节点放在同一个虚拟节点里。组件齐全，专为学习、开发和测试设计，<span class="highlight">不适合生产</span>。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启动集群</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 用Docker作为驱动启动集群（复用已装好的Docker，最省心）
+$ minikube start --driver=docker
+
+# 资源紧张时可限制内存和CPU
+$ minikube start --driver=docker --memory=2200mb --cpus=2
+
+# 启动需要拉取镜像，第一次稍慢，看到 "Done!" 即成功
+# 完成后minikube会自动配置好kubectl，使其指向这个集群</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">验证集群可用</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 查看集群状态
+$ minikube status
+# host: Running
+# kubelet: Running
+# apiserver: Running
+
+# 查看节点——应有一个名为minikube的节点，状态Ready
+$ kubectl get nodes
+# NAME       STATUS   ROLES           AGE   VERSION
+# minikube   Ready    control-plane   1m    v1.30.0
+
+# 查看系统组件是否都跑起来了
+$ kubectl get pods -n kube-system</code></pre>
+          </div>
+
+          <div class="highlight-box info">
+            <div class="highlight-title">minikube的实用附加命令</div>
+            <div class="highlight-content">
+              <p>- <code>minikube dashboard</code>：打开图形化的K8s仪表盘（类似第十一讲的Portainer，但是K8s版）</p>
+              <p>- <code>minikube stop</code>：停止集群（保留数据，下次start继续）</p>
+              <p>- <code>minikube delete</code>：彻底删除集群（清理实验环境用）</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">minikube vs kind vs 真实集群</div>
+            <p>本地学习还有 <code>kind</code>（Kubernetes IN Docker）等工具。它们都用于<strong>学习/测试</strong>。真实生产集群则用 kubeadm 自建，或直接用云厂商的托管K8s（阿里云ACK、AWS EKS等）。除了 minikube，<strong>Docker Desktop 自带一个一键开启的 K8s</strong>，对已装 Docker Desktop 的同学更省事——见下一页。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.2</span>
+          <h1 class="page-title">用Docker Desktop启用Kubernetes</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">Docker Desktop内置Kubernetes</div>
+            <div class="definition-content">
+              如果你用的是 <span class="highlight">Windows 或 macOS 上的 Docker Desktop</span>，其实<span class="highlight">不用额外装 minikube</span>——Docker Desktop 自带一个单节点 Kubernetes，在设置里勾选一下就能启用。它和 minikube 二选一即可，对已经装好 Docker Desktop 的同学最省心。
+            </div>
+          </div>
+
+          <p class="paragraph">
+            这是真正的"演示友好"路径：无需命令行、无需额外下载，点几下鼠标就有了一个本地 K8s 集群，<code>kubectl</code> 也会被自动配置好。下面是图形化操作步骤。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">启用步骤（Docker Desktop图形界面）</span>
+              <span class="code-lang">操作步骤</span>
+            </div>
+            <pre><code># 1. 打开 Docker Desktop，点右上角齿轮进入 Settings（设置）
+# 2. 左侧选择 "Kubernetes"
+# 3. 勾选 "Enable Kubernetes"（启用 Kubernetes）
+# 4. 点击 "Apply & Restart"（应用并重启）
+# 5. Docker Desktop 会拉取K8s组件镜像并启动，
+#    底部状态栏出现绿色的 "Kubernetes running" 即成功
+#    （第一次启动需要联网下载，请耐心等待几分钟）</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">验证集群（命令行）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># Docker Desktop 会自动把 kubectl 指向它的集群
+# 查看节点——节点名就叫 docker-desktop
+$ kubectl get nodes
+# NAME             STATUS   ROLES           AGE   VERSION
+# docker-desktop   Ready    control-plane   2m    v1.30.x
+
+# 查看系统组件（和minikube一样，五脏俱全）
+$ kubectl get pods -n kube-system</code></pre>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">演示要点：节点名能区分用的是哪套</div>
+            <p>看 <code>kubectl get nodes</code> 的节点名就知道当前连的是哪个集群：<code>minikube</code> 说明是 minikube，<code>docker-desktop</code> 说明是 Docker Desktop 内置的。这在课堂演示时一眼就能确认"现在到底在操作哪个集群"。</p>
+          </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">使用前提与注意</div>
+            <div class="highlight-content">
+              <p>- 仅 <strong>Windows / macOS 的 Docker Desktop</strong> 有此功能；纯 Linux 服务器请用 minikube 或 kubeadm</p>
+              <p>- 比较吃内存，建议在 Docker Desktop 的 Settings → Resources 里给到 <strong>至少 4GB</strong></p>
+              <p>- 不想用时，在同一设置页<strong>取消勾选</strong> Enable Kubernetes 即可关闭；出问题可点 "Reset Kubernetes Cluster" 重置</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.3</span>
+          <h1 class="page-title">minikube与Docker Desktop如何选</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">两种本地集群方案</div>
+            <div class="definition-content">
+              minikube 和 Docker Desktop 内置 K8s 都能给你一个<span class="highlight">本地单节点集群</span>，本讲实验<span class="highlight">用哪个都行</span>。区别主要在"装在哪、灵活性、占用资源"上，下面对比帮你选择。
+            </div>
+          </div>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>对比项</th>
+                <th>minikube</th>
+                <th>Docker Desktop 内置K8s</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="highlight">适用平台</span></td>
+                <td>Windows / macOS / Linux 全支持</td>
+                <td>仅 Windows / macOS</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">安装方式</span></td>
+                <td>需单独下载 minikube</td>
+                <td>已装Docker Desktop即可，勾选启用</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">启动方式</span></td>
+                <td>命令行 <code>minikube start</code></td>
+                <td>图形界面点选，对新手更直观</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">灵活性</span></td>
+                <td>高，可指定K8s版本、多节点、丰富插件</td>
+                <td>较低，版本跟随Docker Desktop</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">附带仪表盘</span></td>
+                <td><code>minikube dashboard</code> 一键打开</td>
+                <td>需自行部署Dashboard</td>
+              </tr>
+              <tr>
+                <td><span class="highlight">关闭/清理</span></td>
+                <td><code>minikube stop/delete</code></td>
+                <td>设置里取消勾选 / Reset</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">两套都装了？用context切换</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># kubectl 通过"上下文(context)"决定连哪个集群
+# 列出所有上下文，带 * 的是当前正在用的
+$ kubectl config get-contexts
+# CURRENT   NAME             CLUSTER          ...
+# *         docker-desktop   docker-desktop
+#           minikube         minikube
+
+# 切换到 minikube 集群
+$ kubectl config use-context minikube
+
+# 切回 Docker Desktop 集群
+$ kubectl config use-context docker-desktop
+
+# 切换后务必再确认一次连的是哪个
+$ kubectl get nodes</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">给本课的建议</div>
+            <div class="kp-content">
+              <p>- <span class="key-point">Windows/Mac 且已装 Docker Desktop</span>：直接勾选启用，最省事，适合快速跟着演示走</p>
+              <p>- <span class="key-point">Linux，或想体验更接近真实集群</span>：用 minikube，灵活性更好，还自带 dashboard</p>
+              <p>- <span class="key-point">关键提醒</span>：<strong>两个集群不要同时开</strong>，都很吃内存；用哪个就只开哪个。同时装了就用 <code>kubectl config use-context</code> 来回切。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.4</span>
+          <h1 class="page-title">kubectl核心命令</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">kubectl定义</div>
+            <div class="definition-content">
+              kubectl 是与集群交互的<span class="highlight">命令行工具</span>，本质是 API Server 的客户端——你敲的每条命令，都被翻译成 HTTP 请求发给 API Server。掌握几个高频命令，就能应付日常80%的操作。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">查看类命令（最常用）</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># get：列出某类资源（pods/nodes/services/deployments...）
+$ kubectl get pods                 # 当前命名空间的Pod
+$ kubectl get pods -A              # 所有命名空间（-A = --all-namespaces）
+$ kubectl get pods -o wide         # 显示更多信息（IP、所在节点）
+$ kubectl get all                  # 查看常见资源的总览
+
+# describe：查看某个资源的详细信息和事件（排错神器）
+$ kubectl describe pod <pod名>
+# 输出底部的 Events 部分，是排查问题的第一现场
+
+# logs：查看Pod里容器的日志（等价于docker logs）
+$ kubectl logs <pod名>
+$ kubectl logs -f <pod名>          # -f 实时跟踪
+
+# exec：进入Pod里的容器（等价于docker exec）
+$ kubectl exec -it <pod名> -- sh   # 注意中间的 --</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">命令的统一格式</div>
+            <div class="kp-content">
+              <p>kubectl 命令几乎都遵循同一个套路：</p>
+              <p><code>kubectl [动作] [资源类型] [资源名] [选项]</code></p>
+              <p>- <strong>动作</strong>：get（看列表）、describe（看详情）、create/apply（创建）、delete（删除）、logs、exec…</p>
+              <p>- <strong>资源类型</strong>：pod、node、service(svc)、deployment(deploy)、namespace(ns)…（括号是简写）</p>
+              <p>例如 <code>kubectl get svc -n dev</code> = 查看dev命名空间的所有Service。记住这个格式，命令就不用死记。</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">exec命令里的 -- 是什么？</div>
+            <p><code>kubectl exec -it mypod -- sh</code> 中间的 <code>--</code> 用来<strong>分隔</strong>"kubectl的参数"和"要在容器里执行的命令"。<code>--</code> 后面的 <code>sh</code> 是在容器里跑的。漏写 <code>--</code> 是新手常见错误。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.5</span>
+          <h1 class="page-title">命令式：快速创建资源</h1>
+        </div>
+        <div class="page-body">
+          <p class="paragraph">
+            操作 K8s 有两种风格，对应 Part 1.3 讲的命令式与声明式。先看<strong>命令式</strong>——用一条条 kubectl 命令直接创建，适合快速实验和临时操作。
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">命令式部署与暴露一个Nginx</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 1. 创建一个Deployment（它会保证Pod一直在）
+$ kubectl create deployment web --image=nginx:alpine
+
+# 2. 查看创建出来的Deployment和Pod
+$ kubectl get deployments
+$ kubectl get pods
+
+# 3. 扩容到3个副本（声明"我现在要3个"）
+$ kubectl scale deployment web --replicas=3
+$ kubectl get pods    # 现在能看到3个web-xxx的Pod
+
+# 4. 把Deployment暴露为Service，对外提供访问入口
+$ kubectl expose deployment web --port=80 --type=NodePort
+
+# 5. 用minikube打开这个服务（自动在浏览器访问）
+$ minikube service web
+# 看到Nginx欢迎页，说明从Service到Pod的链路通了</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">这几条命令复习了Part 3的对象</div>
+            <div class="kp-content">
+              <p>- <code>create deployment</code> → 创建 <span class="key-point">Deployment</span>（站长），它自动建出 Pod</p>
+              <p>- <code>scale --replicas=3</code> → 修改期望副本数，控制器自动补齐到3个</p>
+              <p>- <code>expose ... --type=NodePort</code> → 创建 <span class="key-point">Service</span>（客服电话），给3个Pod一个统一入口</p>
+              <p>短短几行，就把"声明式 + 控制器 + 服务发现"全跑了一遍。</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">命令式的缺点</div>
+            <p>命令式快，但<strong>不可复现、难维护</strong>：一堆命令散落各处，换个环境得重敲一遍，也没法存进 Git 做版本管理。这正是生产环境更偏爱声明式的原因——见下一页。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">4.6</span>
+          <h1 class="page-title">声明式：用YAML管理</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">声明式（kubectl apply）</div>
+            <div class="definition-content">
+              声明式是 K8s 的<span class="highlight">推荐做法</span>：把期望状态写进 YAML 文件，用 <code>kubectl apply -f</code> 提交给集群。文件即"事实"，可版本化、可复现、可审阅。这与第十讲的 <code>docker-compose.yml</code> 一脉相承——都是"用文件描述期望"。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">deployment.yaml（逐行注释）</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code>apiVersion: apps/v1          # 用哪个API版本
+kind: Deployment             # 对象类型：Deployment
+metadata:
+  name: web                  # 这个Deployment叫web
+spec:
+  replicas: 3                # 期望状态：3个副本（核心！）
+  selector:
+    matchLabels:
+      app: web               # 管理带 app=web 标签的Pod
+  template:                  # Pod模板：副本长什么样
+    metadata:
+      labels:
+        app: web             # 给Pod打上 app=web 标签
+    spec:
+      containers:
+      - name: nginx          # 容器名
+        image: nginx:alpine  # 用哪个镜像
+        ports:
+        - containerPort: 80  # 容器监听的端口</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">应用与更新</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 提交期望状态给集群（创建或更新）
+$ kubectl apply -f deployment.yaml
+
+# 想改成5个副本？改YAML里的replicas: 5，再apply一次即可
+# K8s会自动对比差异，只做必要的变更（多起2个Pod）
+$ kubectl apply -f deployment.yaml
+
+# 查看声明式对象的rollout状态
+$ kubectl rollout status deployment/web
+
+# 删除：用同一份文件，确保删干净
+$ kubectl delete -f deployment.yaml</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">命令式 vs 声明式，如何选？</div>
+            <div class="kp-content">
+              <p><strong>命令式（create/scale/expose）</strong>：适合临时实验、快速验证、学习探索。优点是快，缺点是不可复现。</p>
+              <p><strong>声明式（apply -f yaml）</strong>：适合正式项目、团队协作、生产部署。YAML文件提交到Git，谁都能复现同一套环境，改配置只需改文件再apply。</p>
+              <p><span class="key-point">最佳实践</span>：学习时多用命令式快速感受，真正部署时一律用声明式YAML。这和第十讲"用docker-compose.yml而非一堆docker run"的道理完全一致。</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">apply 的"幂等"特性</div>
+            <p><code>kubectl apply</code> 可以<strong>反复执行</strong>而不会出错：第一次创建，之后每次都只把实际状态调整到与文件一致。这种"执行多少次结果都一样"的特性叫<strong>幂等</strong>，是声明式的一大优势——你不用关心"现在是第几次执行"。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 5 章节页 -->
+      <div class="page section-page">
+        <div class="section-content">
+          <span class="section-label">Part 5</span>
+          <h1 class="section-title">动手实验与故障排查</h1>
+          <p class="section-desc">部署第一个应用、排查与清理</p>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">部署并访问第一个应用（一）</h1>
+        </div>
+        <div class="page-body">
+          <div class="experiment-section">
+            <div class="experiment-header">
+              <span class="experiment-badge">实验</span>
+              <span class="experiment-title">用声明式YAML部署Nginx并对外访问</span>
+            </div>
+            <div class="experiment-purpose">
+              <h4>实验目的</h4>
+              <p>综合运用本讲所学：搭建集群、用YAML声明Deployment、暴露Service、验证自愈，完整体验"声明式 + 控制循环"的威力。</p>
+            </div>
+            <div class="experiment-steps">
+              <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">1</span><span class="step-text">启动minikube集群并确认就绪</span></div>
+              <div class="step-item"><span class="step-num">2</span><span class="step-text">编写 deployment.yaml 和 service.yaml</span></div>
+              <div class="step-item"><span class="step-num">3</span><span class="step-text">apply 提交，查看Pod与Service</span></div>
+              <div class="step-item"><span class="step-num">4</span><span class="step-text">通过Service访问Nginx</span></div>
+              <div class="step-item"><span class="step-num">5</span><span class="step-text">删除一个Pod，验证自愈</span></div>
+              <div class="step-item"><span class="step-num">6</span><span class="step-text">扩容到4个副本</span></div>
+            </div>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.2rem;">
+            <div class="code-header">
+              <span class="code-title">步骤1-2：启动集群并准备YAML</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤1：启动集群
+$ minikube start --driver=docker
+$ kubectl get nodes        # 确认minikube节点 Ready
+
+# 步骤2：创建项目目录与两个YAML
+$ mkdir k8s-first && cd k8s-first
+
+# deployment.yaml：声明3个nginx副本
+$ cat > deployment.yaml << 'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+EOF</code></pre>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.2rem;">
+            <div class="code-header">
+              <span class="code-title">步骤2（续）：service.yaml</span>
+              <span class="code-lang">YAML</span>
+            </div>
+            <pre><code># service.yaml：给web这组Pod一个固定访问入口
+$ cat > service.yaml << 'EOF'
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-svc
+spec:
+  type: NodePort          # 通过节点端口对外暴露
+  selector:
+    app: web              # 选中所有 app=web 的Pod
+  ports:
+  - port: 80              # Service端口
+    targetPort: 80        # 转发到Pod的80端口
+EOF</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">实验</span>
+          <h1 class="page-title">部署并访问第一个应用（二）</h1>
+        </div>
+        <div class="page-body">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">步骤3-6：部署、访问、自愈、扩容</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 步骤3：提交期望状态
+$ kubectl apply -f deployment.yaml
+$ kubectl apply -f service.yaml
+
+$ kubectl get pods        # 应有3个 web-xxx 的Pod，STATUS=Running
+$ kubectl get svc web-svc # 看到Service及其端口
+
+# 步骤4：通过Service访问（minikube会打开浏览器）
+$ minikube service web-svc
+# 或拿到URL用curl测试
+$ minikube service web-svc --url
+
+# 步骤5：验证自愈——删掉一个Pod
+$ kubectl delete pod <某个web-xxx>
+$ kubectl get pods        # 立刻又补出一个新的，始终保持3个
+
+# 步骤6：扩容到4个副本（改YAML再apply）
+$ sed -i 's/replicas: 3/replicas: 4/' deployment.yaml
+$ kubectl apply -f deployment.yaml
+$ kubectl get pods        # 现在是4个</code></pre>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">实验预期结果（逐步对照）</div>
+            <div class="kp-content">
+              <p><strong>步骤3预期</strong>：<code>kubectl get pods</code> 显示3个web开头的Pod，全部Running、READY为1/1。</p>
+              <p><strong>步骤4预期</strong>：浏览器/ curl 看到 "Welcome to nginx!" 页面，证明 Service → Pod 链路通畅。</p>
+              <p><strong>步骤5预期</strong>：删除后再查，总数仍是3个（一个新Pod补位，名字不同、AGE很小），亲眼见证自愈。</p>
+              <p><strong>步骤6预期</strong>：Pod数量变为4，且无需重建已有Pod——K8s只做"差量"调整。</p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-title">对比第十讲，体会进步</div>
+            <p>第十讲用 Compose 也能跑3个Nginx，但删掉一个不会自动恢复，机器宕机就全没了。这里的 Deployment 会<strong>持续维持副本数</strong>，这正是从"单机编排"迈向"集群编排"的本质飞跃。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">5.1</span>
+          <h1 class="page-title">常见问题排查指南</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">排查总原则</div>
+            <div class="definition-content">
+              K8s 排查的万能起手式是两条命令：<span class="highlight">kubectl get pods</span>（看状态）和 <span class="highlight">kubectl describe pod &lt;名&gt;</span>（看详情和Events）。<span class="highlight">describe 输出底部的 Events</span> 几乎总能告诉你问题出在哪。
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题1：Pod一直处于 Pending</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：<code>get pods</code> 显示 STATUS=Pending，长时间不变。</p>
+              <p><strong>原因</strong>：调度失败，没有节点能容纳它（最常见是资源不足）。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. <code>kubectl describe pod &lt;名&gt;</code> 看 Events，常见提示 "Insufficient cpu/memory"</p>
+              <p>2. 给 minikube 分配更多资源重启：<code>minikube start --memory=4g --cpus=2</code></p>
+              <p>3. 或降低Pod的资源请求（resources.requests）</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题2：ImagePullBackOff / ErrImagePull</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：Pod 状态为 ImagePullBackOff。</p>
+              <p><strong>原因</strong>：拉取镜像失败——镜像名拼错、标签不存在、或网络拉不到。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. 检查 image 拼写和标签是否正确</p>
+              <p>2. <code>kubectl describe pod &lt;名&gt;</code> 看 Events 里的具体拉取错误</p>
+              <p>3. 国内网络可配置镜像加速，或先 <code>docker pull</code> 验证镜像能拉到</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题3：CrashLoopBackOff</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：Pod 反复重启，状态 CrashLoopBackOff。</p>
+              <p><strong>原因</strong>：容器启动后很快就崩溃退出，K8s 不停重启它。通常是应用本身报错、配置缺失、依赖未就绪。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. <code>kubectl logs &lt;名&gt;</code> 看容器日志，定位崩溃原因（最关键）</p>
+              <p>2. 若已重启多次，看上一次的日志：<code>kubectl logs &lt;名&gt; --previous</code></p>
+              <p>3. 检查环境变量、配置、启动命令是否正确</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">问题4：Service访问不通</div>
+            <div class="kp-content">
+              <p><strong>现象</strong>：Pod 都Running，但通过Service访问不到。</p>
+              <p><strong>原因</strong>：常见是 Service 的 <code>selector</code> 标签和 Pod 的 <code>labels</code> 对不上，导致Service没选中任何Pod。</p>
+              <p><strong>解决</strong>：</p>
+              <p>1. <code>kubectl describe svc &lt;名&gt;</code> 看 Endpoints，若为空说明没选中Pod</p>
+              <p>2. 核对 Service 的 selector 与 Deployment 模板里的 labels 完全一致</p>
+              <p>3. minikube 下用 <code>minikube service &lt;名&gt;</code> 而非直接访问 NodePort</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">排查命令速查</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code>$ kubectl get pods -o wide          # 看状态、IP、所在节点
+$ kubectl describe pod <名>          # 看详情，重点看Events
+$ kubectl logs <名>                  # 看容器日志
+$ kubectl logs <名> --previous       # 看崩溃前的日志
+$ kubectl get events --sort-by=.lastTimestamp  # 看全局事件
+$ kubectl describe svc <名>          # 看Service的Endpoints</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">总结</span>
+          <h1 class="page-title">本讲核心要点回顾</h1>
+        </div>
+        <div class="page-body">
+          <div class="key-conclusion">
+            <div class="conclusion-title">核心知识点</div>
+            <div class="conclusion-content">
+              <p>1. <span class="highlight">K8s解决Compose的单机局限</span>：跨机调度、自愈、弹性伸缩、滚动更新</p>
+              <p>2. <span class="highlight">声明式是核心思想</span>：你声明期望状态，控制循环持续让现实逼近期望</p>
+              <p>3. <span class="highlight">架构分两层</span>：控制平面（API Server/etcd/Scheduler/Controller Manager）动脑，工作节点（kubelet/kube-proxy/运行时）动手</p>
+              <p>4. <span class="highlight">核心对象</span>：Pod是最小单位，Node是机器，Namespace是逻辑隔离，Deployment管副本，Service给入口</p>
+              <p>5. <span class="highlight">kubectl是唯一入口工具</span>：get/describe/logs/exec四件套，apply -f提交YAML</p>
+              <p>6. <span class="highlight">minikube</span>用于本地学习，一条命令搭起五脏俱全的单节点集群</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">从Docker到K8s的认知跃迁</div>
+            <div class="kp-content">
+              <p>- 管理单位：从"容器"变成"<span class="key-point">Pod</span>"</p>
+              <p>- 操作方式：从"命令式docker run"变成"<span class="key-point">声明式apply YAML</span>"</p>
+              <p>- 可靠性：从"挂了就没了"变成"<span class="key-point">控制器自愈</span>，持续维持期望"</p>
+              <p>- 范围：从"一台机器"变成"<span class="key-point">一个集群</span>"</p>
+              <p>抓住"声明期望 + 控制循环"这条主线，K8s 再多的概念都有了归属。</p>
+            </div>
+          </div>
+
+          <div class="knowledge-point">
+            <div class="kp-title">常用命令速查</div>
+            <div class="kp-content">
+              <p><code>minikube start</code> - 启动本地集群</p>
+              <p><code>kubectl get nodes/pods/svc</code> - 查看资源</p>
+              <p><code>kubectl describe pod &lt;名&gt;</code> - 看详情与事件（排错）</p>
+              <p><code>kubectl logs -f &lt;名&gt;</code> - 看日志</p>
+              <p><code>kubectl exec -it &lt;名&gt; -- sh</code> - 进入容器</p>
+              <p><code>kubectl apply -f xxx.yaml</code> - 声明式提交</p>
+              <p><code>kubectl scale deploy &lt;名&gt; --replicas=N</code> - 扩缩容</p>
+            </div>
+          </div>
+
+          <div class="next-lecture">
+            <h3>下节预告：第十三讲 Pod与Deployment</h3>
+            <ul>
+              <li>深入Pod的生命周期、健康检查（探针）与多容器协作</li>
+              <li>Deployment的滚动更新、回滚与副本管理实战</li>
+              <li>从本讲的"认识对象"进阶到"熟练编写工作负载YAML"</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page content-page">
+        <div class="page-header">
+          <span class="page-number">清理</span>
+          <h1 class="page-title">实验环境清理</h1>
+        </div>
+        <div class="page-body">
+          <div class="definition-box">
+            <div class="definition-term">为什么要清理？</div>
+            <div class="definition-content">
+              minikube 集群会持续占用<span class="highlight">内存、CPU和磁盘</span>（尤其它本身就是一个大容器/虚拟机）。完成实验后及时清理，可以释放资源、避免下次启动冲突。
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">删除本讲创建的资源</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 进入项目目录
+$ cd ~/k8s-first
+
+# 用同一份YAML删除（声明式清理，干净彻底）
+$ kubectl delete -f service.yaml
+$ kubectl delete -f deployment.yaml
+
+# 或按类型删除命令式创建的资源
+$ kubectl delete deployment web 2>/dev/null
+$ kubectl delete service web web-svc 2>/dev/null
+
+# 确认已清空
+$ kubectl get all</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">停止或删除整个集群</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 方式1：只停止集群，保留数据（下次start可继续）
+$ minikube stop
+
+# 方式2：彻底删除集群，释放全部资源（推荐课后执行）
+$ minikube delete
+
+# 验证清理
+$ minikube status      # 应提示集群不存在或已停止
+$ docker ps -a         # minikube相关容器应已移除</code></pre>
+          </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">⚠️ 提示</div>
+            <div class="highlight-content">
+              <p><code>minikube delete</code> 会删除整个本地集群及其中所有资源（包括你部署的应用），不可恢复。下次做实验重新 <code>minikube start</code> 即可，会是一个全新的干净集群。</p>
+              <p>如果只是当天课程结束、明天还要继续，用 <code>minikube stop</code> 即可，保留环境更省事。</p>
+            </div>
+          </div>
+
+          <div class="key-conclusion">
+            <div class="conclusion-title">迈入云原生</div>
+            <div class="conclusion-content">
+              <p>从单机 Docker 到集群 Kubernetes，你已经踏入云原生的大门。本讲建立的"声明式 + 架构 + 核心对象"认知框架，是后续 Pod、Deployment、Service、存储、配置管理等所有内容的地基。地基稳了，后面的高楼自然好盖。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="page-navigation">
+      <button class="nav-btn prev" id="prevBtn">上一页</button>
+      <div class="page-indicator">
+        <span class="current" id="currentPage">1</span>
+        <span class="separator">/</span>
+        <span class="total" id="totalPages">32</span>
+      </div>
+      <button class="nav-btn next" id="nextBtn">下一页</button>
+    </div>
+
+  </div>
+
+  <script src="../template/lecture-template.js"></script>
+</body>
+</html>
