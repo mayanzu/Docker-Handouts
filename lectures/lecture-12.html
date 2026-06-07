@@ -143,7 +143,7 @@
             </div>
             <div class="card">
               <h3><span class="card-num">3</span>控制器是什么</h3>
-              <p>控制器（Controller）是一个<span class="highlight">不停循环检查的"管家"</span>：它对比"你想要的"和"现在实际的"，发现不一致就动手纠正。容器挂了它自动重启，这就是K8s"自愈"的来源。</p>
+              <p>控制器（Controller）是一个<span class="highlight">不停循环检查的组件</span>：它对比"你想要的"和"现在实际的"，发现不一致就动手纠正。容器挂了它自动重启，这就是K8s"自愈"的来源。</p>
             </div>
           </div>
 
@@ -318,13 +318,6 @@ $ kubectl get pods
             </tbody>
           </table>
 
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：Compose是"个体户"，K8s是"连锁集团"</div>
-            <div class="kp-content">
-              <p><strong>Docker Compose = 一家小餐馆</strong>：老板（你）亲自安排后厨、前台、收银，一切都在这一间店里。店面就这么大，客人多了挤不下，老板病了店就关门。</p>
-              <p><strong>Kubernetes = 连锁餐饮集团</strong>：总部（控制平面）只下达"全国要有100家在营业的门店"的目标，各地分店（节点）自动开张。某家店着火了，总部立刻在别处补开一家，始终维持100家。你只管定目标，总部负责落地和兜底。</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -342,7 +335,7 @@ $ kubectl get pods
           </div>
 
           <p class="paragraph">
-            "Kubernetes"源自希腊语，意为"舵手"或"领航员"——它就像一艘巨型货轮（装满集装箱/容器）的船长，负责指挥成千上万个容器在集群中有序地装载、运输、调度。常缩写为 <code>K8s</code>（K和s之间有8个字母）。
+            "Kubernetes"源自希腊语，意为"舵手"或"领航员"，负责调度和管理成千上万个容器在集群中有序运行。常缩写为 <code>K8s</code>（K和s之间有8个字母）。
           </p>
 
           <div class="card-grid">
@@ -447,14 +440,6 @@ $ kubectl get pods
   这正是热身演示里"删掉Pod又自己回来"的原因。</code></pre>
           </div>
 
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：声明式就像家里的恒温空调</div>
-            <div class="kp-content">
-              <p><strong>命令式</strong>：像老式空调，你手动按"制冷"按钮一段时间，热了再按一次，全靠你盯着。</p>
-              <p><strong>声明式（K8s）</strong>：像设定了26℃的恒温空调。你只声明"我要26℃"（期望状态），空调自己不停测温（实际状态），高了就制冷、低了就停，<strong>持续维持</strong>你要的温度，无需你干预。</p>
-              <p>K8s 就是你整个集群的"恒温器"：你设定期望，它永远努力维持。</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -489,14 +474,14 @@ $ kubectl get pods
                │ kubectl 发送"期望状态"
                v
   ┌───────────────────────────────────────────┐
-  │        控制平面 Control Plane（大脑）        │
+  │        控制平面 Control Plane（决策）        │
   │  ┌──────────────┐   ┌──────────────────┐   │
   │  │  API Server   │   │      etcd         │   │
-  │  │ (统一入口/前台)│◄─►│ (集群数据库/账本) │   │
+  │  │ (统一入口/网关)│◄─►│ (集群数据库/存储) │   │
   │  └──────┬───────┘   └──────────────────┘   │
   │  ┌──────┴───────┐   ┌──────────────────┐   │
   │  │  Scheduler    │   │ Controller Manager│   │
-  │  │ (调度器/派活)  │   │ (控制器/管家)     │   │
+  │  │ (调度器/分配)  │   │ (控制器/纠偏)     │   │
   │  └──────────────┘   └──────────────────┘   │
   └───────────────────────┬───────────────────┘
                           │ 下发指令
@@ -509,19 +494,7 @@ $ kubectl get pods
   │ └───────┘ │    │ └───────┘ │    │ └───────┘ │
   │ [Pod][Pod]│    │ [Pod][Pod]│    │ [Pod][Pod]│ ← 你的应用
   └───────────┘    └───────────┘    └───────────┘
-       四肢：真正运行容器的地方</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：架构就像一家物流公司</div>
-            <div class="kp-content">
-              <p>- <strong>API Server（调度中心前台）</strong>：所有指令的唯一入口，对外接单，对内协调</p>
-              <p>- <strong>etcd（公司总账本）</strong>：记录"现在有哪些货、在哪、状态如何"的唯一权威账本</p>
-              <p>- <strong>Scheduler（派单员）</strong>：决定每个新订单（Pod）派给哪个司机（节点）</p>
-              <p>- <strong>Controller Manager（车队主管）</strong>：盯着"该有10辆车在路上"，少了就再派一辆</p>
-              <p>- <strong>Worker节点（司机+货车）</strong>：真正拉货跑运输的人，对应运行容器的机器</p>
-              <p>- <strong>kubelet（司机本人）</strong>：在每辆车上，听总部指挥，负责把货装好运到位</p>
-            </div>
+       工作节点：真正运行容器的地方</code></pre>
           </div>
 
           <div class="tip-box">
@@ -547,7 +520,7 @@ $ kubectl get pods
           <div class="knowledge-point">
             <div class="kp-title">① API Server——集群的唯一入口</div>
             <div class="kp-content">
-              <p>所有组件、所有 <code>kubectl</code> 命令，都必须经过 API Server。它就像公司的<strong>前台总机</strong>：对外接收请求、做认证鉴权，对内是其他组件交流的中转站。</p>
+              <p>所有组件、所有 <code>kubectl</code> 命令，都必须经过 API Server。它对外接收请求、做认证鉴权，对内是其他组件交流的中转站。</p>
               <p><span class="key-point">关键</span>：其他组件之间<strong>不直接对话</strong>，全部通过 API Server。这种"中心化"设计让集群清晰可控。</p>
             </div>
           </div>
@@ -564,7 +537,6 @@ $ kubectl get pods
             <div class="kp-title">③ Scheduler——调度器</div>
             <div class="kp-content">
               <p>当一个新 Pod 需要运行，Scheduler 负责决定它<strong>该放到哪个工作节点</strong>。它会综合考虑：哪个节点资源够（CPU/内存）、有没有特殊要求（标签、亲和性）等，挑出最合适的节点。</p>
-              <p><span class="key-point">类比</span>：像派单员，手里一堆订单（待调度Pod）和一队司机（节点），把每单派给最合适的司机。</p>
             </div>
           </div>
 
@@ -592,10 +564,9 @@ $ kubectl get pods
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">① kubelet——节点上的"工头"</div>
+            <div class="kp-title">① kubelet——节点代理</div>
             <div class="kp-content">
               <p>kubelet 是每个工作节点上的代理，<strong>听 API Server 指挥</strong>。它负责：接收"在本节点运行某Pod"的指令、调用容器运行时把容器拉起来、持续向控制平面汇报本节点和Pod的健康状况。</p>
-              <p><span class="key-point">类比</span>：工地上的工头，听总部安排，指挥工人（容器运行时）干活，并定时上报进度。</p>
             </div>
           </div>
 
@@ -648,12 +619,12 @@ $ kubectl get pods
     当前实际是0个，于是创建3个Pod对象（仅登记，还没真正运行）
     这3个Pod此时状态是 Pending（待调度）
 
-  第3步：Scheduler 派活
+  第3步：Scheduler 调度
     Scheduler 发现有3个Pending的Pod没着落
     根据各节点资源，决定每个Pod放到哪个节点
     把"Pod→节点"的绑定结果写回 API Server（存入etcd）
 
-  第4步：kubelet 真正干活
+  第4步：kubelet 启动容器
     目标节点上的 kubelet 从 API Server 得知"你要跑这个Pod"
     调用容器运行时（containerd）拉取nginx镜像、启动容器
     Pod 状态变为 Running
@@ -726,12 +697,12 @@ $ kubectl get pods
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：Pod就像一个豌豆荚</div>
+            <div class="kp-title">Pod内的容器如何协作</div>
             <div class="kp-content">
-              <p>"Pod"本意就是"豆荚"。把容器想象成豆荚里的<strong>豌豆</strong>：</p>
-              <p>- 一个豆荚（Pod）里可以有一颗或几颗豌豆（容器）</p>
-              <p>- 同一豆荚里的豌豆<strong>挨得最近</strong>（共享网络和存储，localhost互通）</p>
-              <p>- 摘豆荚是整个摘下来（Pod整体调度、整体销毁），不会只摘半个豆荚</p>
+              <p>Pod是K8s的最小部署单位，内部可以包含一个或多个容器：</p>
+              <p>- 一个Pod里可以有一个或多个容器</p>
+              <p>- 同一Pod内的容器<strong>共享网络和存储</strong>，彼此通过 localhost 互通</p>
+              <p>- Pod是整体调度、整体销毁的最小单位，不会只启动或销毁其中一部分容器</p>
               <p>这呼应了第九讲学过的 Container 网络模式——同Pod容器共享网络栈，正是那个原理在K8s里的体现。</p>
             </div>
           </div>
@@ -809,11 +780,11 @@ $ kubectl get pods -n kube-system
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：Node是楼，Namespace是楼里的分区</div>
+            <div class="kp-title">Node 与 Namespace 的区别</div>
             <div class="kp-content">
-              <p><strong>Node（节点）</strong> = 一栋办公楼，提供真实的水电空间（CPU/内存）。集群有几个Node，就是有几栋楼。</p>
-              <p><strong>Namespace（命名空间）</strong> = 楼里按部门划分的区域。研发部（dev）、测试部（test）、财务部各占一片，互不打扰。即使两个部门都有个叫"打印机"的东西（同名资源），也不会冲突，因为分属不同区域。</p>
-              <p>注意：Namespace 是<strong>逻辑</strong>隔离（划区域），不是<strong>物理</strong>隔离（不是分到不同楼）。同一个Node上可以跑着不同Namespace的Pod。</p>
+              <p><strong>Node（节点）</strong>：提供真实计算资源（CPU/内存）的机器，集群有几台机器就有几个Node。</p>
+              <p><strong>Namespace（命名空间）</strong>：对集群资源做逻辑分组，例如 dev、test 各占一个命名空间，互不干扰；不同命名空间下可以存在同名资源而不冲突。</p>
+              <p>注意：Namespace 是<strong>逻辑</strong>隔离，不是<strong>物理</strong>隔离。同一个Node上可以跑着不同Namespace的Pod。</p>
             </div>
           </div>
 
@@ -868,17 +839,6 @@ $ kubectl get pods -n kube-system
        ▲
        │ 对外暴露访问入口
   Service（给这3个Pod一个固定入口 + 负载均衡）</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：把这些对象串成一个外卖店</div>
-            <div class="kp-content">
-              <p>- <strong>Pod</strong> = 一个外卖小哥，能干活但可能随时离职（被销毁）</p>
-              <p>- <strong>Deployment</strong> = 站长，规定"必须始终有3个小哥在岗"，有人离职马上招新人</p>
-              <p>- <strong>Service</strong> = 对外的统一客服电话，顾客打这个号就行，由它自动转给某个在岗小哥，不用记每个小哥的私人号码（Pod IP）</p>
-              <p>- <strong>Namespace</strong> = 这家店所在的商圈分区</p>
-              <p>- <strong>Node</strong> = 承载这一切的物理门面</p>
-            </div>
           </div>
 
           <div class="tip-box">

@@ -126,16 +126,16 @@
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>IP地址是什么</h3>
-              <p>就像身份证号是人的唯一标识，<span class="highlight">IP地址是计算机在网络中的唯一标识</span>。IPv4 由 4 个数字组成，如 <code>192.168.1.1</code>。详见下一页。</p>
+              <p><span class="highlight">IP地址是计算机在网络中的唯一标识</span>。IPv4 由 4 个数字组成，如 <code>192.168.1.1</code>。详见下一页。</p>
             </div>
             <div class="card">
               <h3><span class="card-num">2</span>端口是什么</h3>
-              <p>一台电脑可能有多个程序同时上网。<span class="highlight">端口就像大楼的房间号</span>，帮操作系统把网络流量分配给正确的程序。</p>
+              <p>一台电脑可能有多个程序同时上网。<span class="highlight">端口是程序的网络出入口编号</span>，帮操作系统把网络流量分配给正确的程序。</p>
               <p style="margin-top:0.5rem;">例如：Nginx通常占用<code>80</code>端口，MySQL占用<code>3306</code>端口。你访问网页时，实际上是在访问服务器的<code>80</code>端口。</p>
             </div>
             <div class="card">
               <h3><span class="card-num">3</span>宿主机是什么</h3>
-              <p><span class="highlight">宿主机就是运行Docker的那台电脑</span>。容器运行在宿主机上，就像租客住在一栋公寓里。外部访问容器服务时，实际上是先访问宿主机，再由宿主机转发给容器。</p>
+              <p><span class="highlight">宿主机就是运行Docker的那台电脑</span>。容器运行在宿主机上。外部访问容器服务时，实际上是先访问宿主机，再由宿主机转发给容器。</p>
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@
           <div class="definition-box">
             <div class="definition-term">什么是 IP 地址？</div>
             <div class="definition-content">
-              IP 地址是计算机在网络中的唯一标识，就像身份证号是人的唯一标识。目前广泛使用的 <span class="highlight">IPv4</span> 由 4 个数字组成，每个数字范围 0~255，之间用点分隔，例如 <code>192.168.1.1</code>。
+              IP 地址是计算机在网络中的唯一标识。目前广泛使用的 <span class="highlight">IPv4</span> 由 4 个数字组成，每个数字范围 0~255，之间用点分隔，例如 <code>192.168.1.1</code>。
             </div>
           </div>
 
@@ -161,8 +161,8 @@
               <h3>网络号 + 主机号</h3>
               <p>IP 地址分为两部分：</p>
               <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
-                <li><strong>网络号</strong>：相当于小区地址，相同网络号的电脑可以直接互通</li>
-                <li><strong>主机号</strong>：相当于门牌号，区分同一网络中的不同电脑</li>
+                <li><strong>网络号</strong>：标识所属网络，相同网络号的电脑可以直接互通</li>
+                <li><strong>主机号</strong>：区分同一网络中的不同电脑</li>
               </ul>
               <p style="margin-top:0.5rem;">例：<code>192.168.1.100</code> 中，<code>192.168.1</code> 是网络号，<code>100</code> 是主机号。</p>
             </div>
@@ -314,7 +314,7 @@
           <div class="definition-box">
             <div class="definition-term">Nginx</div>
             <div class="definition-content">
-              Nginx（发音"engine-x"）是一款高性能的<span class="highlight">Web服务器</span>和<span class="highlight">反向代理服务器</span>。简单来说，它就像餐厅的前台接待员：顾客（浏览器）向它点菜（请求网页），它负责把订单送到后厨（后端服务），再把做好的菜（网页内容）端给顾客。
+              Nginx（发音"engine-x"）是一款高性能的<span class="highlight">Web服务器</span>和<span class="highlight">反向代理服务器</span>。它接收浏览器的网页请求，按需转发给后端服务，再把响应结果返回给浏览器。
             </div>
           </div>
 
@@ -440,7 +440,7 @@ server {
           <div class="definition-box">
             <div class="definition-term">网络命名空间（Network Namespace）</div>
             <div class="definition-content">
-              Linux内核提供的一种资源隔离机制。每个网络命名空间拥有独立的网络设备、IP地址、路由表和防火墙规则。就像每栋写字楼有独立的水电系统，互不干扰。
+              Linux内核提供的一种资源隔离机制。每个网络命名空间拥有独立的网络设备、IP地址、路由表和防火墙规则，彼此互不干扰。
             </div>
           </div>
 
@@ -478,17 +478,6 @@ server {
           <div class="tip-box">
             <div class="tip-title">关键理解</div>
             <p>容器的网络隔离不是"没有网络"，而是<strong>拥有一张完全独立的网络</strong>。Docker做的第一件事，就是像 <code>ip netns add ns-1</code> 一样，为每个容器创建一个独立的网络命名空间。容器内的 <code>eth0</code> 只在容器内部可见，宿主机和其他容器都看不到。</p>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：网络命名空间就像独立办公室</div>
-            <div class="kp-content">
-              <p>想象一栋写字楼（宿主机），每个公司租一间办公室（网络命名空间）。</p>
-              <p>- A公司在301室，有自己的电话系统（网络接口），电话号码是 <code>10.0.1.2</code></p>
-              <p>- B公司在302室，也有自己的电话系统，电话号码是 <code>10.0.1.3</code></p>
-              <p>- 两间办公室的电话系统完全独立，A公司拨打自己的分机号不会打到B公司</p>
-              <p>- 这就是网络命名空间的本质：<strong>每个容器有独立的"电话号码簿"和"电话线路"</strong></p>
-            </div>
           </div>
 
           <div class="knowledge-point">
@@ -566,17 +555,6 @@ sudo ip netns exec ns-1 ip link set veth-1-peer up
             <div class="kp-title">核心结论</div>
             <div class="kp-content">
               <p>Docker容器的网络，本质上就是我们在WSL中手动演示的这套流程的<span class="highlight">自动化封装</span>。</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">veth pair 生活类比：对讲机</div>
-            <div class="kp-content">
-              <p>veth pair 就像一对<strong>对讲机</strong>：A说"收到请回答"，B一定能听到；B回复"收到"，A也一定能听到。</p>
-              <p>- 对讲机A（veth-1）放在宿主机的手上</p>
-              <p>- 对讲机B（veth-1-peer）放在容器 ns-1 的手上</p>
-              <p>- 数据从一头进去，必然从另一头出来，不可能丢失</p>
-              <p>- 这对对讲机是"专线"，只有它们两个能互相通话</p>
             </div>
           </div>
 
@@ -679,19 +657,6 @@ sudo ip netns exec ns-3 ip link set veth-3-peer up
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">网桥生活类比：公司前台总机</div>
-            <div class="kp-content">
-              <p>想象网桥就是公司的<strong>前台总机系统</strong>：</p>
-              <p>- 每个员工（容器）都有一个分机号（IP地址）</p>
-              <p>- 前台总机（网桥）记住所有分机号对应的座位</p>
-              <p>- A员工拨打B员工的分机号，总机自动转接到B的座位</p>
-              <p>- 不需要A和B之间拉一根专属电话线</p>
-              <p>- 新员工入职（新容器启动），总机自动记录他的分机号</p>
-              <p>- 员工离职（容器删除），总机自动删除他的分机号</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
             <div class="kp-title">网桥更多使用场景</div>
             <div class="kp-content">
               <p><strong>场景1：多容器应用部署</strong></p>
@@ -720,11 +685,11 @@ sudo ip netns exec ns-3 ip link set veth-3-peer up
           </div>
 
           <p class="paragraph">
-            ns-4 和 ns-5 可以互相通信，但还<strong>不能访问外网</strong>。因为 <code>10.0.2.0/24</code> 是私网地址——外网路由器不认识这个地址，就像寄信时写了"某小区3号楼"但没有写城市名，快递员不知道往哪送。
+            ns-4 和 ns-5 可以互相通信，但还<strong>不能访问外网</strong>。因为 <code>10.0.2.0/24</code> 是私网地址——外网路由器不认识这个地址，无法回送数据。
           </p>
 
           <p class="paragraph">
-            解决方案是<strong>NAT（网络地址转换）</strong>：把容器发出的数据包的"发件人地址"从私网IP改成宿主机的公网IP，外网的服务器就能把响应送回来。这就像快递员帮你把"某小区3号楼"改成"北京市朝阳区某小区3号楼"。
+            解决方案是<strong>NAT（网络地址转换）</strong>：把容器发出的数据包的"发件人地址"从私网IP改成宿主机的公网IP，外网的服务器就能把响应送回来。
           </p>
 
           <div class="highlight-box warning">
@@ -890,30 +855,7 @@ sudo ip netns exec ns-5 ip link set veth-5-peer up
   DNAT（Destination NAT）——改目标
     场景：外网访问容器
     作用：把"收件人"从宿主机IP改成容器IP
-    目的：让外部请求能够送达正确的容器
-
-  生活中的类比：
-  SNAT = 你寄信时，快递员把你的家庭地址改成公司地址，
-         这样回信能寄到公司再转给你
-  DNAT = 别人寄信到公司，前台根据门牌号转发给你</code></pre>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">NAT 生活类比：公司前台代收发快递</div>
-            <div class="kp-content">
-              <p>想象NAT就是公司的<strong>前台代收发快递服务</strong>：</p>
-              <p><strong>SNAT（发快递）</strong>：</p>
-              <p>- 员工A（容器，内部地址10.0.2.2）要寄快递给外部客户</p>
-              <p>- 但快递单上写"10.0.2.2"，快递公司不认识这个地址</p>
-              <p>- 前台（NAT）把发件人地址改成"XX公司前台"（宿主机公网IP）</p>
-              <p>- 客户收到快递，看到发件人是"XX公司前台"，回信也寄回前台</p>
-              <p>- 前台收到回信，根据记录转交给员工A</p>
-              <p><strong>DNAT（收快递）</strong>：</p>
-              <p>- 客户要寄快递给员工B（容器，内部地址10.0.2.3）</p>
-              <p>- 但客户不知道员工B的内部地址，只能寄到"XX公司前台"</p>
-              <p>- 前台（NAT）查看登记簿，发现"找80号窗口"对应员工B</p>
-              <p>- 前台把快递转交给员工B</p>
-            </div>
+    目的：让外部请求能够送达正确的容器</code></pre>
           </div>
 
           <div class="knowledge-point">
@@ -1012,7 +954,7 @@ ping: bad address 'nginx-2'</code></pre>
           <div class="definition-box">
             <div class="definition-term">自定义Bridge网络</div>
             <div class="definition-content">
-              用户手动创建的bridge网络。与默认bridge最大的区别是：自定义bridge内置了<span class="highlight">DNS服务发现</span>。同一自定义网络中的容器可以通过<span class="highlight">容器名</span>互相解析和访问，就像同一个公司的同事可以通过姓名找到对方，而不需要记住对方的手机号（IP地址）。
+              用户手动创建的bridge网络。与默认bridge最大的区别是：自定义bridge内置了<span class="highlight">DNS服务发现</span>。同一自定义网络中的容器可以通过<span class="highlight">容器名</span>互相解析和访问，无需记住对方的IP地址。
             </div>
           </div>
 
@@ -1403,7 +1345,6 @@ PONG                    # 成功！不需要指定 IP，因为共享网络栈
 
   第3步：DNAT转换——改目标地址
     把目标从"宿主机:8080"改成"172.17.0.2:80"
-    就像前台把"找公司前台"改成"找3楼301房间"
 
   第4步：数据包发送到 docker0 网桥
     网桥查表，发现172.17.0.2在哪，提前路由
