@@ -139,7 +139,7 @@
             </div>
             <div class="card">
               <h3><span class="card-num">3</span>/metrics端点是什么</h3>
-              <p>很多程序会暴露一个 <code>/metrics</code> 的HTTP网址，访问它就能拿到一大段当前的指标文本。Prometheus就是定时访问这个网址来"抄数据"，就像抄电表读数一样。</p>
+              <p>很多程序会暴露一个 <code>/metrics</code> 的HTTP网址，访问它就能拿到一大段当前的指标文本。Prometheus就是定时访问这个网址来采集数据。</p>
             </div>
           </div>
 
@@ -265,10 +265,6 @@ $ docker stats
             </div>
           </div>
 
-          <p class="paragraph">
-            想象一个大型商场：监控摄像头（指标采集）24小时记录情况，监控室的硬盘（时序数据库）保存录像以备回放，保安中心（监控系统）实时盯着大屏，报警系统（告警机制）在异常时立刻通知相关人员。容器监控就是这套系统的数字化版本——只不过被监控的不是商场，而是你的一堆容器。
-          </p>
-
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>故障预警</h3>
@@ -285,18 +281,6 @@ $ docker stats
             <div class="card">
               <h3><span class="card-num">4</span>故障排查</h3>
               <p>通过历史曲线还原故障现场，回答"昨晚3点到底发生了什么"</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：监控就像汽车的仪表盘</div>
-            <div class="kp-content">
-              <p>想象你开车上高速，仪表盘上有各种指针：</p>
-              <p>- <strong>时速表（CPU使用率）</strong>：开太快（CPU 100%）容易出事，太慢（CPU 0%）说明可能抛锚了</p>
-              <p>- <strong>油量表（内存）</strong>：快没油了（内存即将耗尽）要提前加油，否则半路熄火（容器被OOM杀死）</p>
-              <p>- <strong>水温报警灯（告警）</strong>：水温过高时红灯亮起，提醒你赶紧停车检查，而不是等发动机烧坏</p>
-              <p>- <strong>行车记录仪（历史数据）</strong>：出了事故，回放录像就知道是谁的责任</p>
-              <p>没有仪表盘的车也能开，但你完全是"盲开"，出问题只能等抛锚。运维没有监控的系统，就是在盲开。</p>
             </div>
           </div>
 
@@ -458,21 +442,6 @@ $ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}"</code></pre
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：Pull像查岗，Push像打卡</div>
-            <div class="kp-content">
-              <p><strong>Pull模式（Prometheus）= 老师查岗</strong>：</p>
-              <p>- 老师（Prometheus）拿着名单，每隔15秒挨个教室点名一次</p>
-              <p>- 学生（容器）只要待在座位上（暴露 /metrics 端点）等着被点到即可</p>
-              <p>- 好处：老师清楚地知道"该有谁"，谁没应答（target down）一目了然，便于发现宕机</p>
-              <p><strong>Push模式 = 学生打卡</strong>：</p>
-              <p>- 学生主动跑到老师办公室签到（主动上报数据）</p>
-              <p>- 好处：适合短命任务（如定时任务跑完就退出，来不及被Pull）</p>
-              <p>- 坏处：如果学生根本没来打卡，老师可能误以为"今天没这个学生"，不易发现宕机</p>
-              <p>Prometheus默认用Pull，对于短命任务则提供Pushgateway作为补充。</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
             <div class="kp-title">为什么Prometheus选择Pull模式？</div>
             <div class="kp-content">
               <p>1. <span class="key-point">易发现故障</span>：抓不到目标就知道它挂了，Push模式下"没收到数据"难以区分是宕机还是网络问题</p>
@@ -506,7 +475,7 @@ $ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}"</code></pre
           </div>
 
           <p class="paragraph">
-            前面几讲我们一直在用 <code>docker run</code>、<code>docker ps</code>、<code>docker network</code> 这些命令管理Docker。这些命令很强大，但也有门槛：参数多、容易打错、看不到全局。Portainer就像Docker的"控制面板"，把这些功能搬到了网页上——你可以在浏览器里点几下，就完成启动容器、查看日志、进入终端等操作。
+            前面几讲我们一直在用 <code>docker run</code>、<code>docker ps</code>、<code>docker network</code> 这些命令管理Docker。这些命令很强大，但也有门槛：参数多、容易打错、看不到全局。Portainer是Docker的图形化"控制面板"，把这些功能搬到了网页上——你可以在浏览器里点几下，就完成启动容器、查看日志、进入终端等操作。
           </p>
 
           <div class="card-grid">
@@ -525,16 +494,6 @@ $ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}"</code></pre
             <div class="card">
               <h3><span class="card-num">4</span>数据卷管理</h3>
               <p>查看挂载点、创建和删除数据卷</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：Portainer就像智能家居App</div>
-            <div class="kp-content">
-              <p>想象你家里有很多智能设备（容器）：空调、灯、窗帘、扫地机器人。</p>
-              <p><strong>没有App（纯命令行）</strong>：每个设备都要走到跟前手动操作，开空调要去按空调遥控器，关灯要去按墙上开关。设备一多就手忙脚乱。</p>
-              <p><strong>有了App（Portainer）</strong>：打开手机App，所有设备的状态一目了然，点一下就能开关任何设备，还能看到每个设备的用电量。</p>
-              <p>Portainer就是Docker的这个"App"：一个界面纵览所有容器，鼠标点点就能管理。但要注意——App只是"遥控器"，真正干活的还是底层的Docker引擎。</p>
             </div>
           </div>
 
@@ -715,7 +674,7 @@ http://localhost:9000
           </div>
 
           <p class="paragraph">
-            Prometheus的工作方式类似于"定时抄表员"：它拿着一份目标清单，每隔固定时间（默认15秒）就去访问每个目标的 <code>/metrics</code> 端点"抄一次数"，把抄来的数据按时间顺序存进数据库。需要看数据时，用PromQL查询；指标超过阈值时，触发告警。
+            Prometheus的工作方式是：它拿着一份目标清单，每隔固定时间（默认15秒）就去访问每个目标的 <code>/metrics</code> 端点采集一次，把采集到的数据按时间顺序存进数据库。需要看数据时，用PromQL查询；指标超过阈值时，触发告警。
           </p>
 
           <div class="card-grid">
@@ -741,16 +700,16 @@ http://localhost:9000
             <div class="kp-title">Prometheus自己不采集容器指标？</div>
             <div class="kp-content">
               <p>这是初学者最容易困惑的点：<strong>Prometheus本身并不知道怎么读取Docker容器的CPU、内存</strong>。它只会做一件事——访问 <code>/metrics</code> 网址抓文本。</p>
-              <p>所以需要一个"翻译官"，把容器的资源数据翻译成Prometheus看得懂的 <code>/metrics</code> 格式。这个翻译官就是下一页要讲的 <span class="key-point">cAdvisor</span>。同理，监控主机本身（CPU、磁盘）需要 <span class="key-point">Node Exporter</span>，监控MySQL需要 <span class="key-point">mysqld-exporter</span>……这些"翻译官"统称为 <span class="key-point">Exporter（导出器）</span>。</p>
+              <p>所以需要一个专门的采集组件，把容器的资源数据转换成Prometheus能识别的 <code>/metrics</code> 格式。这个组件就是下一页要讲的 <span class="key-point">cAdvisor</span>。同理，监控主机本身（CPU、磁盘）需要 <span class="key-point">Node Exporter</span>，监控MySQL需要 <span class="key-point">mysqld-exporter</span>……这些采集组件统称为 <span class="key-point">Exporter（导出器）</span>。</p>
             </div>
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：指标名+标签就像快递面单</div>
+            <div class="kp-title">指标名 + 标签：Prometheus的多维数据模型</div>
             <div class="kp-content">
-              <p>Prometheus的"多维数据模型"听起来抽象，其实就像快递面单：</p>
-              <p>- <strong>指标名</strong> = 物品类型，如 <code>container_memory_usage_bytes</code>（容器内存使用量）</p>
-              <p>- <strong>标签（label）</strong> = 面单上的各种属性，如 <code>{name="nginx", image="nginx:alpine"}</code></p>
+              <p>一条指标由"指标名 + 一组标签"唯一确定：</p>
+              <p>- <strong>指标名</strong>：表示测量的对象，如 <code>container_memory_usage_bytes</code>（容器内存使用量）</p>
+              <p>- <strong>标签（label）</strong>：附加的维度属性，如 <code>{name="nginx", image="nginx:alpine"}</code></p>
               <p>有了标签，你就能精确查询："只看名字叫nginx的容器的内存"，或"按镜像分组统计内存总和"。这种"一个指标名+任意多个标签"的设计，让查询变得极其灵活。</p>
             </div>
           </div>
@@ -766,7 +725,7 @@ http://localhost:9000
           <div class="definition-box">
             <div class="definition-term">cAdvisor定义</div>
             <div class="definition-content">
-              cAdvisor（Container Advisor，容器顾问）是Google开发的<span class="highlight">容器指标采集工具</span>，专门用于读取本机所有容器的资源使用信息。它原生支持Docker，启动后会自动发现所有容器，并把每个容器的CPU、内存、网络、磁盘指标，整理成Prometheus能抓取的 <code>/metrics</code> 格式。它就是Part 3.1说的那个"翻译官"。
+              cAdvisor（Container Advisor，容器顾问）是Google开发的<span class="highlight">容器指标采集工具</span>，专门用于读取本机所有容器的资源使用信息。它原生支持Docker，启动后会自动发现所有容器，并把每个容器的CPU、内存、网络、磁盘指标，整理成Prometheus能抓取的 <code>/metrics</code> 格式。它就是Part 3.1所说的针对容器的Exporter。
             </div>
           </div>
 
@@ -829,7 +788,7 @@ $ curl -s http://localhost:8080/metrics | grep container_memory_usage_bytes | he
           </div>
 
           <div class="tip-box">
-            <div class="tip-title">动手理解"翻译官"</div>
+            <div class="tip-title">动手理解 /metrics 端点</div>
             <p>建议亲自 <code>curl</code> 一下 <code>/metrics</code> 端点。你会看到成百上千行 <code>指标名{标签} 数值</code> 的文本。Prometheus要做的，就是定时抓走这一大段文本，按时间存起来。理解了这一步，整个监控链路就通了。</p>
             <p>实际每行的标签会比上面示例多很多——除了 <code>name</code>、<code>image</code>，还会带 <code>id</code>、<code>container_label_com_docker_compose_*</code> 等一长串，看起来比书里冗长是正常的。查询时用 <code>{name!=""}</code> 这类标签过滤照样有效，不影响使用。</p>
           </div>
@@ -943,7 +902,7 @@ $ curl -s http://localhost:9100/metrics | grep -E "node_memory_MemAvailable|node
           <div class="definition-box">
             <div class="definition-term">prometheus.yml的作用</div>
             <div class="definition-content">
-              <code>prometheus.yml</code> 是Prometheus的核心配置文件，它告诉Prometheus<span class="highlight">"该去抓哪些目标、多久抓一次"</span>。其中 <code>scrape_configs</code> 就是那份"抄表清单"，每个 <code>job</code> 对应一类被监控目标。
+              <code>prometheus.yml</code> 是Prometheus的核心配置文件，它告诉Prometheus<span class="highlight">"该去抓哪些目标、多久抓一次"</span>。其中 <code>scrape_configs</code> 就是那份采集目标清单，每个 <code>job</code> 对应一类被监控目标。
             </div>
           </div>
 
@@ -1138,7 +1097,7 @@ count(container_last_seen{name!=""})</code></pre>
           <div class="definition-box">
             <div class="definition-term">Grafana定义</div>
             <div class="definition-content">
-              Grafana是一个<span class="highlight">开源的度量分析与可视化平台</span>。它本身<span class="highlight">不存储数据</span>，而是从各种数据源（Prometheus、InfluxDB、Elasticsearch、MySQL等）读取数据，画成漂亮的仪表盘，并能在指标异常时告警。它是整套监控栈的"门面"。
+              Grafana是一个<span class="highlight">开源的度量分析与可视化平台</span>。它本身<span class="highlight">不存储数据</span>，而是从各种数据源（Prometheus、InfluxDB、Elasticsearch、MySQL等）读取数据，画成漂亮的仪表盘，并能在指标异常时告警。它是整套监控栈的可视化展示层。
             </div>
           </div>
 
@@ -1162,17 +1121,6 @@ count(container_last_seen{name!=""})</code></pre>
             <div class="card">
               <h3><span class="card-num">4</span>仪表盘市场</h3>
               <p>社区有上万个现成仪表盘，导入ID即可用</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：Grafana就像汽车的中控大屏</div>
-            <div class="kp-content">
-              <p>回到Part 1.1"汽车仪表盘"的类比，继续往下说：</p>
-              <p>- <strong>传感器（Exporter/cAdvisor）</strong>：埋在发动机、油箱里，采集原始数据</p>
-              <p>- <strong>行车电脑（Prometheus）</strong>：收集并存储所有传感器数据</p>
-              <p>- <strong>中控大屏（Grafana）</strong>：把数据画成好看的仪表，时速、油耗、续航一目了然，还能在异常时弹窗报警</p>
-              <p>同一份传感器数据，廉价车只有几个指针（Prometheus原生图表），豪华车有炫酷的大屏（Grafana仪表盘）。数据是一样的，区别在于"展示"。</p>
             </div>
           </div>
 
@@ -1400,12 +1348,12 @@ count(container_last_seen{name!=""})</code></pre>
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：告警阈值就像闹钟和体温计</div>
+            <div class="kp-title">告警的三个关键参数</div>
             <div class="kp-content">
-              <p><strong>阈值（threshold）</strong> = 体温计的38℃红线：低于它正常，高于它报警</p>
-              <p><strong>持续时间（for / 5分钟）</strong> = 避免误判：量一次38℃可能是刚运动完，连续5分钟都高才算发烧</p>
-              <p><strong>通知渠道</strong> = 通知谁：发烧了是告诉家长（邮件）还是直接叫救护车（电话）</p>
-              <p>设阈值的艺术在于：太敏感会"狼来了"（频繁误报，大家麻木），太迟钝会漏报（出事了才响）。需要结合历史数据反复调整。</p>
+              <p><strong>阈值（threshold）</strong>：触发告警的临界值，指标低于它视为正常，高于它则告警。</p>
+              <p><strong>持续时间（for）</strong>：指标需连续超过阈值一段时间（如5分钟）才真正告警，用来过滤掉瞬时尖峰造成的误报。</p>
+              <p><strong>通知渠道</strong>：告警触发后通过哪种方式通知（邮件、钉钉、企业微信、电话等），可按严重程度（warning / critical）分级到不同渠道。</p>
+              <p>设阈值的关键在于平衡：太敏感会频繁误报、让人麻木，太迟钝会漏报、出事才响。需要结合历史数据反复调整。</p>
             </div>
           </div>
 
@@ -1446,6 +1394,7 @@ count(container_last_seen{name!=""})</code></pre>
             </div>
             <div class="experiment-steps">
               <h4>实验步骤</h4>
+              <div class="step-item"><span class="step-num">0</span><span class="step-text">清理前面单独部署的容器（释放端口）</span></div>
               <div class="step-item"><span class="step-num">1</span><span class="step-text">创建项目目录与 prometheus.yml</span></div>
               <div class="step-item"><span class="step-num">2</span><span class="step-text">编写 docker-compose.yml（三个服务同网络）</span></div>
               <div class="step-item"><span class="step-num">3</span><span class="step-text">一键启动并检查容器状态</span></div>
@@ -1453,6 +1402,18 @@ count(container_last_seen{name!=""})</code></pre>
               <div class="step-item"><span class="step-num">5</span><span class="step-text">在Grafana添加数据源</span></div>
               <div class="step-item"><span class="step-num">6</span><span class="step-text">导入仪表盘，看到曲线跳动</span></div>
             </div>
+          </div>
+
+          <div class="code-block" style="margin-top: 1.2rem;">
+            <div class="code-header">
+              <span class="code-title">步骤0：清理前面单独部署的容器</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code># 前面各节单独部署的容器占用了 :8080 / :9090 / :3000 等端口，
+# 而下面的 compose 栈也要用这些端口，必须先停掉它们，否则会报
+# "address already in use"。-f 强制删除，2>/dev/null 忽略"容器不存在"的报错。
+$ docker rm -f portainer cadvisor node-exporter prometheus grafana 2>/dev/null
+$ docker network prune -f</code></pre>
           </div>
 
           <div class="code-block" style="margin-top: 1.2rem;">
@@ -1687,7 +1648,7 @@ $ docker network inspect monitoring-stack_monitor-net</code></pre>
             <div class="conclusion-content">
               <p>1. <span class="highlight">监控的价值</span>在于故障预警、性能优化、容量规划、故障排查，关注CPU/内存/网络/磁盘四类指标</p>
               <p>2. <span class="highlight">监控数据流</span>：容器 → cAdvisor采集 → Prometheus存储 → Grafana展示，这是本讲主线</p>
-              <p>3. <span class="highlight">Prometheus用Pull模式</span>定时抓 <code>/metrics</code>，靠Exporter（cAdvisor/Node Exporter）做"翻译官"</p>
+              <p>3. <span class="highlight">Prometheus用Pull模式</span>定时抓 <code>/metrics</code>，靠Exporter（cAdvisor/Node Exporter）采集并转换指标</p>
               <p>4. <span class="highlight">PromQL</span>查询：Gauge直接读，Counter套 <code>rate()</code>，再用 <code>sum/avg ... by</code> 聚合</p>
               <p>5. <span class="highlight">Grafana</span>不存数据，配数据源指向Prometheus，导入仪表盘+配置告警</p>
               <p>6. <span class="highlight">Portainer</span>提供图形化管理，但同样不存历史，与监控栈互补</p>

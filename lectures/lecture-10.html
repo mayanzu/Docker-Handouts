@@ -147,22 +147,6 @@
             在前面的课程中，我们学习了如何使用 <code>docker run</code> 命令启动单个容器。但在实际开发中，一个完整的应用往往由多个容器组成。每次启动应用时，都要逐个输入冗长的命令，不仅效率低下，还容易出错。Docker Compose的出现，就是为了让多容器应用的管理变得简单高效。
           </p>
 
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：Compose就像餐厅的套餐菜单</div>
-            <div class="kp-content">
-              <p>想象你去餐厅吃饭，有两种点餐方式：</p>
-              <p><strong>方式1：单点</strong>（类似docker run）</p>
-              <p>- "我要一份宫保鸡丁"</p>
-              <p>- "我要一碗米饭"</p>
-              <p>- "我要一份青菜"</p>
-              <p>- "我要一碗汤"</p>
-              <p>每道菜都要单独点，容易遗漏，而且服务员要记录多次。</p>
-              <p><strong>方式2：套餐</strong>（类似Docker Compose）</p>
-              <p>- "我要A套餐"</p>
-              <p>套餐已经定义好了包含哪些菜品，一句话就能点完，不会遗漏，服务员也更容易记录。Docker Compose就是为你的应用定义一份"套餐菜单"，一条命令就能启动所有需要的容器。</p>
-            </div>
-          </div>
-
           <div class="card-grid">
             <div class="card">
               <h3><span class="card-num">1</span>一键启动</h3>
@@ -240,7 +224,7 @@ $ docker run -d \
   -e DB_HOST=my-db \
   -e REDIS_HOST=my-redis \
   --network my-app-network \
-  my-api-image
+  nginx:alpine          # 演示用，实际替换为你自己的API镜像
 
 # 第五步：启动前端Nginx容器
 $ docker run -d \
@@ -483,21 +467,6 @@ $ docker compose down</code></pre>
             </div>
           </div>
 
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：手动编排 vs Compose编排</div>
-            <div class="kp-content">
-              <p><strong>手动编排</strong>就像组织一场音乐会，你需要：</p>
-              <p>- 逐个打电话通知每位乐手到场时间</p>
-              <p>- 记住谁先到、谁后到（小提琴手必须在指挥之前到）</p>
-              <p>- 每次演出都要重复这个过程</p>
-              <p>- 如果有新乐手加入，需要重新协调所有人</p>
-              <p><strong>Compose编排</strong>就像有一份演出计划表：</p>
-              <p>- 计划表上写明了所有乐手的到场时间和顺序</p>
-              <p>- 只需要发布一次计划表，所有人按表行动</p>
-              <p>- 每次演出都按同一份计划表执行，不会出错</p>
-              <p>- 修改计划表后，所有人自动按新计划行动</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -636,7 +605,7 @@ $ docker compose exec [服务名称] bash</code></pre>
           </div>
 
           <p class="paragraph">
-            可以把YAML理解为一种"有格式的文本"，用来描述数据的结构。就像填写表格一样，YAML通过简单的规则让计算机理解你想要表达的信息。Docker Compose使用YAML格式来定义多容器应用的配置。
+            可以把YAML理解为一种"有格式的文本"，用来描述数据的结构。YAML通过简单的规则让计算机理解你想要表达的信息。Docker Compose使用YAML格式来定义多容器应用的配置。
           </p>
 
           <div class="knowledge-point">
@@ -876,25 +845,6 @@ volumes:
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：Compose文件就像建筑施工图</div>
-            <div class="kp-content">
-              <p>想象你要建造一栋房子，需要一份完整的施工图：</p>
-              <p><strong>services（服务）</strong> = 房间</p>
-              <p>- 客厅（web服务）：接待访客</p>
-              <p>- 厨房（api服务）：处理业务逻辑</p>
-              <p>- 储藏室（db服务）：存储数据</p>
-              <p>每个房间有自己的功能，但都是房子的一部分。</p>
-              <p><strong>networks（网络）</strong> = 走廊和门</p>
-              <p>- 走廊连接各个房间，让人可以在房间之间移动</p>
-              <p>- 有些房间之间有门（同一网络），可以直接互通</p>
-              <p>- 有些房间之间没有门（不同网络），需要绕路</p>
-              <p><strong>volumes（数据卷）</strong> = 保险柜</p>
-              <p>- 即使房子拆了重建（容器删除重建），保险柜里的贵重物品（数据）依然保留</p>
-              <p>- 保险柜可以从旧房子搬到新房子（数据卷可以挂载到新容器）</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
             <div class="kp-title">为什么使用YAML格式？</div>
             <div class="kp-content">
               <p>Docker Compose选择YAML格式而不是JSON或XML，主要原因是：</p>
@@ -1105,8 +1055,8 @@ volumes:
             </div>
             <pre><code>services:
   web:
-    image: myapp:latest
-    
+    image: nginx:alpine        # 演示用，实际替换为你自己的应用镜像
+
     # 方式1：直接在docker-compose.yml中定义（适合简单场景）
     environment:
       - NODE_ENV=production
@@ -1114,8 +1064,8 @@ volumes:
       - DB_PORT=3306
 
   api:
-    image: myapi:latest
-    
+    image: nginx:alpine        # 演示用，实际替换为你自己的应用镜像
+
     # 方式2：键值对形式（更简洁）
     environment:
       API_KEY: "123456789"
@@ -1171,21 +1121,6 @@ REDIS_PORT=6379</code></pre>
               <p>2. <span class="key-point">.env文件</span>：通过env_file加载的变量</p>
               <p>3. <span class="key-point">宿主机环境变量</span>：运行docker compose命令时的shell环境变量</p>
               <p>例如，如果docker-compose.yml中设置了<code>DB_HOST=mysql</code>，即使.env文件中设置了<code>DB_HOST=postgres</code>，最终容器内的DB_HOST也是mysql。</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：环境变量就像遥控器的频道设置</div>
-            <div class="kp-content">
-              <p>想象你有一台电视机（容器），它可以接收不同的频道（配置）：</p>
-              <p><strong>硬编码配置</strong>（不使用环境变量）：</p>
-              <p>- 电视机出厂时就固定了只能看CCTV-1</p>
-              <p>- 如果想看其他频道，必须拆开电视机重新焊接电路板</p>
-              <p><strong>环境变量配置</strong>：</p>
-              <p>- 电视机出厂时预留了遥控器接口</p>
-              <p>- 通过遥控器（环境变量）可以随时切换频道</p>
-              <p>- 同一台电视机，在家里看新闻（开发环境），在办公室看财经（生产环境）</p>
-              <p>- 不需要修改电视机本身（不需要重新构建镜像）</p>
             </div>
           </div>
 
@@ -1297,6 +1232,13 @@ networks:
 
 volumes:
   db-data:</code></pre>
+          </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">build 片段需要你自己的源码</div>
+            <div class="highlight-content">
+              <p>凡是用 <code>build: ./xxx</code> 的服务，都要求对应目录里有你自己的代码和 <code>Dockerfile</code>，否则 <code>docker compose up --build</code> 会报找不到 Dockerfile。本节是<strong>语法演示</strong>；完整可运行的 build 实例见 3.3 的 Flask 应用（会用 <code>cat</code> 现场创建 app 代码与 Dockerfile）。</p>
+            </div>
           </div>
 
           <div class="knowledge-point">
@@ -1476,10 +1418,35 @@ volumes:
 
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">步骤4：创建测试文件</span>
+              <span class="code-title">步骤4：创建Nginx配置与测试文件</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># 创建PHP测试文件
+            <pre><code># 创建Nginx配置：把 .php 请求转发给 php-fpm，否则PHP不会执行
+$ cat > nginx.conf << 'EOF'
+events {}
+http {
+    include       /etc/nginx/mime.types;
+    server {
+        listen 80;
+        root /var/www/html;
+        index index.php index.html;
+
+        location / {
+            try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # .php 请求交给 php 服务（php-fpm）的 9000 端口处理
+        location ~ \.php$ {
+            fastcgi_pass php:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+}
+EOF
+
+# 创建PHP测试文件
 $ cat > html/index.php << 'EOF'
 &lt;?php echo "&lt;h1&gt;LEMP Stack is Working!&lt;/h1&gt;"; ?&gt;
 &lt;p&gt;PHP Version: &lt;?php echo phpversion(); ?&gt;&lt;/p&gt;
@@ -1617,11 +1584,8 @@ services:
   # 作用：存储会话、缓存数据、计数器等
   redis:
     image: redis:alpine
-    # 使用自定义配置文件启动
-    command: redis-server /usr/local/etc/redis/redis.conf
+    # 直接用默认配置启动即可（如需自定义，再挂载 redis.conf 并加 command）
     volumes:
-      # 挂载配置文件
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       # 持久化Redis数据
       - redis-data:/data
     networks:
@@ -1776,6 +1740,13 @@ volumes:
   user-db-data:
   order-db-data:</code></pre>
           </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">这是架构示例，不能直接 docker compose up</div>
+            <div class="highlight-content">
+              <p>上面的微服务配置用于展示<strong>编排结构</strong>。其中 <code>user-service</code>、<code>order-service</code> 用的是 <code>build:</code>，需要你在对应目录里准备<strong>自己的源码和 Dockerfile</strong>；<code>gateway</code> 还需要一份 <code>gateway.conf</code>。这些文件本讲未提供，因此该片段<strong>不能照抄直接运行</strong>。要动手实操，请使用前面的 LEMP / Flask 示例，或把 <code>build:</code> 换成现成的官方镜像。</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1863,6 +1834,22 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY app.py .
 CMD ["python", "app.py"]
+EOF
+
+# 创建Nginx反向代理配置（compose里的nginx服务会挂载它，否则nginx启动失败）
+$ cat > nginx/nginx.conf << 'EOF'
+events {}
+http {
+    upstream flask {
+        server web:5000;
+    }
+    server {
+        listen 80;
+        location / {
+            proxy_pass http://flask;
+        }
+    }
+}
 EOF</code></pre>
           </div>
 
@@ -1945,7 +1932,7 @@ $ docker compose down</code></pre>
     # 但web不会等待api和db"就绪"，只是等待它们"启动"
 
   api:
-    image: myapi:latest
+    image: nginx:alpine        # 演示用，实际替换为你自己的应用镜像
     depends_on:
       - db
       - redis
@@ -1967,23 +1954,6 @@ $ docker compose down</code></pre>
               <p>- 例如数据库容器启动了，但数据库服务可能还在初始化</p>
               <p>- 应用容器可能会因为连接不上数据库而报错退出</p>
               <p>- 解决方案：使用健康检查（healthcheck）或重试机制</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：depends_on就像排队等号</div>
-            <div class="kp-content">
-              <p>想象你去银行办业务，需要先取号，再等叫号：</p>
-              <p><strong>depends_on的行为</strong>（只管排队顺序）：</p>
-              <p>- 系统确保你在A先生之后取号</p>
-              <p>- 但不保证A先生已经办完业务</p>
-              <p>- 你可能取到号了，但A先生还在柜台办理</p>
-              <p>- 如果你的业务依赖A先生办完（比如A是你的担保人），你还是要等</p>
-              <p><strong>healthcheck的行为</strong>（等待真正就绪）：</p>
-              <p>- 不仅确保A先生先取号</p>
-              <p>- 还会等待A先生办完业务、拿到回执</p>
-              <p>- 确认A先生完全办好了，你才开始办理</p>
-              <p>- 这样你的业务就不会因为依赖未满足而失败</p>
             </div>
           </div>
 
@@ -2050,7 +2020,7 @@ $ docker compose down</code></pre>
       start_period: 10s
 
   web:
-    image: myapp:latest
+    image: nginx:alpine        # 演示用，实际替换为你自己的应用镜像
     depends_on:
       db:
         # 只有当db健康检查通过后，web才会启动
@@ -2093,10 +2063,10 @@ $ docker compose down</code></pre>
 
   # Web应用健康检查（HTTP接口）
   web:
-    image: myweb:latest
+    image: nginx:alpine
     healthcheck:
-      # 使用curl检查HTTP接口是否响应
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      # 用wget检查HTTP接口是否响应（nginx:alpine自带busybox wget，无需curl）
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
       interval: 10s
       timeout: 5s
       retries: 3</code></pre>
@@ -2120,25 +2090,6 @@ $ docker compose down</code></pre>
               <p>3. start_period后，开始正式检查</p>
               <p>4. 连续成功1次 → healthy状态</p>
               <p>5. 连续失败retries次 → unhealthy状态</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：健康检查就像体检</div>
-            <div class="kp-content">
-              <p>想象容器是一个员工，健康检查就是定期体检：</p>
-              <p><strong>interval（检查间隔）</strong> = 体检频率</p>
-              <p>- 每5秒检查一次，就像每5秒量一次体温</p>
-              <p>- 频率太高浪费资源，频率太低发现问题太晚</p>
-              <p><strong>timeout（超时时间）</strong> = 体检时限</p>
-              <p>- 如果3秒内没有完成检查，认为检查失败</p>
-              <p>- 就像体检时如果医生3秒内没有得到回应，认为员工昏迷了</p>
-              <p><strong>retries（重试次数）</strong> = 确诊标准</p>
-              <p>- 连续3次体检不合格，才认定员工真的生病了</p>
-              <p>- 避免偶然的网络抖动导致误判</p>
-              <p><strong>start_period（启动宽限期）</strong> = 新员工适应期</p>
-              <p>- 新员工刚入职10秒内，体检不合格不算数</p>
-              <p>- 给服务足够的初始化时间</p>
             </div>
           </div>
 
@@ -2211,7 +2162,7 @@ $ docker compose up -d --scale web=3 --scale api=2
 
   # Web应用服务（3个副本）
   web:
-    image: myweb:latest
+    image: nginx:alpine        # 演示用，实际替换为你自己的应用镜像
     # 不暴露端口（通过Nginx反向代理访问）
     # 每个副本会自动分配不同的内部端口
     deploy:
@@ -2221,7 +2172,7 @@ $ docker compose up -d --scale web=3 --scale api=2
 # nginx.conf配置示例：
 # upstream backend {
 #     # Compose会自动将web服务名解析到所有副本
-#     server web:5000;
+#     server web:80;
 # }
 # 
 # server {
@@ -2256,23 +2207,6 @@ $ docker compose up -d --scale web=3 --scale api=2
             </div>
           </div>
 
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：扩展服务就像增加收银台</div>
-            <div class="kp-content">
-              <p>想象一个超市，顾客排队结账：</p>
-              <p><strong>无状态服务扩展</strong>（收银台）：</p>
-              <p>- 平时2个收银台够用</p>
-              <p>- 周末人多，开放6个收银台</p>
-              <p>- 每个收银台功能完全相同，顾客去哪个都一样</p>
-              <p>- 这就是Web服务的水平扩展</p>
-              <p><strong>有状态服务扩展</strong>（银行柜台）：</p>
-              <p>- 你在1号柜台办理业务，办到一半</p>
-              <p>- 不能随便切换到2号柜台继续办理</p>
-              <p>- 因为1号柜台的工作人员记录了你的办理进度</p>
-              <p>- 这就是数据库等有状态服务，不能简单扩展</p>
-            </div>
-          </div>
-
           <div class="code-block">
             <div class="code-header">
               <span class="code-title">服务扩展实战举例：电商网站高峰期扩容</span>
@@ -2284,7 +2218,7 @@ $ docker compose up -d --scale web=3 --scale api=2
 # 平时配置（docker-compose.yml中）
 services:
   web:
-    image: myshop-web:latest
+    image: nginx:alpine        # 演示用，实际替换为你自己的电商应用镜像
     deploy:
       replicas: 2  # 平时2个副本
 
@@ -2358,7 +2292,7 @@ $ docker compose up -d --scale web=2
 
   # 后端API服务
   backend:
-    image: myapi:latest
+    image: nginx:alpine        # 演示用，实际替换为你自己的API镜像
     networks:
       # 同时连接两个网络
       - web-net    # 接收前端请求
@@ -2435,25 +2369,6 @@ volumes:
           </div>
 
           <div class="knowledge-point">
-            <div class="kp-title">生活类比：网络隔离就像公司的门禁系统</div>
-            <div class="kp-content">
-              <p>想象一栋办公楼，有不同的安全区域：</p>
-              <p><strong>web-net（前台网络）</strong> = 公共区域</p>
-              <p>- 访客可以进入前台（frontend服务）</p>
-              <p>- 前台可以联系办公区（backend服务）</p>
-              <p>- 但访客不能直接进入办公区</p>
-              <p><strong>db-net（后台网络）</strong> = 机密区域</p>
-              <p>- 只有持有特殊门卡的员工（backend服务）才能进入</p>
-              <p>- 数据库（database服务）在机密区域内</p>
-              <p>- 访客和前台人员都无法进入</p>
-              <p><strong>backend服务</strong> = 持有两张门卡的员工</p>
-              <p>- 可以在前台接待访客（连接web-net）</p>
-              <p>- 也可以进入机密区域查询数据（连接db-net）</p>
-              <p>- 起到桥梁作用，但不会让访客直接接触机密信息</p>
-            </div>
-          </div>
-
-          <div class="knowledge-point">
             <div class="kp-title">网络隔离的实际应用场景</div>
             <div class="kp-content">
               <p><strong>场景1：多租户系统</strong></p>
@@ -2472,25 +2387,6 @@ volumes:
             </div>
           </div>
 
-          <div class="knowledge-point">
-            <div class="kp-title">生活类比：数据卷就像不同类型的存储柜</div>
-            <div class="kp-content">
-              <p><strong>命名数据卷</strong> = 银行保险柜</p>
-              <p>- 银行（Docker）帮你管理，你只需要记住柜号（卷名）</p>
-              <p>- 即使你搬家（容器删除），保险柜里的东西还在</p>
-              <p>- 需要时可以重新打开（挂载到新容器）</p>
-              <p><strong>宿主机挂载</strong> = 家里的书架</p>
-              <p>- 你可以随时查看和修改书架上的书（文件）</p>
-              <p>- 书架在你家（宿主机），位置固定</p>
-              <p>- 适合经常需要查看和修改的东西</p>
-              <p><strong>只读挂载</strong> = 博物馆展柜</p>
-              <p>- 可以看，但不能碰（只读）</p>
-              <p>- 保护重要文物（配置文件）不被破坏</p>
-              <p><strong>临时卷</strong> = 购物车</p>
-              <p>- 购物时临时存放商品（临时数据）</p>
-              <p>- 结账后（容器删除）购物车就清空了</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -2809,7 +2705,7 @@ $ docker compose down -v</code></pre>
               <p><strong>解决</strong>：</p>
               <p>1. 确认所有服务都加入了同一个网络</p>
               <p>2. 检查连接地址是否使用了正确的服务名（不是localhost或127.0.0.1）</p>
-              <p>3. 使用<code>docker compose exec [服务名] ping -c 3 [目标服务名]</code>测试网络连通性（-c 3表示发送3个包后停止）</p>
+              <p>3. 用<code>docker compose exec [服务名] nslookup [目标服务名]</code>测试服务名能否解析；Alpine镜像不含<code>ping</code>，可改用<code>nslookup</code>或<code>wget -qO- http://[目标服务名]:[端口]</code></p>
               <p>4. 检查防火墙设置是否阻止了容器间通信</p>
             </div>
           </div>
@@ -2869,8 +2765,8 @@ $ docker compose exec [服务名] sh
 # 或如果有bash
 $ docker compose exec [服务名] bash
 
-# 在容器内测试网络连通性（-c 3 表示发送3个包后停止，避免无限ping）
-$ docker compose exec web ping -c 3 db
+# 在容器内测试服务名能否解析（Alpine镜像不含ping，用nslookup测DNS）
+$ docker compose exec web nslookup db
 
 # 查看容器详细信息（包括网络、挂载等）
 $ docker inspect [容器名]
@@ -2936,9 +2832,9 @@ services:
         reservations:
           cpus: '0.25'       # 预留25% CPU
           memory: 256M       # 预留256MB内存
-    # 健康检查
+    # 健康检查（nginx:alpine自带busybox wget，无需curl）
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
