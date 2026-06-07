@@ -869,9 +869,11 @@ $ docker run -d \
 http://localhost:9100/metrics
 
 # 抓几个典型的主机指标看看
-$ curl -s http://localhost:9100/metrics | grep -E "node_memory_MemAvailable|node_filesystem_avail" | head -3
-# node_memory_MemAvailable_bytes 2.1e+09   ← 可用内存
-# node_filesystem_avail_bytes{...} 5.0e+10  ← 磁盘可用空间</code></pre>
+# 用 ^ 锚定，过滤掉开头的 # HELP / # TYPE 注释行，只看真正的指标值
+$ curl -s http://localhost:9100/metrics | grep -E "^(node_memory_MemAvailable|node_filesystem_avail)"
+# node_memory_MemAvailable_bytes 2.1e+09                       ← 可用内存
+# node_filesystem_avail_bytes{mountpoint="/boot/efi"} 2.0e+08  ← 各挂载点会有多行
+# node_filesystem_avail_bytes{mountpoint="/"} 5.0e+10          ← 根文件系统可用空间</code></pre>
           </div>
 
           <div class="knowledge-point">
