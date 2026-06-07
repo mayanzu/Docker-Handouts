@@ -1481,11 +1481,11 @@ volumes:
             </div>
             <pre><code># 创建PHP测试文件
 $ cat > html/index.php << 'EOF'
-<?php echo "<h1>LEMP Stack is Working!</h1>"; ?>
-<p>PHP Version: <?php echo phpversion(); ?></p>
-<p>Web Server: Nginx</p>
-<p>Database: MySQL 8.0</p>
-<p>phpMyAdmin: <a href="http://localhost:8080">http://localhost:8080</a></p>
+&lt;?php echo "&lt;h1&gt;LEMP Stack is Working!&lt;/h1&gt;"; ?&gt;
+&lt;p&gt;PHP Version: &lt;?php echo phpversion(); ?&gt;&lt;/p&gt;
+&lt;p&gt;Web Server: Nginx&lt;/p&gt;
+&lt;p&gt;Database: MySQL 8.0&lt;/p&gt;
+&lt;p&gt;phpMyAdmin: &lt;a href="http://localhost:8080"&gt;http://localhost:8080&lt;/a&gt;&lt;/p&gt;
 EOF
 
 # 修改权限，让Nginx和PHP容器可以读取
@@ -2594,7 +2594,7 @@ volumes:
               <span class="code-lang">Bash</span>
             </div>
             <pre><code># 创建测试页面
-$ echo "<h1>LNMP实验环境部署成功！</h1><p>Nginx + PHP + MySQL</p>" > html/index.html
+$ echo "&lt;h1&gt;LNMP实验环境部署成功！&lt;/h1&gt;&lt;p&gt;Nginx + PHP + MySQL&lt;/p&gt;" > html/index.html
 
 # 修改权限，让Nginx容器可以读取
 $ chmod 644 html/index.html
