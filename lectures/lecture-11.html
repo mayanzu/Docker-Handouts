@@ -164,20 +164,25 @@
         <div class="page-body">
           <div class="code-block">
             <div class="code-header">
-              <span class="code-title">先混个脸熟</span>
+              <span class="code-title">先混个脸熟（仅预览，先别逐行执行）</span>
               <span class="code-lang">Bash</span>
             </div>
-            <pre><code># docker stats：查看容器的实时资源使用（自带的迷你监控）
-$ docker stats
+            <pre><code># 本节只是先认识这几个命令、了解大致用途，
+# 不要现在就逐行执行——它们会在后面对应小节按顺序使用。
+# 尤其 docker compose up -d 会一次拉起整套栈并占用 8080/9090/3000，
+# 现在跑会和后续"单独部署 cAdvisor"等步骤撞端口。
+
+# docker stats：查看容器的实时资源使用（自带的迷你监控）
+docker stats
 
 # docker volume create：创建数据卷，用于持久化监控数据
-$ docker volume create grafana_data
+docker volume create grafana_data
 
-# curl /metrics：手动抓一次指标，看看长什么样
-$ curl http://localhost:8080/metrics | head -20
+# curl /metrics：手动抓一次指标，看看长什么样（需先部署 cAdvisor）
+curl http://localhost:8080/metrics | head -20
 
-# docker compose up -d：用Compose一键拉起整套监控栈
-$ docker compose up -d</code></pre>
+# docker compose up -d：用Compose一键拉起整套监控栈（见 Part 5 实验）
+docker compose up -d</code></pre>
           </div>
 
           <div class="note-box" style="margin-top: 1rem;">
