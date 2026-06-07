@@ -805,6 +805,7 @@ $ docker run -d \
             <div class="highlight-title">镜像地址说明</div>
             <div class="highlight-content">
               <p>老教程里的 <code>google/cadvisor</code> 镜像（Docker Hub）已经<strong>停止更新多年</strong>。官方现在维护的是 <code>gcr.io/cadvisor/cadvisor</code>。如果国内拉取 <code>gcr.io</code> 困难，可使用镜像加速器，或改用社区维护的兼容镜像。</p>
+              <p><code>prom/prometheus</code>、<code>grafana/grafana</code>、<code>cadvisor</code> 这几个镜像都有数百MB，首次拉取在国内网络下通常要等 <strong>3–5 分钟</strong>，请耐心等待，不要以为是卡住了。</p>
             </div>
           </div>
 
@@ -830,6 +831,7 @@ $ curl -s http://localhost:8080/metrics | grep container_memory_usage_bytes | he
           <div class="tip-box">
             <div class="tip-title">动手理解"翻译官"</div>
             <p>建议亲自 <code>curl</code> 一下 <code>/metrics</code> 端点。你会看到成百上千行 <code>指标名{标签} 数值</code> 的文本。Prometheus要做的，就是定时抓走这一大段文本，按时间存起来。理解了这一步，整个监控链路就通了。</p>
+            <p>实际每行的标签会比上面示例多很多——除了 <code>name</code>、<code>image</code>，还会带 <code>id</code>、<code>container_label_com_docker_compose_*</code> 等一长串，看起来比书里冗长是正常的。查询时用 <code>{name!=""}</code> 这类标签过滤照样有效，不影响使用。</p>
           </div>
 
           <div class="knowledge-point">
@@ -885,6 +887,13 @@ $ docker run -d \
 # --pid=host        共享宿主机进程空间
 # -v /:/host:ro     只读挂载宿主机根目录
 # --path.rootfs     告诉它去/host读取宿主机文件系统</code></pre>
+          </div>
+
+          <div class="highlight-box warning">
+            <div class="highlight-title">关于 -p 9100:9100 与 --net=host 同时出现</div>
+            <div class="highlight-content">
+              <p>用了 <code>--net=host</code> 后容器直接共享宿主机网络，此时 <code>-p 9100:9100</code> 实际<strong>不生效</strong>——Docker会提示 <code>Published ports are discarded when using host network mode</code>。9100端口由宿主机网络直接暴露，浏览器照样能访问 <code>localhost:9100/metrics</code>。这里保留 <code>-p</code> 只作端口的文档标注，看到这条警告属于正常现象，不是报错。</p>
+            </div>
           </div>
 
           <div class="code-block">
@@ -1019,6 +1028,11 @@ http://localhost:9090
 # 点 Execute，能出数据就说明抓取成功</code></pre>
           </div>
 
+          <div class="tip-box">
+            <div class="tip-title">target刚启动时显示 UNKNOWN 是正常的</div>
+            <p>Prometheus刚启动后，Targets页里 cadvisor 可能先显示 <code>UNKNOWN</code>，大约15–30秒后才变成绿色 <code>UP</code>。这是因为 <code>scrape_interval</code> 是15s、首次抓取本身有延迟，并非故障。稍等一两个抓取周期再刷新即可，先别急着排查。</p>
+          </div>
+
           <div class="knowledge-point">
             <div class="kp-title">排查target显示DOWN的思路</div>
             <div class="kp-content">
@@ -1026,7 +1040,7 @@ http://localhost:9090
               <p>1. <span class="key-point">检查是否同网络</span>：Prometheus和目标必须在同一Docker网络</p>
               <p>2. <span class="key-point">检查服务名拼写</span>：targets里的名字要和容器/服务名完全一致</p>
               <p>3. <span class="key-point">检查端口</span>：cAdvisor是8080，Node Exporter是9100，别写错</p>
-              <p>4. <span class="key-point">手动测试</span>：进入Prometheus容器 <code>docker exec -it prometheus sh</code>，再 <code>wget -qO- http://cadvisor:8080/metrics</code> 看能否抓到</p>
+              <p>4. <span class="key-point">手动测试连通性</span>：用一次性curl容器接入同一网络验证 <code>docker run --rm --network &lt;监控网络名&gt; curlimages/curl -s http://cadvisor:8080/metrics | head</code>。注意 <code>prom/prometheus</code> 镜像内不含 wget/curl，所以不在Prometheus容器里测</p>
             </div>
           </div>
         </div>
@@ -1596,7 +1610,7 @@ $ docker compose ps
               <p><strong>解决</strong>：</p>
               <p>1. 确认三个服务都在 <code>monitor-net</code>（用Compose默认满足）</p>
               <p>2. 确认prometheus.yml里写的是 <code>cadvisor:8080</code> 而非localhost</p>
-              <p>3. 进容器测试：<code>docker exec -it prometheus sh</code> 再 <code>wget -qO- http://cadvisor:8080/metrics</code></p>
+              <p>3. 测试网络连通：<code>docker run --rm --network &lt;监控网络名&gt; curlimages/curl -s http://cadvisor:8080/metrics | head</code>（用一次性curl容器，因为 <code>prom/prometheus</code> 镜像不含 wget/curl）</p>
             </div>
           </div>
 
@@ -1651,8 +1665,10 @@ $ docker compose ps
 # 看某个服务日志
 $ docker compose logs -f prometheus
 
-# 进Prometheus容器测试能否抓到cAdvisor
-$ docker exec -it prometheus sh -c "wget -qO- http://cadvisor:8080/metrics | head"
+# 测试能否解析服务名并抓到cAdvisor（用一次性curl容器接入监控网络）
+# 注意：prom/prometheus镜像内不含wget/curl，所以不在Prometheus容器里测
+$ docker run --rm --network monitoring-stack_monitor-net \
+    curlimages/curl -s http://cadvisor:8080/metrics | head
 
 # 确认它们在同一网络、能解析服务名
 $ docker network inspect monitoring-stack_monitor-net</code></pre>
