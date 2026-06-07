@@ -1190,12 +1190,17 @@ http://localhost:3000
             </div>
           </div>
 
+          <div class="note-box" style="margin-top: 1rem;">
+            <p><strong>关于Grafana版本</strong>：下面的菜单路径以 <strong>Grafana 11/13</strong> 新版 UI 为准（新建/导入都走右上角的 <strong>New</strong> 按钮）。如果你用的是 v9 及更早版本，对应入口在左侧 <code>Dashboards → New</code> 下，功能一样、位置略有不同。各步已同时标注新旧路径。</p>
+          </div>
+
           <div class="code-block">
             <div class="code-header">
               <span class="code-title">添加Prometheus数据源（操作步骤）</span>
               <span class="code-lang">操作步骤</span>
             </div>
-            <pre><code># 1. 左侧菜单 Connections -> Data sources -> Add data source
+            <pre><code># 1. 左侧菜单 Connections -> Data sources -> Add new data source
+#    （旧版按钮叫 "Add data source"）
 # 2. 选择 "Prometheus"
 # 3. 配置连接：
 #    Name: Prometheus
@@ -1239,7 +1244,8 @@ http://localhost:3000
               <span class="code-title">方式一：手动创建一个面板</span>
               <span class="code-lang">操作步骤</span>
             </div>
-            <pre><code># 1. 左侧菜单 Dashboards -> New -> New dashboard
+            <pre><code># 1. 右上角 "New" 按钮 -> New dashboard
+#    （旧版：左侧 Dashboards -> New -> New dashboard）
 # 2. 点击 "Add visualization"，选择Prometheus数据源
 # 3. 在下方Query区域，把PromQL粘进去，例如：
 #    rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100
@@ -1273,7 +1279,8 @@ count(container_last_seen{name!=""})</code></pre>
               <span class="code-lang">操作步骤</span>
             </div>
             <pre><code># Grafana社区有上万个免费仪表盘，导入ID即可一键生成
-# 1. 左侧菜单 Dashboards -> New -> Import
+# 1. 右上角 "New" 按钮 -> Import dashboard
+#    （旧版：左侧 Dashboards -> New -> Import）
 # 2. 在 "Import via grafana.com" 输入仪表盘ID，点Load
 # 3. 选择Prometheus数据源，点Import
 
@@ -1530,12 +1537,12 @@ $ docker compose ps
               <span class="code-lang">操作步骤</span>
             </div>
             <pre><code># 步骤5：访问 http://localhost:3000 （admin/admin）
-#   Connections -> Data sources -> Add -> Prometheus
+#   Connections -> Data sources -> Add new data source -> Prometheus
 #   URL 填 http://prometheus:9090
 #   Save & test 出现绿色成功提示
 
 # 步骤6：导入现成仪表盘
-#   Dashboards -> New -> Import
+#   右上角 New -> Import dashboard（旧版：Dashboards -> New -> Import）
 #   输入ID 14282（cAdvisor exporter）-> Load -> 选数据源 -> Import
 #   即可看到所有容器的CPU、内存、网络实时曲线</code></pre>
           </div>
