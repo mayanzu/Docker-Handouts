@@ -383,9 +383,7 @@ EOF</code></pre>
               <span class="code-title">步骤4：编写docker-compose.yml配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   web:
     image: nginx:alpine
     ports:
@@ -793,9 +791,9 @@ $ vim docker-compose.yml
               <span class="code-title">步骤2：docker-compose.yml基本结构详解</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code># 版本声明（可选，但建议指定）
-# 不同版本支持不同的功能特性
-version: "3.8"
+            <pre><code># 提示：旧教程常在开头写 version: "3.8"，新版 Docker Compose
+#       已废弃该字段（写了会提示 "version is obsolete"），直接从
+#       services 开始即可，本讲示例统一不再写 version。
 
 # 服务定义（核心部分）
 # services是一个字典，每个键对应一个服务
@@ -1335,9 +1333,7 @@ $ vim docker-compose.yml
               <span class="code-title">步骤3：编写LEMP栈配置内容（完整注释版）</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   # Nginx Web服务器
   # 作用：接收用户请求，转发给PHP处理，返回结果
   nginx:
@@ -1544,9 +1540,7 @@ $ vim docker-compose.yml
               <span class="code-title">步骤4：编写docker-compose.yml配置（Flask应用）</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   # Flask Web应用
   web:
     build: ./app            # 从app目录构建镜像
@@ -1670,9 +1664,7 @@ $ vim docker-compose.yml</code></pre>
               <span class="code-title">微服务架构 docker-compose.yml 配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   # API网关（统一入口）
   gateway:
     image: nginx:alpine
@@ -2446,9 +2438,7 @@ $ vim docker-compose.yml
               <span class="code-title">docker-compose.yml配置内容（实验用）</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   nginx:
     image: nginx:alpine
     ports:
@@ -2577,9 +2567,7 @@ $ vim docker-compose.yml
               <span class="code-title">WordPress docker-compose.yml配置内容</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   wordpress:
     image: wordpress:latest
     ports:
@@ -2812,9 +2800,7 @@ $ docker volume inspect [卷名]</code></pre>
               <span class="code-title">生产环境配置示例</span>
               <span class="code-lang">YAML</span>
             </div>
-            <pre><code>version: "3.8"
-
-services:
+            <pre><code>services:
   web:
     image: nginx:1.24-alpine  # 指定具体版本
     ports:
