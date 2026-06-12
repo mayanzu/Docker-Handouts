@@ -947,6 +947,26 @@ scrape_configs:
             <p>这正是第九讲"自定义网络DNS服务发现"的应用！Prometheus、cAdvisor、Node Exporter必须在<strong>同一个Docker自定义网络</strong>里，这样Prometheus才能用 <code>cadvisor:8080</code>（服务名）访问到cAdvisor。如果写 <code>localhost:8080</code>，Prometheus只会去找自己容器内的8080端口，根本抓不到cAdvisor。这是新手最常踩的坑。</p>
           </div>
 
+          <div class="tip-box">
+            <div class="tip-title">云服务器注意：服务名解析失败怎么办？</div>
+            <p>在阿里云、腾讯云等云服务器上，宿主机的 <code>/etc/resolv.conf</code> 常被配置为外部 DNS（如 <code>100.96.0.2</code>）。Docker 默认会把这份配置复制进容器，<strong>覆盖掉 Docker 内建 DNS <code>127.0.0.11</code></strong>，导致 Prometheus 解析 <code>cadvisor</code> 等服务名时报错：</p>
+            <p><code>Error scraping target: Get "http://cadvisor:8080/metrics": dial tcp: lookup cadvisor on 100.96.0.2:53: no such host</code></p>
+            <p>如果确认服务名、网络、端口都没错，但仍然出现上述报错，请显式指定使用 Docker 内建 DNS：</p>
+            <p><strong>Compose 写法（推荐）</strong>：给 <code>prometheus</code> 和 <code>cadvisor</code> 服务都加上：</p>
+            <pre style="background:#f5f5f5;padding:0.5rem;border-radius:4px;margin:0.5rem 0;"><code>services:
+  prometheus:
+    dns:
+      - 127.0.0.11
+  cadvisor:
+    dns:
+      - 127.0.0.11</code></pre>
+            <p><strong>docker run 写法</strong>：加上 <code>--dns 127.0.0.11</code>：</p>
+            <pre style="background:#f5f5f5;padding:0.5rem;border-radius:4px;margin:0.5rem 0;"><code>$ docker run -d --name prometheus --dns 127.0.0.11 ...</code></pre>
+            <p><strong>验证</strong>：修复后进入容器查看 <code>/etc/resolv.conf</code>，应看到 <code>nameserver 127.0.0.11</code>：</p>
+            <pre style="background:#f5f5f5;padding:0.5rem;border-radius:4px;margin:0.5rem 0;"><code>$ docker exec prometheus cat /etc/resolv.conf</code></pre>
+            <p>本地 Docker Desktop / 标准 Linux 通常不会触发这个问题，但云服务器环境建议主动加上 DNS 配置，避免踩坑。</p>
+          </div>
+
           <div class="code-block">
             <div class="code-header">
               <span class="code-title">启动Prometheus</span>
@@ -1006,7 +1026,8 @@ http://localhost:9090
               <p>1. <span class="key-point">检查是否同网络</span>：Prometheus和目标必须在同一Docker网络</p>
               <p>2. <span class="key-point">检查服务名拼写</span>：targets里的名字要和容器/服务名完全一致</p>
               <p>3. <span class="key-point">检查端口</span>：cAdvisor是8080，Node Exporter是9100，别写错</p>
-              <p>4. <span class="key-point">手动测试连通性</span>：用一次性curl容器接入同一网络验证 <code>docker run --rm --network &lt;监控网络名&gt; curlimages/curl -s http://cadvisor:8080/metrics | head</code>。注意 <code>prom/prometheus</code> 镜像内不含 wget/curl，所以不在Prometheus容器里测</p>
+              <p>4. <span class="key-point">检查容器DNS</span>：云服务器常见，宿主机外部DNS会覆盖Docker内建DNS，导致服务名无法解析。给相关服务加上 <code>dns: 127.0.0.11</code>（详见3.4节tip-box）</p>
+              <p>5. <span class="key-point">手动测试连通性</span>：用一次性curl容器接入同一网络验证 <code>docker run --rm --network &lt;监控网络名&gt; curlimages/curl -s http://cadvisor:8080/metrics | head</code>。注意 <code>prom/prometheus</code> 镜像内不含 wget/curl，所以不在Prometheus容器里测</p>
             </div>
           </div>
         </div>
@@ -1466,6 +1487,9 @@ EOF</code></pre>
     volumes:
       # 挂载抓取配置（与本文件同目录）
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    # 显式指定 Docker 内建 DNS，避免云服务器宿主机外部 DNS 覆盖导致服务名解析失败
+    dns:
+      - 127.0.0.11
     networks:
       - monitor-net
 
@@ -1481,6 +1505,9 @@ EOF</code></pre>
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true
+    # 与 prometheus 保持一致，确保在所有环境下都能正确解析服务名
+    dns:
+      - 127.0.0.11
     networks:
       - monitor-net
 
